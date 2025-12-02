@@ -66,6 +66,7 @@ import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
 
+//
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
@@ -75,12 +76,12 @@ Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
-  
+
   await NotificationService.I.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
@@ -89,13 +90,15 @@ Future<void> main() async {
       await NotificationService.I.showNow(
         id: (n.title ?? 'msg').hashCode ^ (n.body ?? '').hashCode,
         title: n.title ?? 'Mensaje',
-        body:  n.body  ?? '',
+        body: n.body ?? '',
       );
     }
   });
   FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
   if (kIsWeb) {
-    await fb_auth.FirebaseAuth.instance.setPersistence(fb_auth.Persistence.LOCAL);
+    await fb_auth.FirebaseAuth.instance.setPersistence(
+      fb_auth.Persistence.LOCAL,
+    );
   }
 
   try {
@@ -127,10 +130,10 @@ class _MyAppState extends State<MyApp> {
   BackgroundStyle _bgStyle = BackgroundStyle.none;
   bool _loaded = false;
 
-  final _foodSvc    = FoodFirestoreService('local');
+  final _foodSvc = FoodFirestoreService('local');
 
   final _gymService = GymFirestoreService();
-  final _studySvc   = StudyFirestoreService();
+  final _studySvc = StudyFirestoreService();
 
   StreamSubscription<String>? _notifSub;
 
@@ -139,7 +142,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadPrefs();
     _askNotifPermission();
-    NotificationService.I.scheduleHabitDailyReminder(const TimeOfDay(hour: 0, minute: 0));
+    NotificationService.I.scheduleHabitDailyReminder(
+      const TimeOfDay(hour: 0, minute: 0),
+    );
 
     _notifSub = NotificationService.I.onPayload.listen((p) {
       if (p == 'OPEN_HABITS') {
@@ -206,13 +211,14 @@ class _MyAppState extends State<MyApp> {
         theme: _safe(AppTheme.getLight(_preset)),
         darkTheme: _safe(AppTheme.getDark(_preset)),
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
-        scrollBehavior: const MaterialScrollBehavior().copyWith(scrollbars: false),
-
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          scrollbars: false,
+        ),
       );
     }
 
     final light = _safe(AppTheme.getLight(_preset));
-    final dark  = _safe(AppTheme.getDark(_preset));
+    final dark = _safe(AppTheme.getDark(_preset));
 
     return StreamBuilder<fb_auth.User?>(
       stream: fb_auth.FirebaseAuth.instance.authStateChanges(),
@@ -232,43 +238,60 @@ class _MyAppState extends State<MyApp> {
             GlobalCupertinoLocalizations.delegate,
             FlutterQuillLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('es', 'ES'),
-            Locale('en', 'US'),
-          ],
-          scrollBehavior: const MaterialScrollBehavior().copyWith(scrollbars: false),
+          supportedLocales: const [Locale('es', 'ES'), Locale('en', 'US')],
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            scrollbars: false,
+          ),
 
           builder: (context, child) {
             final mq = MediaQuery.of(context);
             final padded = mq.copyWith(
-              padding: mq.padding + const EdgeInsets.only(bottom: kFabAvoidHeight),
+              padding:
+                  mq.padding + const EdgeInsets.only(bottom: kFabAvoidHeight),
             );
             return MediaQuery(
               data: padded,
-              child: AppBackground(style: _bgStyle, child: child ?? const SizedBox.shrink() ),
+              child: AppBackground(
+                style: _bgStyle,
+                child: child ?? const SizedBox.shrink(),
+              ),
             );
           },
 
-          home: user == null
-              ? const _AuthScreen()
-              : HomeScreen(toggleTheme: toggleTheme, themeMode: _themeMode),
+          home:
+              user == null
+                  ? const _AuthScreen()
+                  : HomeScreen(toggleTheme: toggleTheme, themeMode: _themeMode),
 
           routes: {
-            '/settings': (_) => SettingsScreen(
+            '/settings':
+                (_) => SettingsScreen(
                   currentPreset: _preset,
                   currentMode: _themeMode,
                   currentBackground: _bgStyle,
                   onChangePreset: (p) {
                     setState(() => _preset = p);
-                    ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
+                    ThemePrefs.save(
+                      preset: _preset,
+                      mode: _themeMode,
+                      bg: _bgStyle,
+                    );
                   },
                   onChangeMode: (m) {
                     setState(() => _themeMode = m);
-                    ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
+                    ThemePrefs.save(
+                      preset: _preset,
+                      mode: _themeMode,
+                      bg: _bgStyle,
+                    );
                   },
                   onChangeBackground: (b) {
                     setState(() => _bgStyle = b);
-                    ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
+                    ThemePrefs.save(
+                      preset: _preset,
+                      mode: _themeMode,
+                      bg: _bgStyle,
+                    );
                   },
                 ),
             '/modules': (_) => const ModulesScreen(),
@@ -313,7 +336,8 @@ class _MyAppState extends State<MyApp> {
             '/gym/analytics': (_) => GymAnalyticsScreen(svc: _gymService),
             '/gym/goals': (_) => GymGoalsScreen(svc: _gymService),
             '/gym/body/weight': (_) => BodyweightScreen(svc: _gymService),
-            '/gym/body/measurements': (_) => MeasurementsScreen(svc: _gymService),
+            '/gym/body/measurements':
+                (_) => MeasurementsScreen(svc: _gymService),
 
             '/study': (_) => StudyHomeScreen(svc: _studySvc),
             '/study/timer': (_) => StudyTimerScreen(svc: _studySvc),
@@ -362,15 +386,19 @@ class _AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<_AuthScreen> {
   final _email = TextEditingController();
-  final _pass  = TextEditingController();
+  final _pass = TextEditingController();
   bool _busy = false;
   String? _err;
 
   Future<void> _signin() async {
-    setState(() { _busy = true; _err = null; });
+    setState(() {
+      _busy = true;
+      _err = null;
+    });
     try {
       await fb_auth.FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email.text.trim(), password: _pass.text,
+        email: _email.text.trim(),
+        password: _pass.text,
       );
     } on fb_auth.FirebaseAuthException catch (e) {
       setState(() => _err = e.message ?? e.code);
@@ -380,10 +408,14 @@ class _AuthScreenState extends State<_AuthScreen> {
   }
 
   Future<void> _register() async {
-    setState(() { _busy = true; _err = null; });
+    setState(() {
+      _busy = true;
+      _err = null;
+    });
     try {
       await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _email.text.trim(), password: _pass.text,
+        email: _email.text.trim(),
+        password: _pass.text,
       );
     } on fb_auth.FirebaseAuthException catch (e) {
       setState(() => _err = e.message ?? e.code);
@@ -393,12 +425,21 @@ class _AuthScreenState extends State<_AuthScreen> {
   }
 
   Future<void> _google() async {
-    setState(() { _busy = true; _err = null; });
+    setState(() {
+      _busy = true;
+      _err = null;
+    });
     try {
       if (kIsWeb) {
-        await fb_auth.FirebaseAuth.instance.signInWithPopup(fb_auth.GoogleAuthProvider());
+        await fb_auth.FirebaseAuth.instance.signInWithPopup(
+          fb_auth.GoogleAuthProvider(),
+        );
       } else {
-        setState(() => _err = 'Google Sign-In nativo no configurado. Usa email/contraseña.');
+        setState(
+          () =>
+              _err =
+                  'Google Sign-In nativo no configurado. Usa email/contraseña.',
+        );
       }
     } on fb_auth.FirebaseAuthException catch (e) {
       setState(() => _err = e.message ?? e.code);
@@ -419,34 +460,59 @@ class _AuthScreenState extends State<_AuthScreen> {
             margin: const EdgeInsets.all(16),
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email')),
-                const SizedBox(height: 8),
-                TextField(controller: _pass, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Expanded(child: FilledButton(
-                    onPressed: _busy ? null : _signin,
-                    child: _busy ? const SizedBox(height:18,width:18,child:CircularProgressIndicator(strokeWidth:2)) : const Text('Entrar'),
-                  )),
-                  const SizedBox(width: 8),
-                  Expanded(child: OutlinedButton(
-                    onPressed: _busy ? null : _register,
-                    child: const Text('Crear cuenta'),
-                  )),
-                ]),
-                const SizedBox(height: 8),
-                if (kIsWeb)
-                  OutlinedButton.icon(
-                    onPressed: _busy ? null : _google,
-                    icon: const Icon(Icons.account_circle),
-                    label: const Text('Continuar con Google'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _email,
+                    decoration: const InputDecoration(labelText: 'Email'),
                   ),
-                if (_err != null) ...[
                   const SizedBox(height: 8),
-                  Text(_err!, style: TextStyle(color: cs.error)),
-                ]
-              ]),
+                  TextField(
+                    controller: _pass,
+                    decoration: const InputDecoration(labelText: 'Contraseña'),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _busy ? null : _signin,
+                          child:
+                              _busy
+                                  ? const SizedBox(
+                                    height: 18,
+                                    width: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Text('Entrar'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _busy ? null : _register,
+                          child: const Text('Crear cuenta'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (kIsWeb)
+                    OutlinedButton.icon(
+                      onPressed: _busy ? null : _google,
+                      icon: const Icon(Icons.account_circle),
+                      label: const Text('Continuar con Google'),
+                    ),
+                  if (_err != null) ...[
+                    const SizedBox(height: 8),
+                    Text(_err!, style: TextStyle(color: cs.error)),
+                  ],
+                ],
+              ),
             ),
           ),
         ),

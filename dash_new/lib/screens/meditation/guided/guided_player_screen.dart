@@ -46,30 +46,32 @@ class _GuidedPlayerScreenState extends State<GuidedPlayerScreen> {
           _completedLogged = true;
           await _logSession();
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Sesión registrada')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Sesión registrada')));
           }
         }
       });
       setState(() {});
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo cargar el audio: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo cargar el audio: $e')));
     }
   }
 
   Future<void> _logSession() async {
     if (_audio == null) return;
-    await MeditationFirestoreService.I.addSession(MeditationSession(
-      id: '',
-      title: _audio!.title,
-      type: SessionType.guided,
-      durationSec: _audio!.durationSec,
-      date: DateTime.now(),
-    ));
+    await MeditationFirestoreService.I.addSession(
+      MeditationSession(
+        id: '',
+        title: _audio!.title,
+        type: SessionType.guided,
+        durationSec: _audio!.durationSec,
+        date: DateTime.now(),
+      ),
+    );
   }
 
   @override
@@ -120,17 +122,23 @@ class _GuidedPlayerScreenState extends State<GuidedPlayerScreen> {
                     _player.duration ?? Duration(seconds: _audio!.durationSec);
 
                 final safePos = _clampDuration(pos, Duration.zero, total);
-                final maxMs = total.inMilliseconds.toDouble().clamp(1.0, double.infinity);
-                final valMs = safePos.inMilliseconds.toDouble().clamp(0.0, maxMs);
+                final maxMs = total.inMilliseconds.toDouble().clamp(
+                  1.0,
+                  double.infinity,
+                );
+                final valMs = safePos.inMilliseconds.toDouble().clamp(
+                  0.0,
+                  maxMs,
+                );
 
                 return Column(
                   children: [
                     Slider(
                       value: valMs,
                       max: maxMs,
-                      onChanged: (v) => _player.seek(
-                        Duration(milliseconds: v.toInt()),
-                      ),
+                      onChanged:
+                          (v) =>
+                              _player.seek(Duration(milliseconds: v.toInt())),
                     ),
                     Text('${_fmt(safePos)} / ${_fmt(total)}'),
                   ],
@@ -151,7 +159,8 @@ class _GuidedPlayerScreenState extends State<GuidedPlayerScreen> {
                     IconButton(
                       icon: const Icon(Icons.replay_10),
                       onPressed: () {
-                        final total = _player.duration ??
+                        final total =
+                            _player.duration ??
                             Duration(seconds: _audio!.durationSec);
                         final target = _clampDuration(
                           _player.position - const Duration(seconds: 10),
@@ -163,15 +172,17 @@ class _GuidedPlayerScreenState extends State<GuidedPlayerScreen> {
                     ),
                     IconButton(
                       iconSize: 40,
-                      icon: Icon(playing
-                          ? Icons.pause_circle
-                          : Icons.play_circle),
-                      onPressed: () => playing ? _player.pause() : _player.play(),
+                      icon: Icon(
+                        playing ? Icons.pause_circle : Icons.play_circle,
+                      ),
+                      onPressed:
+                          () => playing ? _player.pause() : _player.play(),
                     ),
                     IconButton(
                       icon: const Icon(Icons.forward_10),
                       onPressed: () {
-                        final total = _player.duration ??
+                        final total =
+                            _player.duration ??
                             Duration(seconds: _audio!.durationSec);
                         final target = _clampDuration(
                           _player.position + const Duration(seconds: 10),

@@ -60,17 +60,21 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
   Future<void> _saveSession() async {
     final duration = (_initial - _seconds).clamp(0, _initial);
     if (duration <= 0) return;
-    await MeditationFirestoreService.I.addSession(MeditationSession(
-      id: '',
-      title: _title.text.trim().isEmpty ? 'Meditación' : _title.text.trim(),
-      type: SessionType.timer,
-      durationSec: duration,
-      date: DateTime.now(),
-      moodBefore: _moodBefore,
-      moodAfter: _moodAfter,
-    ));
+    await MeditationFirestoreService.I.addSession(
+      MeditationSession(
+        id: '',
+        title: _title.text.trim().isEmpty ? 'Meditación' : _title.text.trim(),
+        type: SessionType.timer,
+        durationSec: duration,
+        date: DateTime.now(),
+        moodBefore: _moodBefore,
+        moodAfter: _moodAfter,
+      ),
+    );
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sesión guardada')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Sesión guardada')));
       Navigator.pop(context);
     }
   }
@@ -109,23 +113,29 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
-              children: [3,5,10,15,20,30,45,60].map((m) {
-                final sec = m*60;
-                final sel = _presetSeconds == sec;
-                return ChoiceChip(
-                  label: Text('${m}m'),
-                  selected: sel,
-                  onSelected: (_) {
-                    setState(() {
-                      _presetSeconds = sec;
-                      _seconds = sec;
-                    });
-                  },
-                );
-              }).toList(),
+              children:
+                  [3, 5, 10, 15, 20, 30, 45, 60].map((m) {
+                    final sec = m * 60;
+                    final sel = _presetSeconds == sec;
+                    return ChoiceChip(
+                      label: Text('${m}m'),
+                      selected: sel,
+                      onSelected: (_) {
+                        setState(() {
+                          _presetSeconds = sec;
+                          _seconds = sec;
+                        });
+                      },
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 12),
-            Center(child: Text(_format(_seconds), style: Theme.of(context).textTheme.displayMedium)),
+            Center(
+              child: Text(
+                _format(_seconds),
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+            ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -150,19 +160,50 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
               ],
             ),
             const Divider(height: 24),
-            _moodRow('Antes', _moodBefore, (v) => setState(() => _moodBefore = v)),
-            _moodRow('Después', _moodAfter, (v) => setState(() => _moodAfter = v)),
+            _moodRow(
+              'Antes',
+              _moodBefore,
+              (v) => setState(() => _moodBefore = v),
+            ),
+            _moodRow(
+              'Después',
+              _moodAfter,
+              (v) => setState(() => _moodAfter = v),
+            ),
             const Divider(height: 24),
-            Text('Ambiente (opcional)', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Ambiente (opcional)',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
-                ChoiceChip(label: const Text('Ninguno'), selected: _ambience=='none', onSelected: (_) => _setAmbience('none')),
-                ChoiceChip(label: const Text('Lluvia'), selected: _ambience=='rain', onSelected: (_) => _setAmbience('rain')),
-                ChoiceChip(label: const Text('Bosque'), selected: _ambience=='forest', onSelected: (_) => _setAmbience('forest')),
-                ChoiceChip(label: const Text('Chimenea'), selected: _ambience=='fire', onSelected: (_) => _setAmbience('fire')),
-                ChoiceChip(label: const Text('Río'), selected: _ambience=='river', onSelected: (_) => _setAmbience('river')),
+                ChoiceChip(
+                  label: const Text('Ninguno'),
+                  selected: _ambience == 'none',
+                  onSelected: (_) => _setAmbience('none'),
+                ),
+                ChoiceChip(
+                  label: const Text('Lluvia'),
+                  selected: _ambience == 'rain',
+                  onSelected: (_) => _setAmbience('rain'),
+                ),
+                ChoiceChip(
+                  label: const Text('Bosque'),
+                  selected: _ambience == 'forest',
+                  onSelected: (_) => _setAmbience('forest'),
+                ),
+                ChoiceChip(
+                  label: const Text('Chimenea'),
+                  selected: _ambience == 'fire',
+                  onSelected: (_) => _setAmbience('fire'),
+                ),
+                ChoiceChip(
+                  label: const Text('Río'),
+                  selected: _ambience == 'river',
+                  onSelected: (_) => _setAmbience('river'),
+                ),
               ],
             ),
             ListTile(
@@ -170,10 +211,14 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
               leading: const Icon(Icons.volume_up),
               title: Slider(
                 value: _volume,
-                onChanged: (v){ setState(()=>_volume=v); _player.setVolume(_volume); },
-                min: 0, max: 1,
+                onChanged: (v) {
+                  setState(() => _volume = v);
+                  _player.setVolume(_volume);
+                },
+                min: 0,
+                max: 1,
               ),
-              trailing: Text('${(_volume*100).round()}%'),
+              trailing: Text('${(_volume * 100).round()}%'),
             ),
             const SizedBox(height: 16),
             if (!_running)
@@ -189,8 +234,8 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
   }
 
   String _format(int s) {
-    final m = (s ~/ 60).toString().padLeft(2,'0');
-    final sec = (s % 60).toString().padLeft(2,'0');
+    final m = (s ~/ 60).toString().padLeft(2, '0');
+    final sec = (s % 60).toString().padLeft(2, '0');
     return '$m:$sec';
   }
 
@@ -203,14 +248,22 @@ class _TimerSessionScreenState extends State<TimerSessionScreen> {
           Wrap(
             spacing: 8,
             children: List.generate(5, (i) {
-              final v = i+1;
+              final v = i + 1;
               final sel = v == value;
               return GestureDetector(
                 onTap: () => onChanged(v),
                 child: CircleAvatar(
                   radius: 16,
-                  backgroundColor: sel ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: Text(['😞','🙁','😐','🙂','😌'][i], style: const TextStyle(fontSize: 16)),
+                  backgroundColor:
+                      sel
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
+                  child: Text(
+                    ['😞', '🙁', '😐', '🙂', '😌'][i],
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ),
               );
             }),

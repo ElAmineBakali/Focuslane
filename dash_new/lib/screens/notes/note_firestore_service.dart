@@ -21,7 +21,10 @@ class NoteFirestoreService {
       return _col(uid)
           .orderBy('updatedAt', descending: true)
           .snapshots()
-          .map((snapshot) => snapshot.docs.map((doc) => Note.fromDoc(doc)).toList());
+          .map(
+            (snapshot) =>
+                snapshot.docs.map((doc) => Note.fromDoc(doc)).toList(),
+          );
     });
   }
 
@@ -30,8 +33,10 @@ class NoteFirestoreService {
     if (uid == null) return null;
     final data = note.toMap();
     // Asegurar timestamps y consistencia
-    if (!data.containsKey('createdAt')) data['createdAt'] = Timestamp.fromDate(DateTime.now());
-    if (!data.containsKey('updatedAt')) data['updatedAt'] = Timestamp.fromDate(DateTime.now());
+    if (!data.containsKey('createdAt'))
+      data['createdAt'] = Timestamp.fromDate(DateTime.now());
+    if (!data.containsKey('updatedAt'))
+      data['updatedAt'] = Timestamp.fromDate(DateTime.now());
     final ref = await _col(uid).add(data);
     // Añadir campo id explícito para futuras migraciones (opcional)
     try {

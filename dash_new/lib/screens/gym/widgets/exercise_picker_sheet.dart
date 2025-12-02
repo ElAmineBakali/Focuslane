@@ -5,7 +5,11 @@ import '../models/exercise_library_data.dart';
 class ExercisePickerSheet extends StatefulWidget {
   final int order;
   final int restDefault;
-  const ExercisePickerSheet({super.key, required this.order, required this.restDefault});
+  const ExercisePickerSheet({
+    super.key,
+    required this.order,
+    required this.restDefault,
+  });
 
   @override
   State<ExercisePickerSheet> createState() => _ExercisePickerSheetState();
@@ -29,14 +33,17 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final results = kExerciseLibrary.where((e) {
-      if (_query.isEmpty) return true;
-      return e.name.toLowerCase().contains(_query.toLowerCase()) ||
-          e.muscleGroup.toLowerCase().contains(_query.toLowerCase());
-    }).toList();
+    final results =
+        kExerciseLibrary.where((e) {
+          if (_query.isEmpty) return true;
+          return e.name.toLowerCase().contains(_query.toLowerCase()) ||
+              e.muscleGroup.toLowerCase().contains(_query.toLowerCase());
+        }).toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(title: const Text('Añadir ejercicio')),
@@ -45,7 +52,10 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: TextField(
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar ejercicio'),
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Buscar ejercicio',
+                  ),
                   onChanged: (v) => setState(() => _query = v),
                 ),
               ),
@@ -72,27 +82,68 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   void _configureAndReturn(ExerciseLibraryItem ex) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(ex.name),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: _setsCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Series')),
-              TextField(controller: _repsCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Reps')),
-              TextField(controller: _restCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Descanso (s)')),
-              TextField(controller: _tempoCtrl, decoration: const InputDecoration(labelText: 'Tempo (p. ej. 3-1-1)')),
-              TextField(controller: _rpeCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'RPE objetivo')),
-              TextField(controller: _p1rmCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: '%1RM objetivo')),
-              TextField(controller: _notesCtrl, decoration: const InputDecoration(labelText: 'Notas')),
+      builder:
+          (_) => AlertDialog(
+            title: Text(ex.name),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _setsCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Series'),
+                  ),
+                  TextField(
+                    controller: _repsCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Reps'),
+                  ),
+                  TextField(
+                    controller: _restCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Descanso (s)',
+                    ),
+                  ),
+                  TextField(
+                    controller: _tempoCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Tempo (p. ej. 3-1-1)',
+                    ),
+                  ),
+                  TextField(
+                    controller: _rpeCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'RPE objetivo',
+                    ),
+                  ),
+                  TextField(
+                    controller: _p1rmCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: '%1RM objetivo',
+                    ),
+                  ),
+                  TextField(
+                    controller: _notesCtrl,
+                    decoration: const InputDecoration(labelText: 'Notas'),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Añadir'),
+              ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Añadir')),
-        ],
-      ),
     );
     if (ok == true) {
       final e = RoutineExercise(
@@ -106,8 +157,14 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
         restSec: int.tryParse(_restCtrl.text),
         order: widget.order,
         tempo: _tempoCtrl.text.trim().isEmpty ? null : _tempoCtrl.text.trim(),
-        targetRPE: _rpeCtrl.text.trim().isEmpty ? null : double.tryParse(_rpeCtrl.text),
-        targetPercent1RM: _p1rmCtrl.text.trim().isEmpty ? null : double.tryParse(_p1rmCtrl.text),
+        targetRPE:
+            _rpeCtrl.text.trim().isEmpty
+                ? null
+                : double.tryParse(_rpeCtrl.text),
+        targetPercent1RM:
+            _p1rmCtrl.text.trim().isEmpty
+                ? null
+                : double.tryParse(_p1rmCtrl.text),
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       );
       // ignore: use_build_context_synchronously

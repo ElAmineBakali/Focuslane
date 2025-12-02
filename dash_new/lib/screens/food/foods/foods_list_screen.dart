@@ -24,11 +24,12 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
           IconButton(
             tooltip: 'Nuevo',
             icon: const Icon(Icons.add),
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => FoodEditSheet(svc: widget.svc),
-            ),
+            onPressed:
+                () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => FoodEditSheet(svc: widget.svc),
+                ),
           ),
         ],
       ),
@@ -36,28 +37,38 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Row(children: [
-              Expanded(
-                child: TextField(
-                  onChanged: (v) => setState(() => _q = v),
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar…'),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: (v) => setState(() => _q = v),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Buscar…',
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              FilterChip(
-                label: const Text('Sólo suplementos'),
-                selected: _suppsOnly,
-                onSelected: (v) => setState(() => _suppsOnly = v),
-              ),
-            ]),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Sólo suplementos'),
+                  selected: _suppsOnly,
+                  onSelected: (v) => setState(() => _suppsOnly = v),
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: StreamBuilder<List<Food>>(
-              stream: widget.svc.streamFoods(query: _q, supplementsOnly: _suppsOnly),
+              stream: widget.svc.streamFoods(
+                query: _q,
+                supplementsOnly: _suppsOnly,
+              ),
               builder: (context, snap) {
-                if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+                if (!snap.hasData)
+                  return const Center(child: CircularProgressIndicator());
                 final list = snap.data!;
-                if (list.isEmpty) return const Center(child: Text('Sin alimentos aún'));
+                if (list.isEmpty)
+                  return const Center(child: Text('Sin alimentos aún'));
                 return ListView.separated(
                   padding: const EdgeInsets.all(12),
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -66,7 +77,11 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                     final f = list[i];
                     return Card(
                       child: ListTile(
-                        leading: Icon(Icons.fastfood, color: f.color ?? Theme.of(context).colorScheme.primary),
+                        leading: Icon(
+                          Icons.fastfood,
+                          color:
+                              f.color ?? Theme.of(context).colorScheme.primary,
+                        ),
                         title: Text(f.name),
                         subtitle: Text(
                           '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}'
@@ -78,18 +93,33 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                               await showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
-                                builder: (_) => FoodEditSheet(svc: widget.svc, initial: f),
+                                builder:
+                                    (_) => FoodEditSheet(
+                                      svc: widget.svc,
+                                      initial: f,
+                                    ),
                               );
                             }
                             if (v == 'del') {
-                              final ok = await _confirm(context, 'Eliminar', '¿Eliminar "${f.name}"?');
+                              final ok = await _confirm(
+                                context,
+                                'Eliminar',
+                                '¿Eliminar "${f.name}"?',
+                              );
                               if (ok) await widget.svc.deleteFood(f.id);
                             }
                           },
-                          itemBuilder: (_) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Editar')),
-                            PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                          ],
+                          itemBuilder:
+                              (_) => const [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Editar'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'del',
+                                  child: Text('Eliminar'),
+                                ),
+                              ],
                         ),
                       ),
                     );
@@ -106,14 +136,21 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
   Future<bool> _confirm(BuildContext context, String title, String msg) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(msg),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: Text(title),
+            content: Text(msg),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Eliminar'),
+              ),
+            ],
+          ),
     );
     return ok == true;
   }

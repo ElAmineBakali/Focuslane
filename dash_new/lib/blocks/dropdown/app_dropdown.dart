@@ -26,16 +26,16 @@ class AppDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final compactPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 6);
-    
+    final compactPadding = const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 6,
+    );
+
     return Container(
       padding: isCompact ? compactPadding : padding,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            cs.surfaceContainerLow,
-            cs.surfaceContainer,
-          ],
+          colors: [cs.surfaceContainerLow, cs.surfaceContainer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -66,21 +66,26 @@ class AppDropdown<T> extends StatelessWidget {
                 onChanged: onChanged,
                 dropdownColor: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(14),
-                icon: Icon(Icons.keyboard_arrow_down_rounded, color: cs.onSurfaceVariant, size: isCompact ? 18 : (isMobile ? 20 : 22)),
+                icon: Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: cs.onSurfaceVariant,
+                  size: isCompact ? 18 : (isMobile ? 20 : 22),
+                ),
                 style: TextStyle(
                   color: cs.onSurface,
                   fontSize: isCompact ? 13 : (isMobile ? 14 : 15),
                   fontWeight: FontWeight.w500,
                 ),
-                hint: hint != null
-                    ? Text(
-                        hint!,
-                        style: TextStyle(
-                          color: cs.onSurfaceVariant,
-                          fontSize: isCompact ? 13 : (isMobile ? 14 : 15),
-                        ),
-                      )
-                    : null,
+                hint:
+                    hint != null
+                        ? Text(
+                          hint!,
+                          style: TextStyle(
+                            color: cs.onSurfaceVariant,
+                            fontSize: isCompact ? 13 : (isMobile ? 14 : 15),
+                          ),
+                        )
+                        : null,
               ),
             ),
           ),

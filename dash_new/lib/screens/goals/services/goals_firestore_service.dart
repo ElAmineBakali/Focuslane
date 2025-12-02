@@ -82,11 +82,19 @@ class GoalsFirestoreService {
     await _subCol(goalId).doc(subId).delete();
   }
 
-  Future<void> setSubGoalStatus(String goalId, String subId, GoalStatus status) async {
+  Future<void> setSubGoalStatus(
+    String goalId,
+    String subId,
+    GoalStatus status,
+  ) async {
     await _subCol(goalId).doc(subId).update({'status': status.name});
   }
 
-  Future<void> bumpSubGoalProgress(String goalId, String subId, double delta) async {
+  Future<void> bumpSubGoalProgress(
+    String goalId,
+    String subId,
+    double delta,
+  ) async {
     await _db.runTransaction((tx) async {
       final ref = _subCol(goalId).doc(subId);
       final snap = await tx.get(ref);

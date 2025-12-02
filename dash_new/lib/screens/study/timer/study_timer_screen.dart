@@ -41,8 +41,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
 
   static const int _N_WORK_START = 41010;
   static const int _N_REST_START = 41011;
-  static const int _N_WORK_END   = 41020;
-  static const int _N_REST_END   = 41021;
+  static const int _N_WORK_END = 41020;
+  static const int _N_REST_END = 41021;
   static const int _N_SESSION_SAVED = 41030;
 
   @override
@@ -126,7 +126,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         _startBox('work', (_cfg['block'] ?? 50).toInt());
         break;
       case StudyMethod.custom:
-        final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+        final seq =
+            (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
+            const [];
         if (seq.isEmpty) {
           AppToast.error(context, 'Secuencia vacía');
           return;
@@ -155,11 +157,18 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
   void _startPomodoro() {
     final work = (_cfg['work'] ?? 25).toInt() * 60;
     _cycle++;
-    _changePhase('work', work, after: () {
-      final isLong = (_cycle % ((_cfg['cycles'] ?? 4).toInt())) == 0;
-      final restMin = isLong ? (_cfg['long'] ?? 15).toInt() : (_cfg['short'] ?? 5).toInt();
-      _changePhase('rest', restMin * 60, after: () {});
-    });
+    _changePhase(
+      'work',
+      work,
+      after: () {
+        final isLong = (_cycle % ((_cfg['cycles'] ?? 4).toInt())) == 0;
+        final restMin =
+            isLong
+                ? (_cfg['long'] ?? 15).toInt()
+                : (_cfg['short'] ?? 5).toInt();
+        _changePhase('rest', restMin * 60, after: () {});
+      },
+    );
   }
 
   void _startFlowtimeWork() {
@@ -181,7 +190,11 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     _changePhase(phase, minutes * 60, after: () {});
   }
 
-  void _changePhase(String newPhase, int seconds, {required VoidCallback after}) {
+  void _changePhase(
+    String newPhase,
+    int seconds, {
+    required VoidCallback after,
+  }) {
     _ticker?.cancel();
     setState(() {
       _phase = newPhase;
@@ -206,7 +219,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           return;
         }
         if (_method == StudyMethod.custom && _phase == 'work') {
-          final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          final seq =
+              (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
+              const [];
           final currentRest = (seq.first['rest'] ?? 10).toInt();
           _changePhase('rest', currentRest * 60, after: () {});
           return;
@@ -271,9 +286,10 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     );
 
     if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (_) => SessionSummaryScreen(session: session),
-    ));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => SessionSummaryScreen(session: session)),
+    );
   }
 
   @override
@@ -288,10 +304,14 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     final cs = Theme.of(context).colorScheme;
     Color phaseColor(String p) {
       switch (p) {
-        case 'work': return cs.primaryContainer;
-        case 'rest': return cs.tertiaryContainer;
-        case 'counting': return cs.secondaryContainer;
-        default: return cs.surfaceContainerHighest;
+        case 'work':
+          return cs.primaryContainer;
+        case 'rest':
+          return cs.tertiaryContainer;
+        case 'counting':
+          return cs.secondaryContainer;
+        default:
+          return cs.surfaceContainerHighest;
       }
     }
 
@@ -315,18 +335,30 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             tooltip: 'Tareas',
             icon: const Icon(Icons.checklist),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (_) => StudyTasksScreen(svc: svc, initialCourseId: _courseId),
-              ));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => StudyTasksScreen(
+                        svc: svc,
+                        initialCourseId: _courseId,
+                      ),
+                ),
+              );
             },
           ),
           IconButton(
             tooltip: 'Analytics',
             icon: const Icon(Icons.bar_chart_rounded),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (_) => StudyAnalyticsScreen(svc: svc, courseId: _courseId),
-              ));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) =>
+                          StudyAnalyticsScreen(svc: svc, courseId: _courseId),
+                ),
+              );
             },
           ),
         ],
@@ -356,17 +388,35 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(_phase == 'work' ? Icons.play_circle_fill : _phase == 'rest' ? Icons.self_improvement : Icons.hourglass_empty),
+                        Icon(
+                          _phase == 'work'
+                              ? Icons.play_circle_fill
+                              : _phase == 'rest'
+                              ? Icons.self_improvement
+                              : Icons.hourglass_empty,
+                        ),
                         const SizedBox(width: 8),
-                        Text(phaseLabel, style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          phaseLabel,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(_formatTime(_timeLeft), style: const TextStyle(fontSize: 56, fontWeight: FontWeight.bold)),
+                    Text(
+                      _formatTime(_timeLeft),
+                      style: const TextStyle(
+                        fontSize: 56,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     if (_method != StudyMethod.simple)
                       Padding(
                         padding: const EdgeInsets.only(top: 6),
-                        child: Text('Ciclo: $_cycle', style: const TextStyle(fontStyle: FontStyle.italic)),
+                        child: Text(
+                          'Ciclo: $_cycle',
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
                     const SizedBox(height: 24),
                     Wrap(
@@ -374,14 +424,27 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                       runSpacing: 10,
                       alignment: WrapAlignment.center,
                       children: [
-                        FilledButton.icon(onPressed: _start, icon: const Icon(Icons.play_arrow), label: const Text('Iniciar')),
-                        OutlinedButton.icon(onPressed: _pause, icon: const Icon(Icons.pause), label: const Text('Pausar')),
-                        TextButton.icon(onPressed: _reset, icon: const Icon(Icons.refresh), label: const Text('Reset')),
-                        if (_courseId != null) FilledButton.tonalIcon(
-                          onPressed: _stopAndSave,
-                          icon: const Icon(Icons.save),
-                          label: const Text('Guardar sesión'),
+                        FilledButton.icon(
+                          onPressed: _start,
+                          icon: const Icon(Icons.play_arrow),
+                          label: const Text('Iniciar'),
                         ),
+                        OutlinedButton.icon(
+                          onPressed: _pause,
+                          icon: const Icon(Icons.pause),
+                          label: const Text('Pausar'),
+                        ),
+                        TextButton.icon(
+                          onPressed: _reset,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Reset'),
+                        ),
+                        if (_courseId != null)
+                          FilledButton.tonalIcon(
+                            onPressed: _stopAndSave,
+                            icon: const Icon(Icons.save),
+                            label: const Text('Guardar sesión'),
+                          ),
                       ],
                     ),
                   ],
@@ -431,14 +494,19 @@ class _HeaderSelectors extends StatelessWidget {
                 initialValue: courseId,
                 hint: const Text('Curso'),
                 items: [
-                  ...courses.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
+                  ...courses.map(
+                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                  ),
                 ],
                 onChanged: onCourseChanged,
               ),
             ),
             if (courseId != null)
               StreamBuilder<List<StudyTask>>(
-                stream: svc.streamTasks(courseId: courseId!, status: TaskStatus.todo),
+                stream: svc.streamTasks(
+                  courseId: courseId!,
+                  status: TaskStatus.todo,
+                ),
                 builder: (context, tsnap) {
                   final tasks = tsnap.data ?? const [];
                   return Padding(
@@ -448,7 +516,12 @@ class _HeaderSelectors extends StatelessWidget {
                       hint: const Text('Vincular tarea (opcional)'),
                       items: [
                         const DropdownMenuItem(value: null, child: Text('—')),
-                        ...tasks.map((t) => DropdownMenuItem(value: t.id, child: Text(t.title))),
+                        ...tasks.map(
+                          (t) => DropdownMenuItem(
+                            value: t.id,
+                            child: Text(t.title),
+                          ),
+                        ),
                       ],
                       onChanged: onTaskChanged,
                     ),

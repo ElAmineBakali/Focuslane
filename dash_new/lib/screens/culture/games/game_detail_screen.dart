@@ -28,25 +28,51 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (game == null) return const Scaffold(body: Center(child: Text('Sin juego')));
+    if (game == null)
+      return const Scaffold(body: Center(child: Text('Sin juego')));
     final g = game!;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(g.title),
         actions: [
-          IconButton(icon: const Icon(Icons.edit), onPressed: ()=>Navigator.pushNamed(context, GameEditScreen.route, arguments: g)),
-          IconButton(icon: const Icon(Icons.delete_outline), onPressed: () async { await svc.deleteGame(g.id); if (mounted) Navigator.pop(context); }),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  GameEditScreen.route,
+                  arguments: g,
+                ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () async {
+              await svc.deleteGame(g.id);
+              if (mounted) Navigator.pop(context);
+            },
+          ),
         ],
       ),
       body: PaddedListView(
         children: [
-          Card(child: ListTile(
-            leading: const Icon(Icons.sports_esports),
-            title: Text('${g.platform} • ${g.hours.toStringAsFixed(1)} h'),
-            subtitle: Text('Estado: ${g.status.name} • ${g.progressPct}% • Dificultad: ${g.difficulty ?? "-"} • Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}'),
-          )),
-          if (g.notes != null && g.notes!.isNotEmpty) Card(child: ListTile(leading: const Icon(Icons.notes), title: const Text('Notas'), subtitle: Text(g.notes!))),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.sports_esports),
+              title: Text('${g.platform} • ${g.hours.toStringAsFixed(1)} h'),
+              subtitle: Text(
+                'Estado: ${g.status.name} • ${g.progressPct}% • Dificultad: ${g.difficulty ?? "-"} • Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}',
+              ),
+            ),
+          ),
+          if (g.notes != null && g.notes!.isNotEmpty)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.notes),
+                title: const Text('Notas'),
+                subtitle: Text(g.notes!),
+              ),
+            ),
 
           const SizedBox(height: 8),
           Card(
@@ -55,26 +81,56 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Sesiones de juego', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Sesiones de juego',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _min, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Minutos'))),
+                      Expanded(
+                        child: TextField(
+                          controller: _min,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Minutos',
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: TextField(controller: _prog, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Progreso % (después)'))),
+                      Expanded(
+                        child: TextField(
+                          controller: _prog,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Progreso % (después)',
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  TextField(controller: _note, decoration: const InputDecoration(labelText: 'Notas (opcional)')),
+                  TextField(
+                    controller: _note,
+                    decoration: const InputDecoration(
+                      labelText: 'Notas (opcional)',
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   FilledButton(
                     onPressed: () async {
                       final s = GameSession(
-                        id: '', date: DateTime.now(),
+                        id: '',
+                        date: DateTime.now(),
                         minutes: int.tryParse(_min.text) ?? 0,
                         progressAfter: int.tryParse(_prog.text),
-                        notes: _note.text.trim().isEmpty ? null : _note.text.trim(),
+                        notes:
+                            _note.text.trim().isEmpty
+                                ? null
+                                : _note.text.trim(),
                       );
                       await svc.addGameSession(g.id, s);
-                      _min.clear(); _prog.clear(); _note.clear();
+                      _min.clear();
+                      _prog.clear();
+                      _note.clear();
                     },
                     child: const Text('Añadir sesión'),
                   ),
@@ -83,17 +139,31 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     stream: svc.watchGameSessions(g.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty) return const Text('Sin sesiones registradas');
+                      if (data.isEmpty)
+                        return const Text('Sin sesiones registradas');
                       return Column(
-                        children: data.map((x) => ListTile(
-                          leading: const Icon(Icons.timer),
-                          title: Text('${x.minutes} min'),
-                          subtitle: Text(
-                            x.date.toLocal().toString().split('.').first +
-                            (x.progressAfter!=null?' • ${x.progressAfter}%':'') +
-                            (x.notes!=null?' • ${x.notes}':'')
-                          ),
-                        )).toList(),
+                        children:
+                            data
+                                .map(
+                                  (x) => ListTile(
+                                    leading: const Icon(Icons.timer),
+                                    title: Text('${x.minutes} min'),
+                                    subtitle: Text(
+                                      x.date
+                                              .toLocal()
+                                              .toString()
+                                              .split('.')
+                                              .first +
+                                          (x.progressAfter != null
+                                              ? ' • ${x.progressAfter}%'
+                                              : '') +
+                                          (x.notes != null
+                                              ? ' • ${x.notes}'
+                                              : ''),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       );
                     },
                   ),

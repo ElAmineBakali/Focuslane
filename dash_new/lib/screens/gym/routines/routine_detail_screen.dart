@@ -13,10 +13,7 @@ SnackBar _niceBar(String text, {IconData? icon}) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     content: Row(
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-        ],
+        if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
         Expanded(child: Text(text)),
       ],
     ),
@@ -27,7 +24,11 @@ SnackBar _niceBar(String text, {IconData? icon}) {
 class RoutineDetailScreen extends StatelessWidget {
   final GymFirestoreService svc;
   final Routine routine;
-  const RoutineDetailScreen({super.key, required this.svc, required this.routine});
+  const RoutineDetailScreen({
+    super.key,
+    required this.svc,
+    required this.routine,
+  });
 
   Future<void> _createDaySheet(BuildContext context) async {
     final nameCtrl = TextEditingController();
@@ -37,40 +38,57 @@ class RoutineDetailScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          left: 16, right: 16, top: 12,
-          bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom + MediaQuery.of(ctx).viewPadding.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Nuevo día en "${routine.name}"', style: Theme.of(ctx).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Nombre del día (p. ej. Pecho/Espalda)'),
+      builder:
+          (ctx) => Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 12,
+              bottom:
+                  16 +
+                  MediaQuery.of(ctx).viewInsets.bottom +
+                  MediaQuery.of(ctx).viewPadding.bottom,
             ),
-            const SizedBox(height: 8),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Descanso por defecto (segundos, opcional)',
-              ),
-              onChanged: (s) => restDefault = int.tryParse(s),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TextButton(onPressed: ()=> Navigator.pop(ctx, false), child: const Text('Cancelar')),
-                const SizedBox(width: 8),
-                FilledButton(onPressed: ()=> Navigator.pop(ctx, true), child: const Text('Crear')),
+                Text(
+                  'Nuevo día en "${routine.name}"',
+                  style: Theme.of(ctx).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del día (p. ej. Pecho/Espalda)',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Descanso por defecto (segundos, opcional)',
+                  ),
+                  onChanged: (s) => restDefault = int.tryParse(s),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Crear'),
+                    ),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
 
     if (ok == true) {
@@ -84,10 +102,14 @@ class RoutineDetailScreen extends StatelessWidget {
           .collection('days');
 
       final snap = await col.get();
-      final nextOrder = (snap.docs.map((d) {
-        final m = d.data();
-        return (m['order'] as num?)?.toInt() ?? 0;
-      }).fold<int>(0, (a, b) => b > a ? b : a)) + 1;
+      final nextOrder =
+          (snap.docs
+              .map((d) {
+                final m = d.data();
+                return (m['order'] as num?)?.toInt() ?? 0;
+              })
+              .fold<int>(0, (a, b) => b > a ? b : a)) +
+          1;
 
       await col.add({
         'name': name,
@@ -98,7 +120,10 @@ class RoutineDetailScreen extends StatelessWidget {
       // Feedback
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        _niceBar('Día "$name" creado correctamente 🎉', icon: Icons.check_circle_rounded),
+        _niceBar(
+          'Día "$name" creado correctamente 🎉',
+          icon: Icons.check_circle_rounded,
+        ),
       );
     }
   }
@@ -112,18 +137,19 @@ class RoutineDetailScreen extends StatelessWidget {
           StreamBuilder<Routine?>(
             stream: svc.streamDefaultRoutine(),
             builder: (context, snap) {
-              return 
-          
-          IconButton(
-            icon: const Icon(Icons.bar_chart_rounded),
-            tooltip: 'Estadísticas',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => GymAnalyticsScreen(svc: svc)),
-            ),
-          );
-          }
-          )
+              return IconButton(
+                icon: const Icon(Icons.bar_chart_rounded),
+                tooltip: 'Estadísticas',
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GymAnalyticsScreen(svc: svc),
+                      ),
+                    ),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -134,13 +160,21 @@ class RoutineDetailScreen extends StatelessWidget {
       body: StreamBuilder<List<RoutineDay>>(
         stream: svc.streamDays(routine.id),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final days = snap.data!;
           if (days.isEmpty) {
-            return const Center(child: Text('Crea tu primer día con el botón ➕'));
+            return const Center(
+              child: Text('Crea tu primer día con el botón ➕'),
+            );
           }
           return ListView.separated(
-            padding: EdgeInsets.fromLTRB(12, 12, 12, MediaQuery.of(context).viewPadding.bottom + 100),
+            padding: EdgeInsets.fromLTRB(
+              12,
+              12,
+              12,
+              MediaQuery.of(context).viewPadding.bottom + 100,
+            ),
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemCount: days.length,
             itemBuilder: (c, i) {
@@ -149,50 +183,84 @@ class RoutineDetailScreen extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.calendar_today),
                   title: Text(d.name),
-                  subtitle: _LastDoneSubtitle(svc: svc, routineId: routine.id, dayId: d.id),
+                  subtitle: _LastDoneSubtitle(
+                    svc: svc,
+                    routineId: routine.id,
+                    dayId: d.id,
+                  ),
                   trailing: PopupMenuButton<String>(
                     onSelected: (v) async {
                       if (v == 'dup') {
                         await svc.duplicateDay(routine.id, d.id);
                         if (c.mounted) {
                           ScaffoldMessenger.of(c).showSnackBar(
-                            _niceBar('Día duplicado ✨', icon: Icons.copy_all_rounded),
+                            _niceBar(
+                              'Día duplicado ✨',
+                              icon: Icons.copy_all_rounded,
+                            ),
                           );
                         }
                       }
                       if (v == 'del') {
                         final ok = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Eliminar día'),
-                            content: Text('¿Eliminar "${d.name}" y sus ejercicios?'),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                              FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-                            ],
-                          ),
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Eliminar día'),
+                                content: Text(
+                                  '¿Eliminar "${d.name}" y sus ejercicios?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  FilledButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    child: const Text('Eliminar'),
+                                  ),
+                                ],
+                              ),
                         );
                         if (ok == true) {
                           await svc.deleteDayCascade(routine.id, d.id);
                           if (c.mounted) {
                             ScaffoldMessenger.of(c).showSnackBar(
-                              _niceBar('Día eliminado 🗑️', icon: Icons.delete_outline),
+                              _niceBar(
+                                'Día eliminado 🗑️',
+                                icon: Icons.delete_outline,
+                              ),
                             );
                           }
                         }
                       }
                     },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'dup', child: Text('Duplicar día')),
-                      PopupMenuItem(value: 'del', child: Text('Eliminar día')),
-                    ],
+                    itemBuilder:
+                        (_) => const [
+                          PopupMenuItem(
+                            value: 'dup',
+                            child: Text('Duplicar día'),
+                          ),
+                          PopupMenuItem(
+                            value: 'del',
+                            child: Text('Eliminar día'),
+                          ),
+                        ],
                   ),
-                  onTap: () => Navigator.push(
-                    c,
-                    MaterialPageRoute(
-                      builder: (_) => LiveSessionScreen(svc: svc, routine: routine, day: d),
-                    ),
-                  ),
+                  onTap:
+                      () => Navigator.push(
+                        c,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => LiveSessionScreen(
+                                svc: svc,
+                                routine: routine,
+                                day: d,
+                              ),
+                        ),
+                      ),
                 ),
               );
             },
@@ -207,14 +275,20 @@ class _LastDoneSubtitle extends StatelessWidget {
   final GymFirestoreService svc;
   final String routineId;
   final String dayId;
-  const _LastDoneSubtitle({required this.svc, required this.routineId, required this.dayId});
+  const _LastDoneSubtitle({
+    required this.svc,
+    required this.routineId,
+    required this.dayId,
+  });
 
   DateTime? _readAsDate(dynamic v) {
     if (v == null) return null;
     if (v is Timestamp) return v.toDate();
     if (v is DateTime) return v;
     if (v is String) {
-      try { return DateTime.parse(v); } catch (_) {}
+      try {
+        return DateTime.parse(v);
+      } catch (_) {}
     }
     return null;
   }
@@ -230,14 +304,17 @@ class _LastDoneSubtitle extends StatelessWidget {
     return StreamBuilder<DocumentSnapshot>(
       stream: dayRef.snapshots(),
       builder: (context, snap) {
-        if (!snap.hasData || !snap.data!.exists) return const Text('Sin sesiones aún');
+        if (!snap.hasData || !snap.data!.exists)
+          return const Text('Sin sesiones aún');
         final data = snap.data!.data() as Map<String, dynamic>;
-        final dt = _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);
+        final dt =
+            _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);
         if (dt == null) return const Text('Sin sesiones aún');
 
         final lastLocal = dt.toLocal();
         final now = DateTime.now();
-        final sameDay = lastLocal.year == now.year &&
+        final sameDay =
+            lastLocal.year == now.year &&
             lastLocal.month == now.month &&
             lastLocal.day == now.day;
 

@@ -5,7 +5,8 @@ class Outfit {
   final String nombre;
   final String notas;
   final bool favorito;
-  final Map<String, String?> slots; // {top: prendaId, bottom: prendaId, shoes: prendaId...}
+  final Map<String, String?>
+  slots; // {top: prendaId, bottom: prendaId, shoes: prendaId...}
   final Map<String, String>? portada; // {thumbUrl, mediumUrl}
   final int vecesUsado;
   final DateTime? ultimaVezUsado;
@@ -30,11 +31,15 @@ class Outfit {
       favorito: data['favorito'] ?? false,
       // valores null permitidos
       slots: Map<String, String?>.from(data['slots'] ?? {}),
-      portada: data['portada'] != null ? Map<String, String>.from(data['portada']) : null,
+      portada:
+          data['portada'] != null
+              ? Map<String, String>.from(data['portada'])
+              : null,
       vecesUsado: (data['vecesUsado'] as num?)?.toInt() ?? 0,
-      ultimaVezUsado: data['ultimaVezUsado'] != null
-          ? (data['ultimaVezUsado'] as Timestamp).toDate()
-          : null,
+      ultimaVezUsado:
+          data['ultimaVezUsado'] != null
+              ? (data['ultimaVezUsado'] as Timestamp).toDate()
+              : null,
     );
   }
 

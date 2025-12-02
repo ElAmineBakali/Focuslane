@@ -28,8 +28,14 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
 
   /// misma paleta que usamos en Study
   static const _swatches = <int>[
-    0xFF2962FF, 0xFF00BFA5, 0xFF43A047, 0xFFF9A825,
-    0xFFEF6C00, 0xFFE53935, 0xFF8E24AA, 0xFF546E7A,
+    0xFF2962FF,
+    0xFF00BFA5,
+    0xFF43A047,
+    0xFFF9A825,
+    0xFFEF6C00,
+    0xFFE53935,
+    0xFF8E24AA,
+    0xFF546E7A,
   ];
 
   @override
@@ -66,7 +72,9 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
     return TaskFormTheme(
       child: Padding(
         padding: EdgeInsets.only(
-          left: 16, right: 16, top: 16,
+          left: 16,
+          right: 16,
+          top: 16,
           bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Form(
@@ -75,23 +83,39 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(isEdit ? 'Editar activo' : 'Nuevo activo',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  isEdit ? 'Editar activo' : 'Nuevo activo',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
 
                 TextFormField(
                   controller: _name,
                   decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
 
                 DropdownButtonFormField<AssetKind>(
                   initialValue: _kind,
                   items: const [
-                    DropdownMenuItem(value: AssetKind.house, child: Text('Vivienda')),
-                    DropdownMenuItem(value: AssetKind.car, child: Text('Vehículo')),
-                    DropdownMenuItem(value: AssetKind.land, child: Text('Terreno')),
-                    DropdownMenuItem(value: AssetKind.other, child: Text('Otro')),
+                    DropdownMenuItem(
+                      value: AssetKind.house,
+                      child: Text('Vivienda'),
+                    ),
+                    DropdownMenuItem(
+                      value: AssetKind.car,
+                      child: Text('Vehículo'),
+                    ),
+                    DropdownMenuItem(
+                      value: AssetKind.land,
+                      child: Text('Terreno'),
+                    ),
+                    DropdownMenuItem(
+                      value: AssetKind.other,
+                      child: Text('Otro'),
+                    ),
                   ],
                   onChanged: (v) => setState(() => _kind = v ?? _kind),
                   decoration: const InputDecoration(labelText: 'Tipo'),
@@ -102,8 +126,12 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                     Expanded(
                       child: TextFormField(
                         controller: _value,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        decoration: const InputDecoration(labelText: 'Valor estimado'),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Valor estimado',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -120,7 +148,8 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                   controller: _address,
                   decoration: const InputDecoration(
                     labelText: 'Ubicación (dirección)',
-                    helperText: 'Escribe la calle/ciudad. El icono abrirá Maps.',
+                    helperText:
+                        'Escribe la calle/ciudad. El icono abrirá Maps.',
                   ),
                 ),
 
@@ -133,7 +162,9 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
-                  title: Text('Adquirido: ${_acquiredAt != null ? _acquiredAt!.toLocal().toString().split(" ").first : "—"}'),
+                  title: Text(
+                    'Adquirido: ${_acquiredAt != null ? _acquiredAt!.toLocal().toString().split(" ").first : "—"}',
+                  ),
                   onTap: () async {
                     final d = await showDatePicker(
                       context: context,
@@ -148,11 +179,15 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Color', style: Theme.of(context).textTheme.titleMedium),
+                  child: Text(
+                    'Color',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8, runSpacing: 8,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     ChoiceChip(
                       label: const Text('Sin color'),
@@ -166,15 +201,20 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                         selected: sel,
                         label: const SizedBox(width: 0, height: 0),
                         avatar: Container(
-                          width: 22, height: 22,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
                             color: c,
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(color: Colors.black12),
                           ),
                         ),
-                        onSelected: (_) =>
-                            setState(() => _colorHex.text = '0x${hex.toRadixString(16).toUpperCase()}'),
+                        onSelected:
+                            (_) => setState(
+                              () =>
+                                  _colorHex.text =
+                                      '0x${hex.toRadixString(16).toUpperCase()}',
+                            ),
                       );
                     }),
                   ],
@@ -187,7 +227,8 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                     const SizedBox(width: 8),
                     CircleAvatar(
                       radius: 12,
-                      backgroundColor: previewColor ?? Theme.of(context).colorScheme.primary,
+                      backgroundColor:
+                          previewColor ?? Theme.of(context).colorScheme.primary,
                     ),
                   ],
                 ),
@@ -196,7 +237,10 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: ()=>Navigator.pop(context), child: const Text('Cancelar')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: () async {
@@ -207,11 +251,23 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
                           name: _name.text.trim(),
                           kind: _kind,
                           estValue: double.tryParse(_value.text),
-                          currency: _currency.text.trim().isEmpty ? null : _currency.text.trim(),
-                          address: _address.text.trim().isEmpty ? null : _address.text.trim(),
-                          notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+                          currency:
+                              _currency.text.trim().isEmpty
+                                  ? null
+                                  : _currency.text.trim(),
+                          address:
+                              _address.text.trim().isEmpty
+                                  ? null
+                                  : _address.text.trim(),
+                          notes:
+                              _notes.text.trim().isEmpty
+                                  ? null
+                                  : _notes.text.trim(),
                           acquiredAt: _acquiredAt,
-                          colorHex: _colorHex.text.trim().isEmpty ? null : _colorHex.text.trim(),
+                          colorHex:
+                              _colorHex.text.trim().isEmpty
+                                  ? null
+                                  : _colorHex.text.trim(),
                         );
 
                         if (widget.initial == null) {

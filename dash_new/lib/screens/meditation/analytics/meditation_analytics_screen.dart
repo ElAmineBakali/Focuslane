@@ -1,5 +1,5 @@
 // lib/screens/meditation/analytics/meditation_analytics_screen.dart
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import '../services/meditation_firestore_service.dart';
 
 class MeditationAnalyticsScreen extends StatefulWidget {
@@ -7,7 +7,8 @@ class MeditationAnalyticsScreen extends StatefulWidget {
   static const route = '/meditation/analytics';
 
   @override
-  State<MeditationAnalyticsScreen> createState() => _MeditationAnalyticsScreenState();
+  State<MeditationAnalyticsScreen> createState() =>
+      _MeditationAnalyticsScreenState();
 }
 
 class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
@@ -29,7 +30,8 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
               );
-              if (d != null) setState(() => _month = DateTime(d.year, d.month, 1));
+              if (d != null)
+                setState(() => _month = DateTime(d.year, d.month, 1));
             },
           ),
         ],
@@ -49,10 +51,15 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
                 title: 'KPIs del mes',
                 child: Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 12, runSpacing: 12,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
                     _kpi('Minutos', minutes.toDouble(), Icons.timelapse),
-                    _kpi('Sesiones', count.toDouble(), Icons.library_music_outlined),
+                    _kpi(
+                      'Sesiones',
+                      count.toDouble(),
+                      Icons.library_music_outlined,
+                    ),
                   ],
                 ),
               ),
@@ -60,23 +67,28 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
               _sectionCard(
                 icon: Icons.bar_chart,
                 title: 'Minutos por tipo',
-                child: (byType.isEmpty)
-                    ? const ListTile(title: Text('Sin datos'))
-                    : Column(
-                        children: byType.entries.map((e) {
-                          final total = minutes == 0 ? 1 : minutes;
-                          final pct = (e.value / total).clamp(0.0, 1.0);
-                          return ListTile(
-                            leading: const Icon(Icons.label_outline),
-                            title: Text(e.key),
-                            subtitle: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: LinearProgressIndicator(value: pct, minHeight: 8),
-                            ),
-                            trailing: Text('${e.value}m'),
-                          );
-                        }).toList(),
-                      ),
+                child:
+                    (byType.isEmpty)
+                        ? const ListTile(title: Text('Sin datos'))
+                        : Column(
+                          children:
+                              byType.entries.map((e) {
+                                final total = minutes == 0 ? 1 : minutes;
+                                final pct = (e.value / total).clamp(0.0, 1.0);
+                                return ListTile(
+                                  leading: const Icon(Icons.label_outline),
+                                  title: Text(e.key),
+                                  subtitle: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: LinearProgressIndicator(
+                                      value: pct,
+                                      minHeight: 8,
+                                    ),
+                                  ),
+                                  trailing: Text('${e.value}m'),
+                                );
+                              }).toList(),
+                        ),
               ),
               const SizedBox(height: 12),
               _sectionCard(
@@ -110,7 +122,11 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
     );
   }
 
-  Widget _sectionCard({required IconData icon, required String title, required Widget child}) {
+  Widget _sectionCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
+  }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       elevation: 1.5,
@@ -119,7 +135,13 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [Icon(icon), const SizedBox(width: 8), Text(title, style: Theme.of(context).textTheme.titleLarge)]),
+            Row(
+              children: [
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.titleLarge),
+              ],
+            ),
             const SizedBox(height: 8),
             child,
           ],
@@ -135,19 +157,29 @@ class _MeditationAnalyticsScreenState extends State<MeditationAnalyticsScreen> {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Wrap(
-        spacing: 6, runSpacing: 6,
+        spacing: 6,
+        runSpacing: 6,
         children: List.generate(days, (i) {
-          final d = DateTime(_month.year, _month.month, i+1);
+          final d = DateTime(_month.year, _month.month, i + 1);
           final v = byDay[DateTime(d.year, d.month, d.day)] ?? 0;
           final intensity = (v / 30).clamp(0.0, 1.0); // 30 min = full
           return Container(
-            width: 24, height: 24,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(intensity * 0.8),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(intensity * 0.8),
               borderRadius: BorderRadius.circular(4),
             ),
             alignment: Alignment.center,
-            child: Text('${i+1}', style: TextStyle(fontSize: 10, color: intensity > 0.55 ? Colors.white : null)),
+            child: Text(
+              '${i + 1}',
+              style: TextStyle(
+                fontSize: 10,
+                color: intensity > 0.55 ? Colors.white : null,
+              ),
+            ),
           );
         }),
       ),

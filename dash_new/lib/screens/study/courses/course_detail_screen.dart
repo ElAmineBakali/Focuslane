@@ -10,7 +10,11 @@ import '../attendance/attendance_screen.dart'; // ✅ NUEVO
 class CourseDetailScreen extends StatelessWidget {
   final StudyFirestoreService svc;
   final Course course;
-  const CourseDetailScreen({super.key, required this.svc, required this.course});
+  const CourseDetailScreen({
+    super.key,
+    required this.svc,
+    required this.course,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +26,25 @@ class CourseDetailScreen extends StatelessWidget {
           IconButton(
             tooltip: 'Editar',
             icon: const Icon(Icons.edit),
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => CourseEditSheet(svc: svc, initial: course),
-            ),
+            onPressed:
+                () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => CourseEditSheet(svc: svc, initial: course),
+                ),
           ),
           IconButton(
             tooltip: 'Estadísticas',
             icon: const Icon(Icons.bar_chart_rounded),
-            onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => StudyAnalyticsScreen(svc: svc, courseId: course.id)),
-            ),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) =>
+                            StudyAnalyticsScreen(svc: svc, courseId: course.id),
+                  ),
+                ),
           ),
         ],
       ),
@@ -46,9 +57,16 @@ class CourseDetailScreen extends StatelessWidget {
               title: const Text('Estudiar ahora'),
               subtitle: const Text('Inicia una sesión con el último preset'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => StudyTimerScreen(svc: svc, initialCourseId: course.id),
-                ));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => StudyTimerScreen(
+                          svc: svc,
+                          initialCourseId: course.id,
+                        ),
+                  ),
+                );
               },
             ),
           ),
@@ -57,9 +75,16 @@ class CourseDetailScreen extends StatelessWidget {
               leading: Icon(Icons.checklist, color: accent),
               title: const Text('Tareas / Exámenes'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => StudyTasksScreen(svc: svc, initialCourseId: course.id),
-                ));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => StudyTasksScreen(
+                          svc: svc,
+                          initialCourseId: course.id,
+                        ),
+                  ),
+                );
               },
             ),
           ),
@@ -74,9 +99,12 @@ class CourseDetailScreen extends StatelessWidget {
                     : 'Define el % requerido en “Editar” (opcional)',
               ),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => AttendanceScreen(svc: svc, course: course),
-                ));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AttendanceScreen(svc: svc, course: course),
+                  ),
+                );
               },
             ),
           ),

@@ -18,25 +18,41 @@ class TransactionsListScreen extends StatelessWidget {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin transacciones'));
+          if (data.isEmpty)
+            return const Center(child: Text('Sin transacciones'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, i) {
               final t = data[i];
               return ListTile(
-                leading: Icon(t.type == TxType.income ? Icons.trending_up : Icons.trending_down),
+                leading: Icon(
+                  t.type == TxType.income
+                      ? Icons.trending_up
+                      : Icons.trending_down,
+                ),
                 title: Text(t.title),
-                subtitle: Text("${t.category} • ${t.date.toLocal().toString().split('.').first}"),
-                trailing: Text((t.type == TxType.expense ? '-' : '+') + t.amount.toStringAsFixed(2)),
-                onTap: () => Navigator.pushNamed(context, '/finance/transactions/edit', arguments: t),
+                subtitle: Text(
+                  "${t.category} • ${t.date.toLocal().toString().split('.').first}",
+                ),
+                trailing: Text(
+                  (t.type == TxType.expense ? '-' : '+') +
+                      t.amount.toStringAsFixed(2),
+                ),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      '/finance/transactions/edit',
+                      arguments: t,
+                    ),
               );
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/finance/transactions/edit'),
+        onPressed:
+            () => Navigator.pushNamed(context, '/finance/transactions/edit'),
         child: const Icon(Icons.add),
       ),
     );

@@ -47,7 +47,10 @@ class _NoteCreateScreenState extends State<NoteCreateScreen> {
       appBar: AppBar(
         title: const Text('Nueva nota'),
         actions: [
-          IconButton(icon: const Icon(Icons.save), onPressed: () => _saveNote()),
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () => _saveNote(),
+          ),
         ],
       ),
       body: ListView(
@@ -74,9 +77,15 @@ class _NoteCreateScreenState extends State<NoteCreateScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
               const SizedBox(width: 8),
-              FilledButton(onPressed: () => _saveNote(), child: const Text('Guardar')),
+              FilledButton(
+                onPressed: () => _saveNote(),
+                child: const Text('Guardar'),
+              ),
             ],
           ),
         ],

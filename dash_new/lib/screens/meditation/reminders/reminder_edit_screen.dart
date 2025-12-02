@@ -39,16 +39,17 @@ class _ReminderEditScreenState extends State<ReminderEditScreen> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: List.generate(7, (i) => i + 1).map((d) {
-                final sel = _days.contains(d);
-                return FilterChip(
-                  label: Text(['L', 'M', 'X', 'J', 'V', 'S', 'D'][d - 1]),
-                  selected: sel,
-                  onSelected: (_) {
-                    setState(() => sel ? _days.remove(d) : _days.add(d));
-                  },
-                );
-              }).toList(),
+              children:
+                  List.generate(7, (i) => i + 1).map((d) {
+                    final sel = _days.contains(d);
+                    return FilterChip(
+                      label: Text(['L', 'M', 'X', 'J', 'V', 'S', 'D'][d - 1]),
+                      selected: sel,
+                      onSelected: (_) {
+                        setState(() => sel ? _days.remove(d) : _days.add(d));
+                      },
+                    );
+                  }).toList(),
             ),
             const Spacer(),
             FilledButton.icon(
@@ -62,8 +63,9 @@ class _ReminderEditScreenState extends State<ReminderEditScreen> {
                   enabled: true,
                 );
                 // Guardar y obtener id
-                final id =
-                    await MeditationFirestoreService.I.addReminder(reminder);
+                final id = await MeditationFirestoreService.I.addReminder(
+                  reminder,
+                );
 
                 // Programar notificación diaria (simple por ahora)
                 await NotificationService.I.scheduleDaily(

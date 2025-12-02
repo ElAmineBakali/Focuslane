@@ -79,13 +79,17 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       }
 
       final path = 'books/${b.id}/book.pdf';
-      
-      await Supabase.instance.client.storage.from('notes-media').uploadBinary(
-        path,
-        bytes,
-        fileOptions: FileOptions(contentType: 'application/pdf'),
-      );
-      final url = Supabase.instance.client.storage.from('notes-media').getPublicUrl(path);
+
+      await Supabase.instance.client.storage
+          .from('notes-media')
+          .uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: 'application/pdf'),
+          );
+      final url = Supabase.instance.client.storage
+          .from('notes-media')
+          .getPublicUrl(path);
 
       final updated = _copyBookWith(b, pdfUrl: url);
       await CultureFirestoreService.I.updateBook(updated);
@@ -119,7 +123,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         }
         await client.from('notes-media').remove([path]);
       } catch (_) {}
-      
+
       final updated = _copyBookWith(b, pdfUrl: null);
       await CultureFirestoreService.I.updateBook(updated);
       setState(() => book = updated);
@@ -163,7 +167,8 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (book == null) return const Scaffold(body: Center(child: Text('Sin libro')));
+    if (book == null)
+      return const Scaffold(body: Center(child: Text('Sin libro')));
     final b = book!;
 
     return Scaffold(
@@ -173,7 +178,11 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () async {
-              final result = await Navigator.pushNamed(context, BookEditScreen.route, arguments: b);
+              final result = await Navigator.pushNamed(
+                context,
+                BookEditScreen.route,
+                arguments: b,
+              );
               if (result is Book && mounted) {
                 setState(() => book = result);
                 _quickPage.text = result.currentPage.toString();
@@ -197,7 +206,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             child: ListTile(
               leading: const Icon(Icons.menu_book),
               title: Text('${b.author ?? "—"} • ${b.genre ?? ""}'),
-              subtitle: Text('Estado: ${b.status.name} • Rating: ${b.rating?.toStringAsFixed(1) ?? "-"}'),
+              subtitle: Text(
+                'Estado: ${b.status.name} • Rating: ${b.rating?.toStringAsFixed(1) ?? "-"}',
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -208,7 +219,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Archivo PDF', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Archivo PDF',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 6),
                   if (b.pdfUrl != null)
                     ListTile(
@@ -225,9 +239,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                             label: const Text('Ver PDF'),
                           ),
                           OutlinedButton.icon(
-                            onPressed: _uploading ? null : () => _pickAndUploadPdf(b),
+                            onPressed:
+                                _uploading ? null : () => _pickAndUploadPdf(b),
                             icon: const Icon(Icons.upload_file),
-                            label: Text(_uploading ? 'Subiendo...' : 'Actualizar PDF'),
+                            label: Text(
+                              _uploading ? 'Subiendo...' : 'Actualizar PDF',
+                            ),
                           ),
                           IconButton(
                             tooltip: 'Quitar PDF',
@@ -241,11 +258,14 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Text('No hay PDF adjunto',
-                              style: Theme.of(context).textTheme.bodyMedium),
+                          child: Text(
+                            'No hay PDF adjunto',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         ),
                         FilledButton.icon(
-                          onPressed: _uploading ? null : () => _pickAndUploadPdf(b),
+                          onPressed:
+                              _uploading ? null : () => _pickAndUploadPdf(b),
                           icon: const Icon(Icons.upload_file),
                           label: Text(_uploading ? 'Subiendo...' : 'Subir PDF'),
                         ),
@@ -264,7 +284,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Progreso', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Progreso',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -272,15 +295,20 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         child: TextField(
                           controller: _quickPage,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Página actual'),
+                          decoration: const InputDecoration(
+                            labelText: 'Página actual',
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () async {
-                          final p = int.tryParse(_quickPage.text) ?? b.currentPage;
+                          final p =
+                              int.tryParse(_quickPage.text) ?? b.currentPage;
                           await svc.setBookCurrentPage(b.id, p);
-                          setState(() => book = _copyBookWith(b, currentPage: p));
+                          setState(
+                            () => book = _copyBookWith(b, currentPage: p),
+                          );
                         },
                         child: const Text('Actualizar'),
                       ),
@@ -288,9 +316,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   ),
                   const SizedBox(height: 6),
                   LinearProgressIndicator(
-                    value: (b.pagesTotal == null || b.pagesTotal == 0)
-                        ? null
-                        : (b.currentPage / b.pagesTotal!).clamp(0, 1).toDouble(),
+                    value:
+                        (b.pagesTotal == null || b.pagesTotal == 0)
+                            ? null
+                            : (b.currentPage / b.pagesTotal!)
+                                .clamp(0, 1)
+                                .toDouble(),
                     minHeight: 8,
                   ),
                 ],
@@ -305,27 +336,41 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Resúmenes', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Resúmenes',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   TextField(
-                      controller: _sumShort,
-                      maxLines: 4,
-                      decoration: const InputDecoration(labelText: 'Resumen corto')),
+                    controller: _sumShort,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      labelText: 'Resumen corto',
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   TextField(
-                      controller: _sumDeep,
-                      maxLines: 8,
-                      decoration: const InputDecoration(labelText: 'Resumen profundo')),
+                    controller: _sumDeep,
+                    maxLines: 8,
+                    decoration: const InputDecoration(
+                      labelText: 'Resumen profundo',
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   FilledButton(
                     onPressed: () async {
                       await CultureFirestoreService.I.updateBook(
                         _copyBookWith(
                           b,
-                          currentPage: int.tryParse(_quickPage.text) ?? b.currentPage,
+                          currentPage:
+                              int.tryParse(_quickPage.text) ?? b.currentPage,
                           shortSummary:
-                              _sumShort.text.trim().isEmpty ? null : _sumShort.text.trim(),
+                              _sumShort.text.trim().isEmpty
+                                  ? null
+                                  : _sumShort.text.trim(),
                           deepSummary:
-                              _sumDeep.text.trim().isEmpty ? null : _sumDeep.text.trim(),
+                              _sumDeep.text.trim().isEmpty
+                                  ? null
+                                  : _sumDeep.text.trim(),
                         ),
                       );
                       if (mounted) {
@@ -346,14 +391,19 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Sesiones de lectura', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Sesiones de lectura',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _sessPages,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Páginas'),
+                          decoration: const InputDecoration(
+                            labelText: 'Páginas',
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -361,12 +411,17 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         child: TextField(
                           controller: _sessMin,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Minutos'),
+                          decoration: const InputDecoration(
+                            labelText: 'Minutos',
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  TextField(controller: _sessNotes, decoration: const InputDecoration(labelText: 'Notas')),
+                  TextField(
+                    controller: _sessNotes,
+                    decoration: const InputDecoration(labelText: 'Notas'),
+                  ),
                   const SizedBox(height: 6),
                   FilledButton(
                     onPressed: () async {
@@ -375,7 +430,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         date: DateTime.now(),
                         pages: int.tryParse(_sessPages.text) ?? 0,
                         minutes: int.tryParse(_sessMin.text) ?? 0,
-                        notes: _sessNotes.text.trim().isEmpty ? null : _sessNotes.text.trim(),
+                        notes:
+                            _sessNotes.text.trim().isEmpty
+                                ? null
+                                : _sessNotes.text.trim(),
                       );
                       await CultureFirestoreService.I.addBookSession(b.id, s);
                       _sessPages.clear();
@@ -389,20 +447,30 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     stream: CultureFirestoreService.I.watchBookSessions(b.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty) return const Text('Sin sesiones todavía');
+                      if (data.isEmpty)
+                        return const Text('Sin sesiones todavía');
                       return Column(
-                        children: data
-                            .map(
-                              (x) => ListTile(
-                                leading: const Icon(Icons.timer),
-                                title: Text('${x.pages} págs • ${x.minutes} min'),
-                                subtitle: Text(
-                                  x.date.toLocal().toString().split('.').first +
-                                      (x.notes != null ? ' • ${x.notes}' : ''),
-                                ),
-                              ),
-                            )
-                            .toList(),
+                        children:
+                            data
+                                .map(
+                                  (x) => ListTile(
+                                    leading: const Icon(Icons.timer),
+                                    title: Text(
+                                      '${x.pages} págs • ${x.minutes} min',
+                                    ),
+                                    subtitle: Text(
+                                      x.date
+                                              .toLocal()
+                                              .toString()
+                                              .split('.')
+                                              .first +
+                                          (x.notes != null
+                                              ? ' • ${x.notes}'
+                                              : ''),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       );
                     },
                   ),
@@ -420,24 +488,28 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 children: [
                   Text('Citas', style: Theme.of(context).textTheme.titleMedium),
                   TextField(
-                      controller: _quoteText,
-                      maxLines: 3,
-                      decoration: const InputDecoration(labelText: 'Texto')),
+                    controller: _quoteText,
+                    maxLines: 3,
+                    decoration: const InputDecoration(labelText: 'Texto'),
+                  ),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _quotePage,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Página'),
+                          decoration: const InputDecoration(
+                            labelText: 'Página',
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _quoteNote,
-                          decoration:
-                              const InputDecoration(labelText: 'Nota (opcional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Nota (opcional)',
+                          ),
                         ),
                       ),
                     ],
@@ -452,7 +524,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           id: '',
                           text: _quoteText.text.trim(),
                           page: int.tryParse(_quotePage.text),
-                          note: _quoteNote.text.trim().isEmpty ? null : _quoteNote.text.trim(),
+                          note:
+                              _quoteNote.text.trim().isEmpty
+                                  ? null
+                                  : _quoteNote.text.trim(),
                         ),
                       );
                       _quoteText.clear();
@@ -466,23 +541,27 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     stream: CultureFirestoreService.I.watchBookQuotes(b.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty) return const Text('Sin citas guardadas');
+                      if (data.isEmpty)
+                        return const Text('Sin citas guardadas');
                       return Column(
-                        children: data
-                            .map(
-                              (q) => ListTile(
-                                leading: const Icon(Icons.format_quote),
-                                title: Text(q.text),
-                                subtitle: Text(
-                                    'Pág. ${q.page ?? "-"} ${q.note != null ? "• ${q.note}" : ""}'),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: () =>
-                                      CultureFirestoreService.I.deleteBookQuote(b.id, q.id),
-                                ),
-                              ),
-                            )
-                            .toList(),
+                        children:
+                            data
+                                .map(
+                                  (q) => ListTile(
+                                    leading: const Icon(Icons.format_quote),
+                                    title: Text(q.text),
+                                    subtitle: Text(
+                                      'Pág. ${q.page ?? "-"} ${q.note != null ? "• ${q.note}" : ""}',
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed:
+                                          () => CultureFirestoreService.I
+                                              .deleteBookQuote(b.id, q.id),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       );
                     },
                   ),

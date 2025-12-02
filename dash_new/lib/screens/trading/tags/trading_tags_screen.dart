@@ -26,7 +26,8 @@ class _TradingTagsScreenState extends State<TradingTagsScreen> {
               stream: svc.watchTags(),
               builder: (_, s) {
                 final data = s.data ?? [];
-                if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                if (s.connectionState == ConnectionState.waiting)
+                  return const Center(child: CircularProgressIndicator());
                 if (data.isEmpty) return const Center(child: Text('Sin tags'));
                 return ListView.separated(
                   itemCount: data.length,
@@ -36,8 +37,12 @@ class _TradingTagsScreenState extends State<TradingTagsScreen> {
                     return ListTile(
                       leading: const Icon(Icons.tag),
                       title: Text(t.name),
-                      subtitle: t.color != null ? Text('Color: ${t.color}') : null,
-                      trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => svc.deleteTag(t.id)),
+                      subtitle:
+                          t.color != null ? Text('Color: ${t.color}') : null,
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => svc.deleteTag(t.id),
+                      ),
                     );
                   },
                 );
@@ -49,21 +54,44 @@ class _TradingTagsScreenState extends State<TradingTagsScreen> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Expanded(child: TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre'))),
+                Expanded(
+                  child: TextField(
+                    controller: _name,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                ),
                 const SizedBox(width: 8),
-                SizedBox(width: 120, child: TextField(controller: _color, decoration: const InputDecoration(labelText: 'Color (opcional)'))),
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: _color,
+                    decoration: const InputDecoration(
+                      labelText: 'Color (opcional)',
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: () async {
                     if (_name.text.trim().isEmpty) return;
-                    await svc.addTag(TradingTag(id:'', name: _name.text.trim(), color: _color.text.trim().isEmpty ? null : _color.text.trim()));
-                    _name.clear(); _color.clear();
+                    await svc.addTag(
+                      TradingTag(
+                        id: '',
+                        name: _name.text.trim(),
+                        color:
+                            _color.text.trim().isEmpty
+                                ? null
+                                : _color.text.trim(),
+                      ),
+                    );
+                    _name.clear();
+                    _color.clear();
                   },
                   child: const Text('Añadir'),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

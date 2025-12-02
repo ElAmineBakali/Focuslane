@@ -38,7 +38,9 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nueva persona' : 'Persona')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nueva persona' : 'Persona'),
+      ),
       body: Column(
         children: [
           TaskFormTheme(
@@ -51,7 +53,11 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
                     TextFormField(
                       controller: _name,
                       decoration: const InputDecoration(labelText: 'Nombre'),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                      validator:
+                          (v) =>
+                              (v == null || v.trim().isEmpty)
+                                  ? 'Requerido'
+                                  : null,
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -61,12 +67,16 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _contact,
-                      decoration: const InputDecoration(labelText: 'Contacto (opcional)'),
+                      decoration: const InputDecoration(
+                        labelText: 'Contacto (opcional)',
+                      ),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _notes,
-                      decoration: const InputDecoration(labelText: 'Notas (opcional)'),
+                      decoration: const InputDecoration(
+                        labelText: 'Notas (opcional)',
+                      ),
                     ),
                     const SizedBox(height: 8),
                     FilledButton(
@@ -75,9 +85,18 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
                         final obj = Person(
                           id: editing?.id ?? '',
                           name: _name.text.trim(),
-                          defaultCurrency: _currency.text.trim().isEmpty ? 'EUR' : _currency.text.trim(),
-                          contact: _contact.text.trim().isEmpty ? null : _contact.text.trim(),
-                          notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+                          defaultCurrency:
+                              _currency.text.trim().isEmpty
+                                  ? 'EUR'
+                                  : _currency.text.trim(),
+                          contact:
+                              _contact.text.trim().isEmpty
+                                  ? null
+                                  : _contact.text.trim(),
+                          notes:
+                              _notes.text.trim().isEmpty
+                                  ? null
+                                  : _notes.text.trim(),
                           balance: editing?.balance ?? 0,
                         );
                         if (editing == null) {
@@ -99,7 +118,7 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
                           if (mounted) Navigator.pop(context);
                         },
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ),
@@ -122,14 +141,20 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
                     itemBuilder: (_, i) {
                       final e = data[i];
                       return ListTile(
-                        leading: Icon(e.amount >= 0 ? Icons.call_received : Icons.call_made),
-                        title: Text(e.concept),
-                        subtitle: Text(e.date.toLocal().toString().split('.').first),
-                        trailing: Text(e.amount.toStringAsFixed(2)),
-                        onTap: () => Navigator.pushNamed(
-                          context, DebtEntryEditScreen.route,
-                          arguments: {'person': editing!, 'entry': e},
+                        leading: Icon(
+                          e.amount >= 0 ? Icons.call_received : Icons.call_made,
                         ),
+                        title: Text(e.concept),
+                        subtitle: Text(
+                          e.date.toLocal().toString().split('.').first,
+                        ),
+                        trailing: Text(e.amount.toStringAsFixed(2)),
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              DebtEntryEditScreen.route,
+                              arguments: {'person': editing!, 'entry': e},
+                            ),
                       );
                     },
                   );
@@ -138,13 +163,18 @@ class _PersonEditScreenState extends State<PersonEditScreen> {
             ),
         ],
       ),
-      floatingActionButton: editing == null
-          ? null
-          : FloatingActionButton(
-              onPressed: () => Navigator.pushNamed(
-                context, DebtEntryEditScreen.route, arguments: {'person': editing!}),
-              child: const Icon(Icons.add),
-            ),
+      floatingActionButton:
+          editing == null
+              ? null
+              : FloatingActionButton(
+                onPressed:
+                    () => Navigator.pushNamed(
+                      context,
+                      DebtEntryEditScreen.route,
+                      arguments: {'person': editing!},
+                    ),
+                child: const Icon(Icons.add),
+              ),
     );
   }
 }

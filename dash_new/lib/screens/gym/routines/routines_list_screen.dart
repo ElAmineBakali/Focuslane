@@ -18,10 +18,13 @@ class RoutinesListScreen extends StatelessWidget {
       body: StreamBuilder<List<Routine>>(
         stream: svc.streamRoutines(),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final routines = snap.data!;
           if (routines.isEmpty) {
-            return const Center(child: Text('Crea tu primera rutina con el botón +'));
+            return const Center(
+              child: Text('Crea tu primera rutina con el botón +'),
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
@@ -48,29 +51,47 @@ class RoutinesListScreen extends StatelessWidget {
                       if (v == 'del') {
                         final ok = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Eliminar rutina'),
-                            content: Text('¿Eliminar "${r.name}" y todo su contenido?'),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                              FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-                            ],
-                          ),
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Eliminar rutina'),
+                                content: Text(
+                                  '¿Eliminar "${r.name}" y todo su contenido?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  FilledButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    child: const Text('Eliminar'),
+                                  ),
+                                ],
+                              ),
                         );
                         if (ok == true) await svc.deleteRoutineCascade(r.id);
                       }
                     },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'default', child: Text('Hacer predeterminada')),
-                      PopupMenuItem(value: 'edit', child: Text('Editar')),
-                      PopupMenuItem(value: 'dup', child: Text('Duplicar')),
-                      PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                    ],
+                    itemBuilder:
+                        (_) => const [
+                          PopupMenuItem(
+                            value: 'default',
+                            child: Text('Hacer predeterminada'),
+                          ),
+                          PopupMenuItem(value: 'edit', child: Text('Editar')),
+                          PopupMenuItem(value: 'dup', child: Text('Duplicar')),
+                          PopupMenuItem(value: 'del', child: Text('Eliminar')),
+                        ],
                   ),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => RoutineDetailScreen(svc: svc, routine: r)),
+                      MaterialPageRoute(
+                        builder:
+                            (_) => RoutineDetailScreen(svc: svc, routine: r),
+                      ),
                     );
                   },
                 ),
@@ -116,7 +137,9 @@ class RoutinesListScreen extends StatelessWidget {
     // ignore: use_build_context_synchronously
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => RoutineDetailScreen(svc: svc, routine: created)),
+      MaterialPageRoute(
+        builder: (_) => RoutineDetailScreen(svc: svc, routine: created),
+      ),
     );
   }
 
@@ -127,18 +150,20 @@ class RoutinesListScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _RoutineFormSheet(
-        title: 'Editar rutina',
-        initial: _RoutineFormResult(
-          name: r.name,
-          description: r.description,
-          splitType: r.splitType,
-          restSecDefault: r.restSecDefault,
-          colorHex: r.colorHex ?? _rgbToHex(r.color.value),
-          isDefault: r.isDefault,
-        ),
-        showDefaultToggle: false, // al editar no cambiamos aquí predeterminada
-      ),
+      builder:
+          (_) => _RoutineFormSheet(
+            title: 'Editar rutina',
+            initial: _RoutineFormResult(
+              name: r.name,
+              description: r.description,
+              splitType: r.splitType,
+              restSecDefault: r.restSecDefault,
+              colorHex: r.colorHex ?? _rgbToHex(r.color.value),
+              isDefault: r.isDefault,
+            ),
+            showDefaultToggle:
+                false, // al editar no cambiamos aquí predeterminada
+          ),
     );
 
     if (res == null) return;
@@ -243,7 +268,12 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 16 + viewInsets),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: 16 + viewInsets,
+      ),
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -279,10 +309,16 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
               DropdownButtonFormField<String>(
                 initialValue: _split,
                 items: const [
-                  DropdownMenuItem(value: 'PPL', child: Text('PPL (Push/Pull/Legs)')),
+                  DropdownMenuItem(
+                    value: 'PPL',
+                    child: Text('PPL (Push/Pull/Legs)'),
+                  ),
                   DropdownMenuItem(value: 'UL', child: Text('Upper/Lower')),
                   DropdownMenuItem(value: 'FB', child: Text('Full Body')),
-                  DropdownMenuItem(value: 'Custom', child: Text('Personalizada')),
+                  DropdownMenuItem(
+                    value: 'Custom',
+                    child: Text('Personalizada'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _split = v ?? 'Custom'),
                 decoration: const InputDecoration(
@@ -310,41 +346,51 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
               const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Color', style: Theme.of(context).textTheme.labelLarge),
+                child: Text(
+                  'Color',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _palette.map((c) {
-                  final selected = c.value == _selected.value;
-                  return InkWell(
-                    onTap: () => setState(() => _selected = c),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          if (selected)
-                            BoxShadow(
-                              color: cs.primary.withOpacity(.35),
-                              blurRadius: 6,
-                              spreadRadius: 1,
-                            ),
-                        ],
-                        border: selected
-                            ? Border.all(color: Colors.white, width: 2)
-                            : Border.all(color: Colors.transparent),
-                      ),
-                      child: selected
-                          ? const Icon(Icons.check, size: 20, color: Colors.white)
-                          : null,
-                    ),
-                  );
-                }).toList(),
+                children:
+                    _palette.map((c) {
+                      final selected = c.value == _selected.value;
+                      return InkWell(
+                        onTap: () => setState(() => _selected = c),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              if (selected)
+                                BoxShadow(
+                                  color: cs.primary.withOpacity(.35),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                            ],
+                            border:
+                                selected
+                                    ? Border.all(color: Colors.white, width: 2)
+                                    : Border.all(color: Colors.transparent),
+                          ),
+                          child:
+                              selected
+                                  ? const Icon(
+                                    Icons.check,
+                                    size: 20,
+                                    color: Colors.white,
+                                  )
+                                  : null,
+                        ),
+                      );
+                    }).toList(),
               ),
               if (widget.showDefaultToggle) ...[
                 const SizedBox(height: 8),
@@ -358,11 +404,16 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: _submit,
-                    child: Text(widget.title.startsWith('Editar') ? 'Guardar' : 'Crear'),
+                    child: Text(
+                      widget.title.startsWith('Editar') ? 'Guardar' : 'Crear',
+                    ),
                   ),
                 ],
               ),
@@ -384,7 +435,8 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
       context,
       _RoutineFormResult(
         name: _nameCtrl.text.trim(),
-        description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+        description:
+            _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
         splitType: _split,
         restSecDefault: int.parse(_restCtrl.text.trim()),
         colorHex: hex,

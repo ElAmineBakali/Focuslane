@@ -23,26 +23,53 @@ class CalendarAggregatorService {
           final enabled = prefs.enabled;
           final filtered = list.where((e) => enabled.contains(e.type)).toList();
           return prefs.highOnly
-              ? filtered.where((e) => e.priority == CalendarPriority.high).toList()
+              ? filtered
+                  .where((e) => e.priority == CalendarPriority.high)
+                  .toList()
               : filtered;
         });
 
         final enabled = prefs.enabled;
-        final tasks$   = enabled.contains(CalendarType.task)    ? _safeTasks(uid, from, to)   : Stream<List<CalendarEvent>>.value(const []);
-        final study$   = enabled.contains(CalendarType.study)   ? _safeStudy(uid, from, to)   : Stream<List<CalendarEvent>>.value(const []);
-        final gym$     = enabled.contains(CalendarType.gym)     ? _safeGym(uid, from, to)     : Stream<List<CalendarEvent>>.value(const []);
-        final food$    = enabled.contains(CalendarType.food)    ? _safeFood(uid, from, to)    : Stream<List<CalendarEvent>>.value(const []);
-        final finance$ = enabled.contains(CalendarType.finance) ? _safeFinance(uid, from, to) : Stream<List<CalendarEvent>>.value(const []);
+        final tasks$ =
+            enabled.contains(CalendarType.task)
+                ? _safeTasks(uid, from, to)
+                : Stream<List<CalendarEvent>>.value(const []);
+        final study$ =
+            enabled.contains(CalendarType.study)
+                ? _safeStudy(uid, from, to)
+                : Stream<List<CalendarEvent>>.value(const []);
+        final gym$ =
+            enabled.contains(CalendarType.gym)
+                ? _safeGym(uid, from, to)
+                : Stream<List<CalendarEvent>>.value(const []);
+        final food$ =
+            enabled.contains(CalendarType.food)
+                ? _safeFood(uid, from, to)
+                : Stream<List<CalendarEvent>>.value(const []);
+        final finance$ =
+            enabled.contains(CalendarType.finance)
+                ? _safeFinance(uid, from, to)
+                : Stream<List<CalendarEvent>>.value(const []);
 
         final ctrl = StreamController<List<CalendarEvent>>.broadcast();
         final latest = <int, List<CalendarEvent>>{
-          0: const [], 1: const [], 2: const [], 3: const [], 4: const [], 5: const [],
+          0: const [],
+          1: const [],
+          2: const [],
+          3: const [],
+          4: const [],
+          5: const [],
         };
         late final List<StreamSubscription> subs;
 
         void emit() {
           final all = <CalendarEvent>[
-            ...latest[0]!, ...latest[1]!, ...latest[2]!, ...latest[3]!, ...latest[4]!, ...latest[5]!,
+            ...latest[0]!,
+            ...latest[1]!,
+            ...latest[2]!,
+            ...latest[3]!,
+            ...latest[4]!,
+            ...latest[5]!,
           ];
           if (prefs.highOnly) {
             all.removeWhere((e) => e.priority != CalendarPriority.high);
@@ -52,16 +79,36 @@ class CalendarAggregatorService {
         }
 
         subs = [
-          manual$.listen((v){ latest[0]=v; emit(); }),
-          tasks$.listen((v){ latest[1]=v; emit(); }),
-          study$.listen((v){ latest[2]=v; emit(); }),
-          gym$.listen((v){ latest[3]=v; emit(); }),
-          food$.listen((v){ latest[4]=v; emit(); }),
-          finance$.listen((v){ latest[5]=v; emit(); }),
+          manual$.listen((v) {
+            latest[0] = v;
+            emit();
+          }),
+          tasks$.listen((v) {
+            latest[1] = v;
+            emit();
+          }),
+          study$.listen((v) {
+            latest[2] = v;
+            emit();
+          }),
+          gym$.listen((v) {
+            latest[3] = v;
+            emit();
+          }),
+          food$.listen((v) {
+            latest[4] = v;
+            emit();
+          }),
+          finance$.listen((v) {
+            latest[5] = v;
+            emit();
+          }),
         ];
 
         ctrl.onCancel = () async {
-          for (final s in subs) { await s.cancel(); }
+          for (final s in subs) {
+            await s.cancel();
+          }
         };
 
         emit();
@@ -86,13 +133,24 @@ class CalendarAggregatorService {
     }
   }
 
-  Stream<List<CalendarEvent>> _safeTasks(String uid, DateTime from, DateTime to) async* {
+  Stream<List<CalendarEvent>> _safeTasks(
+    String uid,
+    DateTime from,
+    DateTime to,
+  ) async* {
     try {
       final col = _db.collection('users').doc(uid).collection('tasks');
-      final qs = col
-          .where('dueDate', isGreaterThanOrEqualTo: Timestamp.fromDate(_day0(from)))
-          .where('dueDate', isLessThanOrEqualTo: Timestamp.fromDate(_dayEnd(to)))
-          .snapshots();
+      final qs =
+          col
+              .where(
+                'dueDate',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(_day0(from)),
+              )
+              .where(
+                'dueDate',
+                isLessThanOrEqualTo: Timestamp.fromDate(_dayEnd(to)),
+              )
+              .snapshots();
       yield* qs.map((s) {
         return s.docs.map((d) {
           final m = d.data();
@@ -116,13 +174,23 @@ class CalendarAggregatorService {
     }
   }
 
-  Stream<List<CalendarEvent>> _safeStudy(String uid, DateTime from, DateTime to) async* {
+  Stream<List<CalendarEvent>> _safeStudy(
+    String uid,
+    DateTime from,
+    DateTime to,
+  ) async* {
     try {
-      final col = _db.collection('users').doc(uid).collection('study').doc('data').collection('sessions');
-      final qs = col
-          .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
-          .where('start', isLessThanOrEqualTo: Timestamp.fromDate(to))
-          .snapshots();
+      final col = _db
+          .collection('users')
+          .doc(uid)
+          .collection('study')
+          .doc('data')
+          .collection('sessions');
+      final qs =
+          col
+              .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+              .where('start', isLessThanOrEqualTo: Timestamp.fromDate(to))
+              .snapshots();
       yield* qs.map((s) {
         return s.docs.map((d) {
           final m = d.data();
@@ -145,13 +213,23 @@ class CalendarAggregatorService {
     }
   }
 
-  Stream<List<CalendarEvent>> _safeGym(String uid, DateTime from, DateTime to) async* {
+  Stream<List<CalendarEvent>> _safeGym(
+    String uid,
+    DateTime from,
+    DateTime to,
+  ) async* {
     try {
-      final col = _db.collection('users').doc(uid).collection('gym').doc('data').collection('sessions');
-      final qs = col
-          .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
-          .where('start', isLessThanOrEqualTo: Timestamp.fromDate(to))
-          .snapshots();
+      final col = _db
+          .collection('users')
+          .doc(uid)
+          .collection('gym')
+          .doc('data')
+          .collection('sessions');
+      final qs =
+          col
+              .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+              .where('start', isLessThanOrEqualTo: Timestamp.fromDate(to))
+              .snapshots();
       yield* qs.map((s) {
         return s.docs.map((d) {
           final m = d.data();
@@ -175,9 +253,18 @@ class CalendarAggregatorService {
     }
   }
 
-  Stream<List<CalendarEvent>> _safeFood(String uid, DateTime from, DateTime to) async* {
+  Stream<List<CalendarEvent>> _safeFood(
+    String uid,
+    DateTime from,
+    DateTime to,
+  ) async* {
     try {
-      final weeksCol = _db.collection('users').doc(uid).collection('food').doc('data').collection('weeks');
+      final weeksCol = _db
+          .collection('users')
+          .doc(uid)
+          .collection('food')
+          .doc('data')
+          .collection('weeks');
       final ids = {_weekId(from), _weekId(to)}.toList();
 
       final ctrl = StreamController<List<CalendarEvent>>.broadcast();
@@ -195,15 +282,17 @@ class CalendarAggregatorService {
             if (date == null) return;
             final entries = (v as List?) ?? const [];
             if (entries.isEmpty) return;
-            list.add(CalendarEvent(
-              id: 'food-$weekId-$k',
-              title: 'Comidas planificadas ($k)',
-              type: CalendarType.food,
-              priority: CalendarPriority.low,
-              start: date,
-              allDay: true,
-              notes: 'Items: ${entries.length}',
-            ));
+            list.add(
+              CalendarEvent(
+                id: 'food-$weekId-$k',
+                title: 'Comidas planificadas ($k)',
+                type: CalendarType.food,
+                priority: CalendarPriority.low,
+                start: date,
+                allDay: true,
+                notes: 'Items: ${entries.length}',
+              ),
+            );
           });
         }
         list.sort((a, b) => a.start.compareTo(b.start));
@@ -223,7 +312,9 @@ class CalendarAggregatorService {
       }
 
       ctrl.onCancel = () async {
-        for (final s in subs) { await s.cancel(); }
+        for (final s in subs) {
+          await s.cancel();
+        }
       };
 
       ctrl.add(build());
@@ -233,38 +324,61 @@ class CalendarAggregatorService {
     }
   }
 
-  Stream<List<CalendarEvent>> _safeFinance(String uid, DateTime from, DateTime to) async* {
+  Stream<List<CalendarEvent>> _safeFinance(
+    String uid,
+    DateTime from,
+    DateTime to,
+  ) async* {
     try {
-      final col = _db.collection('users').doc(uid).collection('finance').doc('data').collection('transactions');
-      final qs = col
-          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(_day0(from)))
-          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(_dayEnd(to)))
-          .snapshots();
+      final col = _db
+          .collection('users')
+          .doc(uid)
+          .collection('finance')
+          .doc('data')
+          .collection('transactions');
+      final qs =
+          col
+              .where(
+                'date',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(_day0(from)),
+              )
+              .where(
+                'date',
+                isLessThanOrEqualTo: Timestamp.fromDate(_dayEnd(to)),
+              )
+              .snapshots();
       yield* qs.map((s) {
-        return s.docs.map((d) {
-          final m = d.data();
-          final planned = (m['planned'] ?? false) as bool;
-          final isBill = (m['isBill'] ?? false) as bool;
-          final dueTs = (m['dueDate'] as Timestamp?);
-          final date = (dueTs ?? (m['date'] as Timestamp?))?.toDate() ?? DateTime.now();
-          if (!(planned || isBill || dueTs != null)) return null;
-          final type = (m['type'] ?? 'expense').toString();
-          final cat = (m['category'] ?? '') as String;
-          final amount = (m['amount'] as num?)?.toDouble() ?? 0.0;
-          return CalendarEvent(
-            id: 'fin-${d.id}',
-            title: (type == 'income')
-                ? 'Ingreso planificado'
-                : (isBill ? 'Pago (factura)' : 'Gasto planificado'),
-            type: CalendarType.finance,
-            priority: CalendarPriority.normal,
-            start: date,
-            allDay: true,
-            notes: [cat, if (amount != 0) amount.toStringAsFixed(2)]
-                .where((e) => e.isNotEmpty)
-                .join(' • '),
-          );
-        }).whereType<CalendarEvent>().toList();
+        return s.docs
+            .map((d) {
+              final m = d.data();
+              final planned = (m['planned'] ?? false) as bool;
+              final isBill = (m['isBill'] ?? false) as bool;
+              final dueTs = (m['dueDate'] as Timestamp?);
+              final date =
+                  (dueTs ?? (m['date'] as Timestamp?))?.toDate() ??
+                  DateTime.now();
+              if (!(planned || isBill || dueTs != null)) return null;
+              final type = (m['type'] ?? 'expense').toString();
+              final cat = (m['category'] ?? '') as String;
+              final amount = (m['amount'] as num?)?.toDouble() ?? 0.0;
+              return CalendarEvent(
+                id: 'fin-${d.id}',
+                title:
+                    (type == 'income')
+                        ? 'Ingreso planificado'
+                        : (isBill ? 'Pago (factura)' : 'Gasto planificado'),
+                type: CalendarType.finance,
+                priority: CalendarPriority.normal,
+                start: date,
+                allDay: true,
+                notes: [
+                  cat,
+                  if (amount != 0) amount.toStringAsFixed(2),
+                ].where((e) => e.isNotEmpty).join(' • '),
+              );
+            })
+            .whereType<CalendarEvent>()
+            .toList();
       });
     } catch (_) {
       yield const <CalendarEvent>[];
@@ -286,7 +400,17 @@ class CalendarAggregatorService {
       final first = DateTime(year, 1, 1);
       final firstMonday = first.add(Duration(days: (8 - first.weekday) % 7));
       final monday = firstMonday.add(Duration(days: (w - 1) * 7));
-      final idx = const {'Mon':0,'Tue':1,'Wed':2,'Thu':3,'Fri':4,'Sat':5,'Sun':6}[key] ?? 0;
+      final idx =
+          const {
+            'Mon': 0,
+            'Tue': 1,
+            'Wed': 2,
+            'Thu': 3,
+            'Fri': 4,
+            'Sat': 5,
+            'Sun': 6,
+          }[key] ??
+          0;
       return monday.add(Duration(days: idx));
     } catch (_) {
       return null;

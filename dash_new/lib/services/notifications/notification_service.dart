@@ -12,7 +12,8 @@ class NotificationService {
   NotificationService._internal();
   static final NotificationService I = NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
   final _payloadCtrl = StreamController<String>.broadcast();
 
   late final Map<String, AndroidNotificationChannel> _androidChannels = {
@@ -112,7 +113,11 @@ class NotificationService {
 
     await _requestIOSPermissions();
 
-    final androidImpl = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final androidImpl =
+        _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
     if (androidImpl != null) {
       for (final ch in _androidChannels.values) {
         await androidImpl.createNotificationChannel(ch);
@@ -126,8 +131,16 @@ class NotificationService {
 
   Future<void> _requestIOSPermissions() async {
     try {
-      final iosImpl = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-      final granted = await iosImpl?.requestPermissions(alert: true, sound: true, badge: true);
+      final iosImpl =
+          _plugin
+              .resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin
+              >();
+      final granted = await iosImpl?.requestPermissions(
+        alert: true,
+        sound: true,
+        badge: true,
+      );
       if (kDebugMode) {
         print('[NotificationService] iOS permissions granted: $granted');
       }
@@ -137,10 +150,16 @@ class NotificationService {
   AndroidNotificationDetails _androidDetailsForId(String id) {
     final module = _moduleKeyFromId(id);
     final ch = _androidChannels[module] ?? _androidChannels['default']!;
-    return AndroidNotificationDetails(ch.id, ch.name,
-        channelDescription: ch.description,
-        importance: ch.importance,
-        priority: ch.importance == Importance.high ? Priority.high : Priority.defaultPriority);
+    return AndroidNotificationDetails(
+      ch.id,
+      ch.name,
+      channelDescription: ch.description,
+      importance: ch.importance,
+      priority:
+          ch.importance == Importance.high
+              ? Priority.high
+              : Priority.defaultPriority,
+    );
   }
 
   DarwinNotificationDetails _iosDetails() {
@@ -170,23 +189,44 @@ class NotificationService {
 
   tz.TZDateTime _nextInstanceOfTime(TimeOfDay time, {tz.TZDateTime? from}) {
     final now = from ?? tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, time.hour, time.minute);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     return scheduled;
   }
 
-  tz.TZDateTime _nextInstanceOfWeekday(int weekday, TimeOfDay time, {tz.TZDateTime? from}) {
+  tz.TZDateTime _nextInstanceOfWeekday(
+    int weekday,
+    TimeOfDay time, {
+    tz.TZDateTime? from,
+  }) {
     final now = from ?? tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, time.hour, time.minute);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
     while (scheduled.weekday != weekday || !scheduled.isAfter(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     return scheduled;
   }
 
-  Map<String, dynamic> _buildPayload({required String id, required String? payload}) {
+  Map<String, dynamic> _buildPayload({
+    required String id,
+    required String? payload,
+  }) {
     return {
       'id': id,
       'groupId': _baseGroupId(id),
@@ -200,7 +240,6 @@ class NotificationService {
     return idx > 0 ? id.substring(0, idx) : id;
   }
 
-
   Future<void> showNow({
     required int id,
     required String title,
@@ -211,8 +250,17 @@ class NotificationService {
       android: _androidDetailsForId('default_show'),
       iOS: _iosDetails(),
     );
-    await _plugin.show(id, title, body, details, payload: jsonEncode(_buildPayload(id: 'default_show_$id', payload: payload)));
-    if (kDebugMode) print('[NotificationService] showNow id=$id title="$title"');
+    await _plugin.show(
+      id,
+      title,
+      body,
+      details,
+      payload: jsonEncode(
+        _buildPayload(id: 'default_show_$id', payload: payload),
+      ),
+    );
+    if (kDebugMode)
+      print('[NotificationService] showNow id=$id title="$title"');
   }
 
   Future<void> scheduleDailyReminder({
@@ -269,7 +317,8 @@ class NotificationService {
       payload: jsonEncode(_buildPayload(id: id, payload: payload)),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-    if (kDebugMode) print('[NotificationService] scheduleOneTime id=$id @ $scheduledTime');
+    if (kDebugMode)
+      print('[NotificationService] scheduleOneTime id=$id @ $scheduledTime');
   }
 
   Future<void> scheduleWeeklyReminder({
@@ -300,7 +349,10 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
       );
-      if (kDebugMode) print('[NotificationService] scheduleWeekly id=$composedId (base=$id) weekday=$weekday @ ${schedule.toLocal()}');
+      if (kDebugMode)
+        print(
+          '[NotificationService] scheduleWeekly id=$composedId (base=$id) weekday=$weekday @ ${schedule.toLocal()}',
+        );
     }
   }
 
@@ -332,7 +384,10 @@ class NotificationService {
         final data = jsonDecode(p.payload!) as Map<String, dynamic>;
         if (data['groupId'] == groupId) {
           await _plugin.cancel(p.id);
-          if (kDebugMode) print('[NotificationService] cancel by groupId=$groupId -> canceled ${p.id}');
+          if (kDebugMode)
+            print(
+              '[NotificationService] cancel by groupId=$groupId -> canceled ${p.id}',
+            );
         }
       } catch (_) {}
     }
@@ -346,7 +401,10 @@ class NotificationService {
         final data = jsonDecode(p.payload!) as Map<String, dynamic>;
         if (data['module'] == moduleKey) {
           await _plugin.cancel(p.id);
-          if (kDebugMode) print('[NotificationService] cancel by module=$moduleKey -> canceled ${p.id}');
+          if (kDebugMode)
+            print(
+              '[NotificationService] cancel by module=$moduleKey -> canceled ${p.id}',
+            );
         }
       } catch (_) {}
     }
@@ -394,7 +452,9 @@ class NotificationService {
       );
     } else {
       if (kDebugMode) {
-        print('[NotificationService] reschedule: no scheduling data provided for id=$id');
+        print(
+          '[NotificationService] reschedule: no scheduling data provided for id=$id',
+        );
       }
     }
   }
@@ -421,9 +481,10 @@ class NotificationService {
       iOS: _iosDetails(),
     );
     final tzTime = tz.TZDateTime.from(whenLocal, tz.local);
-    final mode = useExact
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexactAllowWhileIdle;
+    final mode =
+        useExact
+            ? AndroidScheduleMode.exactAllowWhileIdle
+            : AndroidScheduleMode.inexactAllowWhileIdle;
     await _plugin.zonedSchedule(
       id,
       title,
@@ -433,7 +494,8 @@ class NotificationService {
       payload: payload,
       androidScheduleMode: mode,
     );
-    if (kDebugMode) print('[NotificationService] scheduleOnce legacy id=$id @ $whenLocal');
+    if (kDebugMode)
+      print('[NotificationService] scheduleOnce legacy id=$id @ $whenLocal');
   }
 
   Future<void> scheduleDaily({
@@ -447,7 +509,14 @@ class NotificationService {
     String androidChannelName = 'Diarias',
   }) async {
     final now = tz.TZDateTime.now(tz.local);
-    var next = tz.TZDateTime(tz.local, now.year, now.month, now.day, at.hour, at.minute);
+    var next = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      at.hour,
+      at.minute,
+    );
     if (next.isBefore(now)) next = next.add(const Duration(days: 1));
     final details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -459,9 +528,10 @@ class NotificationService {
       ),
       iOS: _iosDetails(),
     );
-    final mode = useExact
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexactAllowWhileIdle;
+    final mode =
+        useExact
+            ? AndroidScheduleMode.exactAllowWhileIdle
+            : AndroidScheduleMode.inexactAllowWhileIdle;
     await _plugin.zonedSchedule(
       id,
       title,
@@ -472,21 +542,32 @@ class NotificationService {
       androidScheduleMode: mode,
       matchDateTimeComponents: DateTimeComponents.time,
     );
-    if (kDebugMode) print('[NotificationService] scheduleDaily legacy id=$id @ ${next.toLocal()}');
+    if (kDebugMode)
+      print(
+        '[NotificationService] scheduleDaily legacy id=$id @ ${next.toLocal()}',
+      );
   }
 
   Future<void> debugStatus() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final android =
+        _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
     final enabled = await android?.areNotificationsEnabled();
     final pending = await _plugin.pendingNotificationRequests();
     final nowTz = tz.TZDateTime.now(tz.local);
-    print('[NotificationService] TZ=${tz.local} now=$nowTz enabled=$enabled pending=${pending.length}');
+    print(
+      '[NotificationService] TZ=${tz.local} now=$nowTz enabled=$enabled pending=${pending.length}',
+    );
     for (final p in pending) {
-      print('[NotificationService] -> id=${p.id} title=${p.title} body=${p.body} payload=${p.payload}');
+      print(
+        '[NotificationService] -> id=${p.id} title=${p.title} body=${p.body} payload=${p.payload}',
+      );
     }
   }
 
-    Future<void> scheduleHabitDailyReminder(TimeOfDay time) async {
+  Future<void> scheduleHabitDailyReminder(TimeOfDay time) async {
     await scheduleDailyReminder(
       id: 'habit_daily_reminder',
       title: 'Recordatorio',

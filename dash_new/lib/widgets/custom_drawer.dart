@@ -26,7 +26,9 @@ class CustomDrawer extends StatelessWidget {
                   alignment: Alignment.bottomLeft,
                   child: Text(
                     'Mi Dashboard',
-                    style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onPrimary),
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: theme.colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),
@@ -34,20 +36,66 @@ class CustomDrawer extends StatelessWidget {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    _buildDrawerTile(context, Icons.calendar_month, 'Calendario'),
+                    _buildDrawerTile(
+                      context,
+                      Icons.calendar_month,
+                      'Calendario',
+                    ),
                     _buildDrawerTile(context, Icons.task, 'Tareas', '/tasks'),
                     _buildDrawerTile(context, Icons.notes, 'Notas', '/notes'),
-                    _buildDrawerTile(context, Icons.check_circle_outline, 'Hábitos', '/habits'),
-                    _buildDrawerTile(context, Icons.backpack, 'Estudio', '/study'),
-                    _buildDrawerTile(context, Icons.fitness_center, 'Gimnasio', '/gym'),
-                    _buildDrawerTile(context, Icons.self_improvement, 'Meditación', '/meditation'),
-                    _buildDrawerTile(context, Icons.restaurant, 'Alimentación', '/food'),
-                    _buildDrawerTile(context, Icons.currency_exchange, 'Finanzas', '/finance'),
-                    _buildDrawerTile(context, Icons.candlestick_chart, 'Trading', '/trading'),
-                    _buildDrawerTile(context, Icons.candlestick_chart, 'Cultura', '/culture'),
-                    _buildDrawerTile(context, Icons.candlestick_chart, 'Hobbies'),
-
-
+                    _buildDrawerTile(
+                      context,
+                      Icons.check_circle_outline,
+                      'Hábitos',
+                      '/habits',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.backpack,
+                      'Estudio',
+                      '/study',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.fitness_center,
+                      'Gimnasio',
+                      '/gym',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.self_improvement,
+                      'Meditación',
+                      '/meditation',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.restaurant,
+                      'Alimentación',
+                      '/food',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.currency_exchange,
+                      'Finanzas',
+                      '/finance',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.candlestick_chart,
+                      'Trading',
+                      '/trading',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.candlestick_chart,
+                      'Cultura',
+                      '/culture',
+                    ),
+                    _buildDrawerTile(
+                      context,
+                      Icons.candlestick_chart,
+                      'Hobbies',
+                    ),
                   ],
                 ),
               ),
@@ -59,7 +107,8 @@ class CustomDrawer extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.settings),
                     tooltip: 'Ajustes',
-                    onPressed: () => Navigator.of(context).pushNamed('/settings'),
+                    onPressed:
+                        () => Navigator.of(context).pushNamed('/settings'),
                   ),
                 ),
               ),
@@ -70,7 +119,12 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerTile(BuildContext context, IconData icon, String title, [String? route]) {
+  Widget _buildDrawerTile(
+    BuildContext context,
+    IconData icon,
+    String title, [
+    String? route,
+  ]) {
     final theme = Theme.of(context);
     return ListTile(
       leading: Icon(icon, color: theme.iconTheme.color),

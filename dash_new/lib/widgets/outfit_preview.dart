@@ -15,8 +15,7 @@ class OutfitPreview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(outfit.nombre,
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(outfit.nombre, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
             Text(outfit.notas, maxLines: 2, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 8),

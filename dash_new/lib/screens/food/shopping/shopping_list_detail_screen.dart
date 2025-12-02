@@ -6,10 +6,15 @@ import '../services/food_firestore_service.dart';
 class ShoppingListDetailScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   final String listId;
-  const ShoppingListDetailScreen({super.key, required this.svc, required this.listId});
+  const ShoppingListDetailScreen({
+    super.key,
+    required this.svc,
+    required this.listId,
+  });
 
   @override
-  State<ShoppingListDetailScreen> createState() => _ShoppingListDetailScreenState();
+  State<ShoppingListDetailScreen> createState() =>
+      _ShoppingListDetailScreenState();
 }
 
 class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
@@ -28,64 +33,90 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
       ),
       body: TaskFormTheme(
         child: StreamBuilder<List<ShoppingList>>(
-        stream: widget.svc.streamShoppingLists(),
-        builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-          final list = snap.data!.firstWhere(
-            (l) => l.id == widget.listId,
-            orElse: () => ShoppingList(
-              id: widget.listId,
-              name: 'Lista',
-              scope: ShoppingScope.custom,
-              isDefault: false,
-              items: const [],
-              createdAt: DateTime.now(),
-            ),
-          );
-          final total = list.items.fold<double>(0, (a, it) => a + (it.total ?? 0));
-          return ListView(
-            padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
-            children: [
-              ListTile(
-                title: Text(list.name, style: Theme.of(context).textTheme.titleLarge),
-                subtitle: Text('${list.scope.name} • ${list.items.length} items'),
-                trailing: Text(total > 0 ? 'Total: ${total.toStringAsFixed(2)}' : ''),
-              ),
-              const SizedBox(height: 8),
-              if (list.items.isEmpty) const Center(child: Text('Añade productos con +')),
-              ...list.items.asMap().entries.map((e) {
-                final i = e.value;
-                return Card(
-                  child: ListTile(
-                    leading: Checkbox(
-                      value: i.checked,
-                      onChanged: (v) => widget.svc.toggleChecked(list.id, e.key, v ?? false),
-                    ),
-                    title: Text(i.name),
-                    subtitle: Text(
-                      '${i.qty.toStringAsFixed(0)} ${i.unit.name}'
-                      '${i.pricePerUnit != null ? ' • ${i.pricePerUnit} €/u' : ''}'
-                      '${i.total != null ? ' • total ${i.total}' : ''}',
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (v) async {
-                        if (v == 'edit') await _editItemDialog(e.key, i);
-                        if (v == 'del') await widget.svc.removeShoppingItem(list.id, e.key);
-                      },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'edit', child: Text('Editar')),
-                        PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                      ],
-                    ),
+          stream: widget.svc.streamShoppingLists(),
+          builder: (context, snap) {
+            if (!snap.hasData)
+              return const Center(child: CircularProgressIndicator());
+            final list = snap.data!.firstWhere(
+              (l) => l.id == widget.listId,
+              orElse:
+                  () => ShoppingList(
+                    id: widget.listId,
+                    name: 'Lista',
+                    scope: ShoppingScope.custom,
+                    isDefault: false,
+                    items: const [],
+                    createdAt: DateTime.now(),
                   ),
-                );
-              }),
-              const SizedBox(height: 12),
-            ],
-          );
-        },
+            );
+            final total = list.items.fold<double>(
+              0,
+              (a, it) => a + (it.total ?? 0),
+            );
+            return ListView(
+              padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
+              children: [
+                ListTile(
+                  title: Text(
+                    list.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  subtitle: Text(
+                    '${list.scope.name} • ${list.items.length} items',
+                  ),
+                  trailing: Text(
+                    total > 0 ? 'Total: ${total.toStringAsFixed(2)}' : '',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (list.items.isEmpty)
+                  const Center(child: Text('Añade productos con +')),
+                ...list.items.asMap().entries.map((e) {
+                  final i = e.value;
+                  return Card(
+                    child: ListTile(
+                      leading: Checkbox(
+                        value: i.checked,
+                        onChanged:
+                            (v) => widget.svc.toggleChecked(
+                              list.id,
+                              e.key,
+                              v ?? false,
+                            ),
+                      ),
+                      title: Text(i.name),
+                      subtitle: Text(
+                        '${i.qty.toStringAsFixed(0)} ${i.unit.name}'
+                        '${i.pricePerUnit != null ? ' • ${i.pricePerUnit} €/u' : ''}'
+                        '${i.total != null ? ' • total ${i.total}' : ''}',
+                      ),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (v) async {
+                          if (v == 'edit') await _editItemDialog(e.key, i);
+                          if (v == 'del')
+                            await widget.svc.removeShoppingItem(list.id, e.key);
+                        },
+                        itemBuilder:
+                            (_) => const [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Editar'),
+                              ),
+                              PopupMenuItem(
+                                value: 'del',
+                                child: Text('Eliminar'),
+                              ),
+                            ],
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 12),
+              ],
+            );
+          },
+        ),
       ),
-     )
     );
   }
 
@@ -96,30 +127,53 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
     UnitKind unit = UnitKind.unit;
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Añadir producto'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: name, decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(controller: qty, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Cantidad')),
-            DropdownButton<UnitKind>(
-              value: unit,
-              items: const [
-                DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
-                DropdownMenuItem(value: UnitKind.g, child: Text('g')),
-                DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Añadir producto'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: name,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                ),
+                TextField(
+                  controller: qty,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Cantidad'),
+                ),
+                DropdownButton<UnitKind>(
+                  value: unit,
+                  items: const [
+                    DropdownMenuItem(
+                      value: UnitKind.unit,
+                      child: Text('unidad'),
+                    ),
+                    DropdownMenuItem(value: UnitKind.g, child: Text('g')),
+                    DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                  ],
+                  onChanged: (v) => unit = v ?? UnitKind.unit,
+                ),
+                TextField(
+                  controller: ppu,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Precio por unidad (opcional)',
+                  ),
+                ),
               ],
-              onChanged: (v) => unit = v ?? UnitKind.unit,
             ),
-            TextField(controller: ppu, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Precio por unidad (opcional)')),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Añadir')),
-        ],
-      ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Añadir'),
+              ),
+            ],
+          ),
     );
     if (ok == true) {
       final q = double.tryParse(qty.text) ?? 1;
@@ -145,30 +199,53 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Editar producto'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: name, decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(controller: qty, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Cantidad')),
-            DropdownButton<UnitKind>(
-              value: unit,
-              items: const [
-                DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
-                DropdownMenuItem(value: UnitKind.g, child: Text('g')),
-                DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Editar producto'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: name,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                ),
+                TextField(
+                  controller: qty,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Cantidad'),
+                ),
+                DropdownButton<UnitKind>(
+                  value: unit,
+                  items: const [
+                    DropdownMenuItem(
+                      value: UnitKind.unit,
+                      child: Text('unidad'),
+                    ),
+                    DropdownMenuItem(value: UnitKind.g, child: Text('g')),
+                    DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                  ],
+                  onChanged: (v) => unit = v ?? UnitKind.unit,
+                ),
+                TextField(
+                  controller: ppu,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Precio por unidad (opcional)',
+                  ),
+                ),
               ],
-              onChanged: (v) => unit = v ?? UnitKind.unit,
             ),
-            TextField(controller: ppu, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Precio por unidad (opcional)')),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Guardar')),
-        ],
-      ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Guardar'),
+              ),
+            ],
+          ),
     );
 
     if (ok == true) {
@@ -186,7 +263,11 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
         tags: i.tags,
         notes: i.notes,
       );
-      await widget.svc.upsertShoppingItem(widget.listId, itemId: index.toString(), item: updated);
+      await widget.svc.upsertShoppingItem(
+        widget.listId,
+        itemId: index.toString(),
+        item: updated,
+      );
     }
   }
 
@@ -194,14 +275,21 @@ class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
   Future<bool> _confirm(BuildContext context, String title, String msg) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(msg),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: Text(title),
+            content: Text(msg),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Eliminar'),
+              ),
+            ],
+          ),
     );
     return ok == true;
   }

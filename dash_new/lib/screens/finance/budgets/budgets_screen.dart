@@ -18,7 +18,8 @@ class BudgetsScreen extends StatelessWidget {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin presupuestos'));
+          if (data.isEmpty)
+            return const Center(child: Text('Sin presupuestos'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -27,9 +28,16 @@ class BudgetsScreen extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.account_balance_wallet_outlined),
                 title: Text(b.name),
-                subtitle: Text('Límite: ${b.limit.toStringAsFixed(2)} • ${b.category ?? "Global"} • ${b.period}'),
+                subtitle: Text(
+                  'Límite: ${b.limit.toStringAsFixed(2)} • ${b.category ?? "Global"} • ${b.period}',
+                ),
                 trailing: const Icon(Icons.edit),
-                onTap: () => Navigator.pushNamed(context, BudgetEditScreen.route, arguments: b),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      BudgetEditScreen.route,
+                      arguments: b,
+                    ),
               );
             },
           );
@@ -42,4 +50,3 @@ class BudgetsScreen extends StatelessWidget {
     );
   }
 }
-

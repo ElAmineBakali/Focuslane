@@ -51,10 +51,14 @@ class AssetsListScreen extends StatelessWidget {
               if (v == 'tr') AppLinks.openTradeRepublic();
               if (v == 'imagin') AppLinks.openImagin();
             },
-            itemBuilder: (ctx) => const [
-              PopupMenuItem(value: 'tr', child: Text('Abrir Trade Republic')),
-              PopupMenuItem(value: 'imagin', child: Text('Abrir imagin')),
-            ],
+            itemBuilder:
+                (ctx) => const [
+                  PopupMenuItem(
+                    value: 'tr',
+                    child: Text('Abrir Trade Republic'),
+                  ),
+                  PopupMenuItem(value: 'imagin', child: Text('Abrir imagin')),
+                ],
           ),
           IconButton(
             tooltip: 'Añadir activo',
@@ -77,7 +81,9 @@ class AssetsListScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (data.isEmpty) {
-            return const Center(child: Text('Añade tu primer activo con el botón +'));
+            return const Center(
+              child: Text('Añade tu primer activo con el botón +'),
+            );
           }
           return ListView.separated(
             padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
@@ -90,12 +96,15 @@ class AssetsListScreen extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(_icon(x.kind), color: color),
                   title: Text(x.name),
-                  subtitle: Text([
-                    _kindLabel(x.kind),
-                    if (x.estValue != null)
-                      '${x.estValue!.toStringAsFixed(0)} ${x.currency ?? ''}'.trim(),
-                    if ((x.address ?? '').isNotEmpty) x.address!,
-                  ].join(' • ')),
+                  subtitle: Text(
+                    [
+                      _kindLabel(x.kind),
+                      if (x.estValue != null)
+                        '${x.estValue!.toStringAsFixed(0)} ${x.currency ?? ''}'
+                            .trim(),
+                      if ((x.address ?? '').isNotEmpty) x.address!,
+                    ].join(' • '),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -116,30 +125,42 @@ class AssetsListScreen extends StatelessWidget {
                           } else if (v == 'del') {
                             final ok = await showDialog<bool>(
                               context: ctx,
-                              builder: (_) => AlertDialog(
-                                title: const Text('Eliminar activo'),
-                                content: Text('¿Eliminar "${x.name}"?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Cancelar'),
+                              builder:
+                                  (_) => AlertDialog(
+                                    title: const Text('Eliminar activo'),
+                                    content: Text('¿Eliminar "${x.name}"?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.pop(ctx, false),
+                                        child: const Text('Cancelar'),
+                                      ),
+                                      FilledButton(
+                                        onPressed:
+                                            () => Navigator.pop(ctx, true),
+                                        child: const Text('Eliminar'),
+                                      ),
+                                    ],
                                   ),
-                                  FilledButton(
-                                    onPressed: () => Navigator.pop(ctx, true),
-                                    child: const Text('Eliminar'),
-                                  ),
-                                ],
-                              ),
                             );
                             if (ok == true) {
-                              await FinanceAssetsFirestoreService.I.deleteAsset(x.id);
+                              await FinanceAssetsFirestoreService.I.deleteAsset(
+                                x.id,
+                              );
                             }
                           }
                         },
-                        itemBuilder: (ctx) => const [
-                          PopupMenuItem(value: 'edit', child: Text('Editar')),
-                          PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                        ],
+                        itemBuilder:
+                            (ctx) => const [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Editar'),
+                              ),
+                              PopupMenuItem(
+                                value: 'del',
+                                child: Text('Eliminar'),
+                              ),
+                            ],
                       ),
                     ],
                   ),

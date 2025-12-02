@@ -35,7 +35,9 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
   Widget build(BuildContext context) {
     final svc = MeditationFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo audio' : 'Editar audio')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo audio' : 'Editar audio'),
+      ),
       body: TaskFormTheme(
         child: Padding(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
@@ -46,16 +48,21 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(labelText: 'Título'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _url,
                   decoration: const InputDecoration(
                     labelText: 'URL o asset',
-                    helperText: 'Ejemplos: https://...  ó  assets/audio/guided/mi_audio.mp3',
+                    helperText:
+                        'Ejemplos: https://...  ó  assets/audio/guided/mi_audio.mp3',
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -64,7 +71,15 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                     DropdownButton<int>(
                       value: _minutes,
                       onChanged: (v) => setState(() => _minutes = v ?? 10),
-                      items: [3,5,8,10,12,15,20,30].map((e) => DropdownMenuItem(value: e, child: Text('$e'))).toList(),
+                      items:
+                          [3, 5, 8, 10, 12, 15, 20, 30]
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text('$e'),
+                                ),
+                              )
+                              .toList(),
                     ),
                   ],
                 ),

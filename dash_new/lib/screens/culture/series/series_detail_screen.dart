@@ -29,20 +29,43 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (series == null) return const Scaffold(body: Center(child: Text('Sin serie')));
+    if (series == null)
+      return const Scaffold(body: Center(child: Text('Sin serie')));
 
     final x = series!;
     return Scaffold(
       appBar: AppBar(
         title: Text(x.title),
         actions: [
-          IconButton(icon: const Icon(Icons.edit), onPressed: () => Navigator.pushNamed(context, SeriesEditScreen.route, arguments: x)),
-          IconButton(icon: const Icon(Icons.delete_outline), onPressed: () async { await svc.deleteSeries(x.id); if (mounted) Navigator.pop(context); }),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  SeriesEditScreen.route,
+                  arguments: x,
+                ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () async {
+              await svc.deleteSeries(x.id);
+              if (mounted) Navigator.pop(context);
+            },
+          ),
         ],
       ),
       body: PaddedListView(
         children: [
-          Card(child: ListTile(leading: const Icon(Icons.tv), title: Text(x.platform ?? '—'), subtitle: Text('Estado: ${x.status.name} • Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}'))),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.tv),
+              title: Text(x.platform ?? '—'),
+              subtitle: Text(
+                'Estado: ${x.status.name} • Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}',
+              ),
+            ),
+          ),
 
           const SizedBox(height: 8),
           Card(
@@ -51,15 +74,39 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Episodios', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Episodios',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _s, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Temporada'))),
+                      Expanded(
+                        child: TextField(
+                          controller: _s,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Temporada',
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: TextField(controller: _e, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Nº Episodio'))),
+                      Expanded(
+                        child: TextField(
+                          controller: _e,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Nº Episodio',
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  TextField(controller: _title, decoration: const InputDecoration(labelText: 'Título (opcional)')),
+                  TextField(
+                    controller: _title,
+                    decoration: const InputDecoration(
+                      labelText: 'Título (opcional)',
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   FilledButton(
                     onPressed: () async {
@@ -67,7 +114,10 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                         id: '',
                         season: int.tryParse(_s.text) ?? 1,
                         number: int.tryParse(_e.text) ?? 1,
-                        title: _title.text.trim().isEmpty ? null : _title.text.trim(),
+                        title:
+                            _title.text.trim().isEmpty
+                                ? null
+                                : _title.text.trim(),
                       );
                       await svc.addEpisode(x.id, ep);
                       _title.clear();
@@ -79,19 +129,41 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                     stream: svc.watchEpisodes(x.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (s.connectionState == ConnectionState.waiting) return const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator()));
+                      if (s.connectionState == ConnectionState.waiting)
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
                       if (data.isEmpty) return const Text('Sin episodios aún');
                       return Column(
-                        children: data.map((ep) => CheckboxListTile(
-                          value: ep.watched,
-                          onChanged: (v) => svc.setEpisodeWatched(x.id, ep, v == true),
-                          title: Text('T${ep.season}E${ep.number} ${ep.title ?? ""}'),
-                          subtitle: ep.watchedAt != null ? Text('Visto: ${ep.watchedAt!.toLocal().toString().split(" ").first}') : null,
-                          secondary: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () => svc.deleteEpisode(x.id, ep.id),
-                          ),
-                        )).toList(),
+                        children:
+                            data
+                                .map(
+                                  (ep) => CheckboxListTile(
+                                    value: ep.watched,
+                                    onChanged:
+                                        (v) => svc.setEpisodeWatched(
+                                          x.id,
+                                          ep,
+                                          v == true,
+                                        ),
+                                    title: Text(
+                                      'T${ep.season}E${ep.number} ${ep.title ?? ""}',
+                                    ),
+                                    subtitle:
+                                        ep.watchedAt != null
+                                            ? Text(
+                                              'Visto: ${ep.watchedAt!.toLocal().toString().split(" ").first}',
+                                            )
+                                            : null,
+                                    secondary: IconButton(
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed:
+                                          () => svc.deleteEpisode(x.id, ep.id),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       );
                     },
                   ),

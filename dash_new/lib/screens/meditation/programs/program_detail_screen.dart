@@ -34,12 +34,16 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
         children: [
           ListTile(
             title: Text(program!.description),
-            subtitle: Text('Nivel: ${program!.level} • ${program!.isActive ? "Activo" : "Inactivo"}'),
+            subtitle: Text(
+              'Nivel: ${program!.level} • ${program!.isActive ? "Activo" : "Inactivo"}',
+            ),
           ),
           const Divider(height: 1),
           Expanded(
             child: StreamBuilder<List<ProgramDay>>(
-              stream: MeditationFirestoreService.I.watchProgramDays(program!.id),
+              stream: MeditationFirestoreService.I.watchProgramDays(
+                program!.id,
+              ),
               builder: (context, s) {
                 final days = s.data ?? [];
                 if (s.connectionState == ConnectionState.waiting) {
@@ -56,16 +60,22 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                     return ListTile(
                       leading: CircleAvatar(child: Text('${d.dayNumber}')),
                       title: Text(d.title),
-                      subtitle: Text('${d.recommendedDurationSec ~/ 60} min • ${d.status}'),
+                      subtitle: Text(
+                        '${d.recommendedDurationSec ~/ 60} min • ${d.status}',
+                      ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => Navigator.pushNamed(context, ProgramDayScreen.route, arguments: {
-                        'program': program!,
-                        'day': d,
-                      }),
-                      onLongPress: () => Navigator.pushNamed(context, ProgramDayEditScreen.route, arguments: {
-                        'program': program!,
-                        'day': d,
-                      }),
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            ProgramDayScreen.route,
+                            arguments: {'program': program!, 'day': d},
+                          ),
+                      onLongPress:
+                          () => Navigator.pushNamed(
+                            context,
+                            ProgramDayEditScreen.route,
+                            arguments: {'program': program!, 'day': d},
+                          ),
                     );
                   },
                 );
@@ -75,7 +85,12 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, ProgramDayEditScreen.route, arguments: {'program': program!}),
+        onPressed:
+            () => Navigator.pushNamed(
+              context,
+              ProgramDayEditScreen.route,
+              arguments: {'program': program!},
+            ),
         child: const Icon(Icons.add),
       ),
     );

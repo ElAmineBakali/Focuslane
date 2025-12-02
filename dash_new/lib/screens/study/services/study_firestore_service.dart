@@ -15,7 +15,8 @@ class StudyFirestoreService {
     return _fallbackUserId.isNotEmpty ? _fallbackUserId : 'local';
   }
 
-  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore.instance
+  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore
+      .instance
       .collection('users')
       .doc(_uid)
       .collection('study')
@@ -25,19 +26,23 @@ class StudyFirestoreService {
   Stream<List<Course>> streamCourses({bool includeArchived = false}) {
     Query q = _root.collection('courses');
     if (!includeArchived) q = q.where('isArchived', isEqualTo: false);
-    return q.orderBy('name').snapshots().map(
-      (s) => s.docs
-          .map((d) => Course.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList(),
-    );
+    return q
+        .orderBy('name')
+        .snapshots()
+        .map(
+          (s) =>
+              s.docs
+                  .map(
+                    (d) =>
+                        Course.fromMap(d.id, d.data() as Map<String, dynamic>),
+                  )
+                  .toList(),
+        );
   }
 
   Future<String> createCourse(Course c) async {
     final doc = _root.collection('courses').doc();
-    await doc.set({
-      ...c.toMap(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await doc.set({...c.toMap(), 'createdAt': FieldValue.serverTimestamp()});
     return doc.id;
   }
 
@@ -60,18 +65,37 @@ class StudyFirestoreService {
     Query q = _root.collection('tasks');
 
     int whereCount = 0;
-    if (courseId != null) { q = q.where('courseId', isEqualTo: courseId); whereCount++; }
-    if (status != null)   { q = q.where('status',   isEqualTo: status.name); whereCount++; }
-    if (highPriorityOnly) { q = q.where('priority', isEqualTo: Priority.high.name); whereCount++; }
-    if (from != null)     { q = q.where('due', isGreaterThanOrEqualTo: from.toIso8601String()); whereCount++; }
-    if (to != null)       { q = q.where('due', isLessThanOrEqualTo:   to.toIso8601String());   whereCount++; }
+    if (courseId != null) {
+      q = q.where('courseId', isEqualTo: courseId);
+      whereCount++;
+    }
+    if (status != null) {
+      q = q.where('status', isEqualTo: status.name);
+      whereCount++;
+    }
+    if (highPriorityOnly) {
+      q = q.where('priority', isEqualTo: Priority.high.name);
+      whereCount++;
+    }
+    if (from != null) {
+      q = q.where('due', isGreaterThanOrEqualTo: from.toIso8601String());
+      whereCount++;
+    }
+    if (to != null) {
+      q = q.where('due', isLessThanOrEqualTo: to.toIso8601String());
+      whereCount++;
+    }
 
     if (whereCount <= 1) q = q.orderBy('due', descending: false);
 
     return q.snapshots().map((s) {
-      final list = s.docs
-          .map((d) => StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList();
+      final list =
+          s.docs
+              .map(
+                (d) =>
+                    StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>),
+              )
+              .toList();
       if (whereCount > 1) {
         list.sort((a, b) {
           final ad = a.due?.millisecondsSinceEpoch ?? 0;
@@ -88,10 +112,7 @@ class StudyFirestoreService {
 
   Future<String> createTask(StudyTask t) async {
     final doc = _root.collection('tasks').doc();
-    await doc.set({
-      ...t.toMap(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await doc.set({...t.toMap(), 'createdAt': FieldValue.serverTimestamp()});
     return doc.id;
   }
 
@@ -107,11 +128,20 @@ class StudyFirestoreService {
   Stream<List<TimerPreset>> streamPresets({String? courseId}) {
     Query q = _root.collection('presets');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
-    return q.orderBy('name').snapshots().map(
-      (s) => s.docs
-          .map((d) => TimerPreset.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList(),
-    );
+    return q
+        .orderBy('name')
+        .snapshots()
+        .map(
+          (s) =>
+              s.docs
+                  .map(
+                    (d) => TimerPreset.fromMap(
+                      d.id,
+                      d.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList(),
+        );
   }
 
   Future<String> savePreset(TimerPreset p) async {
@@ -125,13 +155,25 @@ class StudyFirestoreService {
   }
 
   // ===== Sessions =====
-  Stream<List<StudySession>> streamSessions({String? courseId, int limit = 100}) {
-    Query q = _root.collection('sessions').orderBy('date', descending: true).limit(limit);
+  Stream<List<StudySession>> streamSessions({
+    String? courseId,
+    int limit = 100,
+  }) {
+    Query q = _root
+        .collection('sessions')
+        .orderBy('date', descending: true)
+        .limit(limit);
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
-      (s) => s.docs
-          .map((d) => StudySession.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList(),
+      (s) =>
+          s.docs
+              .map(
+                (d) => StudySession.fromMap(
+                  d.id,
+                  d.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -145,9 +187,15 @@ class StudyFirestoreService {
     Query q = _root.collection('schedule');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
-      (s) => s.docs
-          .map((d) => StudyClassBlock.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList(),
+      (s) =>
+          s.docs
+              .map(
+                (d) => StudyClassBlock.fromMap(
+                  d.id,
+                  d.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -169,11 +217,20 @@ class StudyFirestoreService {
   Stream<List<GradeEntry>> streamGrades({String? courseId}) {
     Query q = _root.collection('grades');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
-    return q.orderBy('date', descending: true).snapshots().map(
-      (s) => s.docs
-          .map((d) => GradeEntry.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList(),
-    );
+    return q
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map(
+          (s) =>
+              s.docs
+                  .map(
+                    (d) => GradeEntry.fromMap(
+                      d.id,
+                      d.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList(),
+        );
   }
 
   Future<String> addGrade(GradeEntry g) async {
@@ -205,14 +262,14 @@ class StudyFirestoreService {
     required DateTime day,
     required String status, // 'A' | 'X' | '-'
   }) async {
-    final key = '${day.year.toString().padLeft(4, '0')}-'
+    final key =
+        '${day.year.toString().padLeft(4, '0')}-'
         '${day.month.toString().padLeft(2, '0')}-'
         '${day.day.toString().padLeft(2, '0')}';
 
-    await _root.collection('attendance').doc(courseId).set(
-      { key: status },
-      SetOptions(merge: true),
-    );
+    await _root.collection('attendance').doc(courseId).set({
+      key: status,
+    }, SetOptions(merge: true));
   }
 
   Future<void> setAttendanceRequired(String courseId, double percent) async {

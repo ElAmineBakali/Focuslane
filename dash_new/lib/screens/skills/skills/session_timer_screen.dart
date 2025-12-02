@@ -28,7 +28,11 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
   final _notes = TextEditingController();
   final Map<String, TextEditingController> _metricCtrls = {};
   final Map<String, int> _rubric = {
-    'técnica': 3, 'consistencia': 3, 'creatividad': 3, 'teoría': 3, 'presentación': 3,
+    'técnica': 3,
+    'consistencia': 3,
+    'creatividad': 3,
+    'teoría': 3,
+    'presentación': 3,
   };
   final _nextTask = TextEditingController();
 
@@ -49,13 +53,16 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    for (final c in _metricCtrls.values) { c.dispose(); }
+    for (final c in _metricCtrls.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (skill == null) return const Scaffold(body: Center(child: Text('Sin habilidad')));
+    if (skill == null)
+      return const Scaffold(body: Center(child: Text('Sin habilidad')));
     final svc = SkillsFirestoreService.I;
     final s = skill!;
 
@@ -72,17 +79,32 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
                 final nodes = snap.data ?? [];
                 return DropdownButtonFormField<String?>(
                   initialValue: _subSkillId,
-                  decoration: const InputDecoration(labelText: 'Sub-skill (opcional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Sub-skill (opcional)',
+                  ),
                   items: [
-                    const DropdownMenuItem<String?>(value: null, child: Text('—')),
-                    ...nodes.map((n) => DropdownMenuItem<String?>(value: n.id, child: Text(n.name))),
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text('—'),
+                    ),
+                    ...nodes.map(
+                      (n) => DropdownMenuItem<String?>(
+                        value: n.id,
+                        child: Text(n.name),
+                      ),
+                    ),
                   ],
                   onChanged: (v) => setState(() => _subSkillId = v),
                 );
               },
             ),
             const SizedBox(height: 8),
-            TextField(controller: _objective, decoration: const InputDecoration(labelText: 'Objetivo de la sesión')),
+            TextField(
+              controller: _objective,
+              decoration: const InputDecoration(
+                labelText: 'Objetivo de la sesión',
+              ),
+            ),
             const SizedBox(height: 16),
 
             Row(
@@ -90,10 +112,19 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
                 DropdownButton<SessionMode>(
                   value: _mode,
                   onChanged: (v) => setState(() => _mode = v ?? _mode),
-                  items: SessionMode.values.map((m) => DropdownMenuItem(value: m, child: Text(m.name))).toList(),
+                  items:
+                      SessionMode.values
+                          .map(
+                            (m) =>
+                                DropdownMenuItem(value: m, child: Text(m.name)),
+                          )
+                          .toList(),
                 ),
                 const SizedBox(width: 12),
-                Text('$_minutes min', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  '$_minutes min',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(width: 12),
                 FilledButton.icon(
                   icon: Icon(_running ? Icons.pause : Icons.play_arrow),
@@ -104,7 +135,9 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
                       setState(() => _running = false);
                     } else {
                       _startAt ??= DateTime.now();
-                      _timer ??= Timer.periodic(const Duration(minutes: 1), (_) {
+                      _timer ??= Timer.periodic(const Duration(minutes: 1), (
+                        _,
+                      ) {
                         setState(() => _minutes += 1);
                       });
                       setState(() => _running = true);
@@ -115,56 +148,110 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
                 OutlinedButton.icon(
                   icon: const Icon(Icons.stop),
                   label: const Text('Finalizar'),
-                  onPressed: _minutes == 0 && !_running ? null : () async {
-                    _timer?.cancel();
-                    setState(() => _running = false);
-                    await _saveSession(context);
-                  },
+                  onPressed:
+                      _minutes == 0 && !_running
+                          ? null
+                          : () async {
+                            _timer?.cancel();
+                            setState(() => _running = false);
+                            await _saveSession(context);
+                          },
                 ),
               ],
             ),
 
             const Divider(height: 24),
-            Text('Quick review', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Quick review',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             Row(
               children: [
-                Expanded(child: _slider('Dificultad', _difficulty, (v) => setState(() => _difficulty = v))),
+                Expanded(
+                  child: _slider(
+                    'Dificultad',
+                    _difficulty,
+                    (v) => setState(() => _difficulty = v),
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _slider('Energía', _energy, (v) => setState(() => _energy = v))),
+                Expanded(
+                  child: _slider(
+                    'Energía',
+                    _energy,
+                    (v) => setState(() => _energy = v),
+                  ),
+                ),
               ],
             ),
-            TextField(controller: _notes, decoration: const InputDecoration(labelText: 'Notas'), maxLines: 3),
+            TextField(
+              controller: _notes,
+              decoration: const InputDecoration(labelText: 'Notas'),
+              maxLines: 3,
+            ),
 
             const SizedBox(height: 8),
             if (s.metricsConfig.isNotEmpty) ...[
-              Text('Métricas de la sesión', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Métricas de la sesión',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 6),
-              ...s.metricsConfig.entries.map((e) => TextField(
-                controller: _metricCtrls[e.key],
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: '${e.key} (${e.value})'),
-              )),
+              ...s.metricsConfig.entries.map(
+                (e) => TextField(
+                  controller: _metricCtrls[e.key],
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: '${e.key} (${e.value})',
+                  ),
+                ),
+              ),
               const SizedBox(height: 8),
             ],
 
-            Text('Rúbrica (1–5)', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Rúbrica (1–5)',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             Wrap(
-              spacing: 12, runSpacing: 4,
-              children: _rubric.keys.map((k) => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(width: 110, child: Text(k)),
-                  DropdownButton<int>(
-                    value: _rubric[k],
-                    items: [1,2,3,4,5].map((i) => DropdownMenuItem(value: i, child: Text('$i'))).toList(),
-                    onChanged: (v) => setState(() => _rubric[k] = v ?? 3),
-                  ),
-                ],
-              )).toList(),
+              spacing: 12,
+              runSpacing: 4,
+              children:
+                  _rubric.keys
+                      .map(
+                        (k) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(width: 110, child: Text(k)),
+                            DropdownButton<int>(
+                              value: _rubric[k],
+                              items:
+                                  [1, 2, 3, 4, 5]
+                                      .map(
+                                        (i) => DropdownMenuItem(
+                                          value: i,
+                                          child: Text('$i'),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (v) => setState(() => _rubric[k] = v ?? 3),
+                            ),
+                          ],
+                        ),
+                      )
+                      .toList(),
             ),
 
             const SizedBox(height: 8),
-            TextField(controller: _nextTask, decoration: const InputDecoration(labelText: 'Siguiente micro-tarea (opcional)')),
+            TextField(
+              controller: _nextTask,
+              decoration: const InputDecoration(
+                labelText: 'Siguiente micro-tarea (opcional)',
+              ),
+            ),
           ],
         ),
       ),
@@ -177,7 +264,9 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
       children: [
         Text('$label: $value/5'),
         Slider(
-          min: 1, max: 5, divisions: 4,
+          min: 1,
+          max: 5,
+          divisions: 4,
           value: value.toDouble(),
           onChanged: (v) => onChanged(v.toInt()),
         ),
@@ -211,12 +300,15 @@ class _SessionTimerScreenState extends State<SessionTimerScreen> {
       energy: _energy,
       notes: _notes.text.trim(),
       metrics: metrics,
-      nextMicroTask: _nextTask.text.trim().isEmpty ? null : _nextTask.text.trim(),
+      nextMicroTask:
+          _nextTask.text.trim().isEmpty ? null : _nextTask.text.trim(),
     );
     await svc.addSession(ss);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sesión guardada')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Sesión guardada')));
       Navigator.pop(context);
     }
   }

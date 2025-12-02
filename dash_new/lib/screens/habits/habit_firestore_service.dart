@@ -23,8 +23,8 @@ class HabitFirestoreService {
       if (activeOnly) q = q.where('isActive', isEqualTo: true);
       q = q.limit(200);
       return q.snapshots().map(
-            (s) => s.docs.map((d) => Habit.fromDoc(d)).toList(),
-          );
+        (s) => s.docs.map((d) => Habit.fromDoc(d)).toList(),
+      );
     });
   }
 
@@ -47,9 +47,10 @@ class HabitFirestoreService {
     // calcula orden actual
     final snap = await _col(uid).get();
     final docRef = _col(uid).doc(); // id auto
-    final toSave = habit
-        .copyWith(id: docRef.id, order: snap.docs.length)
-        .toMap(); // sin 'id' dentro
+    final toSave =
+        habit
+            .copyWith(id: docRef.id, order: snap.docs.length)
+            .toMap(); // sin 'id' dentro
     await docRef.set(toSave);
   }
 
@@ -60,7 +61,10 @@ class HabitFirestoreService {
   }
 
   /// Campos sueltos (para editar sin tocar todo)
-  static Future<void> updateHabitFields(String id, Map<String, dynamic> fields) async {
+  static Future<void> updateHabitFields(
+    String id,
+    Map<String, dynamic> fields,
+  ) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     await _col(uid).doc(id).update(fields);
@@ -97,7 +101,11 @@ class HabitFirestoreService {
   }
 
   /// Guardar marca del día (✔️/❌/"-"/número) + lastUpdated
-  Future<void> updateHabitHistory(String id, DateTime date, dynamic value) async {
+  Future<void> updateHabitHistory(
+    String id,
+    DateTime date,
+    dynamic value,
+  ) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     final key = date.toIso8601String().split('T')[0]; // yyyy-MM-dd

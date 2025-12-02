@@ -33,11 +33,12 @@ class OutfitListScreen extends StatelessWidget {
                 title: Text(o.nombre),
                 subtitle: Text(o.notas.isEmpty ? '—' : o.notas),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  "/outfitDetalle",
-                  arguments: o,
-                ),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      "/outfitDetalle",
+                      arguments: o,
+                    ),
               );
             },
           );

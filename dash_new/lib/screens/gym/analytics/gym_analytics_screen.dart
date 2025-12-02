@@ -12,10 +12,7 @@ SnackBar _niceBar(String text, {IconData? icon}) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     content: Row(
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-        ],
+        if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
         Expanded(child: Text(text)),
       ],
     ),
@@ -78,45 +75,51 @@ class GymAnalyticsScreen extends StatelessWidget {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Añadir peso (kg)'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: ctrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: 'Ej: 72.4',
-              prefixIcon: Icon(Icons.monitor_weight_outlined),
-              labelText: 'Peso (kg)',
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Añadir peso (kg)'),
+            content: Form(
+              key: formKey,
+              child: TextFormField(
+                controller: ctrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Ej: 72.4',
+                  prefixIcon: Icon(Icons.monitor_weight_outlined),
+                  labelText: 'Peso (kg)',
+                ),
+                validator: (s) {
+                  final v = double.tryParse((s ?? '').replaceAll(',', '.'));
+                  if (v == null) return 'Introduce un número válido';
+                  if (v <= 0) return 'Debe ser mayor que 0';
+                  return null;
+                },
+              ),
             ),
-            validator: (s) {
-              final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-              if (v == null) return 'Introduce un número válido';
-              if (v <= 0) return 'Debe ser mayor que 0';
-              return null;
-            },
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() == true) {
+                    Navigator.pop(context, true);
+                  }
+                },
+                child: const Text('Guardar'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() == true) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
     );
 
     if (ok == true) {
       final v = double.parse(ctrl.text.replaceAll(',', '.'));
       await svc.addBodyWeight(v, DateTime.now(), computeTrend: true);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(_niceBar('Peso guardado ✅', icon: Icons.check_circle_rounded));
+        ScaffoldMessenger.of(context).showSnackBar(
+          _niceBar('Peso guardado ✅', icon: Icons.check_circle_rounded),
+        );
       }
     }
   }
@@ -130,62 +133,75 @@ class GymAnalyticsScreen extends StatelessWidget {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Añadir medida (cm)'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: muscleCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Músculo',
-                  hintText: 'Ej: brazo',
-                  prefixIcon: Icon(Icons.fitness_center_outlined),
-                ),
-                validator: (s) => (s ?? '').trim().isEmpty ? 'Escribe un músculo' : null,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Añadir medida (cm)'),
+            content: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: muscleCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Músculo',
+                      hintText: 'Ej: brazo',
+                      prefixIcon: Icon(Icons.fitness_center_outlined),
+                    ),
+                    validator:
+                        (s) =>
+                            (s ?? '').trim().isEmpty
+                                ? 'Escribe un músculo'
+                                : null,
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: valCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Valor (cm)',
+                      prefixIcon: Icon(Icons.straighten),
+                    ),
+                    validator: (s) {
+                      final v = double.tryParse((s ?? '').replaceAll(',', '.'));
+                      if (v == null) return 'Número válido';
+                      if (v <= 0) return 'Mayor que 0';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: site,
+                    items:
+                        siteItems
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                    onChanged: (v) => site = v ?? 'avg',
+                    decoration: const InputDecoration(
+                      labelText: 'Lado',
+                      prefixIcon: Icon(Icons.swap_horiz),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: valCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Valor (cm)',
-                  prefixIcon: Icon(Icons.straighten),
-                ),
-                validator: (s) {
-                  final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-                  if (v == null) return 'Número válido';
-                  if (v <= 0) return 'Mayor que 0';
-                  return null;
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() == true) {
+                    Navigator.pop(context, true);
+                  }
                 },
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                initialValue: site,
-                items: siteItems.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                onChanged: (v) => site = v ?? 'avg',
-                decoration: const InputDecoration(
-                  labelText: 'Lado',
-                  prefixIcon: Icon(Icons.swap_horiz),
-                ),
+                child: const Text('Guardar'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() == true) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
     );
 
     if (ok == true) {
@@ -193,7 +209,9 @@ class GymAnalyticsScreen extends StatelessWidget {
       final muscle = muscleCtrl.text.trim();
       await svc.addMeasurement(muscle, cm, DateTime.now(), site: site);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(_niceBar('Medida guardada 📏', icon: Icons.check_circle_rounded));
+        ScaffoldMessenger.of(context).showSnackBar(
+          _niceBar('Medida guardada 📏', icon: Icons.check_circle_rounded),
+        );
       }
     }
   }
@@ -204,40 +222,44 @@ class GymAnalyticsScreen extends StatelessWidget {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Objetivo de peso (kg)'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: ctrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: 'Ej: 70.0 (vacío para limpiar)',
-              prefixIcon: Icon(Icons.flag_outlined),
-              labelText: 'Nuevo objetivo',
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Objetivo de peso (kg)'),
+            content: Form(
+              key: formKey,
+              child: TextFormField(
+                controller: ctrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Ej: 70.0 (vacío para limpiar)',
+                  prefixIcon: Icon(Icons.flag_outlined),
+                  labelText: 'Nuevo objetivo',
+                ),
+                validator: (s) {
+                  final t = (s ?? '').trim();
+                  if (t.isEmpty) return null; // vacío = limpiar
+                  final v = double.tryParse(t.replaceAll(',', '.'));
+                  if (v == null) return 'Número válido o deja vacío';
+                  if (v <= 0) return 'Mayor que 0';
+                  return null;
+                },
+              ),
             ),
-            validator: (s) {
-              final t = (s ?? '').trim();
-              if (t.isEmpty) return null; // vacío = limpiar
-              final v = double.tryParse(t.replaceAll(',', '.'));
-              if (v == null) return 'Número válido o deja vacío';
-              if (v <= 0) return 'Mayor que 0';
-              return null;
-            },
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() == true) {
+                    Navigator.pop(context, true);
+                  }
+                },
+                child: const Text('Guardar'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() == true) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
     );
 
     if (ok == true) {
@@ -245,7 +267,9 @@ class GymAnalyticsScreen extends StatelessWidget {
       final v = txt.isEmpty ? null : double.parse(txt.replaceAll(',', '.'));
       await svc.setBodyWeightTarget(v);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(_niceBar('Objetivo actualizado 🎯', icon: Icons.check_circle_rounded));
+        ScaffoldMessenger.of(context).showSnackBar(
+          _niceBar('Objetivo actualizado 🎯', icon: Icons.check_circle_rounded),
+        );
       }
     }
   }
@@ -257,7 +281,8 @@ class _KpiRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final svc = (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
+    final svc =
+        (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
     final s = Theme.of(context).colorScheme;
     return StreamBuilder<List<SessionDoc>>(
       stream: svc.streamSessions(limit: 180),
@@ -266,8 +291,9 @@ class _KpiRow extends StatelessWidget {
         final now = DateTime.now();
         final from30 = now.subtract(const Duration(days: 30));
 
-        final last30 = sessions.where((x) => !x.date.isBefore(from30)).toList()
-          ..sort((a, b) => a.date.compareTo(b.date));
+        final last30 =
+            sessions.where((x) => !x.date.isBefore(from30)).toList()
+              ..sort((a, b) => a.date.compareTo(b.date));
         final sessionsCount = last30.length;
 
         final byWeek = <String, double>{};
@@ -275,7 +301,10 @@ class _KpiRow extends StatelessWidget {
           final key = '${x.date.year}-W${_weekNumber(x.date)}';
           byWeek[key] = (byWeek[key] ?? 0) + x.volumeKg;
         }
-        final bestWeek = byWeek.values.isEmpty ? 0.0 : byWeek.values.reduce((a, b) => a > b ? a : b);
+        final bestWeek =
+            byWeek.values.isEmpty
+                ? 0.0
+                : byWeek.values.reduce((a, b) => a > b ? a : b);
 
         final sesSpots = <FlSpot>[];
         for (int i = 0; i < last30.length; i++) {
@@ -286,7 +315,8 @@ class _KpiRow extends StatelessWidget {
           stream: svc.streamBodyWeight(limit: 90),
           builder: (context, wSnap) {
             final wList = wSnap.data ?? [];
-            final wLast30 = wList.where((e) => !e.date.isBefore(from30)).toList();
+            final wLast30 =
+                wList.where((e) => !e.date.isBefore(from30)).toList();
             double delta30 = 0;
             if (wLast30.isNotEmpty) {
               delta30 = wLast30.last.weight - wLast30.first.weight;
@@ -298,26 +328,36 @@ class _KpiRow extends StatelessWidget {
 
             return Row(
               children: [
-                Expanded(child: _KpiCard(
-                  title: 'Δ peso 30d',
-                  value: '${delta30 >= 0 ? '+' : ''}${delta30.toStringAsFixed(1)} kg',
-                  spots: weightSpots,
-                  color: s.primary,
-                )),
+                Expanded(
+                  child: _KpiCard(
+                    title: 'Δ peso 30d',
+                    value:
+                        '${delta30 >= 0 ? '+' : ''}${delta30.toStringAsFixed(1)} kg',
+                    spots: weightSpots,
+                    color: s.primary,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _KpiCard(
-                  title: 'Sesiones 30d',
-                  value: '$sessionsCount',
-                  spots: sesSpots,
-                  color: s.secondary,
-                )),
+                Expanded(
+                  child: _KpiCard(
+                    title: 'Sesiones 30d',
+                    value: '$sessionsCount',
+                    spots: sesSpots,
+                    color: s.secondary,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _KpiCard(
-                  title: 'Mejor semana',
-                  value: '${bestWeek.toStringAsFixed(0)} kg',
-                  spots: byWeek.entries.mapIndexed((i, e) => FlSpot(i.toDouble(), e.value)).toList(),
-                  color: s.tertiary,
-                )),
+                Expanded(
+                  child: _KpiCard(
+                    title: 'Mejor semana',
+                    value: '${bestWeek.toStringAsFixed(0)} kg',
+                    spots:
+                        byWeek.entries
+                            .mapIndexed((i, e) => FlSpot(i.toDouble(), e.value))
+                            .toList(),
+                    color: s.tertiary,
+                  ),
+                ),
               ],
             );
           },
@@ -355,34 +395,45 @@ class _KpiCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant),
+            ),
             const SizedBox(height: 4),
             Text(value, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             SizedBox(
               height: 36,
-              child: LineChart(LineChartData(
-                minY: spots.isEmpty ? 0 : null,
-                titlesData: const FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                gridData: const FlGridData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    barWidth: 2,
-                    color: color,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [color.withOpacity(0.28), color.withOpacity(0.06)],
-                        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+              child: LineChart(
+                LineChartData(
+                  minY: spots.isEmpty ? 0 : null,
+                  titlesData: const FlTitlesData(show: false),
+                  borderData: FlBorderData(show: false),
+                  gridData: const FlGridData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: spots,
+                      isCurved: true,
+                      barWidth: 2,
+                      color: color,
+                      dotData: const FlDotData(show: false),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            color.withOpacity(0.28),
+                            color.withOpacity(0.06),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -397,7 +448,8 @@ class _BodyWeightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final svc = (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
+    final svc =
+        (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
     final s = Theme.of(context).colorScheme;
     return StreamBuilder<List<BodyWeightEntry>>(
       stream: svc.streamBodyWeight(limit: 180),
@@ -407,18 +459,29 @@ class _BodyWeightCard extends StatelessWidget {
           builder: (context, g) {
             final target = g.data?.bodyWeightTarget;
             if (!snap.hasData) {
-              return const Card(child: SizedBox(height: 220, child: Center(child: CircularProgressIndicator())));
+              return const Card(
+                child: SizedBox(
+                  height: 220,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              );
             }
             final list = snap.data!;
             if (list.isEmpty) {
-              return const Card(child: SizedBox(height: 220, child: Center(child: Text('Añade registros de peso'))));
+              return const Card(
+                child: SizedBox(
+                  height: 220,
+                  child: Center(child: Text('Añade registros de peso')),
+                ),
+              );
             }
 
             final weightSpots = <FlSpot>[];
-            final trendSpots  = <FlSpot>[];
+            final trendSpots = <FlSpot>[];
             for (int i = 0; i < list.length; i++) {
               weightSpots.add(FlSpot(i.toDouble(), list[i].weight));
-              if (list[i].trend7 != null) trendSpots.add(FlSpot(i.toDouble(), list[i].trend7!));
+              if (list[i].trend7 != null)
+                trendSpots.add(FlSpot(i.toDouble(), list[i].trend7!));
             }
 
             final last = list.last.weight;
@@ -431,7 +494,10 @@ class _BodyWeightCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Peso corporal', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      'Peso corporal',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 6),
                     Text(
                       'Último: ${last.toStringAsFixed(1)} kg'
@@ -464,7 +530,10 @@ class _BodyWeightCard extends StatelessWidget {
                               belowBarData: BarAreaData(
                                 show: true,
                                 gradient: LinearGradient(
-                                  colors: [s.primary.withOpacity(0.28), s.primary.withOpacity(0.06)],
+                                  colors: [
+                                    s.primary.withOpacity(0.28),
+                                    s.primary.withOpacity(0.06),
+                                  ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                 ),
@@ -480,7 +549,10 @@ class _BodyWeightCard extends StatelessWidget {
                               ),
                             if (target != null)
                               LineChartBarData(
-                                spots: [FlSpot(0, target), FlSpot(list.length.toDouble() - 1, target)],
+                                spots: [
+                                  FlSpot(0, target),
+                                  FlSpot(list.length.toDouble() - 1, target),
+                                ],
                                 isCurved: false,
                                 color: s.secondary,
                                 barWidth: 1.8,
@@ -506,22 +578,41 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
   const _WeeklyVolumeByMuscleCard();
 
   static const List<String> _muscleOrder = [
-    'Pecho','Espalda','Hombros','Bíceps','Tríceps','Piernas','Glúteos','Core','Full body','Cardio','Otros'
+    'Pecho',
+    'Espalda',
+    'Hombros',
+    'Bíceps',
+    'Tríceps',
+    'Piernas',
+    'Glúteos',
+    'Core',
+    'Full body',
+    'Cardio',
+    'Otros',
   ];
 
   @override
   Widget build(BuildContext context) {
-    final svc = (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
+    final svc =
+        (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
     final s = Theme.of(context).colorScheme;
 
     final palette = <Color>[
-      s.primary, s.secondary, s.tertiary,
-      s.primaryContainer, s.secondaryContainer, s.tertiaryContainer,
-      s.primary.withOpacity(0.7), s.secondary.withOpacity(0.7),
-      s.tertiary.withOpacity(0.7), s.outlineVariant
+      s.primary,
+      s.secondary,
+      s.tertiary,
+      s.primaryContainer,
+      s.secondaryContainer,
+      s.tertiaryContainer,
+      s.primary.withOpacity(0.7),
+      s.secondary.withOpacity(0.7),
+      s.tertiary.withOpacity(0.7),
+      s.outlineVariant,
     ];
 
-    final idToGroup = {for (final e in kExerciseLibrary) e.id: e.muscleGroup.toString()};
+    final idToGroup = {
+      for (final e in kExerciseLibrary) e.id: e.muscleGroup.toString(),
+    };
 
     String groupForName(String name) {
       final n = name.toLowerCase();
@@ -545,11 +636,21 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
       stream: svc.streamSessions(limit: 80),
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Card(child: SizedBox(height: 240, child: Center(child: CircularProgressIndicator())));
+          return const Card(
+            child: SizedBox(
+              height: 240,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
         }
         final sessions = snap.data!;
         if (sessions.isEmpty) {
-          return const Card(child: SizedBox(height: 240, child: Center(child: Text('Aún no hay sesiones'))));
+          return const Card(
+            child: SizedBox(
+              height: 240,
+              child: Center(child: Text('Aún no hay sesiones')),
+            ),
+          );
         }
 
         final byWeekGroup = <String, Map<String, double>>{};
@@ -560,7 +661,10 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
 
           for (final ex in ses.exercises) {
             final g = groupForExercise(ex);
-            final exVol = ex.sets.fold<double>(0, (a, s) => a + s.weight * s.reps);
+            final exVol = ex.sets.fold<double>(
+              0,
+              (a, s) => a + s.weight * s.reps,
+            );
             map[g] = (map[g] ?? 0) + exVol;
           }
         }
@@ -579,7 +683,9 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
             final val = m[label] ?? 0;
             if (val <= 0) continue;
             final to = from + val;
-            stackItems.add(BarChartRodStackItem(from, to, palette[i % palette.length]));
+            stackItems.add(
+              BarChartRodStackItem(from, to, palette[i % palette.length]),
+            );
             from = to;
           }
           maxY = from > maxY ? from : maxY;
@@ -592,7 +698,9 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
                   toY: from,
                   width: 18,
                   rodStackItems: stackItems,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(8),
+                  ),
                 ),
               ],
             ),
@@ -605,7 +713,10 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Volumen semanal por grupo (kg)', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Volumen semanal por grupo (kg)',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 260,
@@ -613,19 +724,29 @@ class _WeeklyVolumeByMuscleCard extends StatelessWidget {
                     BarChartData(
                       maxY: maxY == 0 ? null : maxY * 1.15,
                       titlesData: FlTitlesData(
-                        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        leftTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
                             reservedSize: 24,
                             getTitlesWidget: (value, meta) {
                               final i = value.toInt();
-                              if (i < 0 || i >= weeks.length) return const SizedBox.shrink();
+                              if (i < 0 || i >= weeks.length)
+                                return const SizedBox.shrink();
                               return Padding(
                                 padding: const EdgeInsets.only(top: 6),
-                                child: Text(weeks[i], style: Theme.of(context).textTheme.labelSmall),
+                                child: Text(
+                                  weeks[i],
+                                  style: Theme.of(context).textTheme.labelSmall,
+                                ),
                               );
                             },
                           ),
@@ -676,15 +797,24 @@ class _Legend extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = <Widget>[];
     for (int i = 0; i < muscles.length; i++) {
-      items.add(Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(width: 10, height: 10, decoration: BoxDecoration(color: colors[i % colors.length], shape: BoxShape.circle)),
-          const SizedBox(width: 6),
-          Text(muscles[i], style: Theme.of(context).textTheme.labelSmall),
-          const SizedBox(width: 12),
-        ],
-      ));
+      items.add(
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: colors[i % colors.length],
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(muscles[i], style: Theme.of(context).textTheme.labelSmall),
+            const SizedBox(width: 12),
+          ],
+        ),
+      );
     }
     return Wrap(spacing: 8, runSpacing: 8, children: items);
   }
@@ -696,17 +826,28 @@ class _AdherenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final svc = (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
+    final svc =
+        (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
     final s = Theme.of(context).colorScheme;
     return StreamBuilder<List<SessionDoc>>(
       stream: svc.streamSessions(limit: 365),
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Card(child: SizedBox(height: 120, child: Center(child: CircularProgressIndicator())));
+          return const Card(
+            child: SizedBox(
+              height: 120,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
         }
         final list = snap.data!;
         if (list.isEmpty) {
-          return const Card(child: SizedBox(height: 120, child: Center(child: Text('Registra tus primeras sesiones'))));
+          return const Card(
+            child: SizedBox(
+              height: 120,
+              child: Center(child: Text('Registra tus primeras sesiones')),
+            ),
+          );
         }
 
         final now = DateTime.now();
@@ -718,7 +859,11 @@ class _AdherenceCard extends StatelessWidget {
 
         int streak = 0;
         for (int i = 0; i < 365; i++) {
-          final d = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+          final d = DateTime(
+            now.year,
+            now.month,
+            now.day,
+          ).subtract(Duration(days: i));
           if (daysWithSession.contains(d)) {
             streak++;
           } else {
@@ -728,7 +873,11 @@ class _AdherenceCard extends StatelessWidget {
 
         int trained = 0;
         for (int i = 0; i < 30; i++) {
-          final d = DateTime(from30.year, from30.month, from30.day).add(Duration(days: i));
+          final d = DateTime(
+            from30.year,
+            from30.month,
+            from30.day,
+          ).add(Duration(days: i));
           if (daysWithSession.contains(d)) trained++;
         }
         final adherence = trained / 30.0;
@@ -737,10 +886,15 @@ class _AdherenceCard extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: s.secondary,
-              child: const Icon(Icons.local_fire_department, color: Colors.white),
+              child: const Icon(
+                Icons.local_fire_department,
+                color: Colors.white,
+              ),
             ),
             title: Text('Racha: $streak día${streak == 1 ? '' : 's'}'),
-            subtitle: Text('Adherencia últimos 30 días: ${(adherence * 100).toStringAsFixed(0)}%'),
+            subtitle: Text(
+              'Adherencia últimos 30 días: ${(adherence * 100).toStringAsFixed(0)}%',
+            ),
           ),
         );
       },
@@ -754,12 +908,18 @@ class _RecentSessionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final svc = (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
+    final svc =
+        (context.findAncestorWidgetOfExactType<GymAnalyticsScreen>()!).svc;
     return StreamBuilder<List<SessionDoc>>(
       stream: svc.streamSessions(limit: 20),
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Card(child: SizedBox(height: 160, child: Center(child: CircularProgressIndicator())));
+          return const Card(
+            child: SizedBox(
+              height: 160,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
         }
         final sessions = snap.data!;
         return Card(
@@ -776,19 +936,23 @@ class _RecentSessionsCard extends StatelessWidget {
                   child: Center(child: Text('Sin sesiones todavía')),
                 )
               else
-                ...sessions.map((s) => ListTile(
-                      leading: const Icon(Icons.fitness_center),
-                      title: Text('${s.routineName} • ${s.dayName}'),
-                      subtitle: Text(
-                        '${s.date.toLocal()} • ${s.volumeKg.toStringAsFixed(0)} kg • ${s.durationMin} min',
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => SessionSummaryScreen(session: s)),
-                        );
-                      },
-                    )),
+                ...sessions.map(
+                  (s) => ListTile(
+                    leading: const Icon(Icons.fitness_center),
+                    title: Text('${s.routineName} • ${s.dayName}'),
+                    subtitle: Text(
+                      '${s.date.toLocal()} • ${s.volumeKg.toStringAsFixed(0)} kg • ${s.durationMin} min',
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SessionSummaryScreen(session: s),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               const SizedBox(height: 8),
             ],
           ),
@@ -807,7 +971,10 @@ class _RpeNoteCard extends StatelessWidget {
     final s = Theme.of(context).colorScheme;
     return Card(
       child: ListTile(
-        leading: CircleAvatar(backgroundColor: s.tertiary, child: const Icon(Icons.info_outline, color: Colors.white)),
+        leading: CircleAvatar(
+          backgroundColor: s.tertiary,
+          child: const Icon(Icons.info_outline, color: Colors.white),
+        ),
         title: const Text('¿Qué es el RPE?'),
         subtitle: const Text(
           'RPE = “Rate of Perceived Exertion”. Escala 1–10 donde 10 es esfuerzo máximo. '

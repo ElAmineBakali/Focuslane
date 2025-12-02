@@ -35,27 +35,30 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
   };
 
   Widget _miniPrenda(Prenda p, bool seleccionada) {
-    final url = p.imagenes['thumb'] ?? p.imagenes['medium'] ?? p.imagenes['full'];
+    final url =
+        p.imagenes['thumb'] ?? p.imagenes['medium'] ?? p.imagenes['full'];
     return Container(
       width: 120,
       decoration: BoxDecoration(
         border: Border.all(
-          color: seleccionada
-              ? Theme.of(context).colorScheme.primary
-              : Colors.transparent,
+          color:
+              seleccionada
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
           width: 3,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(9),
-        child: (url == null || url.isEmpty)
-            ? Container(
-                color: Colors.black12,
-                alignment: Alignment.center,
-                child: const Icon(Icons.photo_outlined),
-              )
-            : Image.network(url, fit: BoxFit.cover),
+        child:
+            (url == null || url.isEmpty)
+                ? Container(
+                  color: Colors.black12,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.photo_outlined),
+                )
+                : Image.network(url, fit: BoxFit.cover),
       ),
     );
   }
@@ -87,57 +90,73 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
             stream: prendaService.prendasStream(uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: CircularProgressIndicator(),
-                ));
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
               }
               final todas = snapshot.data ?? const <Prenda>[];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _categorias.entries.map((entry) {
-                  final cat = entry.key;
-                  final prendas = todas
-                      .where((p) =>
-                          p.categoriaId == cat &&
-                          p.estado != EstadoPrenda.sucia)
-                      .toList();
+                children:
+                    _categorias.entries.map((entry) {
+                      final cat = entry.key;
+                      final prendas =
+                          todas
+                              .where(
+                                (p) =>
+                                    p.categoriaId == cat &&
+                                    p.estado != EstadoPrenda.sucia,
+                              )
+                              .toList();
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(entry.value,
-                          style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 140,
-                        child: prendas.isEmpty
-                            ? const Center(child: Text("No hay prendas disponibles"))
-                            : ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: prendas.length,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(width: 10),
-                                itemBuilder: (context, i) {
-                                  final prenda = prendas[i];
-                                  final seleccionada =
-                                      _slotsSeleccionados[cat] == prenda.id;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _slotsSeleccionados[cat] = prenda.id;
-                                      });
-                                    },
-                                    child: _miniPrenda(prenda, seleccionada),
-                                  );
-                                },
-                              ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  );
-                }).toList(),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            entry.value,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 140,
+                            child:
+                                prendas.isEmpty
+                                    ? const Center(
+                                      child: Text("No hay prendas disponibles"),
+                                    )
+                                    : ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: prendas.length,
+                                      separatorBuilder:
+                                          (_, __) => const SizedBox(width: 10),
+                                      itemBuilder: (context, i) {
+                                        final prenda = prendas[i];
+                                        final seleccionada =
+                                            _slotsSeleccionados[cat] ==
+                                            prenda.id;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _slotsSeleccionados[cat] =
+                                                  prenda.id;
+                                            });
+                                          },
+                                          child: _miniPrenda(
+                                            prenda,
+                                            seleccionada,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    }).toList(),
               );
             },
           ),
@@ -153,16 +172,19 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
 
               if (slotsClean.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Selecciona al menos una prenda')),
+                  const SnackBar(
+                    content: Text('Selecciona al menos una prenda'),
+                  ),
                 );
                 return;
               }
 
               final outfit = Outfit(
                 id: "",
-                nombre: _nombreCtrl.text.trim().isEmpty
-                    ? 'Outfit'
-                    : _nombreCtrl.text.trim(),
+                nombre:
+                    _nombreCtrl.text.trim().isEmpty
+                        ? 'Outfit'
+                        : _nombreCtrl.text.trim(),
                 notas: _notasCtrl.text.trim(),
                 favorito: false,
                 slots: slotsClean,

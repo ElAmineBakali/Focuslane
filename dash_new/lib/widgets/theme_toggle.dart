@@ -16,10 +16,7 @@ class ThemeToggle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text('Tema oscuro'),
-        Switch(
-          value: themeMode == ThemeMode.dark,
-          onChanged: toggleTheme,
-        ),
+        Switch(value: themeMode == ThemeMode.dark, onChanged: toggleTheme),
       ],
     );
   }

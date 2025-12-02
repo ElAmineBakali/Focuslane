@@ -18,7 +18,8 @@ class SubscriptionsScreen extends StatelessWidget {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin suscripciones'));
+          if (data.isEmpty)
+            return const Center(child: Text('Sin suscripciones'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -32,14 +33,20 @@ class SubscriptionsScreen extends StatelessWidget {
                   '${x.billingCycle}${x.billingDay != null ? " • día ${x.billingDay}" : ""}',
                 ),
                 trailing: const Icon(Icons.edit),
-                onTap: () => Navigator.pushNamed(context, SubscriptionEditScreen.route, arguments: x),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      SubscriptionEditScreen.route,
+                      arguments: x,
+                    ),
               );
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, SubscriptionEditScreen.route),
+        onPressed:
+            () => Navigator.pushNamed(context, SubscriptionEditScreen.route),
         child: const Icon(Icons.add),
       ),
     );

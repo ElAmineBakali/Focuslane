@@ -30,10 +30,15 @@ class _OrbToolsScreenState extends State<OrbToolsScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Añadir vela',
-            onPressed: () => Navigator.pushNamed(context, CandleEditScreen.route, arguments: {
-              'symbol': _symbol.text.trim().toUpperCase(),
-              'tf': _tf,
-            }),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  CandleEditScreen.route,
+                  arguments: {
+                    'symbol': _symbol.text.trim().toUpperCase(),
+                    'tf': _tf,
+                  },
+                ),
           ),
         ],
       ),
@@ -52,22 +57,32 @@ class _OrbToolsScreenState extends State<OrbToolsScreen> {
                     controller: _symbol,
                     decoration: const InputDecoration(labelText: 'Símbolo'),
                     textCapitalization: TextCapitalization.characters,
-                    onChanged: (_) => setState((){}),
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
                 DropdownButton<Timeframe>(
                   value: _tf,
                   onChanged: (v) => setState(() => _tf = v ?? _tf),
-                  items: Timeframe.values
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t.code)))
-                      .toList(),
+                  items:
+                      Timeframe.values
+                          .map(
+                            (t) =>
+                                DropdownMenuItem(value: t, child: Text(t.code)),
+                          )
+                          .toList(),
                 ),
                 DropdownButton<CandleMetric>(
                   value: _metric,
                   onChanged: (v) => setState(() => _metric = v ?? _metric),
                   items: const [
-                    DropdownMenuItem(value: CandleMetric.range, child: Text('Rango (H-L)')),
-                    DropdownMenuItem(value: CandleMetric.body, child: Text('Cuerpo |C-O|')),
+                    DropdownMenuItem(
+                      value: CandleMetric.range,
+                      child: Text('Rango (H-L)'),
+                    ),
+                    DropdownMenuItem(
+                      value: CandleMetric.body,
+                      child: Text('Cuerpo |C-O|'),
+                    ),
                   ],
                 ),
                 SizedBox(
@@ -76,35 +91,41 @@ class _OrbToolsScreenState extends State<OrbToolsScreen> {
                     controller: _nCtrl,
                     keyboardType: const TextInputType.numberWithOptions(),
                     decoration: const InputDecoration(labelText: 'Últimas N'),
-                    onChanged: (_) => setState((){}),
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
                 FilledButton.icon(
                   icon: const Icon(Icons.calculate_outlined),
                   label: const Text('Calcular'),
-                  onPressed: () => setState((){}),
+                  onPressed: () => setState(() {}),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            FutureBuilder<Map<String,double>>(
-              future: (_symbol.text.trim().isEmpty)
-                  ? Future.value({'n': 0})
-                  : svc.quartilesFor(
-                      symbol: _symbol.text.trim().toUpperCase(),
-                      timeframe: _tf,
-                      n: _window,
-                      metric: _metric,
-                    ),
+            FutureBuilder<Map<String, double>>(
+              future:
+                  (_symbol.text.trim().isEmpty)
+                      ? Future.value({'n': 0})
+                      : svc.quartilesFor(
+                        symbol: _symbol.text.trim().toUpperCase(),
+                        timeframe: _tf,
+                        n: _window,
+                        metric: _metric,
+                      ),
               builder: (_, s) {
                 final data = s.data ?? {'n': 0};
                 if ((data['n'] ?? 0) == 0) {
-                  return const Card(child: ListTile(title: Text('Sin datos suficientes')));
+                  return const Card(
+                    child: ListTile(title: Text('Sin datos suficientes')),
+                  );
                 }
-                final q1 = data['q1']!, q2 = data['q2']!, q3 = data['q3']!, iqr = data['iqr']!;
+                final q1 = data['q1']!,
+                    q2 = data['q2']!,
+                    q3 = data['q3']!,
+                    iqr = data['iqr']!;
                 final avg = data['avg']!, mn = data['min']!, mx = data['max']!;
-                final up = q3 + 1.5*iqr;
-                final dn = q1 - 1.5*iqr;
+                final up = q3 + 1.5 * iqr;
+                final dn = q1 - 1.5 * iqr;
 
                 return Card(
                   child: Padding(
@@ -112,11 +133,14 @@ class _OrbToolsScreenState extends State<OrbToolsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('Cuartiles ${_metric==CandleMetric.range ? "(Rango H-L)" : "(Cuerpo |C-O|)"} — $_window velas ${_tf.code}',
-                          style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          'Cuartiles ${_metric == CandleMetric.range ? "(Rango H-L)" : "(Cuerpo |C-O|)"} — $_window velas ${_tf.code}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 6),
                         Wrap(
-                          spacing: 12, runSpacing: 8,
+                          spacing: 12,
+                          runSpacing: 8,
                           children: [
                             _chip('Q1', q1),
                             _chip('Q2 (Mediana)', q2),
@@ -142,52 +166,74 @@ class _OrbToolsScreenState extends State<OrbToolsScreen> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: (_symbol.text.trim().isEmpty)
-                  ? const SizedBox()
-                  : StreamBuilder<List<Candle>>(
-                      stream: TradingFirestoreService.I.watchCandles(
-                        symbol: _symbol.text.trim().toUpperCase(),
-                        timeframe: _tf,
-                        limit: 100,
-                      ),
-                      builder: (_, s) {
-                        final data = s.data ?? [];
-                        if (data.isEmpty) {
-                          return const Center(child: Text('Aún no hay velas. Usa “Añadir vela”.'));
-                        }
-                        return ListView.separated(
-                          itemCount: data.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
-                          itemBuilder: (_, i) {
-                            final c = data[i];
-                            final size = _metric == CandleMetric.range ? c.range : c.body;
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: c.close >= c.open
-                                    ? Colors.green.withOpacity(.2)
-                                    : Colors.red.withOpacity(.2),
-                                child: Icon(
-                                  c.close >= c.open ? Icons.north_east : Icons.south_east,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 18,
-                                ),
+              child:
+                  (_symbol.text.trim().isEmpty)
+                      ? const SizedBox()
+                      : StreamBuilder<List<Candle>>(
+                        stream: TradingFirestoreService.I.watchCandles(
+                          symbol: _symbol.text.trim().toUpperCase(),
+                          timeframe: _tf,
+                          limit: 100,
+                        ),
+                        builder: (_, s) {
+                          final data = s.data ?? [];
+                          if (data.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'Aún no hay velas. Usa “Añadir vela”.',
                               ),
-                              title: Text('${c.symbol} ${c.timeframe.code} — ${c.time.toLocal()}'),
-                              subtitle: Text(
-                                'O:${c.open.toStringAsFixed(2)} H:${c.high.toStringAsFixed(2)} '
-                                'L:${c.low.toStringAsFixed(2)} C:${c.close.toStringAsFixed(2)} '
-                                '• ${_metric==CandleMetric.range ? "Rango" : "Cuerpo"}: ${size.toStringAsFixed(4)}'
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () => TradingFirestoreService.I.deleteCandle(c.id),
-                              ),
-                              onTap: () => Navigator.pushNamed(context, CandleEditScreen.route, arguments: {'edit': c}),
                             );
-                          },
-                        );
-                      },
-                    ),
+                          }
+                          return ListView.separated(
+                            itemCount: data.length,
+                            separatorBuilder:
+                                (_, __) => const Divider(height: 1),
+                            itemBuilder: (_, i) {
+                              final c = data[i];
+                              final size =
+                                  _metric == CandleMetric.range
+                                      ? c.range
+                                      : c.body;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor:
+                                      c.close >= c.open
+                                          ? Colors.green.withOpacity(.2)
+                                          : Colors.red.withOpacity(.2),
+                                  child: Icon(
+                                    c.close >= c.open
+                                        ? Icons.north_east
+                                        : Icons.south_east,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    size: 18,
+                                  ),
+                                ),
+                                title: Text(
+                                  '${c.symbol} ${c.timeframe.code} — ${c.time.toLocal()}',
+                                ),
+                                subtitle: Text(
+                                  'O:${c.open.toStringAsFixed(2)} H:${c.high.toStringAsFixed(2)} '
+                                  'L:${c.low.toStringAsFixed(2)} C:${c.close.toStringAsFixed(2)} '
+                                  '• ${_metric == CandleMetric.range ? "Rango" : "Cuerpo"}: ${size.toStringAsFixed(4)}',
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed:
+                                      () => TradingFirestoreService.I
+                                          .deleteCandle(c.id),
+                                ),
+                                onTap:
+                                    () => Navigator.pushNamed(
+                                      context,
+                                      CandleEditScreen.route,
+                                      arguments: {'edit': c},
+                                    ),
+                              );
+                            },
+                          );
+                        },
+                      ),
             ),
           ],
         ),

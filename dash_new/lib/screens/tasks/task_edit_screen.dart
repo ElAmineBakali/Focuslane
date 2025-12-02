@@ -43,14 +43,19 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.task.title);
-    _descriptionController = TextEditingController(text: widget.task.description);
-    _categoryController = TextEditingController(text: widget.task.category ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.task.description,
+    );
+    _categoryController = TextEditingController(
+      text: widget.task.category ?? '',
+    );
     _tagsController = TextEditingController(text: widget.task.tags.join(', '));
-    
+
     _selectedDate = widget.task.dueDate;
-    _selectedTime = widget.task.dueDate != null 
-        ? TimeOfDay.fromDateTime(widget.task.dueDate!)
-        : null;
+    _selectedTime =
+        widget.task.dueDate != null
+            ? TimeOfDay.fromDateTime(widget.task.dueDate!)
+            : null;
     _selectedPriority = widget.task.priority;
     _isPinned = widget.task.isPinned;
     _repeatRule = widget.task.repeatRule;
@@ -115,26 +120,33 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     hintText: 'Introduce un título',
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Título obligatorio' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? 'Título obligatorio'
+                              : null,
                 ),
                 const SizedBox(height: 16),
                 Text('Repetición', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 DropdownButtonFormField<RepeatRule>(
                   initialValue: _repeatRule,
-                  items: RepeatRule.values.map((r) {
-                    return DropdownMenuItem(
-                      value: r,
-                      child: Text(r.label),
-                    );
-                  }).toList(),
-                  onChanged: (v) => setState(() => _repeatRule = v ?? RepeatRule.none),
+                  items:
+                      RepeatRule.values.map((r) {
+                        return DropdownMenuItem(value: r, child: Text(r.label));
+                      }).toList(),
+                  onChanged:
+                      (v) => setState(() => _repeatRule = v ?? RepeatRule.none),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -144,7 +156,8 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   title: const Text('Fijar tarea arriba'),
                 ),
                 Tooltip(
-                  message: 'Esta opción afectará al módulo Calendario próximamente',
+                  message:
+                      'Esta opción afectará al módulo Calendario próximamente',
                   child: SwitchListTile(
                     value: _isCalendarVisible,
                     onChanged: null,
@@ -163,41 +176,56 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                           children: [
                             Checkbox(
                               value: _subtasks[i].isDone,
-                              onChanged: (v) => setState(() => _subtasks[i] = _subtasks[i].copyWith(isDone: v ?? false)),
+                              onChanged:
+                                  (v) => setState(
+                                    () =>
+                                        _subtasks[i] = _subtasks[i].copyWith(
+                                          isDone: v ?? false,
+                                        ),
+                                  ),
                             ),
                             Expanded(
                               child: TextFormField(
                                 initialValue: _subtasks[i].title,
-                                onChanged: (t) => _subtasks[i] = _subtasks[i].copyWith(title: t),
+                                onChanged:
+                                    (t) =>
+                                        _subtasks[i] = _subtasks[i].copyWith(
+                                          title: t,
+                                        ),
                                 decoration: InputDecoration(
                                   hintText: 'Título de subtarea',
                                   filled: true,
                                   fillColor: colorScheme.surface,
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
                               ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.keyboard_arrow_up),
-                              onPressed: i > 0
-                                  ? () => setState(() {
+                              onPressed:
+                                  i > 0
+                                      ? () => setState(() {
                                         final it = _subtasks.removeAt(i);
                                         _subtasks.insert(i - 1, it);
                                       })
-                                  : null,
+                                      : null,
                             ),
                             IconButton(
                               icon: const Icon(Icons.keyboard_arrow_down),
-                              onPressed: i < _subtasks.length - 1
-                                  ? () => setState(() {
+                              onPressed:
+                                  i < _subtasks.length - 1
+                                      ? () => setState(() {
                                         final it = _subtasks.removeAt(i);
                                         _subtasks.insert(i + 1, it);
                                       })
-                                  : null,
+                                      : null,
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline),
-                              onPressed: () => setState(() => _subtasks.removeAt(i)),
+                              onPressed:
+                                  () => setState(() => _subtasks.removeAt(i)),
                             ),
                           ],
                         ),
@@ -207,11 +235,15 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                       child: TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            _subtasks.add(Subtask(
-                              id: DateTime.now().microsecondsSinceEpoch.toString(),
-                              title: '',
-                              isDone: false,
-                            ));
+                            _subtasks.add(
+                              Subtask(
+                                id:
+                                    DateTime.now().microsecondsSinceEpoch
+                                        .toString(),
+                                title: '',
+                                isDone: false,
+                              ),
+                            );
                           });
                         },
                         icon: const Icon(Icons.add),
@@ -232,7 +264,9 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     hintText: 'Escribe una descripción…',
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -245,7 +279,9 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     hintText: 'Introduce una categoría…',
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -254,23 +290,28 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 const SizedBox(height: 5),
                 DropdownButtonFormField<TaskPriority>(
                   initialValue: _selectedPriority,
-                  items: TaskPriority.values.map((p) {
-                    return DropdownMenuItem(
-                      value: p,
-                      child: Row(
-                        children: [
-                          Icon(Icons.flag, color: p.getColor(), size: 18),
-                          const SizedBox(width: 8),
-                          Text(p.label[0].toUpperCase() + p.label.substring(1)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      TaskPriority.values.map((p) {
+                        return DropdownMenuItem(
+                          value: p,
+                          child: Row(
+                            children: [
+                              Icon(Icons.flag, color: p.getColor(), size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                p.label[0].toUpperCase() + p.label.substring(1),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                   onChanged: (val) => setState(() => _selectedPriority = val!),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -283,7 +324,9 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     hintText: 'Ej: urgente, reunión, compras',
                     filled: true,
                     fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -293,9 +336,11 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(_selectedDate == null
-                          ? 'Sin fecha seleccionada'
-                          : DateFormat('dd/MM/yyyy').format(_selectedDate!)),
+                      child: Text(
+                        _selectedDate == null
+                            ? 'Sin fecha seleccionada'
+                            : DateFormat('dd/MM/yyyy').format(_selectedDate!),
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: _pickDueDate,
@@ -311,9 +356,11 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(_selectedTime == null
-                          ? 'Sin hora seleccionada'
-                          : _selectedTime!.format(context)),
+                      child: Text(
+                        _selectedTime == null
+                            ? 'Sin hora seleccionada'
+                            : _selectedTime!.format(context),
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: _pickDueTime,
@@ -330,11 +377,15 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     setState(() {
                       _enableReminder = v;
                       if (v) {
-                        final now = DateTime.now().add(const Duration(hours: 1));
+                        final now = DateTime.now().add(
+                          const Duration(hours: 1),
+                        );
                         _remindDate ??=
-                            _selectedDate ?? DateTime(now.year, now.month, now.day);
+                            _selectedDate ??
+                            DateTime(now.year, now.month, now.day);
                         _remindTime ??=
-                            _selectedTime ?? TimeOfDay(hour: now.hour, minute: now.minute);
+                            _selectedTime ??
+                            TimeOfDay(hour: now.hour, minute: now.minute);
                       }
                     });
                   },
@@ -345,20 +396,24 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(_remindDate == null
-                            ? 'Elegir fecha'
-                            : DateFormat('dd/MM/yyyy').format(_remindDate!)),
+                        child: Text(
+                          _remindDate == null
+                              ? 'Elegir fecha'
+                              : DateFormat('dd/MM/yyyy').format(_remindDate!),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () async {
                           final picked = await showDatePicker(
                             context: context,
                             initialDate:
-                                _remindDate ?? (_selectedDate ?? DateTime.now()),
+                                _remindDate ??
+                                (_selectedDate ?? DateTime.now()),
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null) setState(() => _remindDate = picked);
+                          if (picked != null)
+                            setState(() => _remindDate = picked);
                         },
                         icon: const Icon(Icons.event),
                         label: const Text('Fecha recordatorio'),
@@ -369,9 +424,11 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(_remindTime == null
-                            ? 'Elegir hora'
-                            : _remindTime!.format(context)),
+                        child: Text(
+                          _remindTime == null
+                              ? 'Elegir hora'
+                              : _remindTime!.format(context),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () async {
@@ -379,7 +436,8 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                             context: context,
                             initialTime: _remindTime ?? TimeOfDay.now(),
                           );
-                          if (picked != null) setState(() => _remindTime = picked);
+                          if (picked != null)
+                            setState(() => _remindTime = picked);
                         },
                         icon: const Icon(Icons.alarm),
                         label: const Text('Hora recordatorio'),
@@ -402,16 +460,18 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                         finalDue = _combine(_selectedDate!, _selectedTime);
                       }
 
-                      final remindAt = (_enableReminder && _remindDate != null)
-                          ? _combine(_remindDate!, _remindTime)
-                          : null;
+                      final remindAt =
+                          (_enableReminder && _remindDate != null)
+                              ? _combine(_remindDate!, _remindTime)
+                              : null;
 
                       // Parsear tags
-                      final tags = _tagsController.text
-                          .split(',')
-                          .map((t) => t.trim())
-                          .where((t) => t.isNotEmpty)
-                          .toList();
+                      final tags =
+                          _tagsController.text
+                              .split(',')
+                              .map((t) => t.trim())
+                              .where((t) => t.isNotEmpty)
+                              .toList();
 
                       final updatedTask = Task(
                         id: widget.task.id,
@@ -419,9 +479,10 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                         description: _descriptionController.text.trim(),
                         dueDate: finalDue,
                         priority: _selectedPriority,
-                        category: _categoryController.text.isNotEmpty
-                            ? _categoryController.text.trim()
-                            : null,
+                        category:
+                            _categoryController.text.isNotEmpty
+                                ? _categoryController.text.trim()
+                                : null,
                         completed: widget.task.completed,
                         tags: tags,
                         remindAt: remindAt,
@@ -447,7 +508,10 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                       }
 
                       if (mounted) {
-                        Navigator.popUntil(context, ModalRoute.withName('/tasks'));
+                        Navigator.popUntil(
+                          context,
+                          ModalRoute.withName('/tasks'),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(

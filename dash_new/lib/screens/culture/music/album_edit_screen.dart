@@ -44,21 +44,54 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing==null? 'Nuevo álbum' : 'Editar álbum')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo álbum' : 'Editar álbum'),
+      ),
       body: TaskFormTheme(
         child: ListView(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
           children: [
-            TextField(controller: _title, decoration: const InputDecoration(labelText: 'Título')),
-            TextField(controller: _artist, decoration: const InputDecoration(labelText: 'Artista')),
-            TextField(controller: _year, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Año')),
-            TextField(controller: _cover, decoration: const InputDecoration(labelText: 'Cover URL (opcional)')),
-            TextField(controller: _tracks, decoration: const InputDecoration(labelText: 'Temas favoritos (coma)')),
-            TextField(controller: _notes, decoration: const InputDecoration(labelText: 'Notas'), maxLines: 3),
+            TextField(
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'Título'),
+            ),
+            TextField(
+              controller: _artist,
+              decoration: const InputDecoration(labelText: 'Artista'),
+            ),
+            TextField(
+              controller: _year,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Año'),
+            ),
+            TextField(
+              controller: _cover,
+              decoration: const InputDecoration(
+                labelText: 'Cover URL (opcional)',
+              ),
+            ),
+            TextField(
+              controller: _tracks,
+              decoration: const InputDecoration(
+                labelText: 'Temas favoritos (coma)',
+              ),
+            ),
+            TextField(
+              controller: _notes,
+              decoration: const InputDecoration(labelText: 'Notas'),
+              maxLines: 3,
+            ),
             DropdownButtonFormField<ItemStatus>(
-              initialValue: _status, decoration: const InputDecoration(labelText: 'Estado'),
-              items: ItemStatus.values.map((e)=>DropdownMenuItem(value:e, child: Text(e.name))).toList(),
-              onChanged: (v)=>setState(()=>_status=v??ItemStatus.pending),
+              initialValue: _status,
+              decoration: const InputDecoration(labelText: 'Estado'),
+              items:
+                  ItemStatus.values
+                      .map(
+                        (e) => DropdownMenuItem(value: e, child: Text(e.name)),
+                      )
+                      .toList(),
+              onChanged:
+                  (v) => setState(() => _status = v ?? ItemStatus.pending),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -66,9 +99,13 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
-                  controller: TextEditingController(text: _rating?.toStringAsFixed(1) ?? ''),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (v)=> _rating = double.tryParse(v),
+                  controller: TextEditingController(
+                    text: _rating?.toStringAsFixed(1) ?? '',
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  onChanged: (v) => _rating = double.tryParse(v),
                 ),
               ),
             ),
@@ -83,8 +120,14 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
                   year: int.tryParse(_year.text),
                   status: _status,
                   rating: _rating,
-                  favoriteTracks: _tracks.text.split(',').map((e)=>e.trim()).where((e)=>e.isNotEmpty).toList(),
-                  coverUrl: _cover.text.trim().isEmpty ? null : _cover.text.trim(),
+                  favoriteTracks:
+                      _tracks.text
+                          .split(',')
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty)
+                          .toList(),
+                  coverUrl:
+                      _cover.text.trim().isEmpty ? null : _cover.text.trim(),
                   notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
                 );
                 if (editing == null) {

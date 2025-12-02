@@ -42,7 +42,8 @@ class Task {
   final TaskPriority priority;
   final String? category;
   final DateTime? dueDate; // Fecha y hora límite combinadas
-  final TimeOfDay? reminderTime; // Hora específica del recordatorio diario (si se quiere repetir)
+  final TimeOfDay?
+  reminderTime; // Hora específica del recordatorio diario (si se quiere repetir)
   final bool completed;
   final int? order;
   final List<String> tags; // Etiquetas para organización
@@ -120,9 +121,10 @@ class Task {
       'priority': priority.label,
       'category': category,
       'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
-      'reminderTime': reminderTime != null
-          ? {'hour': reminderTime!.hour, 'minute': reminderTime!.minute}
-          : null,
+      'reminderTime':
+          reminderTime != null
+              ? {'hour': reminderTime!.hour, 'minute': reminderTime!.minute}
+              : null,
       'completed': completed,
       'order': order,
       'tags': tags,
@@ -181,15 +183,21 @@ class Task {
     final subsRaw = map['subtasks'];
     List<Subtask> parsedSubs = [];
     if (subsRaw is List) {
-      parsedSubs = subsRaw
-          .map((e) => e is Map<String, dynamic>
-              ? Subtask.fromMap(Map<String, dynamic>.from(e))
-              : Subtask.fromMap(Map<String, dynamic>.from({
-                  'id': (e['id'] ?? '').toString(),
-                  'title': (e['title'] ?? '').toString(),
-                  'isDone': (e['isDone'] ?? false) as bool,
-                })))
-          .toList();
+      parsedSubs =
+          subsRaw
+              .map(
+                (e) =>
+                    e is Map<String, dynamic>
+                        ? Subtask.fromMap(Map<String, dynamic>.from(e))
+                        : Subtask.fromMap(
+                          Map<String, dynamic>.from({
+                            'id': (e['id'] ?? '').toString(),
+                            'title': (e['title'] ?? '').toString(),
+                            'isDone': (e['isDone'] ?? false) as bool,
+                          }),
+                        ),
+              )
+              .toList();
     }
 
     return Task(
@@ -255,20 +263,16 @@ class Subtask {
   const Subtask({required this.id, required this.title, this.isDone = false});
 
   Subtask copyWith({String? id, String? title, bool? isDone}) => Subtask(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        isDone: isDone ?? this.isDone,
-      );
+    id: id ?? this.id,
+    title: title ?? this.title,
+    isDone: isDone ?? this.isDone,
+  );
 
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'isDone': isDone,
-      };
+  Map<String, dynamic> toMap() => {'id': id, 'title': title, 'isDone': isDone};
 
   factory Subtask.fromMap(Map<String, dynamic> m) => Subtask(
-        id: (m['id'] ?? '').toString(),
-        title: (m['title'] ?? '').toString(),
-        isDone: (m['isDone'] ?? false) as bool,
-      );
+    id: (m['id'] ?? '').toString(),
+    title: (m['title'] ?? '').toString(),
+    isDone: (m['isDone'] ?? false) as bool,
+  );
 }

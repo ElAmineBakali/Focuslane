@@ -29,28 +29,36 @@ class _GamesListScreenState extends State<GamesListScreen> {
               if (v == 'steam') AppLinks.openSteam();
               if (v == 'chess') AppLinks.openChess();
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'Discord', child: Text('Discord')),
-              PopupMenuItem(value: 'PlayStationApp', child: Text('PS App')),
-              PopupMenuItem(value: 'steam', child: Text('Steam')),
-              PopupMenuItem(value: 'chess', child: Text('Chess')),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'Discord', child: Text('Discord')),
+                  PopupMenuItem(value: 'PlayStationApp', child: Text('PS App')),
+                  PopupMenuItem(value: 'steam', child: Text('Steam')),
+                  PopupMenuItem(value: 'chess', child: Text('Chess')),
+                ],
           ),
           PopupMenuButton<ItemStatus?>(
             onSelected: (v) => setState(() => _status = v),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('Todos')),
-              ...ItemStatus.values.map((e) => PopupMenuItem(value: e, child: Text(e.name))),
-            ],
+            itemBuilder:
+                (_) => [
+                  const PopupMenuItem(value: null, child: Text('Todos')),
+                  ...ItemStatus.values.map(
+                    (e) => PopupMenuItem(value: e, child: Text(e.name)),
+                  ),
+                ],
           ),
-          IconButton(icon: const Icon(Icons.add), onPressed: () => Navigator.pushNamed(context, '/culture/game/edit')),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => Navigator.pushNamed(context, '/culture/game/edit'),
+          ),
         ],
       ),
       body: StreamBuilder<List<Game>>(
         stream: svc.watchGames(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin juegos'));
           return ListView.separated(
             itemCount: data.length,
@@ -60,9 +68,16 @@ class _GamesListScreenState extends State<GamesListScreen> {
               return ListTile(
                 leading: const Icon(Icons.sports_esports),
                 title: Text(g.title),
-                subtitle: Text('${g.platform} • ${g.status.name} • ${g.progressPct}%'),
+                subtitle: Text(
+                  '${g.platform} • ${g.status.name} • ${g.progressPct}%',
+                ),
                 trailing: Text('${g.hours.toStringAsFixed(1)} h'),
-                onTap: () => Navigator.pushNamed(context, '/culture/game', arguments: g),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      '/culture/game',
+                      arguments: g,
+                    ),
               );
             },
           );

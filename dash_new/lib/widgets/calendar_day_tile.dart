@@ -15,12 +15,15 @@ class CalendarDayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planesDia = planes
-        .where((p) =>
-            p.fecha.year == fecha.year &&
-            p.fecha.month == fecha.month &&
-            p.fecha.day == fecha.day)
-        .toList();
+    final planesDia =
+        planes
+            .where(
+              (p) =>
+                  p.fecha.year == fecha.year &&
+                  p.fecha.month == fecha.month &&
+                  p.fecha.day == fecha.day,
+            )
+            .toList();
 
     return GestureDetector(
       onTap: onTap,
@@ -33,17 +36,21 @@ class CalendarDayTile extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text("${fecha.day}/${fecha.month}",
-                style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              "${fecha.day}/${fecha.month}",
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 4),
             if (planesDia.isEmpty)
-              const Text("Sin outfit",
-                  style: TextStyle(fontSize: 10, color: Colors.grey))
+              const Text(
+                "Sin outfit",
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              )
             else
-              ...planesDia.map((p) => Text(
-                    p.estado.name,
-                    style: const TextStyle(fontSize: 10),
-                  )),
+              ...planesDia.map(
+                (p) =>
+                    Text(p.estado.name, style: const TextStyle(fontSize: 10)),
+              ),
           ],
         ),
       ),

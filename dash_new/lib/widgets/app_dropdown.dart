@@ -32,7 +32,10 @@ class AppDropdown<T> extends StatelessWidget {
           onChanged: onChanged,
           dropdownColor: color.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
-          hint: hint != null ? Text(hint!, style: TextStyle(color: color.onSurfaceVariant)) : null,
+          hint:
+              hint != null
+                  ? Text(hint!, style: TextStyle(color: color.onSurfaceVariant))
+                  : null,
         ),
       ),
     );

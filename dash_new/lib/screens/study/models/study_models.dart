@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 enum StudyItemType { task, exam }
+
 enum Priority { low, normal, high }
+
 enum TaskStatus { todo, doing, done }
+
 enum StudyMethod { pomodoro, flowtime, timeboxing, custom, simple }
 
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
-    final v = int.parse(hex.startsWith('0x') ? hex.substring(2) : hex, radix: 16);
+    final v = int.parse(
+      hex.startsWith('0x') ? hex.substring(2) : hex,
+      radix: 16,
+    );
     return Color(v);
   } catch (_) {
     return null;
@@ -49,7 +55,10 @@ class Course {
         if (v is DateTime) return v;
         // Firestore Timestamp
         // ignore: unnecessary_type_check
-        final toDate = v is dynamic && v.toString().contains('Timestamp') ? v.toDate() : null;
+        final toDate =
+            v is dynamic && v.toString().contains('Timestamp')
+                ? v.toDate()
+                : null;
         if (toDate is DateTime) return toDate;
         return DateTime.tryParse(v.toString());
       } catch (_) {
@@ -76,7 +85,8 @@ class Course {
     if (teacher != null) 'teacher': teacher,
     if (credits != null) 'credits': credits,
     if (goalHours != null) 'goalHours': goalHours,
-    if (attendanceRequired != null) 'attendanceRequired': attendanceRequired, // ✅
+    if (attendanceRequired != null)
+      'attendanceRequired': attendanceRequired, // ✅
     'isArchived': isArchived,
   };
 }
@@ -151,7 +161,8 @@ class TimerPreset {
   final String id;
   final String name;
   final StudyMethod method;
-  final Map<String, dynamic> params; // e.g. {work:25, short:5, long:15, cycles:4}
+  final Map<String, dynamic>
+  params; // e.g. {work:25, short:5, long:15, cycles:4}
   final String? courseId; // null => global
 
   const TimerPreset({
@@ -189,7 +200,7 @@ class StudySession {
   final String? taskId;
   final StudyMethod method;
   final int minutes; // total
-  final int? laps;   // para simple
+  final int? laps; // para simple
   final int? cycles; // para pomodoro/custom
   final Map<String, dynamic> configSnapshot;
   final String? notes;
@@ -231,7 +242,9 @@ class StudySession {
       minutes: (m['minutes'] as num?)?.toInt() ?? 0,
       laps: (m['laps'] as num?)?.toInt(),
       cycles: (m['cycles'] as num?)?.toInt(),
-      configSnapshot: Map<String, dynamic>.from(m['configSnapshot'] ?? const {}),
+      configSnapshot: Map<String, dynamic>.from(
+        m['configSnapshot'] ?? const {},
+      ),
       notes: m['notes'],
       date: parseDate(m['date']),
     );
@@ -273,8 +286,14 @@ class StudyClassBlock {
       id: id,
       courseId: m['courseId'] ?? '',
       daysOfWeek: List<int>.from(m['daysOfWeek'] ?? const []),
-      start: TimeOfDay(hour: (m['startHour'] as num?)?.toInt() ?? 0, minute: (m['startMinute'] as num?)?.toInt() ?? 0),
-      end: TimeOfDay(hour: (m['endHour'] as num?)?.toInt() ?? 0, minute: (m['endMinute'] as num?)?.toInt() ?? 0),
+      start: TimeOfDay(
+        hour: (m['startHour'] as num?)?.toInt() ?? 0,
+        minute: (m['startMinute'] as num?)?.toInt() ?? 0,
+      ),
+      end: TimeOfDay(
+        hour: (m['endHour'] as num?)?.toInt() ?? 0,
+        minute: (m['endMinute'] as num?)?.toInt() ?? 0,
+      ),
       room: m['room'],
     );
   }

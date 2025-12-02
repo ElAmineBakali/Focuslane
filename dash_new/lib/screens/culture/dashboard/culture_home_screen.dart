@@ -32,14 +32,27 @@ class CultureHomeScreen extends StatelessWidget {
             FutureBuilder<Map<String, dynamic>>(
               future: svc.quickKpis(),
               builder: (_, snap) {
-                final m = snap.data ?? const {
-                  'booksDone': 0, 'moviesDone': 0, 'seriesDone': 0, 'gameHours': 0.0
-                };
+                final m =
+                    snap.data ??
+                    const {
+                      'booksDone': 0,
+                      'moviesDone': 0,
+                      'seriesDone': 0,
+                      'gameHours': 0.0,
+                    };
                 final items = [
                   _kpiSmall(context, 'Libros terminados', '${m['booksDone']}'),
-                  _kpiSmall(context, 'Películas vistas',   '${m['moviesDone']}'),
-                  _kpiSmall(context, 'Series completadas', '${m['seriesDone']}'),
-                  _kpiSmall(context, 'Horas juegos',       (m['gameHours'] as double).toStringAsFixed(1)),
+                  _kpiSmall(context, 'Películas vistas', '${m['moviesDone']}'),
+                  _kpiSmall(
+                    context,
+                    'Series completadas',
+                    '${m['seriesDone']}',
+                  ),
+                  _kpiSmall(
+                    context,
+                    'Horas juegos',
+                    (m['gameHours'] as double).toStringAsFixed(1),
+                  ),
                 ];
                 return _kpiResponsive(items);
               },
@@ -51,7 +64,12 @@ class CultureHomeScreen extends StatelessWidget {
             _nav(context, 'Películas', Icons.local_movies, '/culture/movies'),
             _nav(context, 'Música', Icons.album, '/culture/music'),
             _nav(context, 'Juegos', Icons.sports_esports, '/culture/games'),
-            _nav(context, 'Colecciones', Icons.collections_bookmark, '/culture/collections'),
+            _nav(
+              context,
+              'Colecciones',
+              Icons.collections_bookmark,
+              '/culture/collections',
+            ),
           ],
         ),
       ),
@@ -79,7 +97,9 @@ class CultureHomeScreen extends StatelessWidget {
                 child: Text(
                   'Añadir',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: cs.onPrimary, fontWeight: FontWeight.w700),
+                    color: cs.onPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               Icon(Icons.expand_more, color: cs.onPrimary),
@@ -95,9 +115,10 @@ class CultureHomeScreen extends StatelessWidget {
       context: context,
       showDragHandle: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (ctx) {
-        Widget it(String label, IconData icon, String route){
+        Widget it(String label, IconData icon, String route) {
           return ListTile(
             leading: Icon(icon),
             title: Text(label),
@@ -107,13 +128,18 @@ class CultureHomeScreen extends StatelessWidget {
             },
           );
         }
+
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               it('Libro', Icons.menu_book_outlined, '/culture/book/edit'),
               it('Serie/Anime', Icons.tv_outlined, '/culture/series/edit'),
-              it('Película', Icons.local_movies_outlined, '/culture/movie/edit'),
+              it(
+                'Película',
+                Icons.local_movies_outlined,
+                '/culture/movie/edit',
+              ),
               it('Álbum', Icons.album_outlined, '/culture/album/edit'),
               it('Juego', Icons.sports_esports_outlined, '/culture/game/edit'),
               const SizedBox(height: 8),
@@ -132,19 +158,34 @@ class CultureHomeScreen extends StatelessWidget {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Row(children: [
-            const Icon(Icons.star, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelMedium),
-                const SizedBox(height: 2),
-                Text(value, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              ]),
-            ),
-          ]),
+          child: Row(
+            children: [
+              const Icon(Icons.star, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -161,9 +202,25 @@ class CultureHomeScreen extends StatelessWidget {
         final rows = <Widget>[];
         for (var i = 0; i < items.length; i += 2) {
           if (i + 1 < items.length) {
-            rows.add(Row(children: [Expanded(child: items[i]), const SizedBox(width: 8), Expanded(child: items[i + 1])]));
+            rows.add(
+              Row(
+                children: [
+                  Expanded(child: items[i]),
+                  const SizedBox(width: 8),
+                  Expanded(child: items[i + 1]),
+                ],
+              ),
+            );
           } else {
-            rows.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [SizedBox(width: (w / 2) - 4), Expanded(child: items[i])]));
+            rows.add(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: (w / 2) - 4),
+                  Expanded(child: items[i]),
+                ],
+              ),
+            );
           }
           rows.add(const SizedBox(height: 8));
         }
@@ -172,7 +229,8 @@ class CultureHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _nav(BuildContext ctx, String title, IconData icon, String route) => Card(
+  Widget _nav(BuildContext ctx, String title, IconData icon, String route) =>
+      Card(
         child: ListTile(
           leading: Icon(icon),
           title: Text(title),

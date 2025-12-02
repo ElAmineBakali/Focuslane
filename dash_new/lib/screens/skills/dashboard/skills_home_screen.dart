@@ -22,9 +22,10 @@ class SkillsHomeScreen extends StatelessWidget {
             onSelected: (v) {
               if (v == 'GuitarTuna') AppLinks.openGuitarTuna();
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'GuitarTuna', child: Text('GuitarTuna')),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'GuitarTuna', child: Text('GuitarTuna')),
+                ],
           ),
           IconButton(
             icon: const Icon(Icons.analytics_outlined),
@@ -40,7 +41,9 @@ class SkillsHomeScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (data.isEmpty) {
-            return const Center(child: Text('Crea tu primera habilidad con el botón +'));
+            return const Center(
+              child: Text('Crea tu primera habilidad con el botón +'),
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
@@ -57,7 +60,12 @@ class SkillsHomeScreen extends StatelessWidget {
                     '${skillLevelLabel(x.currentLevel)} • ${x.totalHours.toStringAsFixed(1)}h • racha ${x.streakDays}d',
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(context, SkillDetailScreen.route, arguments: x),
+                  onTap:
+                      () => Navigator.pushNamed(
+                        context,
+                        SkillDetailScreen.route,
+                        arguments: x,
+                      ),
                 ),
               );
             },

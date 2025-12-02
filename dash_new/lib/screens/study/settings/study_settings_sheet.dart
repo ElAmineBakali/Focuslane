@@ -44,7 +44,9 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
     final notif = StudyNotifications(widget.svc);
     await notif.scheduleAll(classes: _notifyClasses, tasks: _notifyTasks);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Recordatorios reprogramados')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Recordatorios reprogramados')),
+      );
     }
   }
 
@@ -58,56 +60,71 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
         top: 12,
       ),
       child: SafeArea(
-        child: _loading
-            ? const SizedBox(height: 160, child: Center(child: CircularProgressIndicator()))
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.settings),
-                      const SizedBox(width: 8),
-                      Text('Ajustes de Study', style: Theme.of(context).textTheme.titleLarge),
-                      const Spacer(),
-                      IconButton(
-                        tooltip: 'Cerrar',
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
+        child:
+            _loading
+                ? const SizedBox(
+                  height: 160,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+                : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.settings),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Ajustes de Study',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          tooltip: 'Cerrar',
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      value: _notifyClasses,
+                      onChanged: (v) => setState(() => _notifyClasses = v),
+                      title: const Text('Recordatorios de clases'),
+                      subtitle: const Text('15 minutos antes de cada bloque'),
+                    ),
+                    SwitchListTile(
+                      value: _notifyTasks,
+                      onChanged: (v) => setState(() => _notifyTasks = v),
+                      title: const Text('Recordatorios de tareas / exámenes'),
+                      subtitle: const Text(
+                        'Un día antes y el mismo día a las 8:00',
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SwitchListTile(
-                    value: _notifyClasses,
-                    onChanged: (v) => setState(() => _notifyClasses = v),
-                    title: const Text('Recordatorios de clases'),
-                    subtitle: const Text('15 minutos antes de cada bloque'),
-                  ),
-                  SwitchListTile(
-                    value: _notifyTasks,
-                    onChanged: (v) => setState(() => _notifyTasks = v),
-                    title: const Text('Recordatorios de tareas / exámenes'),
-                    subtitle: const Text('Un día antes y el mismo día a las 8:00'),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      OutlinedButton.icon(
-                        onPressed: () async { await _save(); await _reschedule(); },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Guardar y reprogramar'),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () async { await _save(); if (mounted) Navigator.pop(context); },
-                        child: const Text('Guardar'),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            await _save();
+                            await _reschedule();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Guardar y reprogramar'),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton(
+                          onPressed: () async {
+                            await _save();
+                            if (mounted) Navigator.pop(context);
+                          },
+                          child: const Text('Guardar'),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
       ),
     );
   }

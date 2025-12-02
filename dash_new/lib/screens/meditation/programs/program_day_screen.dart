@@ -31,12 +31,21 @@ class ProgramDayScreen extends StatelessWidget {
               StreamBuilder<List<GuidedAudio>>(
                 stream: MeditationFirestoreService.I.watchGuided(),
                 builder: (context, s) {
-                  final g = (s.data ?? []).where((x) => x.id == day.guidedAudioId).cast<GuidedAudio?>().firstOrNull;
+                  final g =
+                      (s.data ?? [])
+                          .where((x) => x.id == day.guidedAudioId)
+                          .cast<GuidedAudio?>()
+                          .firstOrNull;
                   if (g == null) return const SizedBox.shrink();
                   return FilledButton.icon(
                     icon: const Icon(Icons.play_arrow),
                     label: Text('Escuchar guía: ${g.title}'),
-                    onPressed: () => Navigator.pushNamed(context, GuidedPlayerScreen.route, arguments: g),
+                    onPressed:
+                        () => Navigator.pushNamed(
+                          context,
+                          GuidedPlayerScreen.route,
+                          arguments: g,
+                        ),
                   );
                 },
               ),
@@ -45,23 +54,28 @@ class ProgramDayScreen extends StatelessWidget {
               icon: const Icon(Icons.check),
               label: const Text('Marcar completado (crea sesión)'),
               onPressed: () async {
-                await MeditationFirestoreService.I.addSession(MeditationSession(
-                  id: '',
-                  title: '${program.name} — Día ${day.dayNumber}',
-                  type: SessionType.guided,
-                  durationSec: day.recommendedDurationSec,
-                  date: DateTime.now(),
-                  notes: day.title,
-                ));
-                await MeditationFirestoreService.I.updateProgramDay(program.id, ProgramDay(
-                  id: day.id,
-                  dayNumber: day.dayNumber,
-                  title: day.title,
-                  goal: day.goal,
-                  recommendedDurationSec: day.recommendedDurationSec,
-                  status: 'done',
-                  guidedAudioId: day.guidedAudioId,
-                ));
+                await MeditationFirestoreService.I.addSession(
+                  MeditationSession(
+                    id: '',
+                    title: '${program.name} — Día ${day.dayNumber}',
+                    type: SessionType.guided,
+                    durationSec: day.recommendedDurationSec,
+                    date: DateTime.now(),
+                    notes: day.title,
+                  ),
+                );
+                await MeditationFirestoreService.I.updateProgramDay(
+                  program.id,
+                  ProgramDay(
+                    id: day.id,
+                    dayNumber: day.dayNumber,
+                    title: day.title,
+                    goal: day.goal,
+                    recommendedDurationSec: day.recommendedDurationSec,
+                    status: 'done',
+                    guidedAudioId: day.guidedAudioId,
+                  ),
+                );
                 if (context.mounted) Navigator.pop(context);
               },
             ),

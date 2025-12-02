@@ -27,9 +27,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget build(BuildContext context) {
     final c = widget.course;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Asistencia: ${c.name}'),
-      ),
+      appBar: AppBar(title: Text('Asistencia: ${c.name}')),
       body: StreamBuilder<Map<String, String>>(
         stream: widget.svc.streamAttendanceMap(c.id),
         builder: (context, snap) {
@@ -37,12 +35,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
           // Stats
           final attended = map.values.where((v) => v == 'A').length;
-          final absent   = map.values.where((v) => v == 'X').length;
-          final noClass  = map.values.where((v) => v == '-').length;
+          final absent = map.values.where((v) => v == 'X').length;
+          final noClass = map.values.where((v) => v == '-').length;
           final totalCount = attended + absent; // '-' no cuenta
 
           // 🔧 Aseguramos double en ambos branches
-          final double pct = totalCount == 0 ? 0.0 : (attended * 100.0 / totalCount);
+          final double pct =
+              totalCount == 0 ? 0.0 : (attended * 100.0 / totalCount);
 
           // 🔧 También aseguramos double aquí
           final double target = c.attendanceRequired ?? 0.0;
@@ -55,8 +54,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 attended: attended,
                 absent: absent,
                 noClass: noClass,
-                percent: pct,          // ahora es double
-                target: target,        // double
+                percent: pct, // ahora es double
+                target: target, // double
                 meets: meets,
               ),
               const SizedBox(height: 8),
@@ -78,12 +77,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         color: Theme.of(context).colorScheme.secondaryContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      titleTextStyle: Theme.of(context).textTheme.titleMedium!
-                          .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+                      titleTextStyle: Theme.of(
+                        context,
+                      ).textTheme.titleMedium!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
                     ),
                     calendarStyle: CalendarStyle(
                       todayDecoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.secondary),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       outsideDaysVisible: false,
@@ -97,23 +102,46 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                         if (st == 'A') {
                           bg = Colors.green.withValues(alpha: .8);
-                          child = const Icon(Icons.check, size: 18, color: Colors.white);
+                          child = const Icon(
+                            Icons.check,
+                            size: 18,
+                            color: Colors.white,
+                          );
                         } else if (st == 'X') {
                           bg = Colors.redAccent.withValues(alpha: .85);
-                          child = const Icon(Icons.close, size: 18, color: Colors.white);
+                          child = const Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.white,
+                          );
                         } else if (st == '-') {
-                          bg = Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .50);
-                          child = Text('${day.day}', style: const TextStyle(fontWeight: FontWeight.bold));
+                          bg = Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withValues(alpha: .50);
+                          child = Text(
+                            '${day.day}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          );
                         } else {
-                          bg = Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .25);
-                          child = Text('${day.day}', style: const TextStyle(fontWeight: FontWeight.bold));
+                          bg = Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withValues(alpha: .25);
+                          child = Text(
+                            '${day.day}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          );
                         }
 
                         return GestureDetector(
                           onTap: () => _editDay(day, st),
                           child: Container(
                             margin: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                              color: bg,
+                              shape: BoxShape.circle,
+                            ),
                             alignment: Alignment.center,
                             child: child,
                           ),
@@ -131,11 +159,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     child: FilledButton.icon(
                       icon: const Icon(Icons.check),
                       label: const Text('Hoy Asistió'),
-                      onPressed: () => widget.svc.setAttendance(
-                        courseId: c.id,
-                        day: DateTime.now(),
-                        status: 'A',
-                      ),
+                      onPressed:
+                          () => widget.svc.setAttendance(
+                            courseId: c.id,
+                            day: DateTime.now(),
+                            status: 'A',
+                          ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -143,11 +172,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.close),
                       label: const Text('Hoy No asistió'),
-                      onPressed: () => widget.svc.setAttendance(
-                        courseId: c.id,
-                        day: DateTime.now(),
-                        status: 'X',
-                      ),
+                      onPressed:
+                          () => widget.svc.setAttendance(
+                            courseId: c.id,
+                            day: DateTime.now(),
+                            status: 'X',
+                          ),
                     ),
                   ),
                 ],
@@ -156,11 +186,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               TextButton.icon(
                 icon: const Icon(Icons.remove),
                 label: const Text('Hoy Sin clase'),
-                onPressed: () => widget.svc.setAttendance(
-                  courseId: c.id,
-                  day: DateTime.now(),
-                  status: '-',
-                ),
+                onPressed:
+                    () => widget.svc.setAttendance(
+                      courseId: c.id,
+                      day: DateTime.now(),
+                      status: '-',
+                    ),
               ),
             ],
           );
@@ -172,39 +203,51 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void _editDay(DateTime day, String? current) {
     showModalBottomSheet(
       context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.check, color: Colors.green),
-              title: const Text('Asistió'),
-              onTap: () {
-                Navigator.pop(context);
-                widget.svc.setAttendance(courseId: widget.course.id, day: day, status: 'A');
-              },
+      builder:
+          (_) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.check, color: Colors.green),
+                  title: const Text('Asistió'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    widget.svc.setAttendance(
+                      courseId: widget.course.id,
+                      day: day,
+                      status: 'A',
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.close, color: Colors.redAccent),
+                  title: const Text('No asistió'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    widget.svc.setAttendance(
+                      courseId: widget.course.id,
+                      day: day,
+                      status: 'X',
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.remove),
+                  title: const Text('Sin clase'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    widget.svc.setAttendance(
+                      courseId: widget.course.id,
+                      day: day,
+                      status: '-',
+                    );
+                  },
+                ),
+                if (current != null) const SizedBox(height: 8),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.close, color: Colors.redAccent),
-              title: const Text('No asistió'),
-              onTap: () {
-                Navigator.pop(context);
-                widget.svc.setAttendance(courseId: widget.course.id, day: day, status: 'X');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.remove),
-              title: const Text('Sin clase'),
-              onTap: () {
-                Navigator.pop(context);
-                widget.svc.setAttendance(courseId: widget.course.id, day: day, status: '-');
-              },
-            ),
-            if (current != null)
-              const SizedBox(height: 8),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -214,7 +257,7 @@ class _StatsHeader extends StatelessWidget {
   final int absent;
   final int noClass;
   final double percent; // 0..100
-  final double target;  // 0..100
+  final double target; // 0..100
   final bool meets;
   const _StatsHeader({
     required this.attended,
@@ -253,17 +296,28 @@ class _StatsHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Asistencia actual', style: Theme.of(context).textTheme.labelLarge),
+                      Text(
+                        'Asistencia actual',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
                       const SizedBox(height: 6),
                       LinearProgressIndicator(
                         value: progress,
                         minHeight: 10,
                         color: color,
-                        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        backgroundColor:
+                            Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
                       ),
                       const SizedBox(height: 4),
-                      Text('${p.toStringAsFixed(1)}% (objetivo ${target.toStringAsFixed(0)}%)',
-                          style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+                      Text(
+                        '${p.toStringAsFixed(1)}% (objetivo ${target.toStringAsFixed(0)}%)',
+                        style: TextStyle(
+                          color: color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -275,7 +329,13 @@ class _StatsHeader extends StatelessWidget {
     );
   }
 
-  Widget _chip(BuildContext ctx, IconData icon, String label, int value, Color color) {
+  Widget _chip(
+    BuildContext ctx,
+    IconData icon,
+    String label,
+    int value,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -288,7 +348,10 @@ class _StatsHeader extends StatelessWidget {
             Icon(icon, size: 18, color: color),
             const SizedBox(width: 6),
             Expanded(child: Text(label, overflow: TextOverflow.ellipsis)),
-            Text('$value', style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+            Text(
+              '$value',
+              style: TextStyle(color: color, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

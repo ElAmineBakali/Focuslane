@@ -44,21 +44,53 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing==null? 'Nueva película' : 'Editar película')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nueva película' : 'Editar película'),
+      ),
       body: TaskFormTheme(
         child: ListView(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
           children: [
-            TextField(controller: _title, decoration: const InputDecoration(labelText: 'Título')),
-            TextField(controller: _year, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Año')),
-            TextField(controller: _minutes, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Minutos')),
-            TextField(controller: _saga, decoration: const InputDecoration(labelText: 'Saga (opcional)')),
-            TextField(controller: _poster, decoration: const InputDecoration(labelText: 'Poster URL (opcional)')),
-            TextField(controller: _notes, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas')),
+            TextField(
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'Título'),
+            ),
+            TextField(
+              controller: _year,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Año'),
+            ),
+            TextField(
+              controller: _minutes,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Minutos'),
+            ),
+            TextField(
+              controller: _saga,
+              decoration: const InputDecoration(labelText: 'Saga (opcional)'),
+            ),
+            TextField(
+              controller: _poster,
+              decoration: const InputDecoration(
+                labelText: 'Poster URL (opcional)',
+              ),
+            ),
+            TextField(
+              controller: _notes,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Notas'),
+            ),
             DropdownButtonFormField<ItemStatus>(
-              initialValue: _status, decoration: const InputDecoration(labelText: 'Estado'),
-              items: ItemStatus.values.map((e)=>DropdownMenuItem(value:e, child: Text(e.name))).toList(),
-              onChanged: (v)=>setState(()=>_status=v??ItemStatus.pending),
+              initialValue: _status,
+              decoration: const InputDecoration(labelText: 'Estado'),
+              items:
+                  ItemStatus.values
+                      .map(
+                        (e) => DropdownMenuItem(value: e, child: Text(e.name)),
+                      )
+                      .toList(),
+              onChanged:
+                  (v) => setState(() => _status = v ?? ItemStatus.pending),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -66,9 +98,13 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
-                  controller: TextEditingController(text: _rating?.toStringAsFixed(1) ?? ''),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (v)=> _rating = double.tryParse(v),
+                  controller: TextEditingController(
+                    text: _rating?.toStringAsFixed(1) ?? '',
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  onChanged: (v) => _rating = double.tryParse(v),
                 ),
               ),
             ),
@@ -84,7 +120,8 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
                   saga: _saga.text.trim().isEmpty ? null : _saga.text.trim(),
                   status: _status,
                   rating: _rating,
-                  posterUrl: _poster.text.trim().isEmpty ? null : _poster.text.trim(),
+                  posterUrl:
+                      _poster.text.trim().isEmpty ? null : _poster.text.trim(),
                   notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
                 );
                 if (editing == null) {

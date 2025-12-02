@@ -25,7 +25,8 @@ class PeopleDebtsScreen extends StatelessWidget {
               stream: svc.watchPeople(),
               builder: (context, snap) {
                 final people = snap.data ?? const <Person>[];
-                final currency = people.isNotEmpty ? people.first.defaultCurrency : 'EUR';
+                final currency =
+                    people.isNotEmpty ? people.first.defaultCurrency : 'EUR';
 
                 double toReceive = 0, toPayAbs = 0;
                 for (final p in people) {
@@ -34,10 +35,21 @@ class PeopleDebtsScreen extends StatelessWidget {
                 }
 
                 return Wrap(
-                  spacing: 12, runSpacing: 12,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    _kpi(context, 'Me deben', _fmt(toReceive, currency), positive: true),
-                    _kpi(context, 'Debo', _fmt(toPayAbs, currency), positive: false),
+                    _kpi(
+                      context,
+                      'Me deben',
+                      _fmt(toReceive, currency),
+                      positive: true,
+                    ),
+                    _kpi(
+                      context,
+                      'Debo',
+                      _fmt(toPayAbs, currency),
+                      positive: false,
+                    ),
                   ],
                 );
               },
@@ -68,9 +80,16 @@ class PeopleDebtsScreen extends StatelessWidget {
                       key: ValueKey(p.id),
                       leading: const Icon(Icons.person_outline),
                       title: Text(p.name),
-                      subtitle: Text('Saldo: ${_fmt(p.balance, p.defaultCurrency)}'),
+                      subtitle: Text(
+                        'Saldo: ${_fmt(p.balance, p.defaultCurrency)}',
+                      ),
                       trailing: Icon(Icons.chevron_right, color: color),
-                      onTap: () => Navigator.pushNamed(context, PersonEditScreen.route, arguments: p),
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            PersonEditScreen.route,
+                            arguments: p,
+                          ),
                     );
                   },
                 );
@@ -86,7 +105,12 @@ class PeopleDebtsScreen extends StatelessWidget {
     );
   }
 
-  Widget _kpi(BuildContext context, String name, String value, {required bool positive}) {
+  Widget _kpi(
+    BuildContext context,
+    String name,
+    String value, {
+    required bool positive,
+  }) {
     final s = Theme.of(context).colorScheme;
     final badge = positive ? s.primary : s.error;
     return SizedBox(
@@ -95,10 +119,16 @@ class PeopleDebtsScreen extends StatelessWidget {
         child: ListTile(
           leading: CircleAvatar(
             backgroundColor: badge,
-            child: Icon(positive ? Icons.trending_up : Icons.trending_down, color: s.onPrimary),
+            child: Icon(
+              positive ? Icons.trending_up : Icons.trending_down,
+              color: s.onPrimary,
+            ),
           ),
           title: Text(name),
-          subtitle: Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

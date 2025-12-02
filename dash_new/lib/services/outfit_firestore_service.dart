@@ -9,14 +9,13 @@ class OutfitFirestoreService {
 
   Stream<List<Outfit>> outfitsStream(String uid) {
     return _col(uid).snapshots().map(
-        (s) => s.docs.map((d) => Outfit.fromFirestore(d)).toList());
+      (s) => s.docs.map((d) => Outfit.fromFirestore(d)).toList(),
+    );
   }
 
   Future<void> addOutfit(String uid, Outfit outfit) async {
     final doc = _col(uid).doc();
-    await doc.set({
-      ...outfit.toFirestore(),
-    });
+    await doc.set({...outfit.toFirestore()});
   }
 
   Future<void> updateOutfit(String uid, Outfit outfit) async {

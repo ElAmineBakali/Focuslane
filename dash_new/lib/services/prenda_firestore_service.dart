@@ -11,7 +11,6 @@ class PrendaFirestoreService {
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       _db.collection('users').doc(uid).collection('wardrobe_items');
 
-
   Stream<List<Prenda>> prendasStream(String uid) => _col(uid)
       .orderBy('nombre', descending: false)
       .snapshots()
@@ -23,10 +22,9 @@ class PrendaFirestoreService {
     return Prenda.fromFirestore(doc);
   }
 
-  Stream<Prenda?> prendaStream(String uid, String id) => _col(uid)
-      .doc(id)
-      .snapshots()
-      .map((d) => d.exists ? Prenda.fromFirestore(d) : null);
+  Stream<Prenda?> prendaStream(String uid, String id) => _col(
+    uid,
+  ).doc(id).snapshots().map((d) => d.exists ? Prenda.fromFirestore(d) : null);
 
   Future<void> addPrenda(String uid, Prenda prenda) async {
     await _col(uid).doc(prenda.id).set(prenda.toFirestore());
@@ -40,7 +38,7 @@ class PrendaFirestoreService {
     await _col(uid).doc(prendaId).delete();
   }
 
-    Future<Map<String, String>> uploadImagenPrenda({
+  Future<Map<String, String>> uploadImagenPrenda({
     required String uid,
     required String prendaId,
     required XFile file,
@@ -48,28 +46,28 @@ class PrendaFirestoreService {
     final bytes = await file.readAsBytes();
     final ts = DateTime.now().millisecondsSinceEpoch;
     final path = 'users/$uid/wardrobe/$prendaId/$ts.jpg';
-    await _storage.from(_bucketName).uploadBinary(
-      path,
-      bytes,
-      fileOptions: const FileOptions(contentType: 'image/jpeg'),
-    );
+    await _storage
+        .from(_bucketName)
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(contentType: 'image/jpeg'),
+        );
     final url = _storage.from(_bucketName).getPublicUrl(path);
-    return {
-      'thumb': url,
-      'medium': url,
-      'full': url,
-    };
+    return {'thumb': url, 'medium': url, 'full': url};
   }
 
-  Stream<List<Prenda>> prendasByCategoria(String uid, String categoriaId) => _col(uid)
-      .where('categoriaId', isEqualTo: categoriaId)
-      .snapshots()
-      .map((s) => s.docs.map(Prenda.fromFirestore).toList());
+  Stream<List<Prenda>> prendasByCategoria(String uid, String categoriaId) =>
+      _col(uid)
+          .where('categoriaId', isEqualTo: categoriaId)
+          .snapshots()
+          .map((s) => s.docs.map(Prenda.fromFirestore).toList());
 
-  Stream<List<Prenda>> prendasByEstado(String uid, EstadoPrenda estado) => _col(uid)
-      .where('estado', isEqualTo: estado.name)
-      .snapshots()
-      .map((s) => s.docs.map(Prenda.fromFirestore).toList());
+  Stream<List<Prenda>> prendasByEstado(String uid, EstadoPrenda estado) =>
+      _col(uid)
+          .where('estado', isEqualTo: estado.name)
+          .snapshots()
+          .map((s) => s.docs.map(Prenda.fromFirestore).toList());
 
   Stream<List<Prenda>> prendasFavoritas(String uid) => _col(uid)
       .where('favorita', isEqualTo: true)
@@ -84,7 +82,11 @@ class PrendaFirestoreService {
     await _col(uid).doc(prendaId).update({'archivada': valor});
   }
 
-  Future<void> updateEstado(String uid, String prendaId, EstadoPrenda estado) async {
+  Future<void> updateEstado(
+    String uid,
+    String prendaId,
+    EstadoPrenda estado,
+  ) async {
     await _col(uid).doc(prendaId).update({'estado': estado.name});
   }
 
@@ -103,7 +105,10 @@ class PrendaFirestoreService {
     });
   }
 
-  Future<void> marcarLavada(String uid, String prendaId) => updateEstado(uid, prendaId, EstadoPrenda.lavada);
-  Future<void> marcarSucia(String uid, String prendaId) => updateEstado(uid, prendaId, EstadoPrenda.sucia);
-  Future<void> marcarLavandose(String uid, String prendaId) => updateEstado(uid, prendaId, EstadoPrenda.lavandose);
+  Future<void> marcarLavada(String uid, String prendaId) =>
+      updateEstado(uid, prendaId, EstadoPrenda.lavada);
+  Future<void> marcarSucia(String uid, String prendaId) =>
+      updateEstado(uid, prendaId, EstadoPrenda.sucia);
+  Future<void> marcarLavandose(String uid, String prendaId) =>
+      updateEstado(uid, prendaId, EstadoPrenda.lavandose);
 }

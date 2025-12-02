@@ -34,11 +34,15 @@ class MediaService {
       final f = result.files.first;
       // ignore: avoid_print
       print('[MediaService] Archivo seleccionado: ${f.name} (${f.size} bytes)');
-      
+
       if (f.bytes != null) {
         // ignore: avoid_print
         print('[MediaService] Subiendo desde bytes...');
-        final url = await uploadBytes(f.bytes!, fileName: f.name, pathPrefix: pathPrefix);
+        final url = await uploadBytes(
+          f.bytes!,
+          fileName: f.name,
+          pathPrefix: pathPrefix,
+        );
         // ignore: avoid_print
         print('[MediaService] URL generada: $url');
         return url;
@@ -63,10 +67,15 @@ class MediaService {
     }
   }
 
-  Future<String> uploadBytes(Uint8List data, {required String fileName, String pathPrefix = 'notes'}) async {
+  Future<String> uploadBytes(
+    Uint8List data, {
+    required String fileName,
+    String pathPrefix = 'notes',
+  }) async {
     try {
       final id = const Uuid().v4();
-      final ext = p.extension(fileName.isNotEmpty ? fileName : 'file').toLowerCase();
+      final ext =
+          p.extension(fileName.isNotEmpty ? fileName : 'file').toLowerCase();
       final path = '$pathPrefix/$id$ext';
       // ignore: avoid_print
       print('[MediaService] Iniciando upload a: $path');

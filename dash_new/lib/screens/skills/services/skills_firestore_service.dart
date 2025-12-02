@@ -80,11 +80,10 @@ class SkillsFirestoreService {
   }
 
   // ===== Projects
-  Stream<List<Project>> watchProjects(String skillId) =>
-      _projectsCol(skillId)
-          .orderBy('state')
-          .snapshots()
-          .map((s) => s.docs.map(Project.fromSnap).toList());
+  Stream<List<Project>> watchProjects(String skillId) => _projectsCol(skillId)
+      .orderBy('state')
+      .snapshots()
+      .map((s) => s.docs.map(Project.fromSnap).toList());
 
   Future<void> addProject(Project p) async =>
       _projectsCol(p.skillId).add(p.toMap());
@@ -117,8 +116,9 @@ class SkillsFirestoreService {
     for (final d in sessions.docs) {
       final m = d.data() as Map<String, dynamic>;
       minutes += ((m['minutes'] ?? 0) as num).toInt();
-      final dayKey =
-          ((m['start'] as Timestamp?)?.toDate() ?? DateTime.now()).toIso8601String().substring(0, 10);
+      final dayKey = ((m['start'] as Timestamp?)?.toDate() ?? DateTime.now())
+          .toIso8601String()
+          .substring(0, 10);
       seenDays.add(dayKey);
     }
     days = seenDays.length;
@@ -144,8 +144,9 @@ class SkillsFirestoreService {
 
   // ===== Meta / agregados
   Future<void> _touchMeta() async {
-    await _metaDoc
-        .set({'lastUpdated': Timestamp.now()}, SetOptions(merge: true));
+    await _metaDoc.set({
+      'lastUpdated': Timestamp.now(),
+    }, SetOptions(merge: true));
   }
 
   Future<void> _recalcSkillAggregates(String skillId) async {

@@ -43,7 +43,9 @@ class TaskDetailScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: theme.textTheme.bodyLarge?.copyWith(color: color.onSurface),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: color.onSurface,
+                ),
               ),
             ),
           ],
@@ -56,7 +58,9 @@ class TaskDetailScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           color: color.surfaceContainerHigh,
           elevation: theme.brightness == Brightness.dark ? 2 : 4,
           shadowColor: color.shadow.withOpacity(0.1),
@@ -71,15 +75,24 @@ class TaskDetailScreen extends StatelessWidget {
                     infoRow(Icons.description, task.description),
                   Row(
                     children: [
-                      Icon(Icons.flag, color: task.priority.getColor(), size: 22),
+                      Icon(
+                        Icons.flag,
+                        color: task.priority.getColor(),
+                        size: 22,
+                      ),
                       const SizedBox(width: 12),
                       Text(
                         'Prioridad: ${task.priority.label[0].toUpperCase()}${task.priority.label.substring(1)}',
-                        style: theme.textTheme.bodyLarge?.copyWith(color: color.onSurface),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: color.onSurface,
+                        ),
                       ),
                     ],
                   ),
-                  infoRow(Icons.category, 'Categoría: ${task.category?.isNotEmpty == true ? task.category : 'Sin categoría'}'),
+                  infoRow(
+                    Icons.category,
+                    'Categoría: ${task.category?.isNotEmpty == true ? task.category : 'Sin categoría'}',
+                  ),
                   if (task.tags.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -92,15 +105,20 @@ class TaskDetailScreen extends StatelessWidget {
                             child: Wrap(
                               spacing: 6,
                               runSpacing: 4,
-                              children: task.tags.map((tag) {
-                                return Chip(
-                                  label: Text(tag),
-                                  backgroundColor: color.primaryContainer,
-                                  labelStyle: TextStyle(color: color.onPrimaryContainer),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  visualDensity: VisualDensity.compact,
-                                );
-                              }).toList(),
+                              children:
+                                  task.tags.map((tag) {
+                                    return Chip(
+                                      label: Text(tag),
+                                      backgroundColor: color.primaryContainer,
+                                      labelStyle: TextStyle(
+                                        color: color.onPrimaryContainer,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
+                                      visualDensity: VisualDensity.compact,
+                                    );
+                                  }).toList(),
                             ),
                           ),
                         ],
@@ -114,7 +132,11 @@ class TaskDetailScreen extends StatelessWidget {
                         leading: const Icon(Icons.sticky_note_2_outlined),
                         title: const Text('Ver nota vinculada'),
                         onTap: () {
-                          Navigator.pushNamed(context, '/notes/editor', arguments: task.linkedNoteId);
+                          Navigator.pushNamed(
+                            context,
+                            '/notes/editor',
+                            arguments: task.linkedNoteId,
+                          );
                         },
                       ),
                     ),
@@ -137,13 +159,18 @@ class TaskDetailScreen extends StatelessWidget {
                     children: [
                       Icon(
                         task.completed ? Icons.check_circle : Icons.cancel,
-                        color: task.completed ? color.primary : color.onSurfaceVariant,
+                        color:
+                            task.completed
+                                ? color.primary
+                                : color.onSurfaceVariant,
                         size: 22,
                       ),
                       const SizedBox(width: 12),
                       Text(
                         task.completed ? 'Completada' : 'Pendiente',
-                        style: theme.textTheme.bodyLarge?.copyWith(color: color.onSurface),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: color.onSurface,
+                        ),
                       ),
                     ],
                   ),
@@ -156,4 +183,3 @@ class TaskDetailScreen extends StatelessWidget {
     );
   }
 }
-

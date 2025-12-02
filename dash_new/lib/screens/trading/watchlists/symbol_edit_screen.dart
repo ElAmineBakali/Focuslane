@@ -34,23 +34,39 @@ class _SymbolEditScreenState extends State<SymbolEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (wl == null) return const Scaffold(body: Center(child: Text('Sin lista')));
+    if (wl == null)
+      return const Scaffold(body: Center(child: Text('Sin lista')));
     final svc = TradingFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing==null ? 'Añadir símbolo' : 'Editar símbolo')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Añadir símbolo' : 'Editar símbolo'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            TextField(controller: _ticker, decoration: const InputDecoration(labelText: 'Ticker'), textCapitalization: TextCapitalization.characters),
-            TextField(controller: _note, decoration: const InputDecoration(labelText: 'Nota')),
+            TextField(
+              controller: _ticker,
+              decoration: const InputDecoration(labelText: 'Ticker'),
+              textCapitalization: TextCapitalization.characters,
+            ),
+            TextField(
+              controller: _note,
+              decoration: const InputDecoration(labelText: 'Nota'),
+            ),
             Row(
               children: [
                 const Expanded(child: Text('Prioridad')),
                 DropdownButton<int>(
                   value: _prio,
-                  items: [1,2,3].map((e)=>DropdownMenuItem(value:e, child: Text('$e'))).toList(),
-                  onChanged: (v)=>setState(()=>_prio=v??2),
+                  items:
+                      [1, 2, 3]
+                          .map(
+                            (e) =>
+                                DropdownMenuItem(value: e, child: Text('$e')),
+                          )
+                          .toList(),
+                  onChanged: (v) => setState(() => _prio = v ?? 2),
                 ),
               ],
             ),
@@ -71,7 +87,7 @@ class _SymbolEditScreenState extends State<SymbolEditScreen> {
                 if (mounted) Navigator.pop(context);
               },
               child: const Text('Guardar'),
-            )
+            ),
           ],
         ),
       ),

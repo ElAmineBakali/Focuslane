@@ -15,7 +15,8 @@ class SkillDetailScreen extends StatefulWidget {
   State<SkillDetailScreen> createState() => _SkillDetailScreenState();
 }
 
-class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTickerProviderStateMixin {
+class _SkillDetailScreenState extends State<SkillDetailScreen>
+    with SingleTickerProviderStateMixin {
   Skill? skill;
   late TabController _tab;
 
@@ -35,7 +36,8 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final svc = SkillsFirestoreService.I;
-    if (skill == null) return const Scaffold(body: Center(child: Text('Sin habilidad')));
+    if (skill == null)
+      return const Scaffold(body: Center(child: Text('Sin habilidad')));
     final s = skill!;
 
     return Scaffold(
@@ -53,11 +55,21 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => Navigator.pushNamed(context, SkillEditScreen.route, arguments: s),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  SkillEditScreen.route,
+                  arguments: s,
+                ),
           ),
           IconButton(
             icon: const Icon(Icons.play_circle_outline),
-            onPressed: () => Navigator.pushNamed(context, SessionTimerScreen.route, arguments: s),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  SessionTimerScreen.route,
+                  arguments: s,
+                ),
           ),
         ],
       ),
@@ -74,23 +86,32 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Árbol de sub-skills', style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      'Árbol de sub-skills',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 8),
-                    ...nodes.map((n) => CheckboxListTile(
-                          value: n.unlocked,
-                          onChanged: (v) => svc.updateSubSkill(
-                            s.id,
-                            SubSkill(
-                              id: n.id,
-                              name: n.name,
-                              parentId: n.parentId,
-                              unlocked: v ?? false,
-                              order: n.order,
+                    ...nodes.map(
+                      (n) => CheckboxListTile(
+                        value: n.unlocked,
+                        onChanged:
+                            (v) => svc.updateSubSkill(
+                              s.id,
+                              SubSkill(
+                                id: n.id,
+                                name: n.name,
+                                parentId: n.parentId,
+                                unlocked: v ?? false,
+                                order: n.order,
+                              ),
                             ),
-                          ),
-                          title: Text(n.name),
-                          subtitle: n.parentId != null ? Text('Depende de: ${n.parentId}') : null,
-                        )),
+                        title: Text(n.name),
+                        subtitle:
+                            n.parentId != null
+                                ? Text('Depende de: ${n.parentId}')
+                                : null,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     FilledButton.icon(
                       icon: const Icon(Icons.add),
@@ -98,13 +119,18 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
                       onPressed: () async {
                         final name = await _promptStr('Nombre del sub-skill');
                         if (name == null || name.trim().isEmpty) return;
-                        final parent = await _promptStr('ID del padre (opcional)');
+                        final parent = await _promptStr(
+                          'ID del padre (opcional)',
+                        );
                         await svc.addSubSkill(
                           s.id,
                           SubSkill(
                             id: '',
                             name: name.trim(),
-                            parentId: (parent?.trim().isEmpty ?? true) ? null : parent!.trim(),
+                            parentId:
+                                (parent?.trim().isEmpty ?? true)
+                                    ? null
+                                    : parent!.trim(),
                           ),
                         );
                       },
@@ -123,7 +149,8 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
               if (snap.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (data.isEmpty) return const Center(child: Text('Aún no hay sesiones'));
+              if (data.isEmpty)
+                return const Center(child: Text('Aún no hay sesiones'));
               return ListView.separated(
                 padding: const EdgeInsets.all(12),
                 itemCount: data.length,
@@ -132,11 +159,16 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
                   final x = data[i];
                   return ListTile(
                     leading: const Icon(Icons.timer_outlined),
-                    title: Text('${x.minutes} min • ${x.objective.isNotEmpty ? x.objective : 'Sesión'}'),
+                    title: Text(
+                      '${x.minutes} min • ${x.objective.isNotEmpty ? x.objective : 'Sesión'}',
+                    ),
                     subtitle: Text(
                       '${x.start.toLocal().toString().split(".").first} • Dificultad ${x.difficulty}/5 • Energía ${x.energy}/5',
                     ),
-                    trailing: x.nextMicroTask != null ? const Icon(Icons.arrow_forward) : null,
+                    trailing:
+                        x.nextMicroTask != null
+                            ? const Icon(Icons.arrow_forward)
+                            : null,
                   );
                 },
               );
@@ -158,7 +190,12 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.dashboard_customize_outlined),
                 label: const Text('Board de proyectos'),
-                onPressed: () => Navigator.pushNamed(context, ProjectBoardScreen.route, arguments: s),
+                onPressed:
+                    () => Navigator.pushNamed(
+                      context,
+                      ProjectBoardScreen.route,
+                      arguments: s,
+                    ),
               ),
             ),
             const SizedBox(width: 8),
@@ -166,7 +203,12 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
               child: FilledButton.icon(
                 icon: const Icon(Icons.play_arrow),
                 label: const Text('Iniciar sesión'),
-                onPressed: () => Navigator.pushNamed(context, SessionTimerScreen.route, arguments: s),
+                onPressed:
+                    () => Navigator.pushNamed(
+                      context,
+                      SessionTimerScreen.route,
+                      arguments: s,
+                    ),
               ),
             ),
           ],
@@ -179,14 +221,21 @@ class _SkillDetailScreenState extends State<SkillDetailScreen> with SingleTicker
     final c = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: TextField(controller: c, autofocus: true),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, c.text), child: const Text('Aceptar')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: Text(title),
+            content: TextField(controller: c, autofocus: true),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, c.text),
+                child: const Text('Aceptar'),
+              ),
+            ],
+          ),
     );
   }
 }
@@ -204,33 +253,42 @@ class _ProjectsPreview extends StatelessWidget {
         final data = snap.data ?? [];
         final ideas = data.where((e) => e.state == ProjectState.idea).toList();
         final doing = data.where((e) => e.state == ProjectState.doing).toList();
-        final blocked = data.where((e) => e.state == ProjectState.blocked).toList();
+        final blocked =
+            data.where((e) => e.state == ProjectState.blocked).toList();
         final done = data.where((e) => e.state == ProjectState.done).toList();
 
         Widget col(String title, List<Project> items) => Expanded(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      Text(title, style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 6),
-                      ...items.take(4).map(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 6),
+                  ...items
+                      .take(4)
+                      .map(
                         (p) => ListTile(
                           dense: true,
                           title: Text(p.title),
-                          subtitle: p.dueDate != null
-                              ? Text('Fecha: ${p.dueDate!.toLocal().toString().split(" ").first}')
-                              : null,
+                          subtitle:
+                              p.dueDate != null
+                                  ? Text(
+                                    'Fecha: ${p.dueDate!.toLocal().toString().split(" ").first}',
+                                  )
+                                  : null,
                         ),
                       ),
-                      if (items.length > 4)
-                        Text('+ ${items.length - 4} más', style: Theme.of(context).textTheme.bodySmall),
-                    ],
-                  ),
-                ),
+                  if (items.length > 4)
+                    Text(
+                      '+ ${items.length - 4} más',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                ],
               ),
-            );
+            ),
+          ),
+        );
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -267,13 +325,11 @@ class _ResourcesView extends StatelessWidget {
     final noteCtl = TextEditingController();
 
     InputDecoration deco(String label) => InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: colors.surface,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        );
+      labelText: label,
+      filled: true,
+      fillColor: colors.surface,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    );
 
     return Column(
       children: [
@@ -282,7 +338,8 @@ class _ResourcesView extends StatelessWidget {
             stream: svc.watchResources(skill.id),
             builder: (_, snap) {
               final items = (snap.data ?? []);
-              if (items.isEmpty) return const Center(child: Text('Sin recursos aún'));
+              if (items.isEmpty)
+                return const Center(child: Text('Sin recursos aún'));
               return ListView.separated(
                 itemCount: items.length,
                 separatorBuilder: (_, __) => const Divider(height: 1),
@@ -291,7 +348,9 @@ class _ResourcesView extends StatelessWidget {
                   return ListTile(
                     leading: const Icon(Icons.link),
                     title: Text(r.title),
-                    subtitle: Text(r.url + (r.note != null ? ' • ${r.note}' : '')),
+                    subtitle: Text(
+                      r.url + (r.note != null ? ' • ${r.note}' : ''),
+                    ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_outline),
                       onPressed: () => svc.deleteResource(skill.id, r.id),
@@ -308,16 +367,10 @@ class _ResourcesView extends StatelessWidget {
           child: Column(
             children: [
               // Fila 1: título
-              TextField(
-                controller: titleCtl,
-                decoration: deco('Título'),
-              ),
+              TextField(controller: titleCtl, decoration: deco('Título')),
               const SizedBox(height: 8),
               // Fila 2: url
-              TextField(
-                controller: urlCtl,
-                decoration: deco('URL'),
-              ),
+              TextField(controller: urlCtl, decoration: deco('URL')),
               const SizedBox(height: 8),
               // Fila 3: nota + botón añadir
               Row(
@@ -331,14 +384,19 @@ class _ResourcesView extends StatelessWidget {
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: () async {
-                      if (titleCtl.text.trim().isEmpty || urlCtl.text.trim().isEmpty) return;
+                      if (titleCtl.text.trim().isEmpty ||
+                          urlCtl.text.trim().isEmpty)
+                        return;
                       await svc.addResource(
                         skill.id,
                         ResourceLink(
                           id: '',
                           title: titleCtl.text.trim(),
                           url: urlCtl.text.trim(),
-                          note: noteCtl.text.trim().isEmpty ? null : noteCtl.text.trim(),
+                          note:
+                              noteCtl.text.trim().isEmpty
+                                  ? null
+                                  : noteCtl.text.trim(),
                         ),
                       );
                       titleCtl.clear();
@@ -346,8 +404,13 @@ class _ResourcesView extends StatelessWidget {
                       noteCtl.clear();
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('Añadir'),
                   ),

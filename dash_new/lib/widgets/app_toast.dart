@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppToast {
-  static void show(BuildContext context, String message, {
+  static void show(
+    BuildContext context,
+    String message, {
     IconData icon = Icons.check_circle,
     Duration duration = const Duration(seconds: 3),
     Color? color,
@@ -17,11 +19,18 @@ class AppToast {
       elevation: 8,
       backgroundColor: bg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      content: Row(children: [
-        Icon(icon, color: cs.primary),
-        const SizedBox(width: 10),
-        Expanded(child: Text(message, style: theme.textTheme.bodyMedium?.copyWith(color: fg))),
-      ]),
+      content: Row(
+        children: [
+          Icon(icon, color: cs.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(color: fg),
+            ),
+          ),
+        ],
+      ),
       action: SnackBarAction(
         label: 'OK',
         textColor: cs.primary,
@@ -33,7 +42,12 @@ class AppToast {
   }
 
   static void error(BuildContext context, String message) {
-    show(context, message, icon: Icons.error_rounded, color: Theme.of(context).colorScheme.errorContainer);
+    show(
+      context,
+      message,
+      icon: Icons.error_rounded,
+      color: Theme.of(context).colorScheme.errorContainer,
+    );
   }
 
   static void info(BuildContext context, String message) {

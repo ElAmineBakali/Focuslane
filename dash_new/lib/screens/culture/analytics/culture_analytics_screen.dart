@@ -13,18 +13,30 @@ class CultureAnalyticsScreen extends StatelessWidget {
       body: FutureBuilder<Map<String, dynamic>>(
         future: svc.quickKpis(),
         builder: (_, s) {
-          final m = s.data ?? const {'booksDone': 0, 'moviesDone': 0, 'seriesDone': 0, 'gameHours': 0.0};
+          final m =
+              s.data ??
+              const {
+                'booksDone': 0,
+                'moviesDone': 0,
+                'seriesDone': 0,
+                'gameHours': 0.0,
+              };
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
               _tile('Libros terminados', '${m['booksDone']}'),
               _tile('Películas vistas', '${m['moviesDone']}'),
               _tile('Series completadas', '${m['seriesDone']}'),
-              _tile('Horas totales de juegos', (m['gameHours'] as double).toStringAsFixed(1)),
+              _tile(
+                'Horas totales de juegos',
+                (m['gameHours'] as double).toStringAsFixed(1),
+              ),
               const Divider(height: 24),
               const ListTile(
                 title: Text('Siguientes ideas'),
-                subtitle: Text('• Racha de lectura diaria\n• % de backlog completado\n• Tiempo medio por libro / serie / juego'),
+                subtitle: Text(
+                  '• Racha de lectura diaria\n• % de backlog completado\n• Tiempo medio por libro / serie / juego',
+                ),
               ),
             ],
           );
@@ -33,5 +45,11 @@ class CultureAnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _tile(String t, String s) => Card(child: ListTile(leading: const Icon(Icons.show_chart), title: Text(t), subtitle: Text(s)));
+  Widget _tile(String t, String s) => Card(
+    child: ListTile(
+      leading: const Icon(Icons.show_chart),
+      title: Text(t),
+      subtitle: Text(s),
+    ),
+  );
 }

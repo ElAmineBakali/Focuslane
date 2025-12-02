@@ -1,5 +1,5 @@
 // lib/services/finance_firestore_service.dart
-import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/finance_models.dart';
 
@@ -11,24 +11,64 @@ class FinanceFirestoreService {
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
 
   /// ---------- Paths ----------
-  CollectionReference get _txCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('transactions');
-  CollectionReference get _budgetsCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('budgets');
-  CollectionReference get _subsCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('subscriptions');
-  CollectionReference get _peopleCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('people');
+  CollectionReference get _txCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('transactions');
+  CollectionReference get _budgetsCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('budgets');
+  CollectionReference get _subsCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('subscriptions');
+  CollectionReference get _peopleCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('people');
   CollectionReference _personLedgerCol(String personId) =>
       _peopleCol.doc(personId).collection('ledger');
-  CollectionReference get _varExpCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('variableExpenses');
-  CollectionReference get _depositsCol => _db.collection('users').doc(_uid).collection('finance').doc('data').collection('deposits');
-  DocumentReference get _metaDoc => _db.collection('users').doc(_uid).collection('finance').doc('meta');
+  CollectionReference get _varExpCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('variableExpenses');
+  CollectionReference get _depositsCol => _db
+      .collection('users')
+      .doc(_uid)
+      .collection('finance')
+      .doc('data')
+      .collection('deposits');
+  DocumentReference get _metaDoc =>
+      _db.collection('users').doc(_uid).collection('finance').doc('meta');
 
   /// ---------- Transactions ----------
-  Stream<List<FinanceTransaction>> watchTransactions({DateTime? from, DateTime? to, String? category, TxType? type}) {
+  Stream<List<FinanceTransaction>> watchTransactions({
+    DateTime? from,
+    DateTime? to,
+    String? category,
+    TxType? type,
+  }) {
     Query q = _txCol.orderBy('date', descending: true);
     if (type != null) q = q.where('type', isEqualTo: type.name);
     if (category != null) q = q.where('category', isEqualTo: category);
-    if (from != null) q = q.where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(from));
-    if (to != null) q = q.where('date', isLessThanOrEqualTo: Timestamp.fromDate(to));
-    return q.snapshots().map((s) => s.docs.map(FinanceTransaction.fromSnap).toList());
+    if (from != null)
+      q = q.where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(from));
+    if (to != null)
+      q = q.where('date', isLessThanOrEqualTo: Timestamp.fromDate(to));
+    return q.snapshots().map(
+      (s) => s.docs.map(FinanceTransaction.fromSnap).toList(),
+    );
   }
 
   Future<void> addTransaction(FinanceTransaction t) async {
@@ -44,8 +84,10 @@ class FinanceFirestoreService {
   }
 
   /// ---------- Budgets ----------
-  Stream<List<Budget>> watchBudgets() =>
-      _budgetsCol.orderBy('name').snapshots().map((s) => s.docs.map(Budget.fromSnap).toList());
+  Stream<List<Budget>> watchBudgets() => _budgetsCol
+      .orderBy('name')
+      .snapshots()
+      .map((s) => s.docs.map(Budget.fromSnap).toList());
 
   Future<void> addBudget(Budget b) async {
     final m = b.toMap();
@@ -66,10 +108,10 @@ class FinanceFirestoreService {
   Future<void> deleteBudget(String id) async => _budgetsCol.doc(id).delete();
 
   /// ---------- Subscriptions (Fijos) ----------
-      Stream<List<Subscription>> watchSubscriptions() => _subsCol
-        .orderBy('order', descending: false)
-        .snapshots()
-        .map((s) => s.docs.map(Subscription.fromSnap).toList());
+  Stream<List<Subscription>> watchSubscriptions() => _subsCol
+      .orderBy('order', descending: false)
+      .snapshots()
+      .map((s) => s.docs.map(Subscription.fromSnap).toList());
 
   Future<void> addSubscription(Subscription x) async {
     final m = x.toMap();
@@ -77,7 +119,8 @@ class FinanceFirestoreService {
     await _subsCol.add(m);
   }
 
-  Future<void> updateSubscription(Subscription x) async => _subsCol.doc(x.id).update(x.toMap());
+  Future<void> updateSubscription(Subscription x) async =>
+      _subsCol.doc(x.id).update(x.toMap());
 
   Future<void> updateSubscriptionsOrder(List<Subscription> subs) async {
     final batch = _db.batch();
@@ -107,8 +150,10 @@ class FinanceFirestoreService {
   Future<void> deleteSubscription(String id) async => _subsCol.doc(id).delete();
 
   /// ---------- People / Debts ----------
-  Stream<List<Person>> watchPeople() =>
-      _peopleCol.orderBy('name').snapshots().map((s) => s.docs.map(Person.fromSnap).toList());
+  Stream<List<Person>> watchPeople() => _peopleCol
+      .orderBy('name')
+      .snapshots()
+      .map((s) => s.docs.map(Person.fromSnap).toList());
 
   Future<void> addPerson(Person p) async => _peopleCol.add(p.toMap());
 
@@ -122,7 +167,10 @@ class FinanceFirestoreService {
   Future<void> deletePerson(String id) async => _peopleCol.doc(id).delete();
 
   Stream<List<DebtEntry>> watchDebtLedger(String personId) =>
-      _personLedgerCol(personId).orderBy('date', descending: true).snapshots().map((s) => s.docs.map(DebtEntry.fromSnap).toList());
+      _personLedgerCol(personId)
+          .orderBy('date', descending: true)
+          .snapshots()
+          .map((s) => s.docs.map(DebtEntry.fromSnap).toList());
 
   Future<void> addDebtEntry(String personId, DebtEntry e) async {
     await _personLedgerCol(personId).add(e.toMap());
@@ -166,17 +214,13 @@ class FinanceFirestoreService {
       }
     }
 
-    batch.set(
-      _metaDoc,
-      {
-        'debtsSummary': {
-          'totalToReceive': toReceive,
-          'totalToPay': toPay.abs(),
-          'lastUpdated': Timestamp.now(),
-        }
+    batch.set(_metaDoc, {
+      'debtsSummary': {
+        'totalToReceive': toReceive,
+        'totalToPay': toPay.abs(),
+        'lastUpdated': Timestamp.now(),
       },
-      SetOptions(merge: true),
-    );
+    }, SetOptions(merge: true));
 
     await batch.commit();
   }
@@ -186,32 +230,54 @@ class FinanceFirestoreService {
 
   /// ---------- Variable Expenses ----------
   Stream<List<VariableExpenseItem>> watchVariableExpenses(String periodKey) =>
-      _varExpCol.doc(periodKey).collection('items').orderBy('name').snapshots()
+      _varExpCol
+          .doc(periodKey)
+          .collection('items')
+          .orderBy('name')
+          .snapshots()
           .map((s) => s.docs.map(VariableExpenseItem.fromSnap).toList());
 
-  Future<void> addVariableExpense(String periodKey, VariableExpenseItem v) async =>
-      _varExpCol.doc(periodKey).collection('items').add(v.toMap());
+  Future<void> addVariableExpense(
+    String periodKey,
+    VariableExpenseItem v,
+  ) async => _varExpCol.doc(periodKey).collection('items').add(v.toMap());
 
-  Future<void> updateVariableExpense(String periodKey, VariableExpenseItem v) async =>
+  Future<void> updateVariableExpense(
+    String periodKey,
+    VariableExpenseItem v,
+  ) async =>
       _varExpCol.doc(periodKey).collection('items').doc(v.id).update(v.toMap());
 
   Future<void> deleteVariableExpense(String periodKey, String id) async =>
       _varExpCol.doc(periodKey).collection('items').doc(id).delete();
 
   /// ---------- Deposits ----------
-  Stream<List<Deposit>> watchDeposits() =>
-      _depositsCol.orderBy('name').snapshots().map((s) => s.docs.map(Deposit.fromSnap).toList());
+  Stream<List<Deposit>> watchDeposits() => _depositsCol
+      .orderBy('name')
+      .snapshots()
+      .map((s) => s.docs.map(Deposit.fromSnap).toList());
 
   Future<void> addDeposit(Deposit d) async => _depositsCol.add(d.toMap());
 
-  Future<void> updateDeposit(Deposit d) async => _depositsCol.doc(d.id).update(d.toMap());
+  Future<void> updateDeposit(Deposit d) async =>
+      _depositsCol.doc(d.id).update(d.toMap());
 
   Future<void> deleteDeposit(String id) async => _depositsCol.doc(id).delete();
 
   Stream<QuerySnapshot> watchDepositMovements(String depositId) =>
-      _depositsCol.doc(depositId).collection('movements').orderBy('date', descending: true).snapshots();
+      _depositsCol
+          .doc(depositId)
+          .collection('movements')
+          .orderBy('date', descending: true)
+          .snapshots();
 
-  Future<void> addDepositMovement(String depositId, {required double amount, required DateTime date, String? reason, String? txRef}) async {
+  Future<void> addDepositMovement(
+    String depositId, {
+    required double amount,
+    required DateTime date,
+    String? reason,
+    String? txRef,
+  }) async {
     final ref = _depositsCol.doc(depositId);
     await ref.collection('movements').add({
       'amount': amount,
@@ -228,15 +294,19 @@ class FinanceFirestoreService {
   Future<Map<String, double>> monthTotals({required DateTime month}) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
-    final qs = await _txCol.where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end)).get();
+    final qs =
+        await _txCol
+            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
     double inc = 0, exp = 0;
     for (final d in qs.docs) {
       final type = (d['type'] ?? 'expense').toString();
       final amount = ((d['amount'] ?? 0) as num).toDouble();
       if (type == 'income') {
         inc += amount;
-      } else if (type == 'expense') exp += amount;
+      } else if (type == 'expense')
+        exp += amount;
     }
     return {'income': inc, 'expense': exp, 'saving': inc - exp};
   }
@@ -258,13 +328,15 @@ class FinanceFirestoreService {
             final a = (m['amount'] as num?)?.toDouble() ?? 0.0;
             if (t == 'income') {
               inc += a;
-            } else if (t == 'expense') exp += a;
+            } else if (t == 'expense')
+              exp += a;
           }
           return {'income': inc, 'expense': exp, 'saving': inc - exp};
         });
   }
 
-  String periodKey(DateTime d) => "${d.year.toString().padLeft(4,'0')}-${d.month.toString().padLeft(2,'0')}";
+  String periodKey(DateTime d) =>
+      "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
 
   // === Historial mensual dentro de cada suscripción ===
   DocumentReference _subHistoryDoc(String subId, String pk) {
@@ -278,16 +350,21 @@ class FinanceFirestoreService {
     });
   }
 
-  Future<void> markSubscriptionPaidForMonth(Subscription s, DateTime when) async {
+  Future<void> markSubscriptionPaidForMonth(
+    Subscription s,
+    DateTime when,
+  ) async {
     final pk = periodKey(when);
-    final txRef = await _txCol.add(FinanceTransaction(
-      id: '',
-      title: s.name,
-      amount: s.amount,
-      type: TxType.expense,
-      category: s.category,
-      date: when,
-    ).toMap());
+    final txRef = await _txCol.add(
+      FinanceTransaction(
+        id: '',
+        title: s.name,
+        amount: s.amount,
+        type: TxType.expense,
+        category: s.category,
+        date: when,
+      ).toMap(),
+    );
 
     await _subHistoryDoc(s.id, pk).set({
       'paid': true,
@@ -297,7 +374,10 @@ class FinanceFirestoreService {
     });
   }
 
-  Future<void> unmarkSubscriptionPaidForMonth(Subscription s, DateTime when) async {
+  Future<void> unmarkSubscriptionPaidForMonth(
+    Subscription s,
+    DateTime when,
+  ) async {
     final pk = periodKey(when);
     final hist = await _subHistoryDoc(s.id, pk).get();
     final data = hist.data() as Map<String, dynamic>?;
@@ -310,15 +390,18 @@ class FinanceFirestoreService {
 
   // Totales por categorías (privado, por si lo re-usas)
   // ignore: unused_element
-  Future<Map<String, double>> _monthExpensesTotals({required DateTime month}) async {
+  Future<Map<String, double>> _monthExpensesTotals({
+    required DateTime month,
+  }) async {
     final start = DateTime(month.year, month.month, 1);
-    final end   = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
 
-    final qs = await _txCol
-        .where('type', isEqualTo: TxType.expense.name)
-        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
-        .get();
+    final qs =
+        await _txCol
+            .where('type', isEqualTo: TxType.expense.name)
+            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
 
     final byCat = <String, double>{};
     for (final d in qs.docs) {
@@ -331,9 +414,11 @@ class FinanceFirestoreService {
   }
 
   /// ---------- Presupuestos: progreso ----------
-  Future<List<Map<String, dynamic>>> budgetsProgress({required DateTime month}) async {
+  Future<List<Map<String, dynamic>>> budgetsProgress({
+    required DateTime month,
+  }) async {
     final start = DateTime(month.year, month.month, 1);
-    final end   = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
+    final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
 
     final snap = await _budgetsCol.get();
 
@@ -352,11 +437,12 @@ class FinanceFirestoreService {
       return p;
     }
 
-    final docs = snap.docs.where((d) {
-      final m = d.data() as Map<String, dynamic>;
-      final per = periodOf(m);
-      return isActive(m) && (per == 'monthly' || per == 'mensual');
-    }).toList();
+    final docs =
+        snap.docs.where((d) {
+          final m = d.data() as Map<String, dynamic>;
+          final per = periodOf(m);
+          return isActive(m) && (per == 'monthly' || per == 'mensual');
+        }).toList();
 
     final budgets = docs.map(Budget.fromSnap).toList();
 
@@ -394,36 +480,35 @@ class FinanceFirestoreService {
     out.sort((a, b) => (b['pct'] as double).compareTo(a['pct'] as double));
     return out;
   }
-
 }
 
-  class FinanceAssetsFirestoreService {
-    FinanceAssetsFirestoreService._();
-    static final I = FinanceAssetsFirestoreService._();
+class FinanceAssetsFirestoreService {
+  FinanceAssetsFirestoreService._();
+  static final I = FinanceAssetsFirestoreService._();
 
-    final root = FirebaseFirestore.instance.collection('finance');
+  final root = FirebaseFirestore.instance.collection('finance');
 
-    // Usa un doc global “assets”, subcolección “items” por usuario (si ya tienes userId, añade el scope).
-    CollectionReference<Map<String, dynamic>> _items() =>
-        FirebaseFirestore.instance.collection('finance_assets');
+  // Usa un doc global “assets”, subcolección “items” por usuario (si ya tienes userId, añade el scope).
+  CollectionReference<Map<String, dynamic>> _items() =>
+      FirebaseFirestore.instance.collection('finance_assets');
 
-    Stream<List<AssetItem>> watchAssets() {
-      return _items()
-          .orderBy('acquiredAt', descending: true)
-          .snapshots()
-          .map((s) => s.docs.map(AssetItem.fromSnap).toList());
-    }
-
-    Future<String> addAsset(AssetItem a) async {
-      final doc = await _items().add(a.toMap());
-      return doc.id;
-    }
-
-    Future<void> updateAsset(AssetItem a) async {
-      await _items().doc(a.id).set(a.toMap(), SetOptions(merge: true));
-    }
-
-    Future<void> deleteAsset(String id) async {
-      await _items().doc(id).delete();
-    }
+  Stream<List<AssetItem>> watchAssets() {
+    return _items()
+        .orderBy('acquiredAt', descending: true)
+        .snapshots()
+        .map((s) => s.docs.map(AssetItem.fromSnap).toList());
   }
+
+  Future<String> addAsset(AssetItem a) async {
+    final doc = await _items().add(a.toMap());
+    return doc.id;
+  }
+
+  Future<void> updateAsset(AssetItem a) async {
+    await _items().doc(a.id).set(a.toMap(), SetOptions(merge: true));
+  }
+
+  Future<void> deleteAsset(String id) async {
+    await _items().doc(id).delete();
+  }
+}

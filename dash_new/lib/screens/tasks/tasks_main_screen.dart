@@ -27,7 +27,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   bool showCompleted = false;
   // Default debe coincidir con un valor presente en el Dropdown
   String sortBy = 'manual';
-  
+
   // Estado de expansión para cada grupo
   final Map<TaskGroup, bool> _expandedGroups = {
     TaskGroup.overdue: true,
@@ -61,43 +61,45 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
           ],
         ),
         centerTitle: true,
-        actions: _tab == 0
-            ? [
-                IconButton(
-                  icon: Icon(Icons.filter_alt, color: theme.iconTheme.color),
-                  onPressed: () => _showFilterDialog(context),
-                ),
-              ]
-            : [
-                // ✅ Marcar todo
-                IconButton(
-                  tooltip: 'Marcar todo',
-                  icon: const Icon(Icons.done_all),
-                  onPressed: () => _Checklist.checkAll(context),
-                ),
-                // ⛔ Desmarcar todo
-                IconButton(
-                  tooltip: 'Desmarcar todo',
-                  icon: const Icon(Icons.close_fullscreen),
-                  onPressed: () => _Checklist.uncheckAll(context),
-                ),
-              ],
+        actions:
+            _tab == 0
+                ? [
+                  IconButton(
+                    icon: Icon(Icons.filter_alt, color: theme.iconTheme.color),
+                    onPressed: () => _showFilterDialog(context),
+                  ),
+                ]
+                : [
+                  // ✅ Marcar todo
+                  IconButton(
+                    tooltip: 'Marcar todo',
+                    icon: const Icon(Icons.done_all),
+                    onPressed: () => _Checklist.checkAll(context),
+                  ),
+                  // ⛔ Desmarcar todo
+                  IconButton(
+                    tooltip: 'Desmarcar todo',
+                    icon: const Icon(Icons.close_fullscreen),
+                    onPressed: () => _Checklist.uncheckAll(context),
+                  ),
+                ],
       ),
 
       // ---------- BODY ----------
       body: _tab == 0 ? _buildTasksBody(theme) : const _ChecklistToday(),
 
       // FAB específico de cada tab (solo para Tareas)
-      floatingActionButton: _tab == 0
-          ? FloatingActionButton(
-              backgroundColor: theme.colorScheme.secondary,
-              foregroundColor: theme.colorScheme.onSecondary,
-              onPressed: () {
-                Navigator.pushNamed(context, '/tasks/create');
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
+      floatingActionButton:
+          _tab == 0
+              ? FloatingActionButton(
+                backgroundColor: theme.colorScheme.secondary,
+                foregroundColor: theme.colorScheme.onSecondary,
+                onPressed: () {
+                  Navigator.pushNamed(context, '/tasks/create');
+                },
+                child: const Icon(Icons.add),
+              )
+              : null,
     );
   }
 
@@ -117,11 +119,12 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         }
 
         List<Task> allTasks = snapshot.data!;
-        
+
         // Filtrar por completadas (FILTRADO FUNCIONAL RESTAURADO)
-        List<Task> tasks = allTasks
-            .where((task) => showCompleted ? true : !task.completed)
-            .toList();
+        List<Task> tasks =
+            allTasks
+                .where((task) => showCompleted ? true : !task.completed)
+                .toList();
 
         // Ordenar por prioridad + fecha
         tasks = TaskGrouper.sortTasks(tasks);
@@ -152,7 +155,9 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 theme,
                 TaskGroup.today,
                 groups[TaskGroup.today]!,
-                isDark ? cs.primaryContainer.withOpacity(0.3) : cs.primary.withOpacity(0.08),
+                isDark
+                    ? cs.primaryContainer.withOpacity(0.3)
+                    : cs.primary.withOpacity(0.08),
               ),
             // Mañana
             if (groups[TaskGroup.tomorrow]!.isNotEmpty)
@@ -161,7 +166,9 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 theme,
                 TaskGroup.tomorrow,
                 groups[TaskGroup.tomorrow]!,
-                isDark ? cs.secondaryContainer.withOpacity(0.3) : cs.secondary.withOpacity(0.08),
+                isDark
+                    ? cs.secondaryContainer.withOpacity(0.3)
+                    : cs.secondary.withOpacity(0.08),
               ),
             // Esta semana
             if (groups[TaskGroup.thisWeek]!.isNotEmpty)
@@ -170,7 +177,9 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 theme,
                 TaskGroup.thisWeek,
                 groups[TaskGroup.thisWeek]!,
-                isDark ? cs.tertiaryContainer.withOpacity(0.3) : cs.tertiary.withOpacity(0.08),
+                isDark
+                    ? cs.tertiaryContainer.withOpacity(0.3)
+                    : cs.tertiary.withOpacity(0.08),
               ),
             // Más adelante
             if (groups[TaskGroup.later]!.isNotEmpty)
@@ -190,16 +199,16 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 groups[TaskGroup.noDate]!,
                 isDark ? cs.surfaceContainerHigh : cs.surfaceContainer,
               ),
-            
+
             // Mensaje si no hay tareas
             if (tasks.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
                 child: Center(
                   child: Text(
-                    showCompleted 
-                      ? 'No hay tareas' 
-                      : 'No hay tareas pendientes',
+                    showCompleted
+                        ? 'No hay tareas'
+                        : 'No hay tareas pendientes',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: cs.onSurfaceVariant,
                     ),
@@ -253,7 +262,10 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: cs.primaryContainer,
                       borderRadius: BorderRadius.circular(12),
@@ -278,7 +290,9 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: tasks.length,
             separatorBuilder: (_, __) => const SizedBox(height: 4),
-            itemBuilder: (context, index) => _buildTaskCard(context, theme, tasks[index]),
+            itemBuilder:
+                (context, index) =>
+                    _buildTaskCard(context, theme, tasks[index]),
           ),
         const Divider(height: 1, thickness: 1),
       ],
@@ -290,18 +304,21 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final hasReminder = task.remindAt != null;
     final hasRepeat = task.repeatRule != RepeatRule.none;
-    final isOverdue = task.dueDate != null &&
+    final isOverdue =
+        task.dueDate != null &&
         task.dueDate!.isBefore(DateTime.now()) &&
         !task.completed;
 
     // Colores adaptativos al tema
-    final cardColor = isOverdue 
-        ? (isDark ? cs.errorContainer.withOpacity(0.3) : cs.error.withOpacity(0.1))
-        : cs.surface;
-    
-    final textColor = isOverdue 
-        ? (isDark ? cs.onErrorContainer : cs.error)
-        : cs.onSurface;
+    final cardColor =
+        isOverdue
+            ? (isDark
+                ? cs.errorContainer.withOpacity(0.3)
+                : cs.error.withOpacity(0.1))
+            : cs.surface;
+
+    final textColor =
+        isOverdue ? (isDark ? cs.onErrorContainer : cs.error) : cs.onSurface;
 
     return Card(
       key: ValueKey(task.id),
@@ -343,10 +360,14 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                   // Lógica de repetición: crear próxima instancia si aplica
                   if (task.repeatRule != RepeatRule.none) {
                     final nextDue = _nextDueDate(task.dueDate, task.repeatRule);
-                    final nextRemind = _nextDateFrom(task.remindAt, task.repeatRule);
-                    final nextSubtasks = task.subtasks
-                        .map((s) => s.copyWith(isDone: false))
-                        .toList();
+                    final nextRemind = _nextDateFrom(
+                      task.remindAt,
+                      task.repeatRule,
+                    );
+                    final nextSubtasks =
+                        task.subtasks
+                            .map((s) => s.copyWith(isDone: false))
+                            .toList();
                     final nextTask = task.copyWith(
                       id: '',
                       completed: false,
@@ -387,7 +408,8 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
               child: Text(
                 task.title,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  decoration: task.completed ? TextDecoration.lineThrough : null,
+                  decoration:
+                      task.completed ? TextDecoration.lineThrough : null,
                   color: textColor,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -439,21 +461,25 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 child: Wrap(
                   spacing: 4,
                   runSpacing: 2,
-                  children: task.tags.take(3).map((tag) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: cs.primaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        tag,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: cs.onPrimaryContainer,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                  children:
+                      task.tags.take(3).map((tag) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: cs.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            tag,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: cs.onPrimaryContainer,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                 ),
               ),
             if (task.subtasks.isNotEmpty) ...[
@@ -467,7 +493,9 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                       canMoveDown: i < task.subtasks.length - 1,
                       onToggle: (isDone) async {
                         final updatedSubs = List<Subtask>.from(task.subtasks);
-                        updatedSubs[i] = updatedSubs[i].copyWith(isDone: isDone);
+                        updatedSubs[i] = updatedSubs[i].copyWith(
+                          isDone: isDone,
+                        );
                         final updated = task.copyWith(subtasks: updatedSubs);
                         await TaskFirestoreService.updateTask(updated);
                       },
@@ -522,7 +550,13 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
       case RepeatRule.weekly:
         return current.add(const Duration(days: 7));
       case RepeatRule.monthly:
-        return DateTime(current.year, current.month + 1, current.day, current.hour, current.minute);
+        return DateTime(
+          current.year,
+          current.month + 1,
+          current.day,
+          current.hour,
+          current.minute,
+        );
       case RepeatRule.none:
         return null;
     }
@@ -536,7 +570,13 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
       case RepeatRule.weekly:
         return current.add(const Duration(days: 7));
       case RepeatRule.monthly:
-        return DateTime(current.year, current.month + 1, current.day, current.hour, current.minute);
+        return DateTime(
+          current.year,
+          current.month + 1,
+          current.day,
+          current.hour,
+          current.minute,
+        );
       case RepeatRule.none:
         return null;
     }
@@ -550,8 +590,10 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: theme.colorScheme.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-/*           title: Text(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          /*           title: Text(
             'Filtros y Orden',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
@@ -563,7 +605,10 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
             children: [
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text('Mostrar completadas', style: theme.textTheme.bodyLarge),
+                title: Text(
+                  'Mostrar completadas',
+                  style: theme.textTheme.bodyLarge,
+                ),
                 activeThumbColor: theme.colorScheme.secondary,
                 value: showCompleted,
                 onChanged: (val) {
@@ -633,10 +678,10 @@ class _TabTextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final style = Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-          color: selected ? cs.primary : cs.onSurface,
-          decoration: selected ? TextDecoration.underline : TextDecoration.none,
-        );
+      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+      color: selected ? cs.primary : cs.onSurface,
+      decoration: selected ? TextDecoration.underline : TextDecoration.none,
+    );
     return InkWell(
       borderRadius: BorderRadius.circular(8),
       onTap: onTap,
@@ -722,9 +767,12 @@ class _Checklist {
     return _col()
         .orderBy('order')
         .snapshots()
-        .map((s) => s.docs
-            .map((d) => _ChecklistItem.fromDoc(d.id, d.data()))
-            .toList());
+        .map(
+          (s) =>
+              s.docs
+                  .map((d) => _ChecklistItem.fromDoc(d.id, d.data()))
+                  .toList(),
+        );
   }
 
   static Future<void> add(String text) async {
@@ -754,7 +802,10 @@ class _Checklist {
   }
 
   static Future<void> reorder(
-      int oldIndex, int newIndex, List<_ChecklistItem> list) async {
+    int oldIndex,
+    int newIndex,
+    List<_ChecklistItem> list,
+  ) async {
     if (newIndex > oldIndex) newIndex--;
     final moved = list.removeAt(oldIndex);
     list.insert(newIndex, moved);
@@ -899,18 +950,21 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                 itemBuilder: (c, i) {
                   final it = items[i];
                   final color = _colorFromHex(it.colorHex);
-                  final tileBg = color?.withOpacity(0.12); // fondo suave cuando hay color
+                  final tileBg = color?.withOpacity(
+                    0.12,
+                  ); // fondo suave cuando hay color
 
                   return Card(
                     key: ValueKey(it.id),
                     color: tileBg ?? Theme.of(context).cardColor,
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 4,
+                    ),
                     child: ListTile(
                       dense: true,
                       visualDensity: VisualDensity.compact,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 8),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                       leading: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -936,8 +990,9 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                         children: [
                           _ColorMenuButton(
                             current: color,
-                            onPick: (c) =>
-                                _Checklist.setColor(it, _hexFromColor(c)),
+                            onPick:
+                                (c) =>
+                                    _Checklist.setColor(it, _hexFromColor(c)),
                             onClear: () => _Checklist.setColor(it, null),
                           ),
                           Checkbox(
@@ -981,7 +1036,9 @@ const List<Color> _kPalette = [
 ];
 
 String? _hexFromColor(Color? c) =>
-    c == null ? null : '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+    c == null
+        ? null
+        : '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
 Color? _colorFromHex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
@@ -1053,9 +1110,10 @@ class _ColorMenuButton extends StatelessWidget {
                           color: c,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: (current == c)
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Colors.black26,
+                            color:
+                                (current == c)
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Colors.black26,
                             width: current == c ? 2 : 1,
                           ),
                         ),
@@ -1076,4 +1134,3 @@ class _ColorMenuButton extends StatelessWidget {
     );
   }
 }
-

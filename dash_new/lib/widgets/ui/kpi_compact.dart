@@ -17,7 +17,8 @@ class KpiCompact extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isNarrow = MediaQuery.of(context).size.width < 480;
-    final w = isNarrow ? (MediaQuery.of(context).size.width - 16 - 12) / 2 : 220.0;
+    final w =
+        isNarrow ? (MediaQuery.of(context).size.width - 16 - 12) / 2 : 220.0;
 
     return SizedBox(
       width: w,
@@ -34,15 +35,21 @@ class KpiCompact extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                     const SizedBox(height: 2),
-                    Text(value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     if (sub != null) ...[
                       const SizedBox(height: 2),
                       Text(sub!, style: Theme.of(context).textTheme.bodySmall),

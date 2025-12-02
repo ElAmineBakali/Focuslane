@@ -119,12 +119,13 @@ class _RestTimerState extends State<RestTimer> {
             ),
             PopupMenuButton<int>(
               tooltip: 'Preset',
-              itemBuilder: (c) => const [
-                PopupMenuItem(value: 60, child: Text('60s')),
-                PopupMenuItem(value: 90, child: Text('90s')),
-                PopupMenuItem(value: 120, child: Text('120s')),
-                PopupMenuItem(value: 180, child: Text('180s')),
-              ],
+              itemBuilder:
+                  (c) => const [
+                    PopupMenuItem(value: 60, child: Text('60s')),
+                    PopupMenuItem(value: 90, child: Text('90s')),
+                    PopupMenuItem(value: 120, child: Text('120s')),
+                    PopupMenuItem(value: 180, child: Text('180s')),
+                  ],
               onSelected: (v) => _reset(v),
               icon: const Icon(Icons.timer_outlined),
             ),

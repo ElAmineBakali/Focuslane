@@ -10,9 +10,9 @@ class Goal {
   final DateTime? targetDate;
 
   /// progreso numérico (opcional): p.ej. minutos/h, %, unidades…
-  final double? progress;        // actual
-  final double? progressTarget;  // objetivo
-  final String? unit;            // ej. "h", "%", "km"
+  final double? progress; // actual
+  final double? progressTarget; // objetivo
+  final String? unit; // ej. "h", "%", "km"
   final List<String> tags;
   final String? colorHex;
   final int? order; // para persistir orden manual
@@ -32,18 +32,18 @@ class Goal {
   });
 
   Map<String, dynamic> toMap(String uid) => {
-        'uid': uid,
-        'title': title,
-        'description': description,
-        'status': status.name,
-        'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
-        'progress': progress,
-        'progressTarget': progressTarget,
-        'unit': unit,
-        'tags': tags,
-        'colorHex': colorHex,
-      'order': order,
-      };
+    'uid': uid,
+    'title': title,
+    'description': description,
+    'status': status.name,
+    'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
+    'progress': progress,
+    'progressTarget': progressTarget,
+    'unit': unit,
+    'tags': tags,
+    'colorHex': colorHex,
+    'order': order,
+  };
 
   static Goal fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -72,12 +72,12 @@ class SubGoal {
   final String id;
   final String title;
   final String? description;
-  final GoalStatus status;         // reutilizamos enum
+  final GoalStatus status; // reutilizamos enum
   final DateTime? dueDate;
   final double? progress;
   final double? progressTarget;
   final String? unit;
-  final String? section;           // para agrupar en la vista
+  final String? section; // para agrupar en la vista
   final int order;
 
   const SubGoal({
@@ -96,16 +96,16 @@ class SubGoal {
   bool get isDone => status == GoalStatus.completed;
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        if (description != null) 'description': description,
-        'status': status.name,
-        if (dueDate != null) 'dueDate': Timestamp.fromDate(dueDate!),
-        if (progress != null) 'progress': progress,
-        if (progressTarget != null) 'progressTarget': progressTarget,
-        if (unit != null) 'unit': unit,
-        if (section != null) 'section': section,
-        'order': order,
-      };
+    'title': title,
+    if (description != null) 'description': description,
+    'status': status.name,
+    if (dueDate != null) 'dueDate': Timestamp.fromDate(dueDate!),
+    if (progress != null) 'progress': progress,
+    if (progressTarget != null) 'progressTarget': progressTarget,
+    if (unit != null) 'unit': unit,
+    if (section != null) 'section': section,
+    'order': order,
+  };
 
   static SubGoal fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;

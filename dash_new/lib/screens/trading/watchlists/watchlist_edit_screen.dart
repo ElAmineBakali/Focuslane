@@ -28,26 +28,33 @@ class _WatchlistEditScreenState extends State<WatchlistEditScreen> {
   Widget build(BuildContext context) {
     final svc = TradingFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing==null ? 'Nueva watchlist' : 'Editar watchlist')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nueva watchlist' : 'Editar watchlist'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre')),
+            TextField(
+              controller: _name,
+              decoration: const InputDecoration(labelText: 'Nombre'),
+            ),
             const Spacer(),
             FilledButton(
               onPressed: () async {
                 final name = _name.text.trim();
                 if (name.isEmpty) return;
                 if (editing == null) {
-                  await svc.addWatchlist(Watchlist(id:'', name:name));
+                  await svc.addWatchlist(Watchlist(id: '', name: name));
                 } else {
-                  await svc.updateWatchlist(Watchlist(id: editing!.id, name: name));
+                  await svc.updateWatchlist(
+                    Watchlist(id: editing!.id, name: name),
+                  );
                 }
                 if (mounted) Navigator.pop(context);
               },
               child: const Text('Guardar'),
-            )
+            ),
           ],
         ),
       ),

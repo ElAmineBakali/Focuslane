@@ -45,7 +45,11 @@ class _SubscriptionEditScreenState extends State<SubscriptionEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nueva suscripción' : 'Editar suscripción')),
+      appBar: AppBar(
+        title: Text(
+          editing == null ? 'Nueva suscripción' : 'Editar suscripción',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
@@ -55,28 +59,47 @@ class _SubscriptionEditScreenState extends State<SubscriptionEditScreen> {
               TextFormField(
                 controller: _name,
                 decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amount,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Importe'),
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Inválido' : null,
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Inválido'
+                            : null,
               ),
               const SizedBox(height: 8),
-              TextFormField(controller: _currency, decoration: const InputDecoration(labelText: 'Divisa (p.ej. EUR)')),
+              TextFormField(
+                controller: _currency,
+                decoration: const InputDecoration(
+                  labelText: 'Divisa (p.ej. EUR)',
+                ),
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _category, decoration: const InputDecoration(labelText: 'Categoría')),
+              TextFormField(
+                controller: _category,
+                decoration: const InputDecoration(labelText: 'Categoría'),
+              ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 initialValue: _billingCycle,
                 items: const [
                   DropdownMenuItem(value: 'monthly', child: Text('Mensual')),
                   DropdownMenuItem(value: 'yearly', child: Text('Anual')),
-                  DropdownMenuItem(value: 'custom', child: Text('Personalizado')),
+                  DropdownMenuItem(
+                    value: 'custom',
+                    child: Text('Personalizado'),
+                  ),
                 ],
-                onChanged: (v) => setState(() => _billingCycle = v ?? 'monthly'),
+                onChanged:
+                    (v) => setState(() => _billingCycle = v ?? 'monthly'),
                 decoration: const InputDecoration(labelText: 'Ciclo de cobro'),
               ),
               if (_billingCycle == 'monthly') ...[
@@ -87,8 +110,16 @@ class _SubscriptionEditScreenState extends State<SubscriptionEditScreen> {
                     DropdownButton<int>(
                       value: _billingDay,
                       onChanged: (v) => setState(() => _billingDay = v),
-                      items: List.generate(28, (i) => i + 1).map((d) => DropdownMenuItem(value: d, child: Text('$d'))).toList(),
-                    )
+                      items:
+                          List.generate(28, (i) => i + 1)
+                              .map(
+                                (d) => DropdownMenuItem(
+                                  value: d,
+                                  child: Text('$d'),
+                                ),
+                              )
+                              .toList(),
+                    ),
                   ],
                 ),
               ],
@@ -103,7 +134,13 @@ class _SubscriptionEditScreenState extends State<SubscriptionEditScreen> {
                 trailing: DropdownButton<int>(
                   value: _remindDaysBefore,
                   onChanged: (v) => setState(() => _remindDaysBefore = v ?? 3),
-                  items: const [0, 1, 2, 3, 5, 7, 10].map((d) => DropdownMenuItem(value: d, child: Text('$d'))).toList(),
+                  items:
+                      const [0, 1, 2, 3, 5, 7, 10]
+                          .map(
+                            (d) =>
+                                DropdownMenuItem(value: d, child: Text('$d')),
+                          )
+                          .toList(),
                 ),
               ),
               SwitchListTile(
@@ -121,8 +158,14 @@ class _SubscriptionEditScreenState extends State<SubscriptionEditScreen> {
                     id: editing?.id ?? '',
                     name: _name.text.trim(),
                     amount: double.parse(_amount.text),
-                    currency: _currency.text.trim().isEmpty ? 'EUR' : _currency.text.trim(),
-                    category: _category.text.trim().isEmpty ? 'Other' : _category.text.trim(),
+                    currency:
+                        _currency.text.trim().isEmpty
+                            ? 'EUR'
+                            : _currency.text.trim(),
+                    category:
+                        _category.text.trim().isEmpty
+                            ? 'Other'
+                            : _category.text.trim(),
                     billingCycle: _billingCycle,
                     billingDay: _billingCycle == 'monthly' ? _billingDay : null,
                     isFixed: _isFixed,

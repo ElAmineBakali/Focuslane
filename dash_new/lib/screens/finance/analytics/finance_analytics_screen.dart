@@ -48,7 +48,8 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
           FutureBuilder<Map<String, double>>(
             future: svc.monthTotals(month: _start),
             builder: (context, snap) {
-              final m = snap.data ?? const {'income': 0, 'expense': 0, 'saving': 0};
+              final m =
+                  snap.data ?? const {'income': 0, 'expense': 0, 'saving': 0};
               final balance = (m['income'] ?? 0) - (m['expense'] ?? 0);
               return Wrap(
                 alignment: WrapAlignment.center,
@@ -64,13 +65,19 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
           ),
 
           const SizedBox(height: 20),
-          _sectionTitle('Gasto por categoría (mes)',
-              subtitle: '${_start.year}-${_start.month.toString().padLeft(2, '0')} • reparto del 100%'),
+          _sectionTitle(
+            'Gasto por categoría (mes)',
+            subtitle:
+                '${_start.year}-${_start.month.toString().padLeft(2, '0')} • reparto del 100%',
+          ),
           const SizedBox(height: 8),
 
           // ===== Gasto por categoría =====
           StreamBuilder<List<FinanceTransaction>>(
-            stream: FinanceFirestoreService.I.watchTransactions(from: _start, to: _end),
+            stream: FinanceFirestoreService.I.watchTransactions(
+              from: _start,
+              to: _end,
+            ),
             builder: (context, s) {
               final txs = s.data ?? [];
               if (s.connectionState == ConnectionState.waiting) {
@@ -88,20 +95,26 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
                   byCat[t.category] = (byCat[t.category] ?? 0) + t.amount;
                 }
               }
-              final entries = byCat.entries.toList()
-                ..sort((a, b) => b.value.compareTo(a.value));
+              final entries =
+                  byCat.entries.toList()
+                    ..sort((a, b) => b.value.compareTo(a.value));
 
               if (entries.isEmpty) {
-                return _card( child: const ListTile(title: Text('Sin gastos este mes')) );
+                return _card(
+                  child: const ListTile(title: Text('Sin gastos este mes')),
+                );
               }
 
-              final parts = entries
-                  .map((e) => _CategoryPart(
-                        name: e.key,
-                        amount: e.value,
-                        pct: totalExpense <= 0 ? 0 : (e.value / totalExpense),
-                      ))
-                  .toList();
+              final parts =
+                  entries
+                      .map(
+                        (e) => _CategoryPart(
+                          name: e.key,
+                          amount: e.value,
+                          pct: totalExpense <= 0 ? 0 : (e.value / totalExpense),
+                        ),
+                      )
+                      .toList();
 
               return _card(
                 child: Column(
@@ -112,7 +125,10 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
                     ...parts.map(
                       (p) => ListTile(
                         dense: true,
-                        leading: Icon(Icons.label_outline, color: _colorFor(p.name)),
+                        leading: Icon(
+                          Icons.label_outline,
+                          color: _colorFor(p.name),
+                        ),
                         title: Text(p.name),
                         subtitle: Text(
                           '${(p.pct * 100).toStringAsFixed(1)}%  •  ${p.amount.toStringAsFixed(2)}',
@@ -124,7 +140,9 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
                       dense: true,
                       leading: const Icon(Icons.show_chart),
                       title: const Text('Resumen'),
-                      subtitle: Text('Categorías con gasto: ${entries.length}   •   Total gasto: ${totalExpense.toStringAsFixed(2)}'),
+                      subtitle: Text(
+                        'Categorías con gasto: ${entries.length}   •   Total gasto: ${totalExpense.toStringAsFixed(2)}',
+                      ),
                     ),
                   ],
                 ),
@@ -134,7 +152,7 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
 
           //const SizedBox(height: 24),
           //_sectionTitle('Presupuestos: consumido vs límite',
-              //subtitle: '${_start.year}-${_start.month.toString().padLeft(2, '0')}'),
+          //subtitle: '${_start.year}-${_start.month.toString().padLeft(2, '0')}'),
           //const SizedBox(height: 8),
 
           // ===== Progreso de presupuestos =====
@@ -256,16 +274,17 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
       child: Row(
-        children: parts.map((p) {
-          final flex = (p.pct * 1000).round().clamp(1, 1000);
-          return Expanded(
-            flex: flex,
-            child: Container(
-              height: 12,
-              color: _colorFor(p.name).withOpacity(0.85),
-            ),
-          );
-        }).toList(),
+        children:
+            parts.map((p) {
+              final flex = (p.pct * 1000).round().clamp(1, 1000);
+              return Expanded(
+                flex: flex,
+                child: Container(
+                  height: 12,
+                  color: _colorFor(p.name).withOpacity(0.85),
+                ),
+              );
+            }).toList(),
       ),
     );
   }

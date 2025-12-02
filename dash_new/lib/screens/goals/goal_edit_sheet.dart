@@ -25,8 +25,14 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
   DateTime? _targetDate;
 
   static const _swatches = <int>[
-    0xFF2962FF, 0xFF00BFA5, 0xFF43A047, 0xFFF9A825,
-    0xFFEF6C00, 0xFFE53935, 0xFF8E24AA, 0xFF546E7A,
+    0xFF2962FF,
+    0xFF00BFA5,
+    0xFF43A047,
+    0xFFF9A825,
+    0xFFEF6C00,
+    0xFFE53935,
+    0xFF8E24AA,
+    0xFF546E7A,
   ];
 
   @override
@@ -54,7 +60,9 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
     return TaskFormTheme(
       child: Padding(
         padding: EdgeInsets.only(
-          left: 16, right: 16, top: 16,
+          left: 16,
+          right: 16,
+          top: 16,
           bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Form(
@@ -63,18 +71,24 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(isEdit ? 'Editar meta' : 'Nueva meta',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  isEdit ? 'Editar meta' : 'Nueva meta',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
 
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(labelText: 'Título'),
-                  validator: (v)=> (v==null || v.trim().isEmpty) ? 'Requerido' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 TextFormField(
                   controller: _desc,
-                  decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción (opcional)',
+                  ),
                   maxLines: 3,
                 ),
 
@@ -84,16 +98,24 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                     Expanded(
                       child: TextFormField(
                         controller: _progress,
-                        decoration: const InputDecoration(labelText: 'Progreso'),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Progreso',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextFormField(
                         controller: _progressTarget,
-                        decoration: const InputDecoration(labelText: 'Objetivo'),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Objetivo',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -110,17 +132,23 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<GoalStatus>(
                   initialValue: _status,
-                  items: GoalStatus.values
-                    .map((e)=>DropdownMenuItem(value: e, child: Text(e.name)))
-                    .toList(),
-                  onChanged: (v)=> setState(()=> _status = v ?? _status),
+                  items:
+                      GoalStatus.values
+                          .map(
+                            (e) =>
+                                DropdownMenuItem(value: e, child: Text(e.name)),
+                          )
+                          .toList(),
+                  onChanged: (v) => setState(() => _status = v ?? _status),
                   decoration: const InputDecoration(labelText: 'Estado'),
                 ),
 
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
-                  title: Text('Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "—"}'),
+                  title: Text(
+                    'Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "—"}',
+                  ),
                   onTap: () async {
                     final d = await showDatePicker(
                       context: context,
@@ -128,40 +156,51 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                       firstDate: DateTime(2020),
                       lastDate: DateTime(2100),
                     );
-                    if (d != null) setState(()=> _targetDate = d);
+                    if (d != null) setState(() => _targetDate = d);
                   },
                 ),
 
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Color', style: Theme.of(context).textTheme.titleMedium),
+                  child: Text(
+                    'Color',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8, runSpacing: 8,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     ChoiceChip(
                       label: const Text('Sin color'),
                       selected: _colorHex == null || _colorHex!.isEmpty,
-                      onSelected: (_)=> setState(()=> _colorHex = null),
+                      onSelected: (_) => setState(() => _colorHex = null),
                     ),
                     ..._swatches.map((hex) {
                       final c = Color(hex);
-                      final sel = _colorHex == '0x${hex.toRadixString(16).toUpperCase()}';
+                      final sel =
+                          _colorHex ==
+                          '0x${hex.toRadixString(16).toUpperCase()}';
                       return ChoiceChip(
                         selected: sel,
                         label: const SizedBox(width: 0, height: 0),
                         avatar: Container(
-                          width: 22, height: 22,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
                             color: c,
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(color: Colors.black12),
                           ),
                         ),
-                        onSelected: (_) => setState(() =>
-                          _colorHex = '0x${hex.toRadixString(16).toUpperCase()}'),
+                        onSelected:
+                            (_) => setState(
+                              () =>
+                                  _colorHex =
+                                      '0x${hex.toRadixString(16).toUpperCase()}',
+                            ),
                       );
                     }),
                   ],
@@ -177,7 +216,10 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: ()=>Navigator.pop(context), child: const Text('Cancelar')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: () async {
@@ -185,14 +227,24 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                         final g = Goal(
                           id: widget.initial?.id ?? '',
                           title: _title.text.trim(),
-                          description: _desc.text.trim().isEmpty ? null : _desc.text.trim(),
+                          description:
+                              _desc.text.trim().isEmpty
+                                  ? null
+                                  : _desc.text.trim(),
                           status: _status,
                           targetDate: _targetDate,
                           progress: double.tryParse(_progress.text),
                           progressTarget: double.tryParse(_progressTarget.text),
-                          unit: _unit.text.trim().isEmpty ? null : _unit.text.trim(),
-                          tags: _tags.text.split(',')
-                               .map((e)=>e.trim()).where((e)=>e.isNotEmpty).toList(),
+                          unit:
+                              _unit.text.trim().isEmpty
+                                  ? null
+                                  : _unit.text.trim(),
+                          tags:
+                              _tags.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .where((e) => e.isNotEmpty)
+                                  .toList(),
                           colorHex: _colorHex,
                         );
                         if (widget.initial == null) {
@@ -206,7 +258,9 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                     ),
                   ],
                 ),
-                SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 24),
+                SizedBox(
+                  height: MediaQuery.of(context).viewPadding.bottom + 24,
+                ),
               ],
             ),
           ),

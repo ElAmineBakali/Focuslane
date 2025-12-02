@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum AssetClass { stock, crypto, fx, future }
+
 enum Direction { long, short }
+
 enum Outcome { win, loss, breakeven, open }
 
 class Trade {
@@ -20,8 +22,8 @@ class Trade {
   final String? strategyId;
   final List<String> tags;
   final double? rMultiple; // calculado
-  final double pnl;        // calculado
-  final double? pnlPct;    // opcional, sobre capital o sobre entrada
+  final double pnl; // calculado
+  final double? pnlPct; // opcional, sobre capital o sobre entrada
   final Outcome outcome;
   final String? notes;
   final List<String> screenshots;
@@ -102,7 +104,9 @@ class Trade {
         orElse: () => Outcome.open,
       ),
       notes: d['notes'],
-      screenshots: (d['screenshots'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      screenshots:
+          (d['screenshots'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
     );
   }
 }
@@ -164,8 +168,17 @@ class WatchSymbol {
   final String ticker;
   final String? note;
   final int priority; // 1..3
-  WatchSymbol({required this.id, required this.ticker, this.note, this.priority = 2});
-  Map<String, dynamic> toMap() => {'ticker': ticker, 'note': note, 'priority': priority};
+  WatchSymbol({
+    required this.id,
+    required this.ticker,
+    this.note,
+    this.priority = 2,
+  });
+  Map<String, dynamic> toMap() => {
+    'ticker': ticker,
+    'note': note,
+    'priority': priority,
+  };
   static WatchSymbol fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
     return WatchSymbol(
@@ -221,13 +234,16 @@ class JournalEntry {
       title: d['title'] ?? '',
       content: d['content'] ?? '',
       mood: (d['mood'] ?? 3) as int,
-      checklist: (d['checklist'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      checklist:
+          (d['checklist'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
     );
   }
 }
 
 // ====== Candles / ORB ======
 enum Timeframe { m1, m5, m15, m30, h1, h4, d1 }
+
 extension TimeframeX on Timeframe {
   String get code => switch (this) {
     Timeframe.m1 => '1m',

@@ -23,24 +23,37 @@ class _MusicListScreenState extends State<MusicListScreen> {
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.link_rounded),
-            onSelected: (v) { if (v == 'sc') AppLinks.openSoundCloud(); },
-            itemBuilder: (_) => const [ PopupMenuItem(value: 'sc', child: Text('SoundCloud')), ],
+            onSelected: (v) {
+              if (v == 'sc') AppLinks.openSoundCloud();
+            },
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'sc', child: Text('SoundCloud')),
+                ],
           ),
           PopupMenuButton<ItemStatus?>(
             onSelected: (v) => setState(() => _status = v),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('Todos')),
-              ...ItemStatus.values.map((e) => PopupMenuItem(value: e, child: Text(e.name))),
-            ],
+            itemBuilder:
+                (_) => [
+                  const PopupMenuItem(value: null, child: Text('Todos')),
+                  ...ItemStatus.values.map(
+                    (e) => PopupMenuItem(value: e, child: Text(e.name)),
+                  ),
+                ],
           ),
-          IconButton(icon: const Icon(Icons.add), onPressed: () => Navigator.pushNamed(context, '/culture/album/edit')),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed:
+                () => Navigator.pushNamed(context, '/culture/album/edit'),
+          ),
         ],
       ),
       body: StreamBuilder<List<Album>>(
         stream: svc.watchAlbums(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin álbumes'));
           return ListView.separated(
             itemCount: data.length,
@@ -52,7 +65,12 @@ class _MusicListScreenState extends State<MusicListScreen> {
                 title: Text(a.title),
                 subtitle: Text('${a.artist} • ${a.status.name}'),
                 trailing: Text(a.rating?.toStringAsFixed(1) ?? '-'),
-                onTap: () => Navigator.pushNamed(context, '/culture/album', arguments: a),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      '/culture/album',
+                      arguments: a,
+                    ),
               );
             },
           );

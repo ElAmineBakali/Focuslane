@@ -21,7 +21,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
 
   static const int _awakeMealBaseId = 430000; // 430000..430004
-  static const int _water2hBaseId = 431000;   // 431000..431011
+  static const int _water2hBaseId = 431000; // 431000..431011
 
   bool _awakeToday = false;
   bool _waterEvery2hOn = false;
@@ -33,7 +33,12 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
     // De momento iniciamos en false y cambiamos al pulsar.
   }
 
-  void _toast(BuildContext c, {required bool ok, required String title, String? sub}) {
+  void _toast(
+    BuildContext c, {
+    required bool ok,
+    required String title,
+    String? sub,
+  }) {
     final s = Theme.of(c).colorScheme;
     final bg = ok ? s.primaryContainer : s.errorContainer;
     final fg = ok ? s.onPrimaryContainer : s.onErrorContainer;
@@ -47,7 +52,12 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
           children: [
             Icon(ok ? Icons.check_circle : Icons.warning_amber, color: fg),
             const SizedBox(width: 10),
-            Expanded(child: Text(sub == null ? title : '$title\n$sub', style: TextStyle(color: fg))),
+            Expanded(
+              child: Text(
+                sub == null ? title : '$title\n$sub',
+                style: TextStyle(color: fg),
+              ),
+            ),
           ],
         ),
       ),
@@ -55,7 +65,7 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
   }
 
   Future<void> _iAmAwake() async {
-    final labels = const ['Desayuno','Snack','Comida','Merienda','Cena'];
+    final labels = const ['Desayuno', 'Snack', 'Comida', 'Merienda', 'Cena'];
     // Limpia anteriores
     for (int i = 0; i < labels.length; i++) {
       await NotificationService.I.cancel(_awakeMealBaseId + i);
@@ -74,7 +84,12 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
     }
     await widget.svc.markAwake(now, dayId: _dayId(now));
     setState(() => _awakeToday = true);
-    _toast(context, ok: true, title: '¡Listo!', sub: 'Te avisaré durante el día.');
+    _toast(
+      context,
+      ok: true,
+      title: '¡Listo!',
+      sub: 'Te avisaré durante el día.',
+    );
   }
 
   Future<void> _cancelAwake() async {
@@ -125,12 +140,24 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
           IconButton(
             tooltip: 'Hoy',
             icon: const Icon(Icons.today),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FoodDiaryScreen(svc: widget.svc))),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => FoodDiaryScreen(svc: widget.svc),
+                  ),
+                ),
           ),
           IconButton(
             tooltip: 'Historial',
             icon: const Icon(Icons.history),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FoodHistoryScreen(svc: widget.svc))),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => FoodHistoryScreen(svc: widget.svc),
+                  ),
+                ),
           ),
           IconButton(
             tooltip: 'Recordatorios',
@@ -142,13 +169,28 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
       body: StreamBuilder<DailyIntakeDoc>(
         stream: widget.svc.streamDay(todayId),
         builder: (context, snap) {
-          final day = snap.data ?? DailyIntakeDoc(
-            id: todayId,
-            entries: const [],
-            waterMl: 0,
-            totals: const { 'kcal': 0.0, 'protein': 0.0, 'carbs': 0.0, 'fat': 0.0, 'fiber': 0.0, 'sodium': 0.0 },
-            targets: const { 'kcal': null, 'protein': null, 'carbs': null, 'fat': null, 'fiber': null },
-          );
+          final day =
+              snap.data ??
+              DailyIntakeDoc(
+                id: todayId,
+                entries: const [],
+                waterMl: 0,
+                totals: const {
+                  'kcal': 0.0,
+                  'protein': 0.0,
+                  'carbs': 0.0,
+                  'fat': 0.0,
+                  'fiber': 0.0,
+                  'sodium': 0.0,
+                },
+                targets: const {
+                  'kcal': null,
+                  'protein': null,
+                  'carbs': null,
+                  'fat': null,
+                  'fiber': null,
+                },
+              );
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -158,21 +200,39 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Wrap(
-                    spacing: 10, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilterChip(
                         selected: _awakeToday,
-                        label: Text(_awakeToday ? 'Despierto HOY' : 'Despierto HOY'),
-                        avatar: Icon(_awakeToday ? Icons.wb_sunny : Icons.wb_sunny_outlined),
+                        label: Text(
+                          _awakeToday ? 'Despierto HOY' : 'Despierto HOY',
+                        ),
+                        avatar: Icon(
+                          _awakeToday
+                              ? Icons.wb_sunny
+                              : Icons.wb_sunny_outlined,
+                        ),
                         selectedColor: s.primaryContainer,
                         onSelected: (v) => v ? _iAmAwake() : _cancelAwake(),
                       ),
                       FilterChip(
                         selected: _waterEvery2hOn,
-                        label: Text(_waterEvery2hOn ? 'Agua c/2h' : 'Agua c/2h'),
-                        avatar: Icon(_waterEvery2hOn ? Icons.water_drop : Icons.water_drop_outlined),
+                        label: Text(
+                          _waterEvery2hOn ? 'Agua c/2h' : 'Agua c/2h',
+                        ),
+                        avatar: Icon(
+                          _waterEvery2hOn
+                              ? Icons.water_drop
+                              : Icons.water_drop_outlined,
+                        ),
                         selectedColor: s.secondaryContainer,
-                        onSelected: (v) => v ? _scheduleWaterEvery2h() : _cancelWaterEvery2h(),
+                        onSelected:
+                            (v) =>
+                                v
+                                    ? _scheduleWaterEvery2h()
+                                    : _cancelWaterEvery2h(),
                       ),
                     ],
                   ),
@@ -182,14 +242,40 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
 
               // 👉 Tappable para abrir Diario
               InkWell(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FoodDiaryScreen(svc: widget.svc))),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FoodDiaryScreen(svc: widget.svc),
+                      ),
+                    ),
                 child: _SummaryCard(day: day),
               ),
               const SizedBox(height: 12),
-              _navRow(context, 'Alimentos', Icons.restaurant, FoodsListScreen(svc: widget.svc)),
-              _navRow(context, 'Recetas', Icons.menu_book, RecipesListScreen(svc: widget.svc)),
-              _navRow(context, 'Planner', Icons.calendar_view_week, FoodPlannerScreen(svc: widget.svc)),
-              _navRow(context, 'Listas de compra', Icons.shopping_cart, ShoppingListsScreen(svc: widget.svc)),
+              _navRow(
+                context,
+                'Alimentos',
+                Icons.restaurant,
+                FoodsListScreen(svc: widget.svc),
+              ),
+              _navRow(
+                context,
+                'Recetas',
+                Icons.menu_book,
+                RecipesListScreen(svc: widget.svc),
+              ),
+              _navRow(
+                context,
+                'Planner',
+                Icons.calendar_view_week,
+                FoodPlannerScreen(svc: widget.svc),
+              ),
+              _navRow(
+                context,
+                'Listas de compra',
+                Icons.shopping_cart,
+                ShoppingListsScreen(svc: widget.svc),
+              ),
             ],
           );
         },
@@ -202,18 +288,23 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
     // … pega aquí tu implementación actual de _openRemindersSheet() …
   }
 
-  Widget _navRow(BuildContext ctx, String title, IconData icon, Widget screen) => Card(
-        child: ListTile(
-          leading: Icon(icon),
-          title: Text(title),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => screen)),
-        ),
-      );
+  Widget _navRow(
+    BuildContext ctx,
+    String title,
+    IconData icon,
+    Widget screen,
+  ) => Card(
+    child: ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: const Icon(Icons.chevron_right),
+      onTap:
+          () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => screen)),
+    ),
+  );
 }
 
 // ---- _SummaryCard se queda igual que el tuyo ----
-
 
 class _SummaryCard extends StatelessWidget {
   final DailyIntakeDoc day;
@@ -237,7 +328,10 @@ class _SummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Resumen de hoy', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Resumen de hoy',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             _row(context, 'Kcal', t['kcal'] ?? 0.0, g['kcal']),
             _row(context, 'Proteína', t['protein'] ?? 0.0, g['protein']),
@@ -246,7 +340,9 @@ class _SummaryCard extends StatelessWidget {
             _row(context, 'Fibra', t['fiber'] ?? 0.0, g['fiber']),
             const SizedBox(height: 8),
             Text('Agua: ${day.waterMl} / ${waterTarget.toInt()} ml'),
-            LinearProgressIndicator(value: _pct(day.waterMl.toDouble(), waterTarget)),
+            LinearProgressIndicator(
+              value: _pct(day.waterMl.toDouble(), waterTarget),
+            ),
           ],
         ),
       ),
@@ -257,10 +353,15 @@ class _SummaryCard extends StatelessWidget {
     final pct = _pct(val, target);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}'),
-        LinearProgressIndicator(value: pct),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}',
+          ),
+          LinearProgressIndicator(value: pct),
+        ],
+      ),
     );
   }
 }

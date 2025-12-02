@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 const double kFabAvoidHeight = 96.0;
 
-EdgeInsets safeListPadding(BuildContext context, {EdgeInsets base = EdgeInsets.zero}) {
+EdgeInsets safeListPadding(
+  BuildContext context, {
+  EdgeInsets base = EdgeInsets.zero,
+}) {
   final bottom = MediaQuery.of(context).viewPadding.bottom + kFabAvoidHeight;
   return base.copyWith(bottom: (base.bottom) + bottom);
 }
 
-EdgeInsets safeScrollPadding(BuildContext context, {EdgeInsets base = EdgeInsets.zero}) {
+EdgeInsets safeScrollPadding(
+  BuildContext context, {
+  EdgeInsets base = EdgeInsets.zero,
+}) {
   final bottom = MediaQuery.of(context).viewPadding.bottom + kFabAvoidHeight;
   return base.copyWith(bottom: (base.bottom) + bottom);
 }

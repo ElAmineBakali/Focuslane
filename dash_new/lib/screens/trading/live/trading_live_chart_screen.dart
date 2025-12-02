@@ -6,7 +6,8 @@ class TradingLiveChartScreen extends StatelessWidget {
   static const route = '/trading/live';
 
   // tu URL específica de TradingView
-  Uri get _url => Uri.parse('https://es.tradingview.com/chart/?symbol=ICMARKETS%3AUSTEC');
+  Uri get _url =>
+      Uri.parse('https://es.tradingview.com/chart/?symbol=ICMARKETS%3AUSTEC');
 
   Future<void> _open() async {
     if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {

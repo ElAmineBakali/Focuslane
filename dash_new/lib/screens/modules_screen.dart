@@ -86,7 +86,10 @@ class _ModulesScreenState extends State<ModulesScreen> {
     );
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(behavior: SnackBarBehavior.floating, content: Text('Módulos guardados')),
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text('Módulos guardados'),
+        ),
       );
     }
   }
@@ -106,52 +109,61 @@ class _ModulesScreenState extends State<ModulesScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: ReorderableListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _rows.length,
-                        onReorder: (oldIndex, newIndex) async {
-                          if (newIndex > oldIndex) newIndex--;
-                          final item = _rows.removeAt(oldIndex);
-                          _rows.insert(newIndex, item);
-                          setState(() {});
-                          await _save();
-                        },
-                        itemBuilder: (context, i) {
-                          final r = _rows[i];
-                          return SwitchListTile.adaptive(
-                            key: ValueKey(r.route),
-                            value: r.visible,
-                            onChanged: (v) async {
-                              setState(() => r.visible = v);
-                              await _save();
-                            },
-                            title: Row(
-                              children: [
-                                const Icon(Icons.drag_handle_rounded, size: 18),
-                                const SizedBox(width: 8),
-                                Icon(r.icon, size: 20),
-                                const SizedBox(width: 8),
-                                Text(r.title),
-                              ],
-                            ),
-                            subtitle: Text(r.route, style: Theme.of(context).textTheme.bodySmall),
-                          );
-                        },
+        child:
+            _loading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                  children: [
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ReorderableListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _rows.length,
+                          onReorder: (oldIndex, newIndex) async {
+                            if (newIndex > oldIndex) newIndex--;
+                            final item = _rows.removeAt(oldIndex);
+                            _rows.insert(newIndex, item);
+                            setState(() {});
+                            await _save();
+                          },
+                          itemBuilder: (context, i) {
+                            final r = _rows[i];
+                            return SwitchListTile.adaptive(
+                              key: ValueKey(r.route),
+                              value: r.visible,
+                              onChanged: (v) async {
+                                setState(() => r.visible = v);
+                                await _save();
+                              },
+                              title: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.drag_handle_rounded,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(r.icon, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(r.title),
+                                ],
+                              ),
+                              subtitle: Text(
+                                r.route,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text('Tip: mantén pulsado un módulo en la Home para abrir esta pantalla.'),
-                ],
-              ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Tip: mantén pulsado un módulo en la Home para abrir esta pantalla.',
+                    ),
+                  ],
+                ),
       ),
     );
   }

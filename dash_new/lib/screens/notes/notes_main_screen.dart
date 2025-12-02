@@ -16,9 +16,7 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mis Notas'),
-      ),
+      appBar: AppBar(title: const Text('Mis Notas')),
       body: StreamBuilder<List<Note>>(
         stream: NoteFirestoreService.getNotes(),
         builder: (context, snapshot) {
@@ -41,15 +39,24 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
                 key: ValueKey(note.id),
                 elevation: 3,
                 color: theme.colorScheme.surface,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(12),
-                  onTap: () => Navigator.pushNamed(context, '/notes/editor', arguments: note),
+                  onTap:
+                      () => Navigator.pushNamed(
+                        context,
+                        '/notes/editor',
+                        arguments: note,
+                      ),
                   title: Text(
                     note.title.isEmpty ? 'Sin título' : note.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

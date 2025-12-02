@@ -51,8 +51,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       appBar: AppBar(
         title: const Text('Editar nota'),
         actions: [
-          IconButton(icon: const Icon(Icons.delete), onPressed: _deleteNote, tooltip: 'Eliminar'),
-          IconButton(icon: const Icon(Icons.save), onPressed: () => _updateNote(), tooltip: 'Guardar'),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _deleteNote,
+            tooltip: 'Eliminar',
+          ),
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () => _updateNote(),
+            tooltip: 'Guardar',
+          ),
         ],
       ),
       body: ListView(
@@ -79,9 +87,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
               const SizedBox(width: 8),
-              FilledButton(onPressed: () => _updateNote(), child: const Text('Guardar')),
+              FilledButton(
+                onPressed: () => _updateNote(),
+                child: const Text('Guardar'),
+              ),
             ],
           ),
         ],
@@ -89,4 +103,3 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 }
-

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../../services/culture_firestore_service.dart';
 import '../../../models/culture_models.dart';
@@ -47,27 +46,72 @@ class _GameEditScreenState extends State<GameEditScreen> {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing==null ? 'Nuevo juego' : 'Editar juego')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo juego' : 'Editar juego'),
+      ),
       body: TaskFormTheme(
         child: ListView(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
           children: [
-            TextField(controller: _title, decoration: const InputDecoration(labelText: 'Título', hintText: 'Ej. Elden Ring')),
-            TextField(controller: _platform, decoration: const InputDecoration(labelText: 'Plataforma')),
+            TextField(
+              controller: _title,
+              decoration: const InputDecoration(
+                labelText: 'Título',
+                hintText: 'Ej. Elden Ring',
+              ),
+            ),
+            TextField(
+              controller: _platform,
+              decoration: const InputDecoration(labelText: 'Plataforma'),
+            ),
             Row(
               children: [
-                Expanded(child: TextField(controller: _hours, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Horas'))),
+                Expanded(
+                  child: TextField(
+                    controller: _hours,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(labelText: 'Horas'),
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: TextField(controller: _progress, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Progreso %'))),
+                Expanded(
+                  child: TextField(
+                    controller: _progress,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Progreso %'),
+                  ),
+                ),
               ],
             ),
-            TextField(controller: _difficulty, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Dificultad (1..5)')),
-            TextField(controller: _cover, decoration: const InputDecoration(labelText: 'Cover URL (opcional)')),
-            TextField(controller: _notes, decoration: const InputDecoration(labelText: 'Notas'), maxLines: 3),
+            TextField(
+              controller: _difficulty,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Dificultad (1..5)'),
+            ),
+            TextField(
+              controller: _cover,
+              decoration: const InputDecoration(
+                labelText: 'Cover URL (opcional)',
+              ),
+            ),
+            TextField(
+              controller: _notes,
+              decoration: const InputDecoration(labelText: 'Notas'),
+              maxLines: 3,
+            ),
             DropdownButtonFormField<ItemStatus>(
-              initialValue: _status, decoration: const InputDecoration(labelText: 'Estado'),
-              items: ItemStatus.values.map((e)=>DropdownMenuItem(value:e, child: Text(e.name))).toList(),
-              onChanged: (v)=>setState(()=>_status=v??ItemStatus.pending),
+              initialValue: _status,
+              decoration: const InputDecoration(labelText: 'Estado'),
+              items:
+                  ItemStatus.values
+                      .map(
+                        (e) => DropdownMenuItem(value: e, child: Text(e.name)),
+                      )
+                      .toList(),
+              onChanged:
+                  (v) => setState(() => _status = v ?? ItemStatus.pending),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -75,9 +119,13 @@ class _GameEditScreenState extends State<GameEditScreen> {
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
-                  controller: TextEditingController(text: _rating?.toStringAsFixed(1) ?? ''),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (v)=> _rating = double.tryParse(v),
+                  controller: TextEditingController(
+                    text: _rating?.toStringAsFixed(1) ?? '',
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  onChanged: (v) => _rating = double.tryParse(v),
                 ),
               ),
             ),
@@ -94,7 +142,8 @@ class _GameEditScreenState extends State<GameEditScreen> {
                   hours: double.tryParse(_hours.text) ?? 0.0,
                   progressPct: int.tryParse(_progress.text) ?? 0,
                   tags: const [],
-                  coverUrl: _cover.text.trim().isEmpty ? null : _cover.text.trim(),
+                  coverUrl:
+                      _cover.text.trim().isEmpty ? null : _cover.text.trim(),
                   notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
                   difficulty: int.tryParse(_difficulty.text),
                 );

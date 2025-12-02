@@ -47,7 +47,9 @@ class _TagSelectorState extends State<TagSelector> {
 
   void _addCustomTag() {
     final tag = _customTagController.text.trim();
-    if (tag.isNotEmpty && !_selected.contains(tag) && _selected.length < widget.maxTags) {
+    if (tag.isNotEmpty &&
+        !_selected.contains(tag) &&
+        _selected.length < widget.maxTags) {
       setState(() {
         _selected.add(tag);
         widget.onTagsChanged(_selected);
@@ -71,7 +73,9 @@ class _TagSelectorState extends State<TagSelector> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               child: Row(
                 children: [
@@ -81,12 +85,16 @@ class _TagSelectorState extends State<TagSelector> {
                       children: [
                         Text(
                           'Etiquetas',
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Selecciona hasta ${widget.maxTags} etiquetas',
-                          style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -111,15 +119,19 @@ class _TagSelectorState extends State<TagSelector> {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: _selected.map((tag) {
-                    return Chip(
-                      label: Text(tag),
-                      deleteIcon: const Icon(Icons.close, size: 18),
-                      onDeleted: () => _toggleTag(tag),
-                      backgroundColor: cs.primaryContainer,
-                      labelStyle: TextStyle(color: cs.onPrimaryContainer, fontWeight: FontWeight.w600),
-                    );
-                  }).toList(),
+                  children:
+                      _selected.map((tag) {
+                        return Chip(
+                          label: Text(tag),
+                          deleteIcon: const Icon(Icons.close, size: 18),
+                          onDeleted: () => _toggleTag(tag),
+                          backgroundColor: cs.primaryContainer,
+                          labelStyle: TextStyle(
+                            color: cs.onPrimaryContainer,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }).toList(),
                 ),
               ),
 
@@ -134,7 +146,9 @@ class _TagSelectorState extends State<TagSelector> {
                       decoration: InputDecoration(
                         hintText: 'Crear etiqueta personalizada',
                         prefixIcon: const Icon(Icons.label_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         filled: true,
                         fillColor: cs.surfaceContainerHigh,
                       ),
@@ -143,7 +157,10 @@ class _TagSelectorState extends State<TagSelector> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    onPressed: _selected.length >= widget.maxTags ? null : _addCustomTag,
+                    onPressed:
+                        _selected.length >= widget.maxTags
+                            ? null
+                            : _addCustomTag,
                     icon: const Icon(Icons.add),
                     tooltip: 'Agregar',
                   ),
@@ -167,24 +184,33 @@ class _TagSelectorState extends State<TagSelector> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: CommonTags.tags.map((tag) {
-                      final isSelected = _selected.contains(tag);
-                      final isDisabled = !isSelected && _selected.length >= widget.maxTags;
-                      
-                      return FilterChip(
-                        label: Text(tag),
-                        selected: isSelected,
-                        onSelected: isDisabled ? null : (_) => _toggleTag(tag),
-                        selectedColor: cs.primaryContainer,
-                        backgroundColor: cs.surfaceContainerHigh,
-                        labelStyle: TextStyle(
-                          color: isSelected ? cs.onPrimaryContainer : cs.onSurface,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        ),
-                        showCheckmark: true,
-                        checkmarkColor: cs.primary,
-                      );
-                    }).toList(),
+                    children:
+                        CommonTags.tags.map((tag) {
+                          final isSelected = _selected.contains(tag);
+                          final isDisabled =
+                              !isSelected && _selected.length >= widget.maxTags;
+
+                          return FilterChip(
+                            label: Text(tag),
+                            selected: isSelected,
+                            onSelected:
+                                isDisabled ? null : (_) => _toggleTag(tag),
+                            selectedColor: cs.primaryContainer,
+                            backgroundColor: cs.surfaceContainerHigh,
+                            labelStyle: TextStyle(
+                              color:
+                                  isSelected
+                                      ? cs.onPrimaryContainer
+                                      : cs.onSurface,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                            ),
+                            showCheckmark: true,
+                            checkmarkColor: cs.primary,
+                          );
+                        }).toList(),
                   ),
                 ],
               ),
@@ -195,14 +221,18 @@ class _TagSelectorState extends State<TagSelector> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     '${_selected.length}/${widget.maxTags} seleccionadas',
-                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                   FilledButton(
                     onPressed: () => Navigator.pop(context),

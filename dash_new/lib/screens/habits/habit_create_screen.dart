@@ -27,7 +27,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   bool _isQuantitative = false;
   String _unit = '';
   Color _selectedColor = Colors.blue;
-  
+
   // Nuevos campos
   String? _emoji;
   String? _iconCode;
@@ -116,79 +116,84 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   void _pickColor() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Selecciona un color'),
-        content: SingleChildScrollView(
-          child: BlockPicker(
-            pickerColor: _selectedColor,
-            onColorChanged: (c) {
-              setState(() => _selectedColor = c);
-              Navigator.of(context).pop();
-            },
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Selecciona un color'),
+            content: SingleChildScrollView(
+              child: BlockPicker(
+                pickerColor: _selectedColor,
+                onColorChanged: (c) {
+                  setState(() => _selectedColor = c);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
   void _pickEmojiIcon() async {
     await showDialog(
       context: context,
-      builder: (context) => EmojiIconPicker(
-        selectedEmoji: _emoji,
-        selectedIconCode: _iconCode,
-        onSelect: (emoji, iconCode) {
-          setState(() {
-            _emoji = emoji;
-            _iconCode = iconCode;
-          });
-        },
-      ),
+      builder:
+          (context) => EmojiIconPicker(
+            selectedEmoji: _emoji,
+            selectedIconCode: _iconCode,
+            onSelect: (emoji, iconCode) {
+              setState(() {
+                _emoji = emoji;
+                _iconCode = iconCode;
+              });
+            },
+          ),
     );
   }
 
   void _manageTags() async {
     await showDialog(
       context: context,
-      builder: (context) => TagSelector(
-        selectedTags: _tags,
-        onTagsChanged: (tags) {
-          setState(() => _tags = tags);
-        },
-      ),
+      builder:
+          (context) => TagSelector(
+            selectedTags: _tags,
+            onTagsChanged: (tags) {
+              setState(() => _tags = tags);
+            },
+          ),
     );
   }
 
   void _manageReminders() async {
     await showDialog(
       context: context,
-      builder: (context) => ReminderManager(
-        reminders: _reminders,
-        onRemindersChanged: (reminders) {
-          setState(() => _reminders = reminders);
-        },
-      ),
+      builder:
+          (context) => ReminderManager(
+            reminders: _reminders,
+            onRemindersChanged: (reminders) {
+              setState(() => _reminders = reminders);
+            },
+          ),
     );
   }
 
   void _loadTemplate() async {
     await showDialog(
       context: context,
-      builder: (context) => TemplateSelector(
-        onSelect: (template) {
-          setState(() {
-            _nameController.text = template.name;
-            _descriptionController.text = template.description;
-            _emoji = template.emoji;
-            _iconCode = template.iconCode;
-            _tags = List.from(template.suggestedTags);
-            _frequency = template.frequency;
-            _isQuantitative = template.isQuantitative;
-            _unit = template.unit;
-            _selectedColor = Color(int.parse(template.colorHex));
-          });
-        },
-      ),
+      builder:
+          (context) => TemplateSelector(
+            onSelect: (template) {
+              setState(() {
+                _nameController.text = template.name;
+                _descriptionController.text = template.description;
+                _emoji = template.emoji;
+                _iconCode = template.iconCode;
+                _tags = List.from(template.suggestedTags);
+                _frequency = template.frequency;
+                _isQuantitative = template.isQuantitative;
+                _unit = template.unit;
+                _selectedColor = Color(int.parse(template.colorHex));
+              });
+            },
+          ),
     );
   }
 
@@ -222,7 +227,9 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _pickEmojiIcon,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -236,14 +243,31 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                             decoration: BoxDecoration(
                               color: _selectedColor.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: _selectedColor.withOpacity(0.3), width: 1.5),
+                              border: Border.all(
+                                color: _selectedColor.withOpacity(0.3),
+                                width: 1.5,
+                              ),
                             ),
                             child: Center(
-                              child: _emoji != null
-                                  ? Text(_emoji!, style: TextStyle(fontSize: isMobile ? 24 : 28))
-                                  : _iconCode != null
-                                      ? Icon(HabitIcons.getIcon(_iconCode), color: _selectedColor, size: isMobile ? 26 : 30)
-                                      : Icon(Icons.emoji_emotions_outlined, color: cs.onSurfaceVariant, size: isMobile ? 26 : 30),
+                              child:
+                                  _emoji != null
+                                      ? Text(
+                                        _emoji!,
+                                        style: TextStyle(
+                                          fontSize: isMobile ? 24 : 28,
+                                        ),
+                                      )
+                                      : _iconCode != null
+                                      ? Icon(
+                                        HabitIcons.getIcon(_iconCode),
+                                        color: _selectedColor,
+                                        size: isMobile ? 26 : 30,
+                                      )
+                                      : Icon(
+                                        Icons.emoji_emotions_outlined,
+                                        color: cs.onSurfaceVariant,
+                                        size: isMobile ? 26 : 30,
+                                      ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -253,34 +277,48 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                               children: [
                                 Text(
                                   'Icono del hábito',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   _emoji != null || _iconCode != null
                                       ? 'Toca para cambiar'
                                       : 'Toca para seleccionar (opcional)',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.edit_outlined,
+                            color: cs.onSurfaceVariant,
+                            size: isMobile ? 20 : 22,
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
 
                 // Nombre
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nombre del hábito'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Campo requerido' : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del hábito',
+                  ),
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? 'Campo requerido'
+                              : null,
                 ),
-                
+
                 const SizedBox(height: 12),
 
                 // Descripción
@@ -289,12 +327,12 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                   decoration: const InputDecoration(labelText: 'Descripción'),
                   maxLines: 2,
                 ),
-                
+
                 const SizedBox(height: 12),
 
                 // Frecuencia
                 DropdownButtonFormField<String>(
-                  value: _frequency,
+                  initialValue: _frequency,
                   decoration: const InputDecoration(labelText: 'Frecuencia'),
                   items: const [
                     DropdownMenuItem(value: 'Diario', child: Text('Diario')),
@@ -303,14 +341,16 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                   ],
                   onChanged: (v) => setState(() => _frequency = v!),
                 ),
-                
+
                 const SizedBox(height: 16),
 
                 // Etiquetas
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _manageTags,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -321,15 +361,25 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.label_outlined, color: cs.primary, size: isMobile ? 20 : 22),
+                              Icon(
+                                Icons.label_outlined,
+                                color: cs.primary,
+                                size: isMobile ? 20 : 22,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'Etiquetas (${_tags.length}/3)',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                              Icon(
+                                Icons.edit_outlined,
+                                color: cs.onSurfaceVariant,
+                                size: isMobile ? 20 : 22,
+                              ),
                             ],
                           ),
                           if (_tags.isNotEmpty) ...[
@@ -337,23 +387,26 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
-                              children: _tags.map((tag) {
-                                return Chip(
-                                  label: Text(tag),
-                                  backgroundColor: cs.primaryContainer,
-                                  labelStyle: TextStyle(
-                                    color: cs.onPrimaryContainer,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: isMobile ? 12 : 13,
-                                  ),
-                                );
-                              }).toList(),
+                              children:
+                                  _tags.map((tag) {
+                                    return Chip(
+                                      label: Text(tag),
+                                      backgroundColor: cs.primaryContainer,
+                                      labelStyle: TextStyle(
+                                        color: cs.onPrimaryContainer,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: isMobile ? 12 : 13,
+                                      ),
+                                    );
+                                  }).toList(),
                             ),
                           ] else ...[
                             const SizedBox(height: 8),
                             Text(
                               'Sin etiquetas asignadas',
-                              style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ],
@@ -361,14 +414,16 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
 
                 // Recordatorios
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _manageReminders,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -376,7 +431,11 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
                       child: Row(
                         children: [
-                          Icon(Icons.notifications_active_outlined, color: cs.primary, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.notifications_active_outlined,
+                            color: cs.primary,
+                            size: isMobile ? 20 : 22,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -384,25 +443,33 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                               children: [
                                 Text(
                                   'Recordatorios (${_reminders.length})',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   _reminders.isEmpty
                                       ? 'Sin recordatorios configurados'
                                       : '${_reminders.where((r) => r.enabled).length} activos',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.edit_outlined,
+                            color: cs.onSurfaceVariant,
+                            size: isMobile ? 20 : 22,
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
 
                 // Cuantitativo
@@ -410,29 +477,39 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                   title: const Text('¿Es cuantitativo?'),
                   subtitle: Text(
                     'Permite registrar números (ej: páginas leídas, km corridos)',
-                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                   value: _isQuantitative,
                   onChanged: (v) => setState(() => _isQuantitative = v),
                 ),
-                
+
                 if (_isQuantitative) ...[
                   const SizedBox(height: 8),
                   TextFormField(
                     initialValue: _unit,
-                    decoration: const InputDecoration(labelText: 'Unidad (ej. páginas, km, vasos...)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Unidad (ej. páginas, km, vasos...)',
+                    ),
                     onChanged: (v) => _unit = v.trim(),
-                    validator: (v) =>
-                        _isQuantitative && (v == null || v.trim().isEmpty) ? 'Campo requerido' : null,
+                    validator:
+                        (v) =>
+                            _isQuantitative && (v == null || v.trim().isEmpty)
+                                ? 'Campo requerido'
+                                : null,
                   ),
                 ],
-                
+
                 const SizedBox(height: 20),
 
                 // Color
                 Row(
                   children: [
-                    const Text('Color del hábito:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Color del hábito:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: _pickColor,
@@ -448,15 +525,19 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
 
                 // Botón guardar
                 Center(
                   child: FilledButton.icon(
                     onPressed: _submit,
-                    icon: Icon(_isEditing ? Icons.save_rounded : Icons.add_rounded),
-                    label: Text(_isEditing ? 'Guardar cambios' : 'Crear hábito'),
+                    icon: Icon(
+                      _isEditing ? Icons.save_rounded : Icons.add_rounded,
+                    ),
+                    label: Text(
+                      _isEditing ? 'Guardar cambios' : 'Crear hábito',
+                    ),
                     style: FilledButton.styleFrom(
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 24 : 32,

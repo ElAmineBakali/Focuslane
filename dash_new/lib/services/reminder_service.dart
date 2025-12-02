@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart' show Day;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    show Day;
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
 import 'package:mi_dashboard_personal/screens/meditation/models/meditation_models.dart';
@@ -19,12 +20,16 @@ class ReminderService {
     final id = 'habit_${habit.id}';
     final timeStr = habit.reminderTime.trim();
 
-    if (!globalEnabled || !habitsEnabled || !habit.isActive || timeStr.isEmpty) {
+    if (!globalEnabled ||
+        !habitsEnabled ||
+        !habit.isActive ||
+        timeStr.isEmpty) {
       await NotificationService.I.cancelNotificationById(id);
       return;
     }
 
-    final changed = previous != null && previous.reminderTime != habit.reminderTime;
+    final changed =
+        previous != null && previous.reminderTime != habit.reminderTime;
     if (changed) {
       await NotificationService.I.cancelNotificationById(id);
     }
@@ -66,7 +71,7 @@ class ReminderService {
 
     DateTime? target = task.remindAt;
 
-    if (target == null || target.isBefore(DateTime.now())) {
+    if (target.isBefore(DateTime.now())) {
       await NotificationService.I.cancelNotificationById(id);
       return;
     }
@@ -112,12 +117,13 @@ class ReminderService {
       return;
     }
 
-    final changed = previous == null ||
+    final changed =
+        previous == null ||
         previous.timeOfDay != reminder.timeOfDay ||
         !_listEquals(previous.daysOfWeek, reminder.daysOfWeek) ||
         previous.enabled != reminder.enabled;
 
-    if (!changed) return; 
+    if (!changed) return;
 
     await NotificationService.I.cancelNotificationById(baseId);
 
@@ -138,7 +144,9 @@ class ReminderService {
   }
 
   Future<void> cancelMeditationReminder(String reminderId) async {
-    await NotificationService.I.cancelNotificationById('meditation_$reminderId');
+    await NotificationService.I.cancelNotificationById(
+      'meditation_$reminderId',
+    );
   }
 
   Future<void> scheduleGymReminder(
@@ -155,8 +163,11 @@ class ReminderService {
       return;
     }
 
-    final timeChanged = previousTime == null || (previousTime.hour != time.hour || previousTime.minute != time.minute);
-    final changed = previous == null || previous.name != routine.name || timeChanged;
+    final timeChanged =
+        previousTime == null ||
+        (previousTime.hour != time.hour || previousTime.minute != time.minute);
+    final changed =
+        previous == null || previous.name != routine.name || timeChanged;
     if (!changed) return;
 
     await NotificationService.I.cancelNotificationById(id);
@@ -211,8 +222,12 @@ class ReminderService {
     return null;
   }
 
-  Future<void> cancelAllHabits() => NotificationService.I.cancelAllNotificationsForModule('habit');
-  Future<void> cancelAllTasks() => NotificationService.I.cancelAllNotificationsForModule('task');
-  Future<void> cancelAllMeditation() => NotificationService.I.cancelAllNotificationsForModule('meditation');
-  Future<void> cancelAllGym() => NotificationService.I.cancelAllNotificationsForModule('gym');
+  Future<void> cancelAllHabits() =>
+      NotificationService.I.cancelAllNotificationsForModule('habit');
+  Future<void> cancelAllTasks() =>
+      NotificationService.I.cancelAllNotificationsForModule('task');
+  Future<void> cancelAllMeditation() =>
+      NotificationService.I.cancelAllNotificationsForModule('meditation');
+  Future<void> cancelAllGym() =>
+      NotificationService.I.cancelAllNotificationsForModule('gym');
 }

@@ -27,25 +27,37 @@ class _SeriesListScreenState extends State<SeriesListScreen> {
             onSelected: (v) {
               if (v == 'crunchyroll') AppLinks.openCrunchyroll();
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'crunchyroll', child: Text('Crunchyroll')),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(
+                    value: 'crunchyroll',
+                    child: Text('Crunchyroll'),
+                  ),
+                ],
           ),
           PopupMenuButton<ItemStatus?>(
             onSelected: (v) => setState(() => _status = v),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('Todas')),
-              ...ItemStatus.values.map((e) => PopupMenuItem(value: e, child: Text(e.name))),
-            ],
+            itemBuilder:
+                (_) => [
+                  const PopupMenuItem(value: null, child: Text('Todas')),
+                  ...ItemStatus.values.map(
+                    (e) => PopupMenuItem(value: e, child: Text(e.name)),
+                  ),
+                ],
           ),
-          IconButton(icon: const Icon(Icons.add), onPressed: () => Navigator.pushNamed(context, '/culture/series/edit')),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed:
+                () => Navigator.pushNamed(context, '/culture/series/edit'),
+          ),
         ],
       ),
       body: StreamBuilder<List<Series>>(
         stream: svc.watchSeries(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin anime'));
           return ListView.separated(
             itemCount: data.length,
@@ -57,7 +69,12 @@ class _SeriesListScreenState extends State<SeriesListScreen> {
                 title: Text(x.title),
                 subtitle: Text('${x.platform ?? "—"} • ${x.status.name}'),
                 trailing: Text(x.rating?.toStringAsFixed(1) ?? '-'),
-                onTap: () => Navigator.pushNamed(context, '/culture/series/detail', arguments: x),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      '/culture/series/detail',
+                      arguments: x,
+                    ),
               );
             },
           );

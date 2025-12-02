@@ -27,10 +27,9 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
 
     // Generar partículas
     for (int i = 0; i < 50; i++) {
-      _particles.add(_Particle(
-        random: _random,
-        colorScheme: Theme.of(context).colorScheme,
-      ));
+      _particles.add(
+        _Particle(random: _random, colorScheme: Theme.of(context).colorScheme),
+      );
     }
 
     _controller.forward().then((_) {
@@ -130,14 +129,12 @@ class _ConfettiPainter extends CustomPainter {
     for (final particle in particles) {
       particle.update(progress);
 
-      final paint = Paint()
-        ..color = particle.color.withOpacity(1.0 - progress * 0.5)
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = particle.color.withOpacity(1.0 - progress * 0.5)
+            ..style = PaintingStyle.fill;
 
-      final center = Offset(
-        particle.x * size.width,
-        particle.y * size.height,
-      );
+      final center = Offset(particle.x * size.width, particle.y * size.height);
 
       canvas.save();
       canvas.translate(center.dx, center.dy);
@@ -160,11 +157,12 @@ class _ConfettiPainter extends CustomPainter {
           break;
 
         case ParticleShape.triangle:
-          final path = Path()
-            ..moveTo(0, -particle.size / 2)
-            ..lineTo(particle.size / 2, particle.size / 2)
-            ..lineTo(-particle.size / 2, particle.size / 2)
-            ..close();
+          final path =
+              Path()
+                ..moveTo(0, -particle.size / 2)
+                ..lineTo(particle.size / 2, particle.size / 2)
+                ..lineTo(-particle.size / 2, particle.size / 2)
+                ..close();
           canvas.drawPath(path, paint);
           break;
 
@@ -240,10 +238,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
       curve: Curves.elasticOut,
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
     _controller.forward();
 
@@ -272,14 +267,14 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
         // Confeti
         if (_showConfetti)
           Positioned.fill(
-            child: IgnorePointer(
-              child: ConfettiAnimation(onComplete: () {}),
-            ),
+            child: IgnorePointer(child: ConfettiAnimation(onComplete: () {})),
           ),
 
         // Dialog
         Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: Container(
@@ -287,10 +282,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
               padding: EdgeInsets.all(isMobile ? 24 : 32),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    cs.primaryContainer,
-                    cs.secondaryContainer,
-                  ],
+                  colors: [cs.primaryContainer, cs.secondaryContainer],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -310,16 +302,19 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: widget.emoji != null
-                            ? Text(
-                                widget.emoji!,
-                                style: TextStyle(fontSize: isMobile ? 40 : 50),
-                              )
-                            : Icon(
-                                Icons.check_circle_rounded,
-                                color: cs.primary,
-                                size: isMobile ? 50 : 60,
-                              ),
+                        child:
+                            widget.emoji != null
+                                ? Text(
+                                  widget.emoji!,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 40 : 50,
+                                  ),
+                                )
+                                : Icon(
+                                  Icons.check_circle_rounded,
+                                  color: cs.primary,
+                                  size: isMobile ? 50 : 60,
+                                ),
                       ),
                     ),
                   ),

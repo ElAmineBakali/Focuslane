@@ -26,21 +26,38 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
             value: _scope,
             underline: const SizedBox.shrink(),
             items: const [
-              DropdownMenuItem(value: ShoppingScope.weekly, child: Text('Semanal')),
-              DropdownMenuItem(value: ShoppingScope.biweekly, child: Text('Quincenal (x2)')),
-              DropdownMenuItem(value: ShoppingScope.monthly, child: Text('Mensual (x4)')),
-              DropdownMenuItem(value: ShoppingScope.custom, child: Text('Custom')),
+              DropdownMenuItem(
+                value: ShoppingScope.weekly,
+                child: Text('Semanal'),
+              ),
+              DropdownMenuItem(
+                value: ShoppingScope.biweekly,
+                child: Text('Quincenal (x2)'),
+              ),
+              DropdownMenuItem(
+                value: ShoppingScope.monthly,
+                child: Text('Mensual (x4)'),
+              ),
+              DropdownMenuItem(
+                value: ShoppingScope.custom,
+                child: Text('Custom'),
+              ),
             ],
-            onChanged: (v) => setState(() => _scope = v ?? ShoppingScope.weekly),
+            onChanged:
+                (v) => setState(() => _scope = v ?? ShoppingScope.weekly),
           ),
           IconButton(
             tooltip: 'Generar lista compra',
             icon: const Icon(Icons.shopping_cart_checkout),
             onPressed: () async {
-              await widget.svc.generateShoppingFromWeek(_menuId, scopeOverride: _scope);
+              await widget.svc.generateShoppingFromWeek(
+                _menuId,
+                scopeOverride: _scope,
+              );
               if (mounted) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Lista generada')));
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Lista generada')));
               }
             },
           ),
@@ -49,7 +66,8 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
       body: StreamBuilder<WeekPlanner>(
         stream: widget.svc.streamWeek(_menuId),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final w = snap.data!;
           final days = const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
           final slots = MealSlot.values;
@@ -57,7 +75,8 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
           return StreamBuilder<List<Food>>(
             stream: widget.svc.streamFoods(),
             builder: (context, foodsSnap) {
-              if (!foodsSnap.hasData) return const Center(child: CircularProgressIndicator());
+              if (!foodsSnap.hasData)
+                return const Center(child: CircularProgressIndicator());
               final foods = foodsSnap.data!;
               final foodsMap = {for (final f in foods) f.id: f};
 
@@ -83,16 +102,23 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                             children: [
                               const Align(
                                 alignment: Alignment.centerRight,
-                                child: Text('Mantén pulsado para borrar', style: TextStyle(fontSize: 12)),
+                                child: Text(
+                                  'Mantén pulsado para borrar',
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Table(
                                 columnWidths: const {0: FixedColumnWidth(190)},
                                 defaultColumnWidth: const FixedColumnWidth(250),
-                                border: TableBorder.all(color: Theme.of(context).dividerColor),
+                                border: TableBorder.all(
+                                  color: Theme.of(context).dividerColor,
+                                ),
                                 children: [
                                   TableRow(
-                                    decoration: BoxDecoration(color: cs.surfaceContainerHighest),
+                                    decoration: BoxDecoration(
+                                      color: cs.surfaceContainerHighest,
+                                    ),
                                     children: [
                                       const _HeaderCell(''),
                                       ...days.map((d) => _HeaderCell(d)),
@@ -104,23 +130,54 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                         _HeaderCell(_slotName(slot)),
                                         ...days.map((d) {
                                           final entries = w.days[d] ?? const [];
-                                          final here = entries.where((e) => e.slot == slot).toList();
-                                          final names = here
-                                              .map((e) => foodsMap[e.refId]?.name ?? e.refId)
-                                              .toList();
+                                          final here =
+                                              entries
+                                                  .where((e) => e.slot == slot)
+                                                  .toList();
+                                          final names =
+                                              here
+                                                  .map(
+                                                    (e) =>
+                                                        foodsMap[e.refId]
+                                                            ?.name ??
+                                                        e.refId,
+                                                  )
+                                                  .toList();
                                           return _PlannerCell(
                                             entries: here,
                                             names: names,
-                                            onAdd: () => _openSlotMenu(w, d, slot, here, foodsMap),
+                                            onAdd:
+                                                () => _openSlotMenu(
+                                                  w,
+                                                  d,
+                                                  slot,
+                                                  here,
+                                                  foodsMap,
+                                                ),
                                             onDelete: (idx) async {
-                                              final dayList = List<PlannerDayEntry>.from(w.days[d] ?? const []);
-                                              final filtered = dayList.where((e) => e.slot == slot).toList();
+                                              final dayList =
+                                                  List<PlannerDayEntry>.from(
+                                                    w.days[d] ?? const [],
+                                                  );
+                                              final filtered =
+                                                  dayList
+                                                      .where(
+                                                        (e) => e.slot == slot,
+                                                      )
+                                                      .toList();
                                               final target = filtered[idx];
                                               dayList.remove(target);
-                                              final newDays = Map<String, List<PlannerDayEntry>>.from(w.days);
+                                              final newDays = Map<
+                                                String,
+                                                List<PlannerDayEntry>
+                                              >.from(w.days);
                                               newDays[d] = dayList;
                                               await widget.svc.saveWeek(
-                                                WeekPlanner(id: _menuId, scope: _scope, days: newDays),
+                                                WeekPlanner(
+                                                  id: _menuId,
+                                                  scope: _scope,
+                                                  days: newDays,
+                                                ),
                                               );
                                             },
                                           );
@@ -179,8 +236,10 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('${_slotName(slot)} • $dayKey',
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  '${_slotName(slot)} • $dayKey',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 if (entries.isEmpty)
                   const Padding(
@@ -200,49 +259,85 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.restaurant),
                             title: Text(name),
-                            subtitle:
-                                Text('Raciones: ${e.servings.toStringAsFixed(0)}'),
+                            subtitle: Text(
+                              'Raciones: ${e.servings.toStringAsFixed(0)}',
+                            ),
                             onTap: () {
                               showDialog(
                                 context: ctx,
-                                builder: (_) => AlertDialog(
-                                  title: Text(name),
-                                  content: f == null
-                                      ? const Text('No se encontró el alimento.')
-                                      : Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Marca: ${f.brand ?? '-'}'),
-                                            Text('Base: ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}'),
-                                            const SizedBox(height: 6),
-                                            Text('Kcal: ${f.kcal.toStringAsFixed(0)}'),
-                                            Text('Proteína: ${f.protein.toStringAsFixed(1)} g'),
-                                            Text('Carbos: ${f.carbs.toStringAsFixed(1)} g'),
-                                            Text('Grasas: ${f.fat.toStringAsFixed(1)} g'),
-                                            Text('Fibra: ${f.fiber.toStringAsFixed(1)} g'),
-                                            Text('Sodio: ${f.sodium.toStringAsFixed(0)} mg'),
-                                          ],
+                                builder:
+                                    (_) => AlertDialog(
+                                      title: Text(name),
+                                      content:
+                                          f == null
+                                              ? const Text(
+                                                'No se encontró el alimento.',
+                                              )
+                                              : Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Marca: ${f.brand ?? '-'}',
+                                                  ),
+                                                  Text(
+                                                    'Base: ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    'Kcal: ${f.kcal.toStringAsFixed(0)}',
+                                                  ),
+                                                  Text(
+                                                    'Proteína: ${f.protein.toStringAsFixed(1)} g',
+                                                  ),
+                                                  Text(
+                                                    'Carbos: ${f.carbs.toStringAsFixed(1)} g',
+                                                  ),
+                                                  Text(
+                                                    'Grasas: ${f.fat.toStringAsFixed(1)} g',
+                                                  ),
+                                                  Text(
+                                                    'Fibra: ${f.fiber.toStringAsFixed(1)} g',
+                                                  ),
+                                                  Text(
+                                                    'Sodio: ${f.sodium.toStringAsFixed(0)} mg',
+                                                  ),
+                                                ],
+                                              ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(ctx),
+                                          child: const Text('Cerrar'),
                                         ),
-                                  actions: [
-                                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cerrar')),
-                                  ],
-                                ),
+                                      ],
+                                    ),
                               );
                             },
                             trailing: IconButton(
                               tooltip: 'Eliminar',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () async {
-                                final dayList = List<PlannerDayEntry>.from(w.days[dayKey] ?? const []);
-                                final filtered = dayList.where((x) => x.slot == slot).toList();
+                                final dayList = List<PlannerDayEntry>.from(
+                                  w.days[dayKey] ?? const [],
+                                );
+                                final filtered =
+                                    dayList
+                                        .where((x) => x.slot == slot)
+                                        .toList();
                                 final target = filtered[i];
                                 dayList.remove(target);
-                                final newDays = Map<String, List<PlannerDayEntry>>.from(w.days);
+                                final newDays =
+                                    Map<String, List<PlannerDayEntry>>.from(
+                                      w.days,
+                                    );
                                 newDays[dayKey] = dayList;
                                 await widget.svc.saveWeek(
-                                  WeekPlanner(id: _menuId, scope: _scope, days: newDays),
+                                  WeekPlanner(
+                                    id: _menuId,
+                                    scope: _scope,
+                                    days: newDays,
+                                  ),
                                 );
                                 if (mounted) Navigator.pop(context);
                               },
@@ -273,71 +368,88 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
   }
 
   /// Selector de alimento + raciones
-  Future<void> _addEntryDialog(WeekPlanner w, String dayKey, MealSlot slot) async {
+  Future<void> _addEntryDialog(
+    WeekPlanner w,
+    String dayKey,
+    MealSlot slot,
+  ) async {
     final servCtrl = TextEditingController(text: '1');
     String query = '';
 
     final picked = await showDialog<Food>(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setState) {
-          return AlertDialog(
-            title: const Text('Añadir alimento al menú'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (v) => setState(() => query = v),
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Buscar alimento…',
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 260,
-                  width: 380,
-                  child: StreamBuilder<List<Food>>(
-                    stream: widget.svc.streamFoods(query: query),
-                    builder: (context, snap) {
-                      if (!snap.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      final list = snap.data!;
-                      if (list.isEmpty) {
-                        return const Center(child: Text('Sin resultados'));
-                      }
-                      return ListView.builder(
-                        itemCount: list.length,
-                        itemBuilder: (_, i) {
-                          final f = list[i];
-                          return ListTile(
-                            leading: Icon(Icons.restaurant,
-                                color: f.color ?? Theme.of(context).colorScheme.primary),
-                            title: Text(f.name),
-                            subtitle: Text(
-                                '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}'),
-                            onTap: () => Navigator.pop(ctx, f),
+      builder:
+          (_) => StatefulBuilder(
+            builder: (ctx, setState) {
+              return AlertDialog(
+                title: const Text('Añadir alimento al menú'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (v) => setState(() => query = v),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Buscar alimento…',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 260,
+                      width: 380,
+                      child: StreamBuilder<List<Food>>(
+                        stream: widget.svc.streamFoods(query: query),
+                        builder: (context, snap) {
+                          if (!snap.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final list = snap.data!;
+                          if (list.isEmpty) {
+                            return const Center(child: Text('Sin resultados'));
+                          }
+                          return ListView.builder(
+                            itemCount: list.length,
+                            itemBuilder: (_, i) {
+                              final f = list[i];
+                              return ListTile(
+                                leading: Icon(
+                                  Icons.restaurant,
+                                  color:
+                                      f.color ??
+                                      Theme.of(context).colorScheme.primary,
+                                ),
+                                title: Text(f.name),
+                                subtitle: Text(
+                                  '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
+                                ),
+                                onTap: () => Navigator.pop(ctx, f),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: servCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Raciones / unidades',
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, null),
+                    child: const Text('Cancelar'),
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: servCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Raciones / unidades'),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, null), child: const Text('Cancelar')),
-            ],
-          );
-        },
-      ),
+                ],
+              );
+            },
+          ),
     );
 
     if (picked != null) {
@@ -366,7 +478,10 @@ class _HeaderCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
     );
   }
 }
@@ -385,8 +500,9 @@ class _PlannerCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle =
-        Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 14.5, height: 1.25);
+    final textStyle = Theme.of(
+      context,
+    ).textTheme.bodySmall?.copyWith(fontSize: 14.5, height: 1.25);
 
     return SizedBox(
       height: 140,
@@ -394,26 +510,32 @@ class _PlannerCell extends StatelessWidget {
         onTap: onAdd,
         child: Padding(
           padding: const EdgeInsets.all(6),
-          child: entries.isEmpty
-              ? const Center(child: Text('—', style: TextStyle(fontSize: 12)))
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...List.generate(entries.length, (i) {
-                      final e = entries[i];
-                      final label = (names != null && i < names!.length) ? names![i] : e.refId;
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onLongPress: () => onDelete(i),
-                        child: Text(
-                          '• $label  ×${e.servings.toStringAsFixed(0)}',
-                          overflow: TextOverflow.ellipsis,
-                          style: textStyle,
-                        ),
-                      );
-                    }),
-                  ],
-                ),
+          child:
+              entries.isEmpty
+                  ? const Center(
+                    child: Text('—', style: TextStyle(fontSize: 12)),
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...List.generate(entries.length, (i) {
+                        final e = entries[i];
+                        final label =
+                            (names != null && i < names!.length)
+                                ? names![i]
+                                : e.refId;
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onLongPress: () => onDelete(i),
+                          child: Text(
+                            '• $label  ×${e.servings.toStringAsFixed(0)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: textStyle,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
         ),
       ),
     );

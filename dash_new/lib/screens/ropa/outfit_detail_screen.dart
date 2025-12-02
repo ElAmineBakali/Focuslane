@@ -26,18 +26,26 @@ class OutfitDetailScreen extends StatelessWidget {
             Widget tile(String slot, String label) {
               final id = outfit.slots[slot];
               final p = (id != null) ? byId[id] : null;
-              final url = p?.imagenes['thumb'] ??
+              final url =
+                  p?.imagenes['thumb'] ??
                   p?.imagenes['medium'] ??
                   p?.imagenes['full'];
               return ListTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: (url == null || url.isEmpty)
-                      ? const SizedBox(
-                          width: 48, height: 48,
-                          child: ColoredBox(color: Color(0x11000000)),
-                        )
-                      : Image.network(url, width: 48, height: 48, fit: BoxFit.cover),
+                  child:
+                      (url == null || url.isEmpty)
+                          ? const SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: ColoredBox(color: Color(0x11000000)),
+                          )
+                          : Image.network(
+                            url,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                          ),
                 ),
                 title: Text(label),
                 subtitle: Text(p?.nombre ?? '—'),

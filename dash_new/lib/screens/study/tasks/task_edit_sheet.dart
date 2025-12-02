@@ -6,7 +6,12 @@ class TaskEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final StudyTask? initial;
   final String? initialCourseId;
-  const TaskEditSheet({super.key, required this.svc, this.initial, this.initialCourseId});
+  const TaskEditSheet({
+    super.key,
+    required this.svc,
+    this.initial,
+    this.initialCourseId,
+  });
 
   @override
   State<TaskEditSheet> createState() => _TaskEditSheetState();
@@ -44,7 +49,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16, right: 16, top: 16,
+        left: 16,
+        right: 16,
+        top: 16,
       ),
       child: SafeArea(
         child: StreamBuilder(
@@ -55,20 +62,40 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(isEdit ? 'Editar' : 'Nueva tarea', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    isEdit ? 'Editar' : 'Nueva tarea',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     initialValue: _courseId,
-                    items: courses.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+                    items:
+                        courses
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c.id,
+                                child: Text(c.name),
+                              ),
+                            )
+                            .toList(),
                     onChanged: (v) => setState(() => _courseId = v),
                     decoration: const InputDecoration(labelText: 'Curso'),
                   ),
-                  TextField(controller: _title, decoration: const InputDecoration(labelText: 'Título')),
+                  TextField(
+                    controller: _title,
+                    decoration: const InputDecoration(labelText: 'Título'),
+                  ),
                   DropdownButtonFormField<StudyItemType>(
                     initialValue: _type,
                     items: const [
-                      DropdownMenuItem(value: StudyItemType.task, child: Text('Tarea')),
-                      DropdownMenuItem(value: StudyItemType.exam, child: Text('Examen')),
+                      DropdownMenuItem(
+                        value: StudyItemType.task,
+                        child: Text('Tarea'),
+                      ),
+                      DropdownMenuItem(
+                        value: StudyItemType.exam,
+                        child: Text('Examen'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _type = v ?? _type),
                     decoration: const InputDecoration(labelText: 'Tipo'),
@@ -76,9 +103,18 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                   DropdownButtonFormField<Priority>(
                     initialValue: _prio,
                     items: const [
-                      DropdownMenuItem(value: Priority.low, child: Text('Baja')),
-                      DropdownMenuItem(value: Priority.normal, child: Text('Normal')),
-                      DropdownMenuItem(value: Priority.high, child: Text('Alta')),
+                      DropdownMenuItem(
+                        value: Priority.low,
+                        child: Text('Baja'),
+                      ),
+                      DropdownMenuItem(
+                        value: Priority.normal,
+                        child: Text('Normal'),
+                      ),
+                      DropdownMenuItem(
+                        value: Priority.high,
+                        child: Text('Alta'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _prio = v ?? _prio),
                     decoration: const InputDecoration(labelText: 'Prioridad'),
@@ -86,9 +122,18 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                   DropdownButtonFormField<TaskStatus>(
                     initialValue: _status,
                     items: const [
-                      DropdownMenuItem(value: TaskStatus.todo, child: Text('Por hacer')),
-                      DropdownMenuItem(value: TaskStatus.doing, child: Text('En progreso')),
-                      DropdownMenuItem(value: TaskStatus.done, child: Text('Hecha')),
+                      DropdownMenuItem(
+                        value: TaskStatus.todo,
+                        child: Text('Por hacer'),
+                      ),
+                      DropdownMenuItem(
+                        value: TaskStatus.doing,
+                        child: Text('En progreso'),
+                      ),
+                      DropdownMenuItem(
+                        value: TaskStatus.done,
+                        child: Text('Hecha'),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _status = v ?? _status),
                     decoration: const InputDecoration(labelText: 'Estado'),
@@ -98,7 +143,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                     children: [
                       Expanded(
                         child: InputDecorator(
-                          decoration: const InputDecoration(labelText: 'Fecha límite (opcional)'),
+                          decoration: const InputDecoration(
+                            labelText: 'Fecha límite (opcional)',
+                          ),
                           child: Text(_due?.toLocal().toString() ?? '—'),
                         ),
                       ),
@@ -122,12 +169,19 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                         ),
                     ],
                   ),
-                  TextField(controller: _notes, decoration: const InputDecoration(labelText: 'Notas'), maxLines: 3),
+                  TextField(
+                    controller: _notes,
+                    decoration: const InputDecoration(labelText: 'Notas'),
+                    maxLines: 3,
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () async {
@@ -142,12 +196,18 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                             due: _due,
                             priority: _prio,
                             status: _status,
-                            notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+                            notes:
+                                _notes.text.trim().isEmpty
+                                    ? null
+                                    : _notes.text.trim(),
                           );
                           if (widget.initial == null) {
                             await widget.svc.createTask(data);
                           } else {
-                            await widget.svc.updateTask(widget.initial!.id, data.toMap());
+                            await widget.svc.updateTask(
+                              widget.initial!.id,
+                              data.toMap(),
+                            );
                           }
                           if (mounted) Navigator.pop(context);
                         },

@@ -22,7 +22,13 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
   final BreathPreset _fallback = BreathPreset(
     id: '_local_fallback',
     name: 'Box 4-4-4-4',
-    inhale: 4, hold: 4, exhale: 4, hold2: 4, cycles: 6, vibration: true, visualStyle: 'circle',
+    inhale: 4,
+    hold: 4,
+    exhale: 4,
+    hold2: 4,
+    cycles: 6,
+    vibration: true,
+    visualStyle: 'circle',
   );
 
   // --- Ciclos / fase
@@ -141,15 +147,19 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
     final p = _selected ?? _fallback;
     if (_cycle >= p.cycles) {
       _timer?.cancel();
-      MeditationFirestoreService.I.addSession(MeditationSession(
-        id: '',
-        title: p.name,
-        type: SessionType.breath,
-        durationSec: (p.inhale + p.hold + p.exhale + p.hold2) * p.cycles,
-        date: DateTime.now(),
-      ));
+      MeditationFirestoreService.I.addSession(
+        MeditationSession(
+          id: '',
+          title: p.name,
+          type: SessionType.breath,
+          durationSec: (p.inhale + p.hold + p.exhale + p.hold2) * p.cycles,
+          date: DateTime.now(),
+        ),
+      );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sesión de respiración guardada')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sesión de respiración guardada')),
+        );
         setState(() => _scale = 0.9);
       }
     } else {
@@ -171,7 +181,8 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeInOut,
-        width: 50 * _scale, height: 50 * _scale,
+        width: 50 * _scale,
+        height: 50 * _scale,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       );
     }
@@ -179,7 +190,8 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeInOut,
-        width: 240, height: 80,
+        width: 240,
+        height: 80,
         alignment: Alignment.center,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -198,7 +210,8 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 450),
       curve: Curves.easeInOut,
-      width: 220 * _scale, height: 220 * _scale,
+      width: 220 * _scale,
+      height: 220 * _scale,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
@@ -214,7 +227,8 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
           IconButton(
             icon: const Icon(Icons.tune),
             tooltip: 'Presets de respiración',
-            onPressed: () => Navigator.pushNamed(context, '/meditation/presets'),
+            onPressed:
+                () => Navigator.pushNamed(context, '/meditation/presets'),
           ),
           IconButton(
             icon: const Icon(Icons.library_music),
@@ -232,12 +246,22 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
               stream: MeditationFirestoreService.I.watchPresets(),
               builder: (context, s) {
                 final presets = (s.data ?? []);
-                final byId = <String, BreathPreset>{ for (final pr in presets) pr.id: pr };
-                final items = byId.values.map((pr) =>
-                  DropdownMenuItem<String>(value: pr.id, child: Text(pr.name))
-                ).toList();
+                final byId = <String, BreathPreset>{
+                  for (final pr in presets) pr.id: pr,
+                };
+                final items =
+                    byId.values
+                        .map(
+                          (pr) => DropdownMenuItem<String>(
+                            value: pr.id,
+                            child: Text(pr.name),
+                          ),
+                        )
+                        .toList();
 
-                final hasSelected = _selectedId != null && items.any((it) => it.value == _selectedId);
+                final hasSelected =
+                    _selectedId != null &&
+                    items.any((it) => it.value == _selectedId);
 
                 return DropdownButtonFormField<String>(
                   initialValue: hasSelected ? _selectedId : null,
@@ -292,16 +316,39 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
             const Divider(height: 28),
 
             // ---------- Ambiente
-            Text('Ambiente (opcional)', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Ambiente (opcional)',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
-                ChoiceChip(label: const Text('Ninguno'), selected: _ambience=='none', onSelected: (_) => _setAmbience('none')),
-                ChoiceChip(label: const Text('Lluvia'), selected: _ambience=='rain', onSelected: (_) => _setAmbience('rain')),
-                ChoiceChip(label: const Text('Bosque'), selected: _ambience=='forest', onSelected: (_) => _setAmbience('forest')),
-                ChoiceChip(label: const Text('Chimenea'), selected: _ambience=='fire', onSelected: (_) => _setAmbience('fire')),
-                ChoiceChip(label: const Text('Río'), selected: _ambience=='river', onSelected: (_) => _setAmbience('river')),
+                ChoiceChip(
+                  label: const Text('Ninguno'),
+                  selected: _ambience == 'none',
+                  onSelected: (_) => _setAmbience('none'),
+                ),
+                ChoiceChip(
+                  label: const Text('Lluvia'),
+                  selected: _ambience == 'rain',
+                  onSelected: (_) => _setAmbience('rain'),
+                ),
+                ChoiceChip(
+                  label: const Text('Bosque'),
+                  selected: _ambience == 'forest',
+                  onSelected: (_) => _setAmbience('forest'),
+                ),
+                ChoiceChip(
+                  label: const Text('Chimenea'),
+                  selected: _ambience == 'fire',
+                  onSelected: (_) => _setAmbience('fire'),
+                ),
+                ChoiceChip(
+                  label: const Text('Río'),
+                  selected: _ambience == 'river',
+                  onSelected: (_) => _setAmbience('river'),
+                ),
               ],
             ),
             ListTile(
@@ -309,10 +356,14 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
               leading: const Icon(Icons.volume_up),
               title: Slider(
                 value: _volume,
-                onChanged: (v){ setState(()=>_volume=v); _player.setVolume(_volume); },
-                min: 0, max: 1,
+                onChanged: (v) {
+                  setState(() => _volume = v);
+                  _player.setVolume(_volume);
+                },
+                min: 0,
+                max: 1,
               ),
-              trailing: Text('${(_volume*100).round()}%'),
+              trailing: Text('${(_volume * 100).round()}%'),
             ),
           ],
         ),
@@ -327,7 +378,12 @@ class _BreathingCoachScreenState extends State<BreathingCoachScreen> {
         borderRadius: BorderRadius.circular(20),
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
-      child: Row(children: [Text('$a: '), Text(b, style: const TextStyle(fontWeight: FontWeight.bold))]),
+      child: Row(
+        children: [
+          Text('$a: '),
+          Text(b, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 }

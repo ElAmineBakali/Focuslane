@@ -15,9 +15,9 @@ class GymHomeScreen extends StatefulWidget {
 
 class _GymHomeScreenState extends State<GymHomeScreen> {
   // IDs fijos para que podamos cancelar/reprogramar sin duplicados
-  static const int _weeklyWeightId   = 22010;
-  static const int _weeklyMeasureId  = 22011;
-  static const int _inactivityId     = 22001; // mismo que en LiveSessionScreen
+  static const int _weeklyWeightId = 22010;
+  static const int _weeklyMeasureId = 22011;
+  static const int _inactivityId = 22001; // mismo que en LiveSessionScreen
 
   Future<void> _scheduleGymReminders() async {
     // 🔔 Recordatorios semanales (próximo lunes 09:00)
@@ -61,7 +61,9 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     } else {
       base = last.add(Duration(days: xDays));
       if (base.isBefore(DateTime.now())) {
-        base = DateTime.now().add(const Duration(minutes: 5)); // si ya pasaste el umbral, avisa pronto
+        base = DateTime.now().add(
+          const Duration(minutes: 5),
+        ); // si ya pasaste el umbral, avisa pronto
       }
     }
     final at = DateTime(base.year, base.month, base.day, 10, 0);
@@ -106,14 +108,17 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => RoutineDetailScreen(svc: svc, routine: def),
+                          builder:
+                              (_) =>
+                                  RoutineDetailScreen(svc: svc, routine: def),
                         ),
                       );
                     },
                     trailing: IconButton(
                       tooltip: 'Reprogramar recordatorios',
                       icon: const Icon(Icons.notifications_active_outlined),
-                      onPressed: _scheduleGymReminders, // por si quieres forzar manualmente
+                      onPressed:
+                          _scheduleGymReminders, // por si quieres forzar manualmente
                     ),
                   ),
                 ),
@@ -121,11 +126,15 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                 child: ListTile(
                   leading: const Icon(Icons.list),
                   title: const Text('Todas mis rutinas'),
-                  subtitle: const Text('Crear, editar, seleccionar predeterminada'),
+                  subtitle: const Text(
+                    'Crear, editar, seleccionar predeterminada',
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => RoutinesListScreen(svc: svc)),
+                      MaterialPageRoute(
+                        builder: (_) => RoutinesListScreen(svc: svc),
+                      ),
                     );
                   },
                 ),

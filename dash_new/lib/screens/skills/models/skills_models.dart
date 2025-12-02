@@ -1,15 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum SkillLevel { novice, intermediate, advanced, expert }
+
 enum SessionMode { timer, pomodoro, manual }
+
 enum ProjectState { idea, doing, blocked, done }
 
 String skillLevelLabel(SkillLevel l) {
   switch (l) {
-    case SkillLevel.novice: return 'Novato';
-    case SkillLevel.intermediate: return 'Intermedio';
-    case SkillLevel.advanced: return 'Avanzado';
-    case SkillLevel.expert: return 'Experto';
+    case SkillLevel.novice:
+      return 'Novato';
+    case SkillLevel.intermediate:
+      return 'Intermedio';
+    case SkillLevel.advanced:
+      return 'Avanzado';
+    case SkillLevel.expert:
+      return 'Experto';
   }
 }
 
@@ -49,25 +55,25 @@ class Skill {
     this.metricsConfig = const {},
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'description': description,
-        'motivation': motivation,
-        'desiredOutcome': desiredOutcome,
-        'context': context,
-        'currentLevel': currentLevel.name,
-        'targetLevel': targetLevel.name,
-        'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
-        'totalHours': totalHours,
-        'streakDays': streakDays,
-        'tags': tags,
-        'metricsConfig': metricsConfig,
-        'createdAt': Timestamp.fromDate(createdAt),
-        'updatedAt': Timestamp.fromDate(updatedAt),
-      };
+    'name': name,
+    'description': description,
+    'motivation': motivation,
+    'desiredOutcome': desiredOutcome,
+    'context': context,
+    'currentLevel': currentLevel.name,
+    'targetLevel': targetLevel.name,
+    'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
+    'totalHours': totalHours,
+    'streakDays': streakDays,
+    'tags': tags,
+    'metricsConfig': metricsConfig,
+    'createdAt': Timestamp.fromDate(createdAt),
+    'updatedAt': Timestamp.fromDate(updatedAt),
+  };
 
   static Skill fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -92,7 +98,11 @@ class Skill {
       totalHours: ((d['totalHours'] ?? 0) as num).toDouble(),
       streakDays: (d['streakDays'] ?? 0) as int,
       tags: (d['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
-      metricsConfig: (d['metricsConfig'] as Map?)?.map((k, v) => MapEntry(k.toString(), v.toString())) ?? const {},
+      metricsConfig:
+          (d['metricsConfig'] as Map?)?.map(
+            (k, v) => MapEntry(k.toString(), v.toString()),
+          ) ??
+          const {},
       createdAt: (d['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (d['updatedAt'] as Timestamp?)?.toDate(),
     );
@@ -115,11 +125,11 @@ class SubSkill {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'parentId': parentId,
-        'unlocked': unlocked,
-        'order': order,
-      };
+    'name': name,
+    'parentId': parentId,
+    'unlocked': unlocked,
+    'order': order,
+  };
 
   static SubSkill fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -143,10 +153,11 @@ class PracticeSession {
   final int minutes;
   final String objective;
   final int difficulty; // 1..5
-  final int energy;     // 1..5
+  final int energy; // 1..5
   final String notes;
   final Map<String, num> metrics; // según config de la skill
-  final Map<String, int> rubric;  // técnica, consistencia, creatividad, teoría, presentación
+  final Map<String, int>
+  rubric; // técnica, consistencia, creatividad, teoría, presentación
   final String? nextMicroTask;
 
   PracticeSession({
@@ -162,7 +173,7 @@ class PracticeSession {
     this.energy = 3,
     this.notes = '',
     this.metrics = const <String, num>{},
-    this.rubric  = const <String, int>{},
+    this.rubric = const <String, int>{},
     this.nextMicroTask,
   });
 
@@ -199,17 +210,20 @@ class PracticeSession {
       difficulty: (d['difficulty'] ?? 3) as int,
       energy: (d['energy'] ?? 3) as int,
       notes: (d['notes'] ?? '') as String,
-      metrics: (d['metrics'] as Map?)
-                ?.map((k, v) => MapEntry(k.toString(), (v as num))) ??
-              const <String, num>{},
-      rubric: (d['rubric'] as Map?)
-                ?.map((k, v) => MapEntry(k.toString(), (v as num).toInt())) ??
-              const <String, int>{},
+      metrics:
+          (d['metrics'] as Map?)?.map(
+            (k, v) => MapEntry(k.toString(), (v as num)),
+          ) ??
+          const <String, num>{},
+      rubric:
+          (d['rubric'] as Map?)?.map(
+            (k, v) => MapEntry(k.toString(), (v as num).toInt()),
+          ) ??
+          const <String, int>{},
       nextMicroTask: d['nextMicroTask'] as String?,
     );
   }
 }
-
 
 class Project {
   final String id;
@@ -233,14 +247,14 @@ class Project {
   });
 
   Map<String, dynamic> toMap() => {
-        'skillId': skillId,
-        'title': title,
-        'description': description,
-        'state': state.name,
-        'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
-        'checklist': checklist.map((e) => e.toMap()).toList(),
-        'evidenceUrls': evidenceUrls,
-      };
+    'skillId': skillId,
+    'title': title,
+    'description': description,
+    'state': state.name,
+    'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
+    'checklist': checklist.map((e) => e.toMap()).toList(),
+    'evidenceUrls': evidenceUrls,
+  };
 
   static Project fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -254,13 +268,14 @@ class Project {
         orElse: () => ProjectState.idea,
       ),
       dueDate: (d['dueDate'] as Timestamp?)?.toDate(),
-      checklist: (d['checklist'] as List?)
+      checklist:
+          (d['checklist'] as List?)
               ?.map((e) => ChecklistItem.fromMap(e as Map<String, dynamic>))
               .toList() ??
           const [],
       evidenceUrls:
           (d['evidenceUrls'] as List?)?.map((e) => e.toString()).toList() ??
-              const [],
+          const [],
     );
   }
 }
@@ -270,8 +285,10 @@ class ChecklistItem {
   final bool done;
   ChecklistItem({required this.text, this.done = false});
   Map<String, dynamic> toMap() => {'text': text, 'done': done};
-  static ChecklistItem fromMap(Map<String, dynamic> m) =>
-      ChecklistItem(text: (m['text'] ?? '') as String, done: (m['done'] ?? false) as bool);
+  static ChecklistItem fromMap(Map<String, dynamic> m) => ChecklistItem(
+    text: (m['text'] ?? '') as String,
+    done: (m['done'] ?? false) as bool,
+  );
 }
 
 class ResourceLink {
@@ -289,11 +306,11 @@ class ResourceLink {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'url': url,
-        'note': note,
-        'subSkillId': subSkillId,
-      };
+    'title': title,
+    'url': url,
+    'note': note,
+    'subSkillId': subSkillId,
+  };
 
   static ResourceLink fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;

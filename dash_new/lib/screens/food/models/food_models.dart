@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 enum UnitKind { g, ml, unit }
+
 enum FavoriteType { food, recipe }
-enum MealSlot { breakfast, snack, lunch, merienda, dinner,  }
+
+enum MealSlot { breakfast, snack, lunch, merienda, dinner }
+
 enum ShoppingScope { weekly, biweekly, monthly, custom }
 
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
-    final v = int.parse(hex.startsWith('0x') ? hex.substring(2) : hex, radix: 16);
+    final v = int.parse(
+      hex.startsWith('0x') ? hex.substring(2) : hex,
+      radix: 16,
+    );
     return Color(v);
   } catch (_) {
     return null;
@@ -19,8 +25,8 @@ Color? _hex(String? hex) {
 class Food {
   final String id;
   final String name;
-  final UnitKind perUnit;     // g | ml | unit (referencia)
-  final double unitSize;      // p.ej. 100 si "por 100g", 1 si "por 1 unidad"
+  final UnitKind perUnit; // g | ml | unit (referencia)
+  final double unitSize; // p.ej. 100 si "por 100g", 1 si "por 1 unidad"
   final double kcal;
   final double protein;
   final double carbs;
@@ -54,9 +60,12 @@ class Food {
   factory Food.fromMap(String id, Map<String, dynamic> m) {
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
 
@@ -125,9 +134,12 @@ class RecipeIngredient {
   factory RecipeIngredient.fromMap(Map<String, dynamic> m) {
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
 
@@ -186,9 +198,14 @@ class Recipe {
       description: m['description'],
       tags: (m['tags'] as List?)?.cast<String>() ?? const [],
       servings: (m['servings'] as num?)?.toInt() ?? 1,
-      ingredients: ((m['ingredients'] as List?) ?? const [])
-          .map((e) => RecipeIngredient.fromMap(Map<String, dynamic>.from(e as Map)))
-          .toList(),
+      ingredients:
+          ((m['ingredients'] as List?) ?? const [])
+              .map(
+                (e) => RecipeIngredient.fromMap(
+                  Map<String, dynamic>.from(e as Map),
+                ),
+              )
+              .toList(),
       steps: m['steps'] ?? '',
       kcal: (m['kcal'] as num?)?.toDouble(),
       protein: (m['protein'] as num?)?.toDouble(),
@@ -234,12 +251,16 @@ class Favorite {
   });
 
   factory Favorite.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) =>
+        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
 
@@ -283,12 +304,16 @@ class IntakeEntry {
   });
 
   factory IntakeEntry.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) =>
+        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
 
@@ -300,7 +325,10 @@ class IntakeEntry {
       unit: u(m['unit']),
       nameSnapshot: m['nameSnapshot'] ?? '',
       macrosSnapshot: Map<String, double>.from(
-        (m['macrosSnapshot'] as Map?)?.map((k, v) => MapEntry('$k', (v as num).toDouble())) ?? const {},
+        (m['macrosSnapshot'] as Map?)?.map(
+              (k, v) => MapEntry('$k', (v as num).toDouble()),
+            ) ??
+            const {},
       ),
     );
   }
@@ -320,7 +348,8 @@ class DailyIntakeDoc {
   final List<IntakeEntry> entries;
   final int waterMl;
   final Map<String, double> totals; // kcal, protein, carbs, fat, fiber, sodium
-  final Map<String, double?> targets; // kcal/protein/carbs/fat/fiber; waterTargetMl en otro int
+  final Map<String, double?>
+  targets; // kcal/protein/carbs/fat/fiber; waterTargetMl en otro int
 
   const DailyIntakeDoc({
     required this.id,
@@ -333,17 +362,29 @@ class DailyIntakeDoc {
   factory DailyIntakeDoc.fromMap(String id, Map<String, dynamic> m) {
     return DailyIntakeDoc(
       id: id,
-      entries: ((m['entries'] as List?) ?? const [])
-          .asMap()
-          .entries
-          .map((e) => IntakeEntry.fromMap(e.key.toString(), Map<String, dynamic>.from(e.value as Map)))
-          .toList(),
+      entries:
+          ((m['entries'] as List?) ?? const [])
+              .asMap()
+              .entries
+              .map(
+                (e) => IntakeEntry.fromMap(
+                  e.key.toString(),
+                  Map<String, dynamic>.from(e.value as Map),
+                ),
+              )
+              .toList(),
       waterMl: (m['waterMl'] as num?)?.toInt() ?? 0,
       totals: Map<String, double>.from(
-        (m['totals'] as Map?)?.map((k, v) => MapEntry('$k', (v as num).toDouble())) ?? const {},
+        (m['totals'] as Map?)?.map(
+              (k, v) => MapEntry('$k', (v as num).toDouble()),
+            ) ??
+            const {},
       ),
       targets: Map<String, double?>.from(
-        (m['targets'] as Map?)?.map((k, v) => MapEntry('$k', (v as num?)?.toDouble())) ?? const {},
+        (m['targets'] as Map?)?.map(
+              (k, v) => MapEntry('$k', (v as num?)?.toDouble()),
+            ) ??
+            const {},
       ),
     );
   }
@@ -373,15 +414,21 @@ class PlannerDayEntry {
   factory PlannerDayEntry.fromMap(Map<String, dynamic> m) {
     MealSlot slot(dynamic v) {
       switch ('$v') {
-        case 'breakfast': return MealSlot.breakfast;
-        case 'snack': return MealSlot.snack;
-        case 'lunch': return MealSlot.lunch;
-        case 'merienda': return MealSlot.merienda;
-        default: return MealSlot.dinner;
+        case 'breakfast':
+          return MealSlot.breakfast;
+        case 'snack':
+          return MealSlot.snack;
+        case 'lunch':
+          return MealSlot.lunch;
+        case 'merienda':
+          return MealSlot.merienda;
+        default:
+          return MealSlot.dinner;
       }
     }
 
-    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) =>
+        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
 
     return PlannerDayEntry(
       slot: slot(m['slot']),
@@ -414,24 +461,29 @@ class WeekPlanner {
     final daysRaw = Map<String, dynamic>.from(m['days'] ?? const {});
     final parsed = <String, List<PlannerDayEntry>>{};
     for (final k in daysRaw.keys) {
-      parsed[k] = ((daysRaw[k] as List?) ?? const [])
-          .map((e) => PlannerDayEntry.fromMap(Map<String, dynamic>.from(e as Map)))
-          .toList();
+      parsed[k] =
+          ((daysRaw[k] as List?) ?? const [])
+              .map(
+                (e) => PlannerDayEntry.fromMap(
+                  Map<String, dynamic>.from(e as Map),
+                ),
+              )
+              .toList();
     }
     ShoppingScope scope(dynamic v) {
       switch ('$v') {
-        case 'weekly': return ShoppingScope.weekly;
-        case 'biweekly': return ShoppingScope.biweekly;
-        case 'monthly': return ShoppingScope.monthly;
-        default: return ShoppingScope.custom;
+        case 'weekly':
+          return ShoppingScope.weekly;
+        case 'biweekly':
+          return ShoppingScope.biweekly;
+        case 'monthly':
+          return ShoppingScope.monthly;
+        default:
+          return ShoppingScope.custom;
       }
     }
 
-    return WeekPlanner(
-      id: id,
-      scope: scope(m['scope']),
-      days: parsed,
-    );
+    return WeekPlanner(id: id, scope: scope(m['scope']), days: parsed);
   }
 
   Map<String, dynamic> toMap() => {
@@ -469,9 +521,12 @@ class ShoppingListItem {
   factory ShoppingListItem.fromMap(String id, Map<String, dynamic> m) {
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
 
@@ -534,10 +589,14 @@ class ShoppingList {
 
     ShoppingScope scope(dynamic v) {
       switch ('$v') {
-        case 'weekly': return ShoppingScope.weekly;
-        case 'biweekly': return ShoppingScope.biweekly;
-        case 'monthly': return ShoppingScope.monthly;
-        default: return ShoppingScope.custom;
+        case 'weekly':
+          return ShoppingScope.weekly;
+        case 'biweekly':
+          return ShoppingScope.biweekly;
+        case 'monthly':
+          return ShoppingScope.monthly;
+        default:
+          return ShoppingScope.custom;
       }
     }
 
@@ -546,11 +605,17 @@ class ShoppingList {
       name: m['name'] ?? '',
       scope: scope(m['scope']),
       isDefault: m['isDefault'] == true,
-      items: ((m['items'] as List?) ?? const [])
-          .asMap()
-          .entries
-          .map((e) => ShoppingListItem.fromMap(e.key.toString(), Map<String, dynamic>.from(e.value as Map)))
-          .toList(),
+      items:
+          ((m['items'] as List?) ?? const [])
+              .asMap()
+              .entries
+              .map(
+                (e) => ShoppingListItem.fromMap(
+                  e.key.toString(),
+                  Map<String, dynamic>.from(e.value as Map),
+                ),
+              )
+              .toList(),
       createdAt: parse(m['createdAt']),
       updatedAt: m['updatedAt'] != null ? parse(m['updatedAt']) : null,
     );
@@ -587,11 +652,15 @@ class PantryItem {
   factory PantryItem.fromMap(String id, Map<String, dynamic> m) {
     UnitKind u(dynamic v) {
       switch ('$v') {
-        case 'g': return UnitKind.g;
-        case 'ml': return UnitKind.ml;
-        default: return UnitKind.unit;
+        case 'g':
+          return UnitKind.g;
+        case 'ml':
+          return UnitKind.ml;
+        default:
+          return UnitKind.unit;
       }
     }
+
     return PantryItem(
       id: id,
       foodId: m['foodId'],

@@ -30,7 +30,11 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     final now = DateTime.now();
     final days = List.generate(
       7,
-      (i) => DateTime(now.year, now.month, now.day).subtract(Duration(days: 6 - i)),
+      (i) => DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: 6 - i)),
     );
     final labels = days.map((d) => DateFormat('yyyy-MM-dd').format(d)).toList();
 
@@ -77,12 +81,17 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     final vals = <double>[];
     for (final m in months) {
       final start = DateTime(m.year, m.month, 1);
-      final end = DateTime(m.year, m.month + 1, 1).subtract(const Duration(days: 1));
+      final end = DateTime(
+        m.year,
+        m.month + 1,
+        1,
+      ).subtract(const Duration(days: 1));
       // Filtramos claves de ese mes
-      final entries = _habit.history.entries.where((e) {
-        final dt = DateTime.tryParse(e.key);
-        return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
-      }).toList();
+      final entries =
+          _habit.history.entries.where((e) {
+            final dt = DateTime.tryParse(e.key);
+            return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
+          }).toList();
 
       if (entries.isEmpty) {
         vals.add(0);
@@ -90,12 +99,17 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
       }
 
       if (_habit.isQuantitative) {
-        final sum = entries.fold<double>(0, (a, e) => a + (double.tryParse(e.value.toString()) ?? 0));
+        final sum = entries.fold<double>(
+          0,
+          (a, e) => a + (double.tryParse(e.value.toString()) ?? 0),
+        );
         vals.add(sum);
       } else {
         final total = entries.length.toDouble();
         final ok = entries.where((e) => e.value == '✔️').length.toDouble();
-        vals.add(total == 0 ? 0 : (ok / total) * 100); // porcentaje de éxito del mes
+        vals.add(
+          total == 0 ? 0 : (ok / total) * 100,
+        ); // porcentaje de éxito del mes
       }
     }
 
@@ -113,7 +127,11 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
   }) async {
     final key = DateFormat('yyyy-MM-dd').format(day);
 
-    await HabitFirestoreService().updateHabitHistory(_habit.id, day, newValue ?? '-');
+    await HabitFirestoreService().updateHabitHistory(
+      _habit.id,
+      day,
+      newValue ?? '-',
+    );
 
     setState(() {
       if (newValue == null) {
@@ -135,9 +153,10 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     final sortedKeys = _habit.history.keys.toList()..sort();
     for (final k in sortedKeys) {
       final v = _habit.history[k];
-      final success = _habit.isQuantitative
-          ? (double.tryParse(v.toString()) ?? 0) > 0
-          : v == '✔️';
+      final success =
+          _habit.isQuantitative
+              ? (double.tryParse(v.toString()) ?? 0) > 0
+              : v == '✔️';
       if (success) {
         tempStreak++;
         if (tempStreak > maxStreak) maxStreak = tempStreak;
@@ -148,9 +167,10 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     tempStreak = 0;
     for (final k in sortedKeys.reversed) {
       final v = _habit.history[k];
-      final success = _habit.isQuantitative
-          ? (double.tryParse(v.toString()) ?? 0) > 0
-          : v == '✔️';
+      final success =
+          _habit.isQuantitative
+              ? (double.tryParse(v.toString()) ?? 0) > 0
+              : v == '✔️';
       if (success) {
         tempStreak++;
       } else {
@@ -160,9 +180,12 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     currentStreak = tempStreak;
 
     final total = _habit.history.length;
-    final completados = _habit.isQuantitative
-        ? _habit.history.values.where((v) => (double.tryParse(v.toString()) ?? 0) > 0).length
-        : _habit.history.values.where((v) => v == '✔️').length;
+    final completados =
+        _habit.isQuantitative
+            ? _habit.history.values
+                .where((v) => (double.tryParse(v.toString()) ?? 0) > 0)
+                .length
+            : _habit.history.values.where((v) => v == '✔️').length;
     final porcentaje = total == 0 ? 0 : (completados / total * 100).round();
 
     // Rango para calendario (permite moverse entre meses)
@@ -170,9 +193,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     //final lastDay = DateTime(_focusedDay.year + 1, 12, 31);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Estadísticas'),
-      ),
+      appBar: AppBar(title: Text('Estadísticas')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -182,11 +203,20 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
             ListTile(
               title: Text(
                 _habit.name,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              subtitle: _habit.description.isNotEmpty ? Text(_habit.description) : null,
+              subtitle:
+                  _habit.description.isNotEmpty
+                      ? Text(_habit.description)
+                      : null,
               leading: CircleAvatar(
-                child: Icon(_habit.isQuantitative ? Icons.stacked_line_chart : Icons.check_circle),
+                child: Icon(
+                  _habit.isQuantitative
+                      ? Icons.stacked_line_chart
+                      : Icons.check_circle,
+                ),
               ),
             ),
 
@@ -198,10 +228,26 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                 runSpacing: 12,
                 alignment: WrapAlignment.spaceBetween,
                 children: [
-                  _StatCard(icon: Icons.check, label: 'Completados', value: '$completados'),
-                  _StatCard(icon: Icons.percent, label: 'Éxito', value: '$porcentaje%'),
-                  _StatCard(icon: Icons.local_fire_department, label: 'Racha', value: '$currentStreak'),
-                  _StatCard(icon: Icons.star, label: 'Máx. racha', value: '$maxStreak'),
+                  _StatCard(
+                    icon: Icons.check,
+                    label: 'Completados',
+                    value: '$completados',
+                  ),
+                  _StatCard(
+                    icon: Icons.percent,
+                    label: 'Éxito',
+                    value: '$porcentaje%',
+                  ),
+                  _StatCard(
+                    icon: Icons.local_fire_department,
+                    label: 'Racha',
+                    value: '$currentStreak',
+                  ),
+                  _StatCard(
+                    icon: Icons.star,
+                    label: 'Máx. racha',
+                    value: '$maxStreak',
+                  ),
                 ],
               ),
             ),
@@ -212,7 +258,10 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
             if (_habit.isQuantitative) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text('Analytics cuantitativos', style: theme.textTheme.titleMedium),
+                child: Text(
+                  'Analytics cuantitativos',
+                  style: theme.textTheme.titleMedium,
+                ),
               ),
               const SizedBox(height: 8),
               Padding(
@@ -279,20 +328,26 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           },
                         ),
                       ),
-                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true)),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: true),
+                      ),
                     ),
                     gridData: const FlGridData(show: true),
-                    borderData:  FlBorderData(show: false),
+                    borderData: FlBorderData(show: false),
                     barTouchData: BarTouchData(
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipItem: (group, _, rod, __) {
-                          final raw = (daily['rawValues'] as List<double>)[group.x.toInt()];
+                          final raw =
+                              (daily['rawValues'] as List<double>)[group.x
+                                  .toInt()];
                           return BarTooltipItem(
                             _habit.isQuantitative
                                 ? '${raw.toStringAsFixed(2)} ${_habit.unit}'
                                 : (raw >= 0.5 ? '✔️' : '—'),
-                            TextStyle(color: theme.colorScheme.onSecondaryContainer),
+                            TextStyle(
+                              color: theme.colorScheme.onSecondaryContainer,
+                            ),
                           );
                         },
                       ),
@@ -308,7 +363,9 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                _habit.isQuantitative ? 'Suma mensual (12 meses)' : 'Éxito mensual (12 meses)',
+                _habit.isQuantitative
+                    ? 'Suma mensual (12 meses)'
+                    : 'Éxito mensual (12 meses)',
                 style: theme.textTheme.titleMedium,
               ),
             ),
@@ -338,13 +395,18 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           },
                         ),
                       ),
-                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true)),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: true),
+                      ),
                     ),
                     lineBarsData: [
                       LineChartBarData(
                         spots: List.generate(
                           (monthly['values'] as List).length,
-                          (i) => FlSpot(i.toDouble(), (monthly['values'] as List<double>)[i]),
+                          (i) => FlSpot(
+                            i.toDouble(),
+                            (monthly['values'] as List<double>)[i],
+                          ),
                         ),
                         isCurved: true,
                         color: theme.colorScheme.secondary,
@@ -354,7 +416,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           gradient: LinearGradient(
                             colors: [
                               theme.colorScheme.secondary.withOpacity(.25),
-                              Colors.transparent
+                              Colors.transparent,
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -364,7 +426,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                       ),
                     ],
                     gridData: const FlGridData(show: true),
-                    borderData:  FlBorderData(show: false),
+                    borderData: FlBorderData(show: false),
                     lineTouchData: const LineTouchData(enabled: true),
                   ),
                 ),
@@ -396,8 +458,9 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                     color: theme.colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  titleTextStyle: theme.textTheme.titleMedium!
-                      .copyWith(color: theme.colorScheme.onSecondaryContainer),
+                  titleTextStyle: theme.textTheme.titleMedium!.copyWith(
+                    color: theme.colorScheme.onSecondaryContainer,
+                  ),
                 ),
                 calendarStyle: CalendarStyle(
                   todayDecoration: BoxDecoration(
@@ -415,7 +478,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                     IconData? icon;
                     if (value == '✔️' ||
                         (_habit.isQuantitative &&
-                            (double.tryParse((value ?? '0').toString()) ?? 0) > 0)) {
+                            (double.tryParse((value ?? '0').toString()) ?? 0) >
+                                0)) {
                       bg = theme.colorScheme.secondary;
                       icon = Icons.check;
                     } else if (value == '❌') {
@@ -433,29 +497,41 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (_) => _EditHabitDayDialog(
-                            date: key,
-                            value: value?.toString(),
-                            isQuantitative: _habit.isQuantitative,
-                            onSave: (newValue) async {
-                              Navigator.pop(context);
-                              await _saveDayValue(day: day, newValue: newValue);
-                            },
-                          ),
+                          builder:
+                              (_) => _EditHabitDayDialog(
+                                date: key,
+                                value: value?.toString(),
+                                isQuantitative: _habit.isQuantitative,
+                                onSave: (newValue) async {
+                                  Navigator.pop(context);
+                                  await _saveDayValue(
+                                    day: day,
+                                    newValue: newValue,
+                                  );
+                                },
+                              ),
                         );
                       },
                       child: Container(
                         margin: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: bg,
+                          shape: BoxShape.circle,
+                        ),
                         child: Center(
-                          child: icon != null
-                              ? Icon(icon, size: 18, color: theme.colorScheme.onSecondary)
-                              : Text(
-                                  '${day.day}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
+                          child:
+                              icon != null
+                                  ? Icon(
+                                    icon,
+                                    size: 18,
+                                    color: theme.colorScheme.onSecondary,
+                                  )
+                                  : Text(
+                                    '${day.day}',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
                         ),
                       ),
                     );
@@ -472,7 +548,10 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total registros: $total', style: theme.textTheme.bodyLarge),
+                  Text(
+                    'Total registros: $total',
+                    style: theme.textTheme.bodyLarge,
+                  ),
                   if (_habit.isQuantitative)
                     Text(
                       'Promedio por día: '
@@ -493,27 +572,32 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Historial completo'),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: ListView(
-                              children: (_habit.history.entries.toList()
-                                    ..sort((a, b) => b.key.compareTo(a.key)))
-                                  .map((e) => ListTile(
-                                        title: Text(e.key),
-                                        trailing: Text('${e.value}'),
-                                      ))
-                                  .toList(),
+                        builder:
+                            (_) => AlertDialog(
+                              title: const Text('Historial completo'),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: ListView(
+                                  children:
+                                      (_habit.history.entries.toList()..sort(
+                                            (a, b) => b.key.compareTo(a.key),
+                                          ))
+                                          .map(
+                                            (e) => ListTile(
+                                              title: Text(e.key),
+                                              trailing: Text('${e.value}'),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: const Text('Cerrar'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text('Cerrar'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ),
                       );
                     },
                   ),
@@ -533,7 +617,11 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  const _StatCard({required this.icon, required this.label, required this.value});
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -549,9 +637,18 @@ class _StatCard extends StatelessWidget {
           children: [
             Icon(icon, color: theme.colorScheme.secondary, size: 20),
             const SizedBox(height: 6),
-            Text(value, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(label, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -593,39 +690,40 @@ class _EditHabitDayDialogState extends State<_EditHabitDayDialog> {
 
     return AlertDialog(
       title: Text('Editar ${widget.date}'),
-      content: widget.isQuantitative
-          ? TextFormField(
-              initialValue: _value?.toString(),
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Cantidad'),
-              onChanged: (v) => _value = v,
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                RadioListTile(
-                  value: '✔️',
-                  groupValue: _value,
-                  title: const Text('Completado'),
-                  activeColor: sec,
-                  onChanged: (v) => setState(() => _value = v),
-                ),
-                RadioListTile(
-                  value: '❌',
-                  groupValue: _value,
-                  title: const Text('No completado'),
-                  activeColor: sec,
-                  onChanged: (v) => setState(() => _value = v),
-                ),
-                RadioListTile(
-                  value: null,
-                  groupValue: _value,
-                  title: const Text('Sin registro'),
-                  activeColor: sec,
-                  onChanged: (v) => setState(() => _value = v),
-                ),
-              ],
-            ),
+      content:
+          widget.isQuantitative
+              ? TextFormField(
+                initialValue: _value?.toString(),
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Cantidad'),
+                onChanged: (v) => _value = v,
+              )
+              : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile(
+                    value: '✔️',
+                    groupValue: _value,
+                    title: const Text('Completado'),
+                    activeColor: sec,
+                    onChanged: (v) => setState(() => _value = v),
+                  ),
+                  RadioListTile(
+                    value: '❌',
+                    groupValue: _value,
+                    title: const Text('No completado'),
+                    activeColor: sec,
+                    onChanged: (v) => setState(() => _value = v),
+                  ),
+                  RadioListTile(
+                    value: null,
+                    groupValue: _value,
+                    title: const Text('Sin registro'),
+                    activeColor: sec,
+                    onChanged: (v) => setState(() => _value = v),
+                  ),
+                ],
+              ),
       actions: [
         TextButton(
           style: TextButton.styleFrom(foregroundColor: sec),
@@ -653,38 +751,46 @@ class _QuantitativeAnalytics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    
+
     // Semana actual
     final weekStart = now.subtract(Duration(days: now.weekday - 1));
-    final weekEnd = weekStart.add(const Duration(days: 6, hours: 23, minutes: 59));
+    final weekEnd = weekStart.add(
+      const Duration(days: 6, hours: 23, minutes: 59),
+    );
     final weekData = _filterAndSum(habit.history, weekStart, weekEnd);
-    
+
     // Mes actual
     final monthStart = DateTime(now.year, now.month, 1);
     final monthEnd = DateTime(now.year, now.month + 1, 0, 23, 59);
     final monthData = _filterAndSum(habit.history, monthStart, monthEnd);
-    
+
     // Año actual
     final yearStart = DateTime(now.year, 1, 1);
     final yearEnd = DateTime(now.year, 12, 31, 23, 59);
     final yearData = _filterAndSum(habit.history, yearStart, yearEnd);
-    
+
     // Mes anterior (para comparativa)
     final prevMonthStart = DateTime(now.year, now.month - 1, 1);
     final prevMonthEnd = DateTime(now.year, now.month, 0, 23, 59);
-    final prevMonthData = _filterAndSum(habit.history, prevMonthStart, prevMonthEnd);
-    
+    final prevMonthData = _filterAndSum(
+      habit.history,
+      prevMonthStart,
+      prevMonthEnd,
+    );
+
     final monthChange = monthData.total - prevMonthData.total;
-    final monthChangePercent = prevMonthData.total > 0 
-        ? ((monthChange / prevMonthData.total) * 100).toStringAsFixed(0)
-        : '∞';
+    final monthChangePercent =
+        prevMonthData.total > 0
+            ? ((monthChange / prevMonthData.total) * 100).toStringAsFixed(0)
+            : '∞';
 
     return Column(
       children: [
         _AnalyticsCard(
           title: 'Esta semana',
           value: '${weekData.total.toStringAsFixed(1)} ${habit.unit}',
-          subtitle: 'Promedio diario: ${weekData.average.toStringAsFixed(1)} ${habit.unit}',
+          subtitle:
+              'Promedio diario: ${weekData.average.toStringAsFixed(1)} ${habit.unit}',
           icon: Icons.calendar_view_week,
           color: Colors.blue,
         ),
@@ -692,7 +798,8 @@ class _QuantitativeAnalytics extends StatelessWidget {
         _AnalyticsCard(
           title: 'Este mes',
           value: '${monthData.total.toStringAsFixed(1)} ${habit.unit}',
-          subtitle: 'Promedio: ${monthData.average.toStringAsFixed(1)} • ${monthChange >= 0 ? '+' : ''}${monthChange.toStringAsFixed(0)} ($monthChangePercent%)',
+          subtitle:
+              'Promedio: ${monthData.average.toStringAsFixed(1)} • ${monthChange >= 0 ? '+' : ''}${monthChange.toStringAsFixed(0)} ($monthChangePercent%)',
           icon: Icons.calendar_today,
           color: Colors.green,
         ),
@@ -700,7 +807,8 @@ class _QuantitativeAnalytics extends StatelessWidget {
         _AnalyticsCard(
           title: 'Este año',
           value: '${yearData.total.toStringAsFixed(1)} ${habit.unit}',
-          subtitle: 'Mejor mes: ${_bestMonth(habit.history, now.year)} ${habit.unit}',
+          subtitle:
+              'Mejor mes: ${_bestMonth(habit.history, now.year)} ${habit.unit}',
           icon: Icons.calendar_month,
           color: Colors.orange,
         ),
@@ -708,33 +816,43 @@ class _QuantitativeAnalytics extends StatelessWidget {
     );
   }
 
-  _PeriodData _filterAndSum(Map<String, dynamic> history, DateTime start, DateTime end) {
-    final entries = history.entries.where((e) {
-      final dt = DateTime.tryParse(e.key);
-      return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
-    }).toList();
+  _PeriodData _filterAndSum(
+    Map<String, dynamic> history,
+    DateTime start,
+    DateTime end,
+  ) {
+    final entries =
+        history.entries.where((e) {
+          final dt = DateTime.tryParse(e.key);
+          return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
+        }).toList();
 
     if (entries.isEmpty) return _PeriodData(0, 0);
 
-    final sum = entries.fold<double>(0, (a, e) => a + (double.tryParse(e.value.toString()) ?? 0));
+    final sum = entries.fold<double>(
+      0,
+      (a, e) => a + (double.tryParse(e.value.toString()) ?? 0),
+    );
     final avg = sum / entries.length;
     return _PeriodData(sum, avg);
   }
 
   String _bestMonth(Map<String, dynamic> history, int year) {
     final monthTotals = <int, double>{};
-    
+
     for (final e in history.entries) {
       final dt = DateTime.tryParse(e.key);
       if (dt == null || dt.year != year) continue;
-      
+
       final val = double.tryParse(e.value.toString()) ?? 0;
       monthTotals[dt.month] = (monthTotals[dt.month] ?? 0) + val;
     }
 
     if (monthTotals.isEmpty) return '0';
-    
-    final best = monthTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
+
+    final best = monthTotals.entries.reduce(
+      (a, b) => a.value > b.value ? a : b,
+    );
     return best.value.toStringAsFixed(1);
   }
 }
@@ -779,7 +897,12 @@ class _AnalyticsCard extends StatelessWidget {
                 children: [
                   Text(title, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 4),
-                  Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    value,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
                 ],

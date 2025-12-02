@@ -11,10 +11,7 @@ SnackBar _niceBar(String text, {IconData? icon}) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     content: Row(
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-        ],
+        if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
         Expanded(child: Text(text)),
       ],
     ),
@@ -51,8 +48,10 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
         stream: svc.streamBodyWeight(),
         builder: (context, snap) {
           final weights = snap.data ?? [];
-          final spots =
-              List.generate(weights.length, (i) => FlSpot(i.toDouble(), weights[i].weight));
+          final spots = List.generate(
+            weights.length,
+            (i) => FlSpot(i.toDouble(), weights[i].weight),
+          );
           return ListView(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
             children: [
@@ -64,44 +63,66 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Añadir peso (kg)', style: theme.textTheme.titleMedium),
+                        Text(
+                          'Añadir peso (kg)',
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 8),
                         Row(
-                          children: {
-                            Expanded(
-                              child: TextFormField(
-                                controller: _ctrl,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.monitor_weight_outlined),
-                                  hintText: 'Ej: 78.3',
-                                  labelText: 'Peso (kg)',
+                          children:
+                              {
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _ctrl,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      prefixIcon: Icon(
+                                        Icons.monitor_weight_outlined,
+                                      ),
+                                      hintText: 'Ej: 78.3',
+                                      labelText: 'Peso (kg)',
+                                    ),
+                                    validator: (s) {
+                                      final v = double.tryParse(
+                                        (s ?? '').replaceAll(',', '.'),
+                                      );
+                                      if (v == null)
+                                        return 'Introduce un número válido';
+                                      if (v <= 0) return 'Debe ser mayor que 0';
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                                validator: (s) {
-                                  final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-                                  if (v == null) return 'Introduce un número válido';
-                                  if (v <= 0) return 'Debe ser mayor que 0';
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton.icon(
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() != true) return;
-                                final v = double.parse(_ctrl.text.replaceAll(',', '.'));
-                                await svc.addBodyWeight(v, DateTime.now(), computeTrend: true);
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    _niceBar('Peso guardado ✅', icon: Icons.check_circle_rounded),
-                                  );
-                                }
-                                _ctrl.clear();
-                              },
-                              icon: const Icon(Icons.save_outlined),
-                              label: const Text('Guardar'),
-                            ),
-                          }.toList(),
+                                const SizedBox(width: 8),
+                                FilledButton.icon(
+                                  onPressed: () async {
+                                    if (_formKey.currentState?.validate() !=
+                                        true)
+                                      return;
+                                    final v = double.parse(
+                                      _ctrl.text.replaceAll(',', '.'),
+                                    );
+                                    await svc.addBodyWeight(
+                                      v,
+                                      DateTime.now(),
+                                      computeTrend: true,
+                                    );
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        _niceBar(
+                                          'Peso guardado ✅',
+                                          icon: Icons.check_circle_rounded,
+                                        ),
+                                      );
+                                    }
+                                    _ctrl.clear();
+                                  },
+                                  icon: const Icon(Icons.save_outlined),
+                                  label: const Text('Guardar'),
+                                ),
+                              }.toList(),
                         ),
                       ],
                     ),
@@ -119,8 +140,10 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Objetivo (kg) • línea en gráfica',
-                              style: theme.textTheme.titleMedium),
+                          Text(
+                            'Objetivo (kg) • línea en gráfica',
+                            style: theme.textTheme.titleMedium,
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
@@ -129,14 +152,19 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     hintText: 'Ej: 75.0',
-                                    labelText: 'Actual: ${goal?.bodyWeightTarget ?? '-'}',
+                                    labelText:
+                                        'Actual: ${goal?.bodyWeightTarget ?? '-'}',
                                     prefixIcon: const Icon(Icons.flag_outlined),
                                   ),
                                   onSubmitted: (s) async {
-                                    final val = double.tryParse(s.replaceAll(',', '.'));
+                                    final val = double.tryParse(
+                                      s.replaceAll(',', '.'),
+                                    );
                                     await svc.setBodyWeightTarget(val);
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         _niceBar('Objetivo actualizado 🎯'),
                                       );
                                     }
@@ -185,15 +213,23 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                 dotData: const FlDotData(show: true),
                                 belowBarData: BarAreaData(
                                   show: true,
-                                  color: theme.colorScheme.primary.withOpacity(.12),
+                                  color: theme.colorScheme.primary.withOpacity(
+                                    .12,
+                                  ),
                                 ),
                               ),
                               if (target != null)
                                 LineChartBarData(
-                                  spots: spots.isEmpty
-                                      ? [const FlSpot(0, 0)]
-                                      : [FlSpot(0, target),
-                                          FlSpot((spots.length - 1).toDouble(), target)],
+                                  spots:
+                                      spots.isEmpty
+                                          ? [const FlSpot(0, 0)]
+                                          : [
+                                            FlSpot(0, target),
+                                            FlSpot(
+                                              (spots.length - 1).toDouble(),
+                                              target,
+                                            ),
+                                          ],
                                   isCurved: false,
                                   color: theme.colorScheme.tertiary,
                                   barWidth: 2,

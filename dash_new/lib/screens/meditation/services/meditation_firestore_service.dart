@@ -34,8 +34,11 @@ class MeditationFirestoreService {
       '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}';
 
   /// ===== Sessions
-  Stream<List<MeditationSession>> watchSessions(
-      {DateTime? from, DateTime? to, SessionType? type}) {
+  Stream<List<MeditationSession>> watchSessions({
+    DateTime? from,
+    DateTime? to,
+    SessionType? type,
+  }) {
     Query q = _sessionsCol.orderBy('date', descending: true);
     if (type != null) q = q.where('type', isEqualTo: type.name);
     if (from != null) {
@@ -44,7 +47,9 @@ class MeditationFirestoreService {
     if (to != null) {
       q = q.where('date', isLessThanOrEqualTo: Timestamp.fromDate(to));
     }
-    return q.snapshots().map((s) => s.docs.map(MeditationSession.fromSnap).toList());
+    return q.snapshots().map(
+      (s) => s.docs.map(MeditationSession.fromSnap).toList(),
+    );
   }
 
   Future<void> addSession(MeditationSession x) async {
@@ -92,8 +97,7 @@ class MeditationFirestoreService {
         }
         if (newStreak > bestStreak) bestStreak = newStreak;
 
-        minutesTotal =
-            ((m['minutesTotal'] as num?)?.toInt() ?? 0) + addMinutes;
+        minutesTotal = ((m['minutesTotal'] as num?)?.toInt() ?? 0) + addMinutes;
 
         if (lastMonthKey == monthKey) {
           minutesThisMonth =
@@ -103,19 +107,15 @@ class MeditationFirestoreService {
         }
       }
 
-      tx.set(
-        _metaDoc,
-        {
-          'lastSessionAt': Timestamp.fromDate(x.date),
-          'lastDayKey': todayKey,
-          'lastMonthKey': monthKey,
-          'streak': newStreak,
-          'bestStreak': bestStreak,
-          'minutesThisMonth': minutesThisMonth,
-          'minutesTotal': minutesTotal,
-        },
-        SetOptions(merge: true),
-      );
+      tx.set(_metaDoc, {
+        'lastSessionAt': Timestamp.fromDate(x.date),
+        'lastDayKey': todayKey,
+        'lastMonthKey': monthKey,
+        'streak': newStreak,
+        'bestStreak': bestStreak,
+        'minutesThisMonth': minutesThisMonth,
+        'minutesTotal': minutesTotal,
+      }, SetOptions(merge: true));
     });
   }
 
@@ -123,7 +123,9 @@ class MeditationFirestoreService {
   Stream<List<MeditationProgram>> watchPrograms({bool? onlyActive}) {
     Query q = _programsCol.orderBy('name');
     if (onlyActive == true) q = q.where('isActive', isEqualTo: true);
-    return q.snapshots().map((s) => s.docs.map(MeditationProgram.fromSnap).toList());
+    return q.snapshots().map(
+      (s) => s.docs.map(MeditationProgram.fromSnap).toList(),
+    );
   }
 
   Future<String> addProgram(MeditationProgram p) async {
@@ -139,10 +141,11 @@ class MeditationFirestoreService {
     await _programsCol.doc(id).delete();
   }
 
-  Stream<List<ProgramDay>> watchProgramDays(String programId) => programDaysCol(programId)
-      .orderBy('dayNumber')
-      .snapshots()
-      .map((s) => s.docs.map(ProgramDay.fromSnap).toList());
+  Stream<List<ProgramDay>> watchProgramDays(String programId) =>
+      programDaysCol(programId)
+          .orderBy('dayNumber')
+          .snapshots()
+          .map((s) => s.docs.map(ProgramDay.fromSnap).toList());
 
   Future<void> addProgramDay(String programId, ProgramDay d) async =>
       await programDaysCol(programId).add(d.toMap());
@@ -205,10 +208,11 @@ class MeditationFirestoreService {
   Future<Map<String, dynamic>> monthStats(DateTime month) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
-    final qs = await _sessionsCol
-        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
-        .get();
+    final qs =
+        await _sessionsCol
+            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
 
     int minutes = 0;
     int count = qs.docs.length;
@@ -221,20 +225,17 @@ class MeditationFirestoreService {
       final t = m['type']?.toString() ?? 'timer';
       byType[t] = (byType[t] ?? 0) + (dur / 60).round();
     }
-    return {
-      'minutes': minutes,
-      'count': count,
-      'byType': byType,
-    };
+    return {'minutes': minutes, 'count': count, 'byType': byType};
   }
 
   Future<Map<DateTime, int>> heatmapMonth(DateTime month) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
-    final qs = await _sessionsCol
-        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
-        .get();
+    final qs =
+        await _sessionsCol
+            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
 
     final map = <DateTime, int>{};
     for (final d in qs.docs) {

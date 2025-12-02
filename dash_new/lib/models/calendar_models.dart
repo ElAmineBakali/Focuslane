@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum CalendarType { task, study, gym, finance, food, other }
+
 enum CalendarPriority { low, normal, high }
 
 class CalendarEvent {
@@ -30,15 +31,15 @@ class CalendarEvent {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'type': type.name,
-        'priority': priority.name,
-        'start': Timestamp.fromDate(start),
-        if (end != null) 'end': Timestamp.fromDate(end!),
-        'allDay': allDay,
-        if (notes != null && notes!.trim().isNotEmpty) 'notes': notes,
-        if (completed != null) 'completed': completed,
-      };
+    'title': title,
+    'type': type.name,
+    'priority': priority.name,
+    'start': Timestamp.fromDate(start),
+    if (end != null) 'end': Timestamp.fromDate(end!),
+    'allDay': allDay,
+    if (notes != null && notes!.trim().isNotEmpty) 'notes': notes,
+    if (completed != null) 'completed': completed,
+  };
 
   static CalendarEvent fromSnap(DocumentSnapshot s) {
     final m = (s.data() as Map<String, dynamic>? ?? {});
@@ -46,7 +47,11 @@ class CalendarEvent {
       id: s.id,
       title: (m['title'] ?? '') as String,
       type: _enumParse(CalendarType.values, m['type'], CalendarType.other),
-      priority: _enumParse(CalendarPriority.values, m['priority'], CalendarPriority.normal),
+      priority: _enumParse(
+        CalendarPriority.values,
+        m['priority'],
+        CalendarPriority.normal,
+      ),
       start: (m['start'] as Timestamp?)?.toDate() ?? DateTime.now(),
       end: (m['end'] as Timestamp?)?.toDate(),
       allDay: (m['allDay'] ?? false) as bool,
@@ -71,8 +76,8 @@ class Timetable {
   final bool isDefault;
   final List<String> days; // ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
   final String startHour; // "07:00"
-  final String endHour;   // "22:00"
-  final int slotMinutes;  // 30,45,60...
+  final String endHour; // "22:00"
+  final int slotMinutes; // 30,45,60...
   final String? colorHex;
 
   Timetable({
@@ -87,14 +92,14 @@ class Timetable {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'isDefault': isDefault,
-        'days': days,
-        'startHour': startHour,
-        'endHour': endHour,
-        'slotMinutes': slotMinutes,
-        'colorHex': colorHex,
-      };
+    'name': name,
+    'isDefault': isDefault,
+    'days': days,
+    'startHour': startHour,
+    'endHour': endHour,
+    'slotMinutes': slotMinutes,
+    'colorHex': colorHex,
+  };
 
   static Timetable fromSnap(DocumentSnapshot s) {
     final m = (s.data() as Map<String, dynamic>? ?? {});
@@ -102,8 +107,9 @@ class Timetable {
       id: s.id,
       name: m['name'] ?? '',
       isDefault: m['isDefault'] ?? false,
-      days: (m['days'] as List?)?.map((e) => e.toString()).toList() ??
-          const ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+      days:
+          (m['days'] as List?)?.map((e) => e.toString()).toList() ??
+          const ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       startHour: (m['startHour'] ?? '07:00') as String,
       endHour: (m['endHour'] ?? '22:00') as String,
       slotMinutes: (m['slotMinutes'] ?? 60) as int,
@@ -134,14 +140,14 @@ class TimetableSlot {
   });
 
   Map<String, dynamic> toMap() => {
-        'day': day,
-        'start': start,
-        'end': end,
-        'title': title,
-        'type': type.name,
-        'note': note,
-        'colorHex': colorHex,
-      };
+    'day': day,
+    'start': start,
+    'end': end,
+    'title': title,
+    'type': type.name,
+    'note': note,
+    'colorHex': colorHex,
+  };
 
   static TimetableSlot fromSnap(DocumentSnapshot s) {
     final m = (s.data() as Map<String, dynamic>? ?? {});
@@ -151,7 +157,11 @@ class TimetableSlot {
       start: m['start'] ?? '09:00',
       end: m['end'] ?? '10:00',
       title: m['title'] ?? '',
-      type: CalendarEvent._enumParse(CalendarType.values, m['type'], CalendarType.other),
+      type: CalendarEvent._enumParse(
+        CalendarType.values,
+        m['type'],
+        CalendarType.other,
+      ),
       note: m['note'],
       colorHex: m['colorHex'],
     );
@@ -163,17 +173,22 @@ class PlannerPrefs {
   final bool highOnly;
   final String? defaultTimetableId;
 
-  PlannerPrefs({required this.enabled, this.highOnly = false, this.defaultTimetableId});
+  PlannerPrefs({
+    required this.enabled,
+    this.highOnly = false,
+    this.defaultTimetableId,
+  });
 
   Map<String, dynamic> toMap() => {
-        'enabled': enabled.map((e) => e.name).toList(),
-        'highOnly': highOnly,
-        'defaultTimetableId': defaultTimetableId,
-      };
+    'enabled': enabled.map((e) => e.name).toList(),
+    'highOnly': highOnly,
+    'defaultTimetableId': defaultTimetableId,
+  };
 
   static PlannerPrefs fromSnap(DocumentSnapshot s) {
     final m = (s.data() as Map<String, dynamic>? ?? {});
-    final list = (m['enabled'] as List?)?.map((e) => e.toString()).toList() ?? [];
+    final list =
+        (m['enabled'] as List?)?.map((e) => e.toString()).toList() ?? [];
     final enabled = <CalendarType>{};
     for (final n in list) {
       for (final v in CalendarType.values) {

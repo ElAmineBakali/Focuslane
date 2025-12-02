@@ -25,17 +25,67 @@ class _Module {
 }
 
 const List<_Module> _defaultModules = [
-  _Module('Calendario', '/calendar', Icons.calendar_month, 'assets/home/calendario.jpg'),
-  _Module('Tareas', '/tasks', Icons.check_circle_outlined, 'assets/home/tareas.jpg'),
+  _Module(
+    'Calendario',
+    '/calendar',
+    Icons.calendar_month,
+    'assets/home/calendario.jpg',
+  ),
+  _Module(
+    'Tareas',
+    '/tasks',
+    Icons.check_circle_outlined,
+    'assets/home/tareas.jpg',
+  ),
   _Module('Notas', '/notes', Icons.notes_outlined, 'assets/home/notas.jpg'),
-  _Module('Hábitos', '/habits', Icons.checklist_outlined, 'assets/home/habitos.jpg'),
-  _Module('Estudio', '/study', Icons.school_outlined, 'assets/home/estudio.jpg'),
-  _Module('Gimnasio', '/gym', Icons.fitness_center_outlined, 'assets/home/gimnasio.jpg'),
-  _Module('Meditación', '/meditation', Icons.self_improvement_outlined, 'assets/home/meditacion.jpg'),
-  _Module('Food', '/food', Icons.restaurant_outlined, 'assets/home/alimentacion.jpg'),
-  _Module('Finanzas', '/finance', Icons.account_balance_wallet_outlined, 'assets/home/finanzas.jpg'),
-  _Module('Trading', '/trading', Icons.candlestick_chart, 'assets/home/trading.jpg'),
-  _Module('Cultura', '/culture', Icons.smart_display, 'assets/home/cultura.jpg'),
+  _Module(
+    'Hábitos',
+    '/habits',
+    Icons.checklist_outlined,
+    'assets/home/habitos.jpg',
+  ),
+  _Module(
+    'Estudio',
+    '/study',
+    Icons.school_outlined,
+    'assets/home/estudio.jpg',
+  ),
+  _Module(
+    'Gimnasio',
+    '/gym',
+    Icons.fitness_center_outlined,
+    'assets/home/gimnasio.jpg',
+  ),
+  _Module(
+    'Meditación',
+    '/meditation',
+    Icons.self_improvement_outlined,
+    'assets/home/meditacion.jpg',
+  ),
+  _Module(
+    'Food',
+    '/food',
+    Icons.restaurant_outlined,
+    'assets/home/alimentacion.jpg',
+  ),
+  _Module(
+    'Finanzas',
+    '/finance',
+    Icons.account_balance_wallet_outlined,
+    'assets/home/finanzas.jpg',
+  ),
+  _Module(
+    'Trading',
+    '/trading',
+    Icons.candlestick_chart,
+    'assets/home/trading.jpg',
+  ),
+  _Module(
+    'Cultura',
+    '/culture',
+    Icons.smart_display,
+    'assets/home/cultura.jpg',
+  ),
   _Module('Hobbies', '/skills', Icons.interests, 'assets/home/hobbies.jpg'),
   _Module('Ropa', '/ropa', Icons.checkroom, 'assets/home/ropa.jpg'),
   _Module('Metas', '/goals', Icons.sports_score, 'assets/home/metas.jpg'),
@@ -51,7 +101,7 @@ class _ModulePrefs {
     final sp = await SharedPreferences.getInstance();
     final saved = sp.getStringList(_kOrder);
     final all = _routes();
-    if (saved == null || saved.isEmpty) return all; 
+    if (saved == null || saved.isEmpty) return all;
     final set = {...saved};
     for (final r in all) {
       if (!set.contains(r)) saved.add(r);
@@ -66,7 +116,7 @@ class _ModulePrefs {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late List<_Module> _modules; 
+  late List<_Module> _modules;
   Set<String> _hidden = {};
   bool _loading = true;
 
@@ -132,7 +182,11 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               tooltip: isDarkNow ? 'Claro' : 'Oscuro',
               onPressed: () => widget.toggleTheme(!isDarkNow),
-              icon: Icon(isDarkNow ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+              icon: Icon(
+                isDarkNow
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+              ),
             ),
           ],
         ),
@@ -147,7 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
         body: LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
-            final int crossAxisCount = width >= 1200 ? 4 : (width >= 900 ? 3 : 2);
+            final int crossAxisCount =
+                width >= 1200 ? 4 : (width >= 900 ? 3 : 2);
             final double maxWidth = width >= 1200 ? 1200 : width;
 
             final bottomInset = MediaQuery.of(context).viewPadding.bottom;
@@ -166,10 +221,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     childAspectRatio: 1.1,
                   ),
                   itemCount: _modules.length,
-                  itemBuilder: (context, i) => _ModuleCard(
-                    module: _modules[i],
-                    onLongPressEdit: _openModulesEditor, 
-                  ),
+                  itemBuilder:
+                      (context, i) => _ModuleCard(
+                        module: _modules[i],
+                        onLongPressEdit: _openModulesEditor,
+                      ),
                 ),
               ),
             );
@@ -202,7 +258,10 @@ class _ModuleCardState extends State<_ModuleCard> {
       builder: (ctx, cons) {
         final dpr = MediaQuery.of(ctx).devicePixelRatio;
         final targetW = (cons.maxWidth * dpr).clamp(320, 900).round();
-        final provider = ResizeImage(AssetImage(widget.module.image), width: targetW);
+        final provider = ResizeImage(
+          AssetImage(widget.module.image),
+          width: targetW,
+        );
 
         return GestureDetector(
           onLongPress: widget.onLongPressEdit,
@@ -214,7 +273,8 @@ class _ModuleCardState extends State<_ModuleCard> {
               borderRadius: BorderRadius.circular(isMobile ? 16 : 18),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                onTap: () => Navigator.of(context).pushNamed(widget.module.route),
+                onTap:
+                    () => Navigator.of(context).pushNamed(widget.module.route),
                 onTapDown: (_) => setState(() => _pressed = true),
                 onTapCancel: () => setState(() => _pressed = false),
                 onTapUp: (_) => setState(() => _pressed = false),
@@ -245,7 +305,10 @@ class _ModuleCardState extends State<_ModuleCard> {
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
-                              colors: [Colors.transparent, Colors.black.withOpacity(.22)],
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(.22),
+                              ],
                             ),
                           ),
                         ),
@@ -259,29 +322,49 @@ class _ModuleCardState extends State<_ModuleCard> {
                           Container(
                             decoration: BoxDecoration(
                               color: s.surface.withOpacity(isDark ? .40 : .55),
-                              borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
-                              border: Border.all(color: s.outlineVariant.withOpacity(.35)),
+                              borderRadius: BorderRadius.circular(
+                                isMobile ? 10 : 12,
+                              ),
+                              border: Border.all(
+                                color: s.outlineVariant.withOpacity(.35),
+                              ),
                             ),
                             padding: EdgeInsets.all(isMobile ? 8 : 10),
-                            child: Icon(widget.module.icon, color: s.onSurface, size: isMobile ? 22 : 24),
+                            child: Icon(
+                              widget.module.icon,
+                              color: s.onSurface,
+                              size: isMobile ? 22 : 24,
+                            ),
                           ),
                           const Spacer(),
                           Text(
                             widget.module.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: s.onSurface,
-                                ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: s.onSurface,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.north_east, size: 16, color: s.onSurfaceVariant),
+                              Icon(
+                                Icons.north_east,
+                                size: 16,
+                                color: s.onSurfaceVariant,
+                              ),
                               const SizedBox(width: 6),
-                              Text('Entrar', style: TextStyle(color: s.onSurfaceVariant, fontSize: 12)),
+                              Text(
+                                'Entrar',
+                                style: TextStyle(
+                                  color: s.onSurfaceVariant,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -301,7 +384,12 @@ class _ModuleCardState extends State<_ModuleCard> {
 class _NoGlowNoScrollbarBehavior extends ScrollBehavior {
   const _NoGlowNoScrollbarBehavior();
   @override
-  Widget buildOverscrollIndicator(BuildContext c, Widget child, ScrollableDetails d) => child;
+  Widget buildOverscrollIndicator(
+    BuildContext c,
+    Widget child,
+    ScrollableDetails d,
+  ) => child;
   @override
-  Widget buildScrollbar(BuildContext c, Widget child, ScrollableDetails d) => child;
+  Widget buildScrollbar(BuildContext c, Widget child, ScrollableDetails d) =>
+      child;
 }

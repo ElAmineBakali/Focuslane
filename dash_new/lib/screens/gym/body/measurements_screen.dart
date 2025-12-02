@@ -11,10 +11,7 @@ SnackBar _niceBar(String text, {IconData? icon}) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     content: Row(
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-        ],
+        if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
         Expanded(child: Text(text)),
       ],
     ),
@@ -60,9 +57,13 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _selected,
-                      items: _muscles
-                          .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-                          .toList(),
+                      items:
+                          _muscles
+                              .map(
+                                (m) =>
+                                    DropdownMenuItem(value: m, child: Text(m)),
+                              )
+                              .toList(),
                       onChanged: (v) => setState(() => _selected = v!),
                       decoration: const InputDecoration(
                         labelText: 'Músculo',
@@ -81,8 +82,9 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                         prefixIcon: Icon(Icons.straighten),
                       ),
                       validator: (s) {
-                        final v =
-                            double.tryParse((s ?? '').replaceAll(',', '.'));
+                        final v = double.tryParse(
+                          (s ?? '').replaceAll(',', '.'),
+                        );
                         if (v == null) return 'Número válido';
                         if (v <= 0) return 'Mayor que 0';
                         return null;
@@ -93,13 +95,17 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                   FilledButton.icon(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() != true) return;
-                      final v = double.parse(_valCtrl.text.replaceAll(',', '.'));
+                      final v = double.parse(
+                        _valCtrl.text.replaceAll(',', '.'),
+                      );
                       await svc.addMeasurement(_selected, v, DateTime.now());
                       _valCtrl.clear();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          _niceBar('Medida guardada 📏',
-                              icon: Icons.check_circle_rounded),
+                          _niceBar(
+                            'Medida guardada 📏',
+                            icon: Icons.check_circle_rounded,
+                          ),
                         );
                       }
                     },
@@ -116,7 +122,9 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
               builder: (context, snap) {
                 final data = snap.data ?? [];
                 final spots = List.generate(
-                    data.length, (i) => FlSpot(i.toDouble(), data[i].valueCm));
+                  data.length,
+                  (i) => FlSpot(i.toDouble(), data[i].valueCm),
+                );
                 return Padding(
                   padding: const EdgeInsets.all(12),
                   child: Card(
@@ -132,8 +140,11 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                               barWidth: 3,
                               dotData: const FlDotData(show: true),
                               belowBarData: BarAreaData(
-                                  show: true,
-                                  color: theme.colorScheme.primary.withOpacity(.12)),
+                                show: true,
+                                color: theme.colorScheme.primary.withOpacity(
+                                  .12,
+                                ),
+                              ),
                             ),
                           ],
                           titlesData: const FlTitlesData(show: false),

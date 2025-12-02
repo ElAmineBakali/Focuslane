@@ -40,7 +40,8 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
               await showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
-                builder: (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
+                builder:
+                    (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
               );
             },
           ),
@@ -93,9 +94,11 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                 highPriorityOnly: _onlyHigh,
               ),
               builder: (context, snap) {
-                if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+                if (!snap.hasData)
+                  return const Center(child: CircularProgressIndicator());
                 final tasks = snap.data!;
-                if (tasks.isEmpty) return const Center(child: Text('Nada por aquí'));
+                if (tasks.isEmpty)
+                  return const Center(child: Text('Nada por aquí'));
 
                 // Grouping
                 final Map<String, List<StudyTask>> groups = {};
@@ -109,13 +112,15 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     final dd = DateTime(d.year, d.month, d.day);
                     return dd.toIso8601String();
                   }
+
                   for (final t in tasks) {
                     groups.putIfAbsent(key(t.due), () => []).add(t);
                   }
                 }
 
-                final entries = groups.entries.toList()
-                  ..sort((a,b) => a.key.compareTo(b.key));
+                final entries =
+                    groups.entries.toList()
+                      ..sort((a, b) => a.key.compareTo(b.key));
 
                 return CustomScrollView(
                   slivers: [
@@ -124,36 +129,57 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
                           child: Text(
-                            _groupBy == 'course' ? 'Curso: ${e.key}' : (e.key == 'Sin fecha' ? e.key : e.key.substring(0,10)),
+                            _groupBy == 'course'
+                                ? 'Curso: ${e.key}'
+                                : (e.key == 'Sin fecha'
+                                    ? e.key
+                                    : e.key.substring(0, 10)),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
                       ),
                       SliverList.separated(
-                        itemBuilder: (_, i) => _TaskCard(task: e.value[i], onEdit: () async {
-                          await showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) => TaskEditSheet(svc: svc, initial: e.value[i]),
-                          );
-                        }, onChangeStatus: (status) async {
-                          await svc.updateTask(e.value[i].id, {'status': status.name});
-                        }, onDelete: () async {
-                          await svc.deleteTask(e.value[i].id);
-                        }, onOpenTimer: () {
-                          final t = e.value[i];
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (_) => StudyTimerScreen(
-                              svc: svc,
-                              initialCourseId: t.courseId,
-                              initialTaskId: t.id,
+                        itemBuilder:
+                            (_, i) => _TaskCard(
+                              task: e.value[i],
+                              onEdit: () async {
+                                await showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder:
+                                      (_) => TaskEditSheet(
+                                        svc: svc,
+                                        initial: e.value[i],
+                                      ),
+                                );
+                              },
+                              onChangeStatus: (status) async {
+                                await svc.updateTask(e.value[i].id, {
+                                  'status': status.name,
+                                });
+                              },
+                              onDelete: () async {
+                                await svc.deleteTask(e.value[i].id);
+                              },
+                              onOpenTimer: () {
+                                final t = e.value[i];
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => StudyTimerScreen(
+                                          svc: svc,
+                                          initialCourseId: t.courseId,
+                                          initialTaskId: t.id,
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
-                          ));
-                        }),
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemCount: e.value.length,
                       ),
-                    ]
+                    ],
                   ],
                 );
               },
@@ -171,20 +197,32 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onEdit;
   final ValueChanged<TaskStatus> onChangeStatus;
-  const _TaskCard({required this.task, required this.onOpenTimer, required this.onDelete, required this.onEdit, required this.onChangeStatus});
+  const _TaskCard({
+    required this.task,
+    required this.onOpenTimer,
+    required this.onDelete,
+    required this.onEdit,
+    required this.onChangeStatus,
+  });
 
   Color _priorityColor(BuildContext context) {
     switch (task.priority) {
-      case Priority.high: return Colors.redAccent;
-      case Priority.normal: return Theme.of(context).colorScheme.primary;
-      case Priority.low: return Colors.teal;
+      case Priority.high:
+        return Colors.redAccent;
+      case Priority.normal:
+        return Theme.of(context).colorScheme.primary;
+      case Priority.low:
+        return Colors.teal;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final icon = task.type == StudyItemType.exam ? Icons.event_available : Icons.task_alt;
+    final icon =
+        task.type == StudyItemType.exam
+            ? Icons.event_available
+            : Icons.task_alt;
     final prioColor = _priorityColor(context);
     return Card(
       surfaceTintColor: cs.surfaceTint,
@@ -196,12 +234,23 @@ class _TaskCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(color: prioColor.withValues(alpha: .12), borderRadius: BorderRadius.circular(10)),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: prioColor.withValues(alpha: .12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   child: Icon(icon, color: prioColor),
                 ),
                 const SizedBox(width: 10),
-                Expanded(child: Text(task.title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600))),
+                Expanded(
+                  child: Text(
+                    task.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
                 PopupMenuButton<String>(
                   onSelected: (v) async {
                     if (v == 'edit') onEdit();
@@ -210,13 +259,23 @@ class _TaskCard extends StatelessWidget {
                     if (v == 'done') onChangeStatus(TaskStatus.done);
                     if (v == 'delete') onDelete();
                   },
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'edit',  child: Text('Editar')),
-                    PopupMenuItem(value: 'todo',  child: Text('Marcar por hacer')),
-                    PopupMenuItem(value: 'doing', child: Text('Marcar en progreso')),
-                    PopupMenuItem(value: 'done',  child: Text('Marcar hecha')),
-                    PopupMenuItem(value: 'delete',child: Text('Eliminar')),
-                  ],
+                  itemBuilder:
+                      (_) => const [
+                        PopupMenuItem(value: 'edit', child: Text('Editar')),
+                        PopupMenuItem(
+                          value: 'todo',
+                          child: Text('Marcar por hacer'),
+                        ),
+                        PopupMenuItem(
+                          value: 'doing',
+                          child: Text('Marcar en progreso'),
+                        ),
+                        PopupMenuItem(
+                          value: 'done',
+                          child: Text('Marcar hecha'),
+                        ),
+                        PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+                      ],
                 ),
               ],
             ),
@@ -227,21 +286,34 @@ class _TaskCard extends StatelessWidget {
               children: [
                 if (task.due != null)
                   _Chip(icon: Icons.event, label: 'Vence: ${task.due}'),
-                _Chip(icon: Icons.flag, label: 'Prioridad: ${task.priority.name}'),
+                _Chip(
+                  icon: Icons.flag,
+                  label: 'Prioridad: ${task.priority.name}',
+                ),
                 _Chip(icon: Icons.info, label: 'Estado: ${task.status.name}'),
                 if ((task.notes ?? '').isNotEmpty)
                   _Chip(icon: Icons.notes, label: 'Notas'),
               ],
             ),
             const SizedBox(height: 10),
-            Row(children: [
-              FilledButton.icon(onPressed: onOpenTimer, icon: const Icon(Icons.timer), label: const Text('Estudiar')),
-              const SizedBox(width: 8),
-              OutlinedButton(onPressed: onEdit, child: const Text('Editar')),
-              const Spacer(),
-              if (task.status != TaskStatus.done)
-                TextButton.icon(onPressed: () => onChangeStatus(TaskStatus.done), icon: const Icon(Icons.check), label: const Text('Marcar hecha')),
-            ])
+            Row(
+              children: [
+                FilledButton.icon(
+                  onPressed: onOpenTimer,
+                  icon: const Icon(Icons.timer),
+                  label: const Text('Estudiar'),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton(onPressed: onEdit, child: const Text('Editar')),
+                const Spacer(),
+                if (task.status != TaskStatus.done)
+                  TextButton.icon(
+                    onPressed: () => onChangeStatus(TaskStatus.done),
+                    icon: const Icon(Icons.check),
+                    label: const Text('Marcar hecha'),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -262,10 +334,14 @@ class _Chip extends StatelessWidget {
         color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 16), const SizedBox(width: 6), Text(label)]),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [Icon(icon, size: 16), const SizedBox(width: 6), Text(label)],
+      ),
     );
   }
 }
+
 class _FiltersBar extends StatelessWidget {
   final StudyFirestoreService svc;
   final String? selectedCourseId;
@@ -307,7 +383,9 @@ class _FiltersBar extends StatelessWidget {
                 hint: const Text('Curso'),
                 items: [
                   const DropdownMenuItem(value: null, child: Text('Todos')),
-                  ...courses.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
+                  ...courses.map(
+                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                  ),
                 ],
                 onChanged: onCourseChanged,
               ),
@@ -316,9 +394,18 @@ class _FiltersBar extends StatelessWidget {
                 hint: const Text('Estado'),
                 items: const [
                   DropdownMenuItem(value: null, child: Text('Todos')),
-                  DropdownMenuItem(value: TaskStatus.todo, child: Text('Por hacer')),
-                  DropdownMenuItem(value: TaskStatus.doing, child: Text('En progreso')),
-                  DropdownMenuItem(value: TaskStatus.done, child: Text('Hechas')),
+                  DropdownMenuItem(
+                    value: TaskStatus.todo,
+                    child: Text('Por hacer'),
+                  ),
+                  DropdownMenuItem(
+                    value: TaskStatus.doing,
+                    child: Text('En progreso'),
+                  ),
+                  DropdownMenuItem(
+                    value: TaskStatus.done,
+                    child: Text('Hechas'),
+                  ),
                 ],
                 onChanged: onStatusChanged,
               ),

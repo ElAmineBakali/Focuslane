@@ -43,7 +43,8 @@ Map<String, WidgetBuilder> financeRoutes = {
   DebtEntryEditScreen.route: (_) => const DebtEntryEditScreen(),
 
   // NOMBRES EXACTOS (coinciden con las clases reales)
-  FixedExpensesChecklistScreen.route: (_) => const FixedExpensesChecklistScreen(),
+  FixedExpensesChecklistScreen.route:
+      (_) => const FixedExpensesChecklistScreen(),
   VariableExpensesScreen.route: (_) => const VariableExpensesScreen(),
 
   DepositsScreen.route: (_) => const DepositsScreen(),

@@ -20,7 +20,15 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
   Strategy? s;
 
   static const _timeframes = <String>[
-    'M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'
+    'M1',
+    'M5',
+    'M15',
+    'M30',
+    'H1',
+    'H4',
+    'D1',
+    'W1',
+    'MN',
   ];
 
   @override
@@ -40,7 +48,8 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (s == null) return const Scaffold(body: Center(child: Text('Sin estrategia')));
+    if (s == null)
+      return const Scaffold(body: Center(child: Text('Sin estrategia')));
     final svc = TradingFirestoreService.I;
 
     return Scaffold(
@@ -74,9 +83,10 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
             DropdownButtonFormField<String>(
               initialValue: _tf.text.isEmpty ? 'D1' : _tf.text,
               decoration: const InputDecoration(labelText: 'Timeframe'),
-              items: _timeframes
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
+              items:
+                  _timeframes
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
               onChanged: (v) => setState(() => _tf.text = v ?? _tf.text),
             ),
 
@@ -116,10 +126,16 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
                     final x = Strategy(
                       id: s!.id,
                       name: _name.text.trim(),
-                      description: _desc.text.trim().isEmpty ? null : _desc.text.trim(),
-                      timeframe: _tf.text.trim().isEmpty ? 'D1' : _tf.text.trim(),
-                      rulesEntry: _entry.text.trim().isEmpty ? null : _entry.text.trim(),
-                      rulesExit: _exit.text.trim().isEmpty ? null : _exit.text.trim(),
+                      description:
+                          _desc.text.trim().isEmpty ? null : _desc.text.trim(),
+                      timeframe:
+                          _tf.text.trim().isEmpty ? 'D1' : _tf.text.trim(),
+                      rulesEntry:
+                          _entry.text.trim().isEmpty
+                              ? null
+                              : _entry.text.trim(),
+                      rulesExit:
+                          _exit.text.trim().isEmpty ? null : _exit.text.trim(),
                       riskPerTradePct: double.tryParse(_risk.text),
                     );
                     await svc.updateStrategy(x);
@@ -130,37 +146,41 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
             ),
 
             const Divider(height: 32),
-            Text('Trades con esta estrategia',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Trades con esta estrategia',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
 
             StreamBuilder<List<Trade>>(
               stream: svc.watchTrades(strategyId: s!.id),
               builder: (_, ss) {
                 final data = ss.data ?? [];
-                if (data.isEmpty) return const ListTile(title: Text('Sin trades'));
+                if (data.isEmpty)
+                  return const ListTile(title: Text('Sin trades'));
                 return Column(
-                  children: data
-                      .map(
-                        (t) => Card(
-                          child: ListTile(
-                            leading: Icon(
-                              t.outcome == Outcome.win
-                                  ? Icons.trending_up
-                                  : t.outcome == Outcome.loss
+                  children:
+                      data
+                          .map(
+                            (t) => Card(
+                              child: ListTile(
+                                leading: Icon(
+                                  t.outcome == Outcome.win
+                                      ? Icons.trending_up
+                                      : t.outcome == Outcome.loss
                                       ? Icons.trending_down
                                       : Icons.horizontal_rule,
+                                ),
+                                title: Text(
+                                  '${t.symbol} • ${t.direction.name.toUpperCase()}',
+                                ),
+                                subtitle: Text(
+                                  'R ${t.rMultiple?.toStringAsFixed(2) ?? "-"} • P&L ${t.pnl.toStringAsFixed(2)}',
+                                ),
+                              ),
                             ),
-                            title: Text(
-                              '${t.symbol} • ${t.direction.name.toUpperCase()}',
-                            ),
-                            subtitle: Text(
-                              'R ${t.rMultiple?.toStringAsFixed(2) ?? "-"} • P&L ${t.pnl.toStringAsFixed(2)}',
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
+                          )
+                          .toList(),
                 );
               },
             ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-String yyyymm(DateTime d) => "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
+String yyyymm(DateTime d) =>
+    "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
 
 // ------------ TRANSACCIONES ------------
 enum TxType { income, expense, transfer }
@@ -44,28 +45,28 @@ class FinanceTransaction {
     this.originalCurrency,
     this.originalAmount,
     this.fxRate,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'amount': amount,
-        'type': type.name,
-        'category': category,
-        'subCategory': subCategory,
-        'date': Timestamp.fromDate(date),
-        'accountId': accountId,
-        'notes': notes,
-        'tags': tags,
-        'isRecurring': isRecurring,
-        'recurrence': recurrence,
-        'envelopeId': envelopeId,
-        'createdAt': Timestamp.fromDate(createdAt),
-        'updatedAt': Timestamp.fromDate(updatedAt),
-        'originalCurrency': originalCurrency,
-        'originalAmount': originalAmount,
-        'fxRate': fxRate,
-      };
+    'title': title,
+    'amount': amount,
+    'type': type.name,
+    'category': category,
+    'subCategory': subCategory,
+    'date': Timestamp.fromDate(date),
+    'accountId': accountId,
+    'notes': notes,
+    'tags': tags,
+    'isRecurring': isRecurring,
+    'recurrence': recurrence,
+    'envelopeId': envelopeId,
+    'createdAt': Timestamp.fromDate(createdAt),
+    'updatedAt': Timestamp.fromDate(updatedAt),
+    'originalCurrency': originalCurrency,
+    'originalAmount': originalAmount,
+    'fxRate': fxRate,
+  };
 
   static FinanceTransaction fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -91,7 +92,10 @@ class FinanceTransaction {
       createdAt: (d['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (d['updatedAt'] as Timestamp?)?.toDate(),
       originalCurrency: d['originalCurrency'] as String?,
-      originalAmount: (d['originalAmount'] is num) ? (d['originalAmount'] as num).toDouble() : null,
+      originalAmount:
+          (d['originalAmount'] is num)
+              ? (d['originalAmount'] as num).toDouble()
+              : null,
       fxRate: (d['fxRate'] is num) ? (d['fxRate'] as num).toDouble() : null,
     );
   }
@@ -118,13 +122,13 @@ class Budget {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'category': category,
-        'limit': limit,
-        'period': period,
-        'startDayOfPeriod': startDayOfPeriod,
-        'active': active,
-      };
+    'name': name,
+    'category': category,
+    'limit': limit,
+    'period': period,
+    'startDayOfPeriod': startDayOfPeriod,
+    'active': active,
+  };
 
   static Budget fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -171,17 +175,17 @@ class Subscription {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'amount': amount,
-        'currency': currency,
-        'category': category,
-        'billingCycle': billingCycle,
-        'billingDay': billingDay,
-        'isFixed': isFixed,
-        'remindDaysBefore': remindDaysBefore,
-        'autoMarkPaid': autoMarkPaid,
-      'order': order,
-      };
+    'name': name,
+    'amount': amount,
+    'currency': currency,
+    'category': category,
+    'billingCycle': billingCycle,
+    'billingDay': billingDay,
+    'isFixed': isFixed,
+    'remindDaysBefore': remindDaysBefore,
+    'autoMarkPaid': autoMarkPaid,
+    'order': order,
+  };
 
   static Subscription fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -222,12 +226,12 @@ class Person {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'defaultCurrency': defaultCurrency,
-        'contact': contact,
-        'notes': notes,
-        'balance': balance,
-      };
+    'name': name,
+    'defaultCurrency': defaultCurrency,
+    'contact': contact,
+    'notes': notes,
+    'balance': balance,
+  };
 
   static Person fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -260,11 +264,11 @@ class DebtEntry {
   });
 
   Map<String, dynamic> toMap() => {
-        'amount': amount,
-        'date': Timestamp.fromDate(date),
-        'concept': concept,
-        'relatedTxId': relatedTxId,
-      };
+    'amount': amount,
+    'date': Timestamp.fromDate(date),
+    'concept': concept,
+    'relatedTxId': relatedTxId,
+  };
 
   static DebtEntry fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -301,13 +305,13 @@ class VariableExpenseItem {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'category': category,
-        'periodKey': periodKey,
-        'status': status,
-        'amount': amount,
-        'linkedTxId': linkedTxId,
-      };
+    'name': name,
+    'category': category,
+    'periodKey': periodKey,
+    'status': status,
+    'amount': amount,
+    'linkedTxId': linkedTxId,
+  };
 
   static VariableExpenseItem fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -346,14 +350,14 @@ class Deposit {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'where': where,
-        'amount': amount,
-        'currency': currency,
-        'isMine': isMine,
-        'category': category,
-        'ownerNote': ownerNote,
-      };
+    'name': name,
+    'where': where,
+    'amount': amount,
+    'currency': currency,
+    'isMine': isMine,
+    'category': category,
+    'ownerNote': ownerNote,
+  };
 
   static Deposit fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -372,19 +376,18 @@ class Deposit {
   }
 }
 
-
 enum AssetKind { house, car, land, other }
 
 class AssetItem {
   final String id;
   final String name;
   final AssetKind kind;
-  final double? estValue;          // valor estimado
-  final String? currency;          // p.ej. EUR
-  final String? address;           // dirección libre
-  final String? notes;             // notas
-  final DateTime? acquiredAt;      // fecha adquisición
-  final String? colorHex;          // UI opcional
+  final double? estValue; // valor estimado
+  final String? currency; // p.ej. EUR
+  final String? address; // dirección libre
+  final String? notes; // notas
+  final DateTime? acquiredAt; // fecha adquisición
+  final String? colorHex; // UI opcional
 
   AssetItem({
     required this.id,
@@ -399,15 +402,15 @@ class AssetItem {
   });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'kind': kind.name,
-        'estValue': estValue,
-        'currency': currency,
-        'address': address,
-        'notes': notes,
-        'acquiredAt': acquiredAt != null ? Timestamp.fromDate(acquiredAt!) : null,
-        'colorHex': colorHex,
-      };
+    'name': name,
+    'kind': kind.name,
+    'estValue': estValue,
+    'currency': currency,
+    'address': address,
+    'notes': notes,
+    'acquiredAt': acquiredAt != null ? Timestamp.fromDate(acquiredAt!) : null,
+    'colorHex': colorHex,
+  };
 
   static AssetItem fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;

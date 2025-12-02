@@ -8,7 +8,10 @@ class PlanOutfitFirestoreService {
       _db.collection('users').doc(uid).collection('wardrobe_plans');
 
   Stream<List<PlanOutfit>> planesPorRango(
-      String uid, DateTime inicio, DateTime fin) {
+    String uid,
+    DateTime inicio,
+    DateTime fin,
+  ) {
     return _col(uid)
         .where('fecha', isGreaterThanOrEqualTo: inicio)
         .where('fecha', isLessThanOrEqualTo: fin)

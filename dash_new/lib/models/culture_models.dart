@@ -21,7 +21,7 @@ class Book {
   final ItemStatus status;
   final List<String> tags;
   final String? coverUrl;
-  final String? pdfUrl;            // ✅ NUEVO
+  final String? pdfUrl; // ✅ NUEVO
   final DateTime? startedAt;
   final DateTime? finishedAt;
 
@@ -39,28 +39,28 @@ class Book {
     this.status = ItemStatus.pending,
     this.tags = const [],
     this.coverUrl,
-    this.pdfUrl,                   // ✅ NUEVO
+    this.pdfUrl, // ✅ NUEVO
     this.startedAt,
     this.finishedAt,
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'author': author,
-        'year': year,
-        'genre': genre,
-        'pagesTotal': pagesTotal,
-        'currentPage': currentPage,
-        'shortSummary': shortSummary,
-        'deepSummary': deepSummary,
-        'rating': rating,
-        'status': status.name,
-        'tags': tags,
-        'coverUrl': coverUrl,
-        'pdfUrl': pdfUrl,          // ✅ NUEVO
-        'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
-        'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
-      };
+    'title': title,
+    'author': author,
+    'year': year,
+    'genre': genre,
+    'pagesTotal': pagesTotal,
+    'currentPage': currentPage,
+    'shortSummary': shortSummary,
+    'deepSummary': deepSummary,
+    'rating': rating,
+    'status': status.name,
+    'tags': tags,
+    'coverUrl': coverUrl,
+    'pdfUrl': pdfUrl, // ✅ NUEVO
+    'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
+    'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
+  };
 
   static Book fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -81,13 +81,12 @@ class Book {
       ),
       tags: (d['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       coverUrl: d['coverUrl'] as String?,
-      pdfUrl: d['pdfUrl'] as String?,             // ✅ NUEVO
+      pdfUrl: d['pdfUrl'] as String?, // ✅ NUEVO
       startedAt: (d['startedAt'] as Timestamp?)?.toDate(),
       finishedAt: (d['finishedAt'] as Timestamp?)?.toDate(),
     );
   }
 }
-
 
 class BookSession {
   final String id;
@@ -105,11 +104,11 @@ class BookSession {
   });
 
   Map<String, dynamic> toMap() => {
-        'date': Timestamp.fromDate(date),
-        'pages': pages,
-        'minutes': minutes,
-        'notes': notes,
-      };
+    'date': Timestamp.fromDate(date),
+    'pages': pages,
+    'minutes': minutes,
+    'notes': notes,
+  };
 
   static BookSession fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -131,11 +130,7 @@ class BookQuote {
 
   BookQuote({required this.id, this.page, required this.text, this.note});
 
-  Map<String, dynamic> toMap() => {
-        'page': page,
-        'text': text,
-        'note': note,
-      };
+  Map<String, dynamic> toMap() => {'page': page, 'text': text, 'note': note};
 
   static BookQuote fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -173,15 +168,15 @@ class Series {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'platform': platform,
-        'status': status.name,
-        'rating': rating,
-        'tags': tags,
-        'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
-        'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
-        'posterUrl': posterUrl,
-      };
+    'title': title,
+    'platform': platform,
+    'status': status.name,
+    'rating': rating,
+    'tags': tags,
+    'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
+    'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
+    'posterUrl': posterUrl,
+  };
 
   static Series fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -226,15 +221,15 @@ class Episode {
   });
 
   Map<String, dynamic> toMap() => {
-        'season': season,
-        'number': number,
-        'title': title,
-        'minutes': minutes,
-        'watched': watched,
-        'watchedAt': watchedAt != null ? Timestamp.fromDate(watchedAt!) : null,
-        'rating': rating,
-        'notes': notes,
-      };
+    'season': season,
+    'number': number,
+    'title': title,
+    'minutes': minutes,
+    'watched': watched,
+    'watchedAt': watchedAt != null ? Timestamp.fromDate(watchedAt!) : null,
+    'rating': rating,
+    'notes': notes,
+  };
 
   static Episode fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -281,17 +276,17 @@ class Movie {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'year': year,
-        'minutes': minutes,
-        'saga': saga,
-        'status': status.name,
-        'rating': rating,
-        'tags': tags,
-        'posterUrl': posterUrl,
-        'watchedAt': watchedAt != null ? Timestamp.fromDate(watchedAt!) : null,
-        'notes': notes,
-      };
+    'title': title,
+    'year': year,
+    'minutes': minutes,
+    'saga': saga,
+    'status': status.name,
+    'rating': rating,
+    'tags': tags,
+    'posterUrl': posterUrl,
+    'watchedAt': watchedAt != null ? Timestamp.fromDate(watchedAt!) : null,
+    'notes': notes,
+  };
 
   static Movie fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -343,17 +338,17 @@ class Album {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'artist': artist,
-        'year': year,
-        'status': status.name,
-        'rating': rating,
-        'favoriteTracks': favoriteTracks,
-        'tags': tags,
-        'coverUrl': coverUrl,
-        'listenedAt': listenedAt != null ? Timestamp.fromDate(listenedAt!) : null,
-        'notes': notes,
-      };
+    'title': title,
+    'artist': artist,
+    'year': year,
+    'status': status.name,
+    'rating': rating,
+    'favoriteTracks': favoriteTracks,
+    'tags': tags,
+    'coverUrl': coverUrl,
+    'listenedAt': listenedAt != null ? Timestamp.fromDate(listenedAt!) : null,
+    'notes': notes,
+  };
 
   static Album fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -367,7 +362,9 @@ class Album {
         orElse: () => ItemStatus.pending,
       ),
       rating: (d['rating'] as num?)?.toDouble(),
-      favoriteTracks: (d['favoriteTracks'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      favoriteTracks:
+          (d['favoriteTracks'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
       tags: (d['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       coverUrl: d['coverUrl'] as String?,
       listenedAt: (d['listenedAt'] as Timestamp?)?.toDate(),
@@ -405,17 +402,17 @@ class Game {
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'platform': platform,
-        'status': status.name,
-        'rating': rating,
-        'hours': hours,
-        'progressPct': progressPct,
-        'tags': tags,
-        'coverUrl': coverUrl,
-        'notes': notes,
-        'difficulty': difficulty,
-      };
+    'title': title,
+    'platform': platform,
+    'status': status.name,
+    'rating': rating,
+    'hours': hours,
+    'progressPct': progressPct,
+    'tags': tags,
+    'coverUrl': coverUrl,
+    'notes': notes,
+    'difficulty': difficulty,
+  };
 
   static Game fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -445,14 +442,20 @@ class GameSession {
   final int? progressAfter; // %
   final String? notes;
 
-  GameSession({required this.id, required this.date, required this.minutes, this.progressAfter, this.notes});
+  GameSession({
+    required this.id,
+    required this.date,
+    required this.minutes,
+    this.progressAfter,
+    this.notes,
+  });
 
   Map<String, dynamic> toMap() => {
-        'date': Timestamp.fromDate(date),
-        'minutes': minutes,
-        'progressAfter': progressAfter,
-        'notes': notes,
-      };
+    'date': Timestamp.fromDate(date),
+    'minutes': minutes,
+    'progressAfter': progressAfter,
+    'notes': notes,
+  };
 
   static GameSession fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -471,12 +474,19 @@ class CultureCollectionItemRef {
   final String type; // 'book'|'series'|'movie'|'album'|'game'
   final String id;
   final int order;
-  CultureCollectionItemRef({required this.type, required this.id, this.order = 0});
+  CultureCollectionItemRef({
+    required this.type,
+    required this.id,
+    this.order = 0,
+  });
 
   Map<String, dynamic> toMap() => {'type': type, 'id': id, 'order': order};
 
-  static CultureCollectionItemRef fromMap(Map m) =>
-      CultureCollectionItemRef(type: m['type'] as String, id: m['id'] as String, order: (m['order'] as num?)?.toInt() ?? 0);
+  static CultureCollectionItemRef fromMap(Map m) => CultureCollectionItemRef(
+    type: m['type'] as String,
+    id: m['id'] as String,
+    order: (m['order'] as num?)?.toInt() ?? 0,
+  );
 }
 
 class CultureCollection {
@@ -486,14 +496,20 @@ class CultureCollection {
   final DateTime? targetDate;
   final List<CultureCollectionItemRef> items;
 
-  CultureCollection({required this.id, required this.name, this.description, this.targetDate, this.items = const []});
+  CultureCollection({
+    required this.id,
+    required this.name,
+    this.description,
+    this.targetDate,
+    this.items = const [],
+  });
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'description': description,
-        'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
-        'items': items.map((e) => e.toMap()).toList(),
-      };
+    'name': name,
+    'description': description,
+    'targetDate': targetDate != null ? Timestamp.fromDate(targetDate!) : null,
+    'items': items.map((e) => e.toMap()).toList(),
+  };
 
   static CultureCollection fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
@@ -502,8 +518,12 @@ class CultureCollection {
       name: (d['name'] ?? '') as String,
       description: d['description'] as String?,
       targetDate: (d['targetDate'] as Timestamp?)?.toDate(),
-      items: (d['items'] as List?)
-              ?.map((e) => CultureCollectionItemRef.fromMap(e as Map<String, dynamic>))
+      items:
+          (d['items'] as List?)
+              ?.map(
+                (e) =>
+                    CultureCollectionItemRef.fromMap(e as Map<String, dynamic>),
+              )
               .toList() ??
           const [],
     );

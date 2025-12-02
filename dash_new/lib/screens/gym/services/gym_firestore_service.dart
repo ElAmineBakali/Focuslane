@@ -13,7 +13,8 @@ class GymFirestoreService {
     return u;
   }
 
-  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore.instance
+  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore
+      .instance
       .collection('users')
       .doc(_uid)
       .collection('gym')
@@ -23,7 +24,11 @@ class GymFirestoreService {
 
   // ===== Routines =====
   Stream<List<Routine>> streamRoutines() {
-    return _root.collection('routines').orderBy('name').snapshots().map(
+    return _root
+        .collection('routines')
+        .orderBy('name')
+        .snapshots()
+        .map(
           (s) => s.docs.map((d) => Routine.fromMap(d.id, d.data())).toList(),
         );
   }
@@ -34,8 +39,12 @@ class GymFirestoreService {
         .where('isDefault', isEqualTo: true)
         .limit(1)
         .snapshots()
-        .map((s) =>
-            s.docs.isEmpty ? null : Routine.fromMap(s.docs.first.id, s.docs.first.data()));
+        .map(
+          (s) =>
+              s.docs.isEmpty
+                  ? null
+                  : Routine.fromMap(s.docs.first.id, s.docs.first.data()),
+        );
   }
 
   Future<String> createRoutine({
@@ -87,7 +96,8 @@ class GymFirestoreService {
       'isDefault': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
-    final days = await _root.collection('routines').doc(id).collection('days').get();
+    final days =
+        await _root.collection('routines').doc(id).collection('days').get();
     for (final d in days.docs) {
       final newDay = await newDoc.collection('days').add(d.data());
       final exs = await d.reference.collection('exercises').get();
@@ -118,10 +128,17 @@ class GymFirestoreService {
         .collection('days')
         .orderBy('order', descending: false)
         .snapshots()
-        .map((s) => s.docs.map((d) => RoutineDay.fromMap(d.id, d.data())).toList());
+        .map(
+          (s) => s.docs.map((d) => RoutineDay.fromMap(d.id, d.data())).toList(),
+        );
   }
 
-  Future<String> addDay(String routineId, String name, {int? order, String? icon}) async {
+  Future<String> addDay(
+    String routineId,
+    String name, {
+    int? order,
+    String? icon,
+  }) async {
     final col = _root.collection('routines').doc(routineId).collection('days');
     final doc = await col.add({
       'name': name,
@@ -132,15 +149,27 @@ class GymFirestoreService {
     return doc.id;
   }
 
-  Future<void> updateDay(String routineId, String dayId, Map<String, dynamic> data) async {
-    await _root.collection('routines').doc(routineId).collection('days').doc(dayId).update(data);
+  Future<void> updateDay(
+    String routineId,
+    String dayId,
+    Map<String, dynamic> data,
+  ) async {
+    await _root
+        .collection('routines')
+        .doc(routineId)
+        .collection('days')
+        .doc(dayId)
+        .update(data);
   }
 
   Future<void> reorderDays(String routineId, List<String> orderedDayIds) async {
     final batch = FirebaseFirestore.instance.batch();
     for (int i = 0; i < orderedDayIds.length; i++) {
-      final ref =
-          _root.collection('routines').doc(routineId).collection('days').doc(orderedDayIds[i]);
+      final ref = _root
+          .collection('routines')
+          .doc(routineId)
+          .collection('days')
+          .doc(orderedDayIds[i]);
       batch.update(ref, {'order': i});
     }
     await batch.commit();
@@ -148,16 +177,24 @@ class GymFirestoreService {
 
   Future<void> duplicateDay(String routineId, String dayId) async {
     final src =
-        await _root.collection('routines').doc(routineId).collection('days').doc(dayId).get();
+        await _root
+            .collection('routines')
+            .doc(routineId)
+            .collection('days')
+            .doc(dayId)
+            .get();
     if (!src.exists) return;
     final data = src.data() as Map<String, dynamic>;
-    final newDay =
-        await _root.collection('routines').doc(routineId).collection('days').add({
-      ...data,
-      'name': '${data['name']} (copia)',
-      'order': DateTime.now().millisecondsSinceEpoch,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    final newDay = await _root
+        .collection('routines')
+        .doc(routineId)
+        .collection('days')
+        .add({
+          ...data,
+          'name': '${data['name']} (copia)',
+          'order': DateTime.now().millisecondsSinceEpoch,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
     final exs = await src.reference.collection('exercises').get();
     for (final e in exs.docs) {
       await newDay.collection('exercises').add(e.data());
@@ -165,7 +202,11 @@ class GymFirestoreService {
   }
 
   Future<void> deleteDayCascade(String routineId, String dayId) async {
-    final dRef = _root.collection('routines').doc(routineId).collection('days').doc(dayId);
+    final dRef = _root
+        .collection('routines')
+        .doc(routineId)
+        .collection('days')
+        .doc(dayId);
     final exs = await dRef.collection('exercises').get();
     for (final e in exs.docs) {
       await e.reference.delete();
@@ -174,7 +215,10 @@ class GymFirestoreService {
   }
 
   // ===== Exercises in day =====
-  Stream<List<RoutineExercise>> streamDayExercises(String routineId, String dayId) {
+  Stream<List<RoutineExercise>> streamDayExercises(
+    String routineId,
+    String dayId,
+  ) {
     return _root
         .collection('routines')
         .doc(routineId)
@@ -183,7 +227,12 @@ class GymFirestoreService {
         .collection('exercises')
         .orderBy('order', descending: false)
         .snapshots()
-        .map((s) => s.docs.map((d) => RoutineExercise.fromMap(d.id, d.data())).toList());
+        .map(
+          (s) =>
+              s.docs
+                  .map((d) => RoutineExercise.fromMap(d.id, d.data()))
+                  .toList(),
+        );
   }
 
   Future<void> addRoutineExercise(
@@ -236,15 +285,20 @@ class GymFirestoreService {
     await batch.commit();
   }
 
-  Future<void> duplicateExercise(String routineId, String dayId, String exId) async {
-    final src = await _root
-        .collection('routines')
-        .doc(routineId)
-        .collection('days')
-        .doc(dayId)
-        .collection('exercises')
-        .doc(exId)
-        .get();
+  Future<void> duplicateExercise(
+    String routineId,
+    String dayId,
+    String exId,
+  ) async {
+    final src =
+        await _root
+            .collection('routines')
+            .doc(routineId)
+            .collection('days')
+            .doc(dayId)
+            .collection('exercises')
+            .doc(exId)
+            .get();
     if (!src.exists) return;
     final data = src.data() as Map<String, dynamic>;
     await _root
@@ -253,13 +307,14 @@ class GymFirestoreService {
         .collection('days')
         .doc(dayId)
         .collection('exercises')
-        .add({
-      ...data,
-      'order': DateTime.now().millisecondsSinceEpoch,
-    });
+        .add({...data, 'order': DateTime.now().millisecondsSinceEpoch});
   }
 
-  Future<void> deleteRoutineExercise(String routineId, String dayId, String exId) async {
+  Future<void> deleteRoutineExercise(
+    String routineId,
+    String dayId,
+    String exId,
+  ) async {
     await _root
         .collection('routines')
         .doc(routineId)
@@ -282,9 +337,9 @@ class GymFirestoreService {
           .collection('days')
           .doc(session.dayId)
           .set({
-        'lastDone': FieldValue.serverTimestamp(),
-        'lastDoneLocal': session.date.toIso8601String(),
-      }, SetOptions(merge: true));
+            'lastDone': FieldValue.serverTimestamp(),
+            'lastDoneLocal': session.date.toIso8601String(),
+          }, SetOptions(merge: true));
     } catch (_) {}
   }
 
@@ -293,25 +348,43 @@ class GymFirestoreService {
     String? dayId,
     int limit = 50,
   }) {
-    Query q = _root.collection('sessions').orderBy('date', descending: true).limit(limit);
+    Query q = _root
+        .collection('sessions')
+        .orderBy('date', descending: true)
+        .limit(limit);
     if (routineId != null) q = q.where('routineId', isEqualTo: routineId);
     if (dayId != null) q = q.where('dayId', isEqualTo: dayId);
     return q.snapshots().map(
-          (s) =>
-              s.docs.map((d) => SessionDoc.fromMap(d.id, d.data() as Map<String, dynamic>)).toList(),
-        );
+      (s) =>
+          s.docs
+              .map(
+                (d) =>
+                    SessionDoc.fromMap(d.id, d.data() as Map<String, dynamic>),
+              )
+              .toList(),
+    );
   }
 
-  Future<double?> bestE1rmForExercise(String exerciseName, {int lookback = 60}) async {
+  Future<double?> bestE1rmForExercise(
+    String exerciseName, {
+    int lookback = 60,
+  }) async {
     final snap =
-        await _root.collection('sessions').orderBy('date', descending: true).limit(lookback).get();
+        await _root
+            .collection('sessions')
+            .orderBy('date', descending: true)
+            .limit(lookback)
+            .get();
     double? best;
     for (final d in snap.docs) {
       final data = d.data();
-      final list = (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      final list =
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ??
+          const [];
       for (final ex in list) {
         if ((ex['name'] ?? '') == exerciseName) {
-          final sets = (ex['sets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          final sets =
+              (ex['sets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
           for (final s in sets) {
             final w = (s['weight'] ?? 0).toDouble();
             final r = (s['reps'] ?? 0).toInt();
@@ -325,7 +398,11 @@ class GymFirestoreService {
   }
 
   Future<void> markDayCompleted(String routineId, String dayId) async {
-    final ref = _root.collection('routines').doc(routineId).collection('days').doc(dayId);
+    final ref = _root
+        .collection('routines')
+        .doc(routineId)
+        .collection('days')
+        .doc(dayId);
     await ref.set({
       'lastDoneAt': FieldValue.serverTimestamp(),
       'completedCount': FieldValue.increment(1),
@@ -334,28 +411,38 @@ class GymFirestoreService {
 
   /// 🔎 Última sesión registrada (para recordar inactividad)
   Future<DateTime?> lastSessionDate() async {
-    final snap = await _root
-        .collection('sessions')
-        .orderBy('date', descending: true)
-        .limit(1)
-        .get();
+    final snap =
+        await _root
+            .collection('sessions')
+            .orderBy('date', descending: true)
+            .limit(1)
+            .get();
     if (snap.docs.isEmpty) return null;
     final data = snap.docs.first.data();
     return DateTime.tryParse(data['date']?.toString() ?? '');
   }
 
   // ===== Body weight =====
-  Future<void> addBodyWeight(double kg, DateTime date,
-      {double? trend7, bool computeTrend = true}) async {
+  Future<void> addBodyWeight(
+    double kg,
+    DateTime date, {
+    double? trend7,
+    bool computeTrend = true,
+  }) async {
     final key = date.toIso8601String().substring(0, 10);
     double? t7 = trend7;
     if (computeTrend) {
       final prev =
-          await _root.collection('bodyweight').orderBy('date', descending: true).limit(6).get();
-      final vals = prev.docs
-          .map((d) => (d.data()['weight'] as num?)?.toDouble())
-          .whereType<double>()
-          .toList();
+          await _root
+              .collection('bodyweight')
+              .orderBy('date', descending: true)
+              .limit(6)
+              .get();
+      final vals =
+          prev.docs
+              .map((d) => (d.data()['weight'] as num?)?.toDouble())
+              .whereType<double>()
+              .toList();
       vals.insert(0, kg);
       if (vals.isNotEmpty) {
         t7 = vals.take(7).reduce((a, b) => a + b) / vals.take(7).length;
@@ -374,11 +461,14 @@ class GymFirestoreService {
         .orderBy('date', descending: true)
         .limit(limit)
         .snapshots()
-        .map((s) => s.docs
-            .map((d) => BodyWeightEntry.fromMap(d.id, d.data()))
-            .toList()
-            .reversed
-            .toList());
+        .map(
+          (s) =>
+              s.docs
+                  .map((d) => BodyWeightEntry.fromMap(d.id, d.data()))
+                  .toList()
+                  .reversed
+                  .toList(),
+        );
   }
 
   Future<void> setBodyWeightTarget(double? kg) async {
@@ -386,13 +476,21 @@ class GymFirestoreService {
   }
 
   Stream<GymGoals> streamGoals() {
-    return _root.snapshots().map((d) =>
-        d.exists ? GymGoals.fromMap(d.data() as Map<String, dynamic>) : const GymGoals());
+    return _root.snapshots().map(
+      (d) =>
+          d.exists
+              ? GymGoals.fromMap(d.data() as Map<String, dynamic>)
+              : const GymGoals(),
+    );
   }
 
   // ===== Measurements (cm) =====
-  Future<void> addMeasurement(String muscle, double cm, DateTime date,
-      {String site = 'avg'}) async {
+  Future<void> addMeasurement(
+    String muscle,
+    double cm,
+    DateTime date, {
+    String site = 'avg',
+  }) async {
     await _root.collection('measurements').add({
       'muscle': muscle,
       'valueCm': cm,
@@ -401,14 +499,27 @@ class GymFirestoreService {
     });
   }
 
-  Stream<List<MeasurementEntry>> streamMeasurements({String? muscle, int limit = 180}) {
-    Query q =
-        _root.collection('measurements').orderBy('date', descending: true).limit(limit);
+  Stream<List<MeasurementEntry>> streamMeasurements({
+    String? muscle,
+    int limit = 180,
+  }) {
+    Query q = _root
+        .collection('measurements')
+        .orderBy('date', descending: true)
+        .limit(limit);
     if (muscle != null) q = q.where('muscle', isEqualTo: muscle);
-    return q.snapshots().map((s) => s.docs
-        .map((d) => MeasurementEntry.fromMap(d.id, d.data() as Map<String, dynamic>))
-        .toList()
-        .reversed
-        .toList());
+    return q.snapshots().map(
+      (s) =>
+          s.docs
+              .map(
+                (d) => MeasurementEntry.fromMap(
+                  d.id,
+                  d.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList()
+              .reversed
+              .toList(),
+    );
   }
 }

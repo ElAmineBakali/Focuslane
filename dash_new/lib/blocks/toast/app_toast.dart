@@ -16,7 +16,7 @@ class AppToast {
     final bg = color ?? cs.surfaceContainerHigh;
     final fgColor = textColor ?? cs.onSurface;
     final isMobile = MediaQuery.of(context).size.width < 600;
-    
+
     final snack = SnackBar(
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
@@ -37,10 +37,7 @@ class AppToast {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              bg,
-              bg.withOpacity(0.95),
-            ],
+            colors: [bg, bg.withOpacity(0.95)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -82,10 +79,18 @@ class AppToast {
                 onPressed: onAction,
                 style: TextButton.styleFrom(
                   foregroundColor: cs.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                child: Text(actionLabel, style: const TextStyle(fontWeight: FontWeight.w600)),
+                child: Text(
+                  actionLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ],
@@ -97,47 +102,63 @@ class AppToast {
     sm.showSnackBar(snack);
   }
 
-  static void success(BuildContext context, String message, {String? actionLabel, VoidCallback? onAction}) =>
-      show(
-        context,
-        message,
-        icon: Icons.check_circle_rounded,
-        color: Theme.of(context).colorScheme.primaryContainer,
-        textColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        actionLabel: actionLabel,
-        onAction: onAction,
-      );
-      
-  static void error(BuildContext context, String message, {String? actionLabel, VoidCallback? onAction}) =>
-      show(
-        context,
-        message,
-        icon: Icons.error_rounded,
-        color: Theme.of(context).colorScheme.errorContainer,
-        textColor: Theme.of(context).colorScheme.onErrorContainer,
-        actionLabel: actionLabel,
-        onAction: onAction,
-      );
-      
-  static void info(BuildContext context, String message, {String? actionLabel, VoidCallback? onAction}) =>
-      show(
-        context,
-        message,
-        icon: Icons.info_rounded,
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-        actionLabel: actionLabel,
-        onAction: onAction,
-      );
-      
-  static void warning(BuildContext context, String message, {String? actionLabel, VoidCallback? onAction}) =>
-      show(
-        context,
-        message,
-        icon: Icons.warning_rounded,
-        color: Theme.of(context).colorScheme.tertiaryContainer,
-        textColor: Theme.of(context).colorScheme.onTertiaryContainer,
-        actionLabel: actionLabel,
-        onAction: onAction,
-      );
+  static void success(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) => show(
+    context,
+    message,
+    icon: Icons.check_circle_rounded,
+    color: Theme.of(context).colorScheme.primaryContainer,
+    textColor: Theme.of(context).colorScheme.onPrimaryContainer,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
+
+  static void error(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) => show(
+    context,
+    message,
+    icon: Icons.error_rounded,
+    color: Theme.of(context).colorScheme.errorContainer,
+    textColor: Theme.of(context).colorScheme.onErrorContainer,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
+
+  static void info(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) => show(
+    context,
+    message,
+    icon: Icons.info_rounded,
+    color: Theme.of(context).colorScheme.secondaryContainer,
+    textColor: Theme.of(context).colorScheme.onSecondaryContainer,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
+
+  static void warning(
+    BuildContext context,
+    String message, {
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) => show(
+    context,
+    message,
+    icon: Icons.warning_rounded,
+    color: Theme.of(context).colorScheme.tertiaryContainer,
+    textColor: Theme.of(context).colorScheme.onTertiaryContainer,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
 }

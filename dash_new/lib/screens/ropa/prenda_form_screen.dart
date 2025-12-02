@@ -60,7 +60,10 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
   }
 
   Future<void> _pickFromGallery() async {
-    final img = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    final img = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 90,
+    );
     if (img != null) {
       final bytes = await img.readAsBytes();
       setState(() {
@@ -71,7 +74,10 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
   }
 
   Future<void> _pickFromCamera() async {
-    final img = await _picker.pickImage(source: ImageSource.camera, imageQuality: 90);
+    final img = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 90,
+    );
     if (img != null) {
       final bytes = await img.readAsBytes();
       setState(() {
@@ -96,13 +102,21 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
 
       final svc = PrendaFirestoreService();
       final col = FirebaseFirestore.instance
-          .collection('users').doc(uid).collection('wardrobe_items');
+          .collection('users')
+          .doc(uid)
+          .collection('wardrobe_items');
 
       final id = widget.initial?.id ?? col.doc().id;
 
-      Map<String, String> imagenes = Map<String, String>.from(widget.initial?.imagenes ?? {});
+      Map<String, String> imagenes = Map<String, String>.from(
+        widget.initial?.imagenes ?? {},
+      );
       if (_pickedFile != null) {
-        imagenes = await svc.uploadImagenPrenda(uid: uid, prendaId: id, file: _pickedFile!);
+        imagenes = await svc.uploadImagenPrenda(
+          uid: uid,
+          prendaId: id,
+          file: _pickedFile!,
+        );
       }
 
       final prenda = Prenda(
@@ -133,8 +147,9 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
       if (mounted) Navigator.pop(context, prenda);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -143,7 +158,8 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final thumb = _imagenes['thumb'] ?? _imagenes['medium'] ?? _imagenes['full'];
+    final thumb =
+        _imagenes['thumb'] ?? _imagenes['medium'] ?? _imagenes['full'];
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.initial == null ? 'Añadir prenda' : 'Editar prenda'),
@@ -161,49 +177,71 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                       TextFormField(
                         controller: _nombreCtrl,
                         decoration: const InputDecoration(labelText: 'Nombre'),
-                        validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Campo obligatorio'
-                            : null,
+                        validator:
+                            (v) =>
+                                v == null || v.trim().isEmpty
+                                    ? 'Campo obligatorio'
+                                    : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _descripcionCtrl,
-                        decoration: const InputDecoration(labelText: 'Descripción'),
+                        decoration: const InputDecoration(
+                          labelText: 'Descripción',
+                        ),
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         initialValue: _categoriaSeleccionada,
-                        decoration: const InputDecoration(labelText: 'Categoría'),
-                        items: _categorias.entries
-                            .map((e) => DropdownMenuItem(
-                                  value: e.key,
-                                  child: Text(e.value),
-                                ))
-                            .toList(),
-                        onChanged: (val) => setState(() => _categoriaSeleccionada = val!),
+                        decoration: const InputDecoration(
+                          labelText: 'Categoría',
+                        ),
+                        items:
+                            _categorias.entries
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.key,
+                                    child: Text(e.value),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged:
+                            (val) =>
+                                setState(() => _categoriaSeleccionada = val!),
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<EstadoPrenda>(
                         initialValue: _estado,
                         decoration: const InputDecoration(labelText: 'Estado'),
-                        items: EstadoPrenda.values
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e.name),
-                                ))
-                            .toList(),
+                        items:
+                            EstadoPrenda.values
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(e.name),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (val) => setState(() => _estado = val!),
                       ),
                       const SizedBox(height: 16),
                       if (_previewBytes != null)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.memory(_previewBytes!, height: 220, fit: BoxFit.cover),
+                          child: Image.memory(
+                            _previewBytes!,
+                            height: 220,
+                            fit: BoxFit.cover,
+                          ),
                         )
                       else if (thumb != null)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(thumb, height: 220, fit: BoxFit.cover),
+                          child: Image.network(
+                            thumb,
+                            height: 220,
+                            fit: BoxFit.cover,
+                          ),
                         )
                       else
                         const Text('Ninguna imagen seleccionada'),
@@ -229,13 +267,14 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                 ),
                 const SizedBox(height: 12),
                 FilledButton.icon(
-                  icon: _saving
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save),
+                  icon:
+                      _saving
+                          ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.save),
                   label: Text(
                     _saving
                         ? 'Guardando…'

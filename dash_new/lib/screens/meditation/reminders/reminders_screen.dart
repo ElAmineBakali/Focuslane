@@ -13,7 +13,7 @@ class RemindersScreen extends StatelessWidget {
     final h = int.tryParse(p.first) ?? 8;
     final m = p.length > 1 ? int.tryParse(p[1]) ?? 0 : 0;
     return TimeOfDay(hour: h.clamp(0, 23), minute: m.clamp(0, 59));
-    }
+  }
 
   int _notifId(String reminderId) {
     // id estable y aislado para meditación
@@ -46,7 +46,8 @@ class RemindersScreen extends StatelessWidget {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin recordatorios'));
+          if (data.isEmpty)
+            return const Center(child: Text('Sin recordatorios'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),

@@ -18,7 +18,10 @@ class _NotesListScreenState extends State<NotesListScreen> {
   List<Note> _applyFilters(List<Note> notes) {
     var list = notes.toList();
     if (_tagFilter.isNotEmpty) {
-      list = list.where((n) => _tagFilter.every((t) => n.tags.contains(t))).toList();
+      list =
+          list
+              .where((n) => _tagFilter.every((t) => n.tags.contains(t)))
+              .toList();
     }
     switch (_sort) {
       case 'created':
@@ -49,7 +52,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
         actions: [
           if (isPhone)
             IconButton(
-              icon: Icon(_grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined),
+              icon: Icon(
+                _grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined,
+              ),
               onPressed: () => setState(() => _grid = !_grid),
               tooltip: _grid ? 'Vista lista' : 'Vista grid',
             ),
@@ -58,11 +63,15 @@ class _NotesListScreenState extends State<NotesListScreen> {
               icon: const Icon(Icons.sort_rounded),
               tooltip: 'Ordenar',
               onSelected: (v) => setState(() => _sort = v),
-              itemBuilder: (context) => const [
-                PopupMenuItem(value: 'updated', child: Text('Recientes')),
-                PopupMenuItem(value: 'created', child: Text('Más antiguos')),
-                PopupMenuItem(value: 'title', child: Text('Por título')),
-              ],
+              itemBuilder:
+                  (context) => const [
+                    PopupMenuItem(value: 'updated', child: Text('Recientes')),
+                    PopupMenuItem(
+                      value: 'created',
+                      child: Text('Más antiguos'),
+                    ),
+                    PopupMenuItem(value: 'title', child: Text('Por título')),
+                  ],
             ),
           if (!isPhone) ...[
             Padding(
@@ -75,8 +84,14 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   icon: Icons.sort_rounded,
                   isCompact: true,
                   items: const [
-                    DropdownMenuItem(value: 'updated', child: Text('Recientes')),
-                    DropdownMenuItem(value: 'created', child: Text('Más antiguos')),
+                    DropdownMenuItem(
+                      value: 'updated',
+                      child: Text('Recientes'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'created',
+                      child: Text('Más antiguos'),
+                    ),
                     DropdownMenuItem(value: 'title', child: Text('Por título')),
                   ],
                   onChanged: (v) {
@@ -88,7 +103,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: IconButton(
-                icon: Icon(_grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined),
+                icon: Icon(
+                  _grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined,
+                ),
                 onPressed: () => setState(() => _grid = !_grid),
                 tooltip: _grid ? 'Vista lista' : 'Vista grid',
               ),
@@ -111,16 +128,24 @@ class _NotesListScreenState extends State<NotesListScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.note_add_outlined, size: 64, color: color.onSurfaceVariant),
+                  Icon(
+                    Icons.note_add_outlined,
+                    size: 64,
+                    color: color.onSurfaceVariant,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'No hay notas',
-                    style: theme.textTheme.titleMedium?.copyWith(color: color.onSurfaceVariant),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: color.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Toca el botón + para crear una',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: color.onSurfaceVariant),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: color.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -166,28 +191,40 @@ class _NoteTile extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final preview = note.content.split('\n').where((l) => l.trim().isNotEmpty).take(3).join('\n');
+    final preview = note.content
+        .split('\n')
+        .where((l) => l.trim().isNotEmpty)
+        .take(3)
+        .join('\n');
     final lastUpdate = DateFormat('dd MMM, HH:mm').format(note.updatedAt);
 
     return Card(
       elevation: 0,
       color: color.surfaceContainerHigh,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+      ),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/notes/editor', arguments: note),
+        onTap:
+            () =>
+                Navigator.pushNamed(context, '/notes/editor', arguments: note),
         borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (note.coverUrl != null && note.coverUrl!.isNotEmpty)
               ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 14 : 16)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(isMobile ? 14 : 16),
+                ),
                 child: Image.network(
                   note.coverUrl!,
                   height: isMobile ? 100 : 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildFallbackCover(color, isMobile ? 100 : 120),
+                  errorBuilder:
+                      (_, __, ___) =>
+                          _buildFallbackCover(color, isMobile ? 100 : 120),
                 ),
               )
             else
@@ -213,7 +250,11 @@ class _NoteTile extends StatelessWidget {
                       ),
                       if (note.isPinned) ...[
                         const SizedBox(width: 8),
-                        Icon(Icons.push_pin, size: isMobile ? 16 : 18, color: color.primary),
+                        Icon(
+                          Icons.push_pin,
+                          size: isMobile ? 16 : 18,
+                          color: color.primary,
+                        ),
                       ],
                     ],
                   ),
@@ -232,7 +273,11 @@ class _NoteTile extends StatelessWidget {
                   SizedBox(height: isMobile ? 10 : 12),
                   Row(
                     children: [
-                      Icon(Icons.access_time, size: isMobile ? 13 : 14, color: color.onSurfaceVariant),
+                      Icon(
+                        Icons.access_time,
+                        size: isMobile ? 13 : 14,
+                        color: color.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         lastUpdate,
@@ -243,7 +288,11 @@ class _NoteTile extends StatelessWidget {
                       ),
                       if (note.tags.isNotEmpty) ...[
                         const SizedBox(width: 12),
-                        Icon(Icons.label_outline, size: isMobile ? 13 : 14, color: color.onSurfaceVariant),
+                        Icon(
+                          Icons.label_outline,
+                          size: isMobile ? 13 : 14,
+                          color: color.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -278,28 +327,40 @@ class _NoteCard extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final preview = note.content.split('\n').where((l) => l.trim().isNotEmpty).take(4).join('\n');
+    final preview = note.content
+        .split('\n')
+        .where((l) => l.trim().isNotEmpty)
+        .take(4)
+        .join('\n');
     final lastUpdate = DateFormat('dd MMM').format(note.updatedAt);
 
     return Card(
       elevation: 0,
       color: color.surfaceContainerHigh,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+      ),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/notes/editor', arguments: note),
+        onTap:
+            () =>
+                Navigator.pushNamed(context, '/notes/editor', arguments: note),
         borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (note.coverUrl != null && note.coverUrl!.isNotEmpty)
               ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 14 : 16)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(isMobile ? 14 : 16),
+                ),
                 child: Image.network(
                   note.coverUrl!,
                   height: isMobile ? 90 : 100,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildFallbackCover(color, isMobile ? 90 : 100),
+                  errorBuilder:
+                      (_, __, ___) =>
+                          _buildFallbackCover(color, isMobile ? 90 : 100),
                 ),
               )
             else
@@ -324,7 +385,11 @@ class _NoteCard extends StatelessWidget {
                         ),
                       ),
                       if (note.isPinned)
-                        Icon(Icons.push_pin, size: isMobile ? 14 : 16, color: color.primary),
+                        Icon(
+                          Icons.push_pin,
+                          size: isMobile ? 14 : 16,
+                          color: color.primary,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -362,10 +427,7 @@ Widget _buildFallbackCover(ColorScheme color, double height) {
       height: height,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.primaryContainer,
-            color.secondaryContainer,
-          ],
+          colors: [color.primaryContainer, color.secondaryContainer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

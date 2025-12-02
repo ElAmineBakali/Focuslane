@@ -13,20 +13,24 @@ class PlanificadorScreen extends StatelessWidget {
     final p = o?.portada;
     if (p == null) return null;
     // soporta distintas claves sin romper compat
-    return p['mediumUrl'] ?? p['thumbUrl'] ?? p['url'] ?? p['image'] ?? p['img'];
+    return p['mediumUrl'] ??
+        p['thumbUrl'] ??
+        p['url'] ??
+        p['image'] ??
+        p['img'];
   }
 
   String _estadoLabel(EstadoPlan e) => switch (e) {
-        EstadoPlan.planificado => 'Planificado',
-        EstadoPlan.usado => 'Usado',
-        EstadoPlan.saltado => 'Saltado',
-      };
+    EstadoPlan.planificado => 'Planificado',
+    EstadoPlan.usado => 'Usado',
+    EstadoPlan.saltado => 'Saltado',
+  };
 
   Color _estadoColor(BuildContext context, EstadoPlan e) => switch (e) {
-        EstadoPlan.planificado => Theme.of(context).colorScheme.primaryContainer,
-        EstadoPlan.usado => Colors.green.withOpacity(.18),
-        EstadoPlan.saltado => Colors.redAccent.withOpacity(.18),
-      };
+    EstadoPlan.planificado => Theme.of(context).colorScheme.primaryContainer,
+    EstadoPlan.usado => Colors.green.withOpacity(.18),
+    EstadoPlan.saltado => Colors.redAccent.withOpacity(.18),
+  };
 
   // --- crear plan ---
   Future<void> _crearPlan(BuildContext context) async {
@@ -46,7 +50,9 @@ class PlanificadorScreen extends StatelessWidget {
       builder: (ctx) {
         return Padding(
           padding: EdgeInsets.only(
-            left: 16, right: 16, top: 12,
+            left: 16,
+            right: 16,
+            top: 12,
             bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom,
           ),
           child: StatefulBuilder(
@@ -58,7 +64,9 @@ class PlanificadorScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   ListTile(
                     leading: const Icon(Icons.event),
-                    title: Text('Fecha: ${fecha.toLocal().toString().split(' ').first}'),
+                    title: Text(
+                      'Fecha: ${fecha.toLocal().toString().split(' ').first}',
+                    ),
                     onTap: () async {
                       final d = await showDatePicker(
                         context: ctx,
@@ -71,7 +79,9 @@ class PlanificadorScreen extends StatelessWidget {
                   ),
                   DropdownButtonFormField<String>(
                     initialValue: parte,
-                    decoration: const InputDecoration(labelText: 'Parte del día (opcional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Parte del día (opcional)',
+                    ),
                     items: const [
                       DropdownMenuItem(value: 'mañana', child: Text('Mañana')),
                       DropdownMenuItem(value: 'tarde', child: Text('Tarde')),
@@ -94,30 +104,48 @@ class PlanificadorScreen extends StatelessWidget {
                       return DropdownButtonFormField<String>(
                         initialValue: outfitId,
                         decoration: const InputDecoration(labelText: 'Outfit'),
-                        items: data.map((o) {
-                          final u = _imgUrl(o);
-                          return DropdownMenuItem(
-                            value: o.id,
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: SizedBox(
-                                    width: 28, height: 28,
-                                    child: u != null
-                                        ? Image.network(u, fit: BoxFit.cover)
-                                        : Container(
-                                            color: Theme.of(ctx).colorScheme.surfaceContainerHighest,
-                                            child: const Icon(Icons.checkroom, size: 18),
-                                          ),
-                                  ),
+                        items:
+                            data.map((o) {
+                              final u = _imgUrl(o);
+                              return DropdownMenuItem(
+                                value: o.id,
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child:
+                                            u != null
+                                                ? Image.network(
+                                                  u,
+                                                  fit: BoxFit.cover,
+                                                )
+                                                : Container(
+                                                  color:
+                                                      Theme.of(ctx)
+                                                          .colorScheme
+                                                          .surfaceContainerHighest,
+                                                  child: const Icon(
+                                                    Icons.checkroom,
+                                                    size: 18,
+                                                  ),
+                                                ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        o.nombre.isEmpty
+                                            ? '(Sin nombre)'
+                                            : o.nombre,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text(o.nombre.isEmpty ? '(Sin nombre)' : o.nombre)),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                         onChanged: (v) => setState(() => outfitId = v),
                       );
                     },
@@ -126,14 +154,19 @@ class PlanificadorScreen extends StatelessWidget {
                   TextField(
                     minLines: 1,
                     maxLines: 3,
-                    decoration: const InputDecoration(labelText: 'Nota (opcional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Nota (opcional)',
+                    ),
                     onChanged: (v) => nota = v,
                   ),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(onPressed: ()=> Navigator.pop(ctx), child: const Text('Cancelar')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Cancelar'),
+                      ),
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () async {
@@ -176,57 +209,73 @@ class PlanificadorScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          left: 16, right: 16, top: 8,
-          bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Plan • ${outfit?.nombre ?? 'Outfit'}', style: Theme.of(ctx).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<EstadoPlan>(
-              initialValue: estado,
-              decoration: const InputDecoration(labelText: 'Estado'),
-              items: EstadoPlan.values
-                  .map((e) => DropdownMenuItem(value: e, child: Text(_estadoLabel(e))))
-                  .toList(),
-              onChanged: (v) => estado = v ?? estado,
+      builder:
+          (ctx) => Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 8,
+              bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom,
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: TextEditingController(text: nota),
-              minLines: 1, maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Nota'),
-              onChanged: (v) => nota = v,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TextButton(onPressed: ()=> Navigator.pop(ctx), child: const Text('Cerrar')),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () async {
-                    final updated = PlanOutfit(
-                      id: plan.id,
-                      fecha: plan.fecha,
-                      parteDelDia: plan.parteDelDia,
-                      outfitId: plan.outfitId,
-                      estado: estado,
-                      nota: nota,
-                    );
-                    await onSave(updated);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
-                  child: const Text('Guardar'),
+                Text(
+                  'Plan • ${outfit?.nombre ?? 'Outfit'}',
+                  style: Theme.of(ctx).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<EstadoPlan>(
+                  initialValue: estado,
+                  decoration: const InputDecoration(labelText: 'Estado'),
+                  items:
+                      EstadoPlan.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(_estadoLabel(e)),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (v) => estado = v ?? estado,
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: TextEditingController(text: nota),
+                  minLines: 1,
+                  maxLines: 3,
+                  decoration: const InputDecoration(labelText: 'Nota'),
+                  onChanged: (v) => nota = v,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cerrar'),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      onPressed: () async {
+                        final updated = PlanOutfit(
+                          id: plan.id,
+                          fecha: plan.fecha,
+                          parteDelDia: plan.parteDelDia,
+                          outfitId: plan.outfitId,
+                          estado: estado,
+                          nota: nota,
+                        );
+                        await onSave(updated);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      },
+                      child: const Text('Guardar'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -275,41 +324,60 @@ class PlanificadorScreen extends StatelessWidget {
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: SizedBox(
-                          width: 56, height: 56,
-                          child: img != null
-                              ? Image.network(img, fit: BoxFit.cover)
-                              : Container(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  child: const Icon(Icons.checkroom),
-                                ),
+                          width: 56,
+                          height: 56,
+                          child:
+                              img != null
+                                  ? Image.network(img, fit: BoxFit.cover)
+                                  : Container(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
+                                    child: const Icon(Icons.checkroom),
+                                  ),
                         ),
                       ),
                       title: Text(
                         outfit?.nombre.isNotEmpty == true
                             ? outfit!.nombre
-                            : (outfit == null ? '(Outfit eliminado)' : '(Sin nombre)'),
+                            : (outfit == null
+                                ? '(Outfit eliminado)'
+                                : '(Sin nombre)'),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "${plan.fecha.toLocal()}".split(' ')[0] +
-                              (plan.parteDelDia != null ? ' • ${plan.parteDelDia}' : ''),
+                                (plan.parteDelDia != null
+                                    ? ' • ${plan.parteDelDia}'
+                                    : ''),
                           ),
                           if (plan.nota.isNotEmpty)
-                            Text(plan.nota, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            Text(
+                              plan.nota,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                         ],
                       ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: _estadoColor(context, plan.estado),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(_estadoLabel(plan.estado), style: const TextStyle(fontSize: 12)),
+                            child: Text(
+                              _estadoLabel(plan.estado),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
                           const SizedBox(height: 6),
                           PopupMenuButton<String>(
@@ -320,36 +388,64 @@ class PlanificadorScreen extends StatelessWidget {
                                   context,
                                   plan: plan,
                                   outfit: outfit,
-                                  onSave: (upd) async => planSvc.updatePlan(uid, upd),
+                                  onSave:
+                                      (upd) async =>
+                                          planSvc.updatePlan(uid, upd),
                                 );
                               } else if (v == 'del') {
                                 final ok = await showDialog<bool>(
                                   context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: const Text('Eliminar plan'),
-                                    content: Text('¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?'),
-                                    actions: [
-                                      TextButton(onPressed: ()=> Navigator.pop(context, false), child: const Text('Cancelar')),
-                                      FilledButton(onPressed: ()=> Navigator.pop(context, true), child: const Text('Eliminar')),
-                                    ],
-                                  ),
+                                  builder:
+                                      (_) => AlertDialog(
+                                        title: const Text('Eliminar plan'),
+                                        content: Text(
+                                          '¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  context,
+                                                  false,
+                                                ),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          FilledButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  context,
+                                                  true,
+                                                ),
+                                            child: const Text('Eliminar'),
+                                          ),
+                                        ],
+                                      ),
                                 );
-                                if (ok == true) await planSvc.deletePlan(uid, plan.id);
+                                if (ok == true)
+                                  await planSvc.deletePlan(uid, plan.id);
                               }
                             },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(value: 'edit', child: Text('Editar')),
-                              PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                            ],
+                            itemBuilder:
+                                (_) => const [
+                                  PopupMenuItem(
+                                    value: 'edit',
+                                    child: Text('Editar'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'del',
+                                    child: Text('Eliminar'),
+                                  ),
+                                ],
                           ),
                         ],
                       ),
-                      onTap: () => _editarPlanSheet(
-                        context,
-                        plan: plan,
-                        outfit: outfit,
-                        onSave: (upd) async => planSvc.updatePlan(uid, upd),
-                      ),
+                      onTap:
+                          () => _editarPlanSheet(
+                            context,
+                            plan: plan,
+                            outfit: outfit,
+                            onSave: (upd) async => planSvc.updatePlan(uid, upd),
+                          ),
                     ),
                   );
                 },

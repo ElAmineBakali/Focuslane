@@ -23,12 +23,14 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
           IconButton(
             tooltip: 'Historial',
             icon: const Icon(Icons.history),
-            onPressed: () => Navigator.pushNamed(context, '/meditation/sessions'),
+            onPressed:
+                () => Navigator.pushNamed(context, '/meditation/sessions'),
           ),
           IconButton(
             tooltip: 'Analíticas',
             icon: const Icon(Icons.insights),
-            onPressed: () => Navigator.pushNamed(context, '/meditation/analytics'),
+            onPressed:
+                () => Navigator.pushNamed(context, '/meditation/analytics'),
           ),
           IconButton(
             icon: const Icon(Icons.calendar_month),
@@ -59,8 +61,18 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
                 final streak = (meta['streak'] as num?)?.toInt() ?? 0;
                 final best = (meta['bestStreak'] as num?)?.toInt() ?? 0;
                 final items = [
-                  _kpiSmall(context, 'Racha actual', '${streak}d', Icons.local_fire_department_outlined),
-                  _kpiSmall(context, 'Mejor racha', '${best}d', Icons.emoji_events_outlined),
+                  _kpiSmall(
+                    context,
+                    'Racha actual',
+                    '${streak}d',
+                    Icons.local_fire_department_outlined,
+                  ),
+                  _kpiSmall(
+                    context,
+                    'Mejor racha',
+                    '${best}d',
+                    Icons.emoji_events_outlined,
+                  ),
                 ];
                 return _kpiResponsive(items);
               },
@@ -73,8 +85,18 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
                 final minutes = (snap.data?['minutes'] ?? 0) as int;
                 final count = (snap.data?['count'] ?? 0) as int;
                 final items = [
-                  _kpiSmall(context, 'Minutos (mes)', minutes.toString(), Icons.timelapse),
-                  _kpiSmall(context, 'Sesiones (mes)', count.toString(), Icons.library_music_outlined),
+                  _kpiSmall(
+                    context,
+                    'Minutos (mes)',
+                    minutes.toString(),
+                    Icons.timelapse,
+                  ),
+                  _kpiSmall(
+                    context,
+                    'Sesiones (mes)',
+                    count.toString(),
+                    Icons.library_music_outlined,
+                  ),
                 ];
                 return _kpiResponsive(items);
               },
@@ -95,7 +117,8 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
             _navCard(
               icon: Icons.notifications_active_outlined,
               title: 'Recordatorios',
-              onTap: () => Navigator.pushNamed(context, '/meditation/reminders'),
+              onTap:
+                  () => Navigator.pushNamed(context, '/meditation/reminders'),
             ),
             _navCard(
               icon: Icons.tag_outlined,
@@ -108,7 +131,12 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
     );
   }
 
-  Widget _kpiSmall(BuildContext context, String title, String value, IconData icon) {
+  Widget _kpiSmall(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
     final w = MediaQuery.of(context).size.width;
     final cardW = w < 480 ? (w - 16 - 8) / 2 : 220.0;
     return SizedBox(
@@ -116,31 +144,34 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Row(children: [
-            Icon(icon, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
+          child: Row(
+            children: [
+              Icon(icon, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelMedium),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                ],
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         ),
       ),
     );
@@ -157,9 +188,25 @@ class _MeditationHomeScreenState extends State<MeditationHomeScreen> {
         final rows = <Widget>[];
         for (var i = 0; i < items.length; i += 2) {
           if (i + 1 < items.length) {
-            rows.add(Row(children: [Expanded(child: items[i]), const SizedBox(width: 8), Expanded(child: items[i + 1])]));
+            rows.add(
+              Row(
+                children: [
+                  Expanded(child: items[i]),
+                  const SizedBox(width: 8),
+                  Expanded(child: items[i + 1]),
+                ],
+              ),
+            );
           } else {
-            rows.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [SizedBox(width: (w / 2) - 4), Expanded(child: items[i])]));
+            rows.add(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: (w / 2) - 4),
+                  Expanded(child: items[i]),
+                ],
+              ),
+            );
           }
           rows.add(const SizedBox(height: 8));
         }

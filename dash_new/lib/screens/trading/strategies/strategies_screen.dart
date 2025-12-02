@@ -42,11 +42,12 @@ class StrategiesScreen extends StatelessWidget {
                   title: Text(x.name),
                   subtitle: Text(x.timeframe),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    StrategyDetailScreen.route,
-                    arguments: x,
-                  ),
+                  onTap:
+                      () => Navigator.pushNamed(
+                        context,
+                        StrategyDetailScreen.route,
+                        arguments: x,
+                      ),
                 ),
               );
             },

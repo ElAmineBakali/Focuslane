@@ -14,7 +14,7 @@ class HabitIcons {
     'water': Icons.local_drink_rounded,
     'nutrition': Icons.restaurant_rounded,
     'heart': Icons.favorite_rounded,
-    
+
     // Educación y trabajo
     'book': Icons.menu_book_rounded,
     'study': Icons.school_rounded,
@@ -25,7 +25,7 @@ class HabitIcons {
     'code': Icons.code_rounded,
     'music': Icons.music_note_rounded,
     'art': Icons.palette_rounded,
-    
+
     // Productividad y organización
     'calendar': Icons.calendar_today_rounded,
     'checklist': Icons.checklist_rounded,
@@ -33,19 +33,19 @@ class HabitIcons {
     'timer': Icons.timer_rounded,
     'clean': Icons.cleaning_services_rounded,
     'organize': Icons.folder_rounded,
-    
+
     // Relaciones y social
     'people': Icons.people_rounded,
     'family': Icons.family_restroom_rounded,
     'phone': Icons.phone_rounded,
     'message': Icons.message_rounded,
     'smile': Icons.sentiment_satisfied_rounded,
-    
+
     // Finanzas
     'money': Icons.attach_money_rounded,
     'savings': Icons.savings_rounded,
     'shopping': Icons.shopping_cart_rounded,
-    
+
     // General
     'star': Icons.star_rounded,
     'trophy': Icons.emoji_events_rounded,
@@ -53,7 +53,7 @@ class HabitIcons {
     'target': Icons.track_changes_rounded,
     'home': Icons.home_rounded,
   };
-  
+
   static IconData? getIcon(String? code) {
     if (code == null) return null;
     return icons[code];
@@ -135,7 +135,7 @@ class HabitTemplates {
       suggestedTags: ['Salud', 'Nutrición'],
       colorHex: '0xFF4CAF50',
     ),
-    
+
     // Educación y desarrollo
     HabitTemplate(
       name: 'Leer',
@@ -187,7 +187,7 @@ class HabitTemplates {
       unit: 'min',
       colorHex: '0xFFE91E63',
     ),
-    
+
     // Productividad
     HabitTemplate(
       name: 'Levantarse temprano',
@@ -213,7 +213,7 @@ class HabitTemplates {
       suggestedTags: ['Casa', 'Organización'],
       colorHex: '0xFF00BCD4',
     ),
-    
+
     // Relaciones y social
     HabitTemplate(
       name: 'Llamar a familia',
@@ -232,7 +232,7 @@ class HabitTemplates {
       suggestedTags: ['Mental', 'Personal'],
       colorHex: '0xFFFFC107',
     ),
-    
+
     // Finanzas
     HabitTemplate(
       name: 'Revisar gastos',

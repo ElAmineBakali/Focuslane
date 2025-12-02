@@ -53,21 +53,41 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
 
     Widget body;
     switch (_index) {
-      case 0: body = CoursesListScreen(svc: widget.svc); break;
-      case 1: body = StudyTasksScreen(svc: widget.svc); break;
-      case 2: body = StudyTimerScreen(svc: widget.svc); break;
-      case 3: body = StudyAnalyticsScreen(svc: widget.svc); break;
-      case 4: body = IntegratedCalendarScreen(svc: widget.svc); break;
-      case 5: body = ScheduleScreen(svc: widget.svc); break;
-      default: body = CoursesListScreen(svc: widget.svc); break;
+      case 0:
+        body = CoursesListScreen(svc: widget.svc);
+        break;
+      case 1:
+        body = StudyTasksScreen(svc: widget.svc);
+        break;
+      case 2:
+        body = StudyTimerScreen(svc: widget.svc);
+        break;
+      case 3:
+        body = StudyAnalyticsScreen(svc: widget.svc);
+        break;
+      case 4:
+        body = IntegratedCalendarScreen(svc: widget.svc);
+        break;
+      case 5:
+        body = ScheduleScreen(svc: widget.svc);
+        break;
+      default:
+        body = CoursesListScreen(svc: widget.svc);
+        break;
     }
 
     return Scaffold(
       body: SafeArea(child: body),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i)=>setState(()=>_index=i),
-        destinations: tabs.map((t)=>NavigationDestination(icon: Icon(t.icon), label: t.title)).toList(),
+        onDestinationSelected: (i) => setState(() => _index = i),
+        destinations:
+            tabs
+                .map(
+                  (t) =>
+                      NavigationDestination(icon: Icon(t.icon), label: t.title),
+                )
+                .toList(),
       ),
     );
   }

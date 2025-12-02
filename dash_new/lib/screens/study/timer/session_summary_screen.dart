@@ -21,10 +21,12 @@ class SessionSummaryScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.timer),
               title: Text('Minutos totales: ${session.minutes}'),
-              subtitle: Text([
-                if (session.cycles != null) 'Ciclos: ${session.cycles}',
-                if (session.laps != null) 'Laps: ${session.laps}',
-              ].join(' • ')),
+              subtitle: Text(
+                [
+                  if (session.cycles != null) 'Ciclos: ${session.cycles}',
+                  if (session.laps != null) 'Laps: ${session.laps}',
+                ].join(' • '),
+              ),
             ),
           ),
           const SizedBox(height: 8),

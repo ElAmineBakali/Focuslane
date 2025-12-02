@@ -54,12 +54,14 @@ class Prenda {
       temporadas: List<String>.from(data['temporadas'] ?? []),
       ocasiones: List<String>.from(data['ocasiones'] ?? []),
       marca: data['marca'],
-      precio: (data['precio'] != null) ? (data['precio'] as num).toDouble() : null,
+      precio:
+          (data['precio'] != null) ? (data['precio'] as num).toDouble() : null,
       imagenes: Map<String, String>.from(data['imagenes'] ?? {}),
       vecesUsada: (data['vecesUsada'] as num?)?.toInt() ?? 0,
-      ultimaVezUsada: (data['ultimaVezUsada'] is Timestamp)
-          ? (data['ultimaVezUsada'] as Timestamp).toDate()
-          : null,
+      ultimaVezUsada:
+          (data['ultimaVezUsada'] is Timestamp)
+              ? (data['ultimaVezUsada'] as Timestamp).toDate()
+              : null,
       archivada: data['archivada'] == true,
       favorita: data['favorita'] == true,
       etiquetas: List<String>.from(data['etiquetas'] ?? []),
@@ -79,7 +81,8 @@ class Prenda {
       'precio': precio,
       'imagenes': imagenes,
       'vecesUsada': vecesUsada,
-      'ultimaVezUsada': ultimaVezUsada != null ? Timestamp.fromDate(ultimaVezUsada!) : null,
+      'ultimaVezUsada':
+          ultimaVezUsada != null ? Timestamp.fromDate(ultimaVezUsada!) : null,
       'archivada': archivada,
       'favorita': favorita,
       'etiquetas': etiquetas,

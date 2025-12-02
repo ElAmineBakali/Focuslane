@@ -26,15 +26,25 @@ class SessionsLogScreen extends StatelessWidget {
             separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (_, i) {
               final x = data[i];
-              final icon = x.type == SessionType.timer
-                  ? Icons.timer_outlined
-                  : (x.type == SessionType.breath ? Icons.blur_circular_outlined : Icons.headphones_outlined);
+              final icon =
+                  x.type == SessionType.timer
+                      ? Icons.timer_outlined
+                      : (x.type == SessionType.breath
+                          ? Icons.blur_circular_outlined
+                          : Icons.headphones_outlined);
               return ListTile(
                 leading: Icon(icon),
                 title: Text(x.title.isEmpty ? x.type.name : x.title),
-                subtitle: Text("${(x.durationSec/60).toStringAsFixed(0)} min • ${x.date.toLocal().toString().split('.').first}"),
+                subtitle: Text(
+                  "${(x.durationSec / 60).toStringAsFixed(0)} min • ${x.date.toLocal().toString().split('.').first}",
+                ),
                 trailing: const Icon(Icons.edit),
-                onTap: () => Navigator.pushNamed(context, SessionEditScreen.route, arguments: x),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      SessionEditScreen.route,
+                      arguments: x,
+                    ),
               );
             },
           );

@@ -38,7 +38,11 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nueva transacción' : 'Editar transacción')),
+      appBar: AppBar(
+        title: Text(
+          editing == null ? 'Nueva transacción' : 'Editar transacción',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
@@ -48,22 +52,35 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
               TextFormField(
                 controller: _title,
                 decoration: const InputDecoration(labelText: 'Título'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amount,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Cantidad'),
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Cantidad inválida' : null,
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Cantidad inválida'
+                            : null,
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<TxType>(
                 initialValue: _type,
                 items: const [
                   DropdownMenuItem(value: TxType.expense, child: Text('Gasto')),
-                  DropdownMenuItem(value: TxType.income, child: Text('Ingreso')),
-                  DropdownMenuItem(value: TxType.transfer, child: Text('Transferencia')),
+                  DropdownMenuItem(
+                    value: TxType.income,
+                    child: Text('Ingreso'),
+                  ),
+                  DropdownMenuItem(
+                    value: TxType.transfer,
+                    child: Text('Transferencia'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _type = v ?? TxType.expense),
                 decoration: const InputDecoration(labelText: 'Tipo'),
@@ -77,7 +94,9 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.event),
-                title: Text('Fecha: ${_date.toLocal().toString().split(' ').first}'),
+                title: Text(
+                  'Fecha: ${_date.toLocal().toString().split(' ').first}',
+                ),
                 onTap: () async {
                   final d = await showDatePicker(
                     context: context,
@@ -99,7 +118,10 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
                     title: _title.text.trim(),
                     amount: double.parse(_amount.text),
                     type: _type,
-                    category: _category.text.trim().isEmpty ? 'Other' : _category.text.trim(),
+                    category:
+                        _category.text.trim().isEmpty
+                            ? 'Other'
+                            : _category.text.trim(),
                     date: _date,
                   );
                   if (editing == null) {
@@ -120,7 +142,7 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
                     if (mounted) Navigator.pop(context);
                   },
                 ),
-              ]
+              ],
             ],
           ),
         ),

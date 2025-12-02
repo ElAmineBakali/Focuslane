@@ -52,7 +52,12 @@ class _ImageEditorDialogState extends State<ImageEditorDialog> {
       if (_scale != 1.0) {
         final w = (edited.width * _scale).clamp(1, 10000).toInt();
         final h = (edited.height * _scale).clamp(1, 10000).toInt();
-        edited = img.copyResize(edited, width: w, height: h, interpolation: img.Interpolation.linear);
+        edited = img.copyResize(
+          edited,
+          width: w,
+          height: h,
+          interpolation: img.Interpolation.linear,
+        );
       }
 
       final cx = (_cropFrac.left.clamp(0.0, 1.0) * edited.width).toInt();
@@ -81,7 +86,10 @@ class _ImageEditorDialogState extends State<ImageEditorDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Editar imagen', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'Editar imagen',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context, null),
@@ -103,68 +111,102 @@ class _ImageEditorDialogState extends State<ImageEditorDialog> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Stack(children: [
-                            InteractiveViewer(
-                              transformationController: _transform,
-                              minScale: 0.5,
-                              maxScale: 5.0,
-                              panEnabled: true,
-                              scaleEnabled: true,
-                              child: Transform(
-                                alignment: Alignment.center,
-                                transform: Matrix4.identity()..rotateZ(_rotationDeg * 3.14159265 / 180)..scale(_scale),
-                                child: Center(child: Image.memory(_workingBytes, fit: BoxFit.contain)),
+                          child: Stack(
+                            children: [
+                              InteractiveViewer(
+                                transformationController: _transform,
+                                minScale: 0.5,
+                                maxScale: 5.0,
+                                panEnabled: true,
+                                scaleEnabled: true,
+                                child: Transform(
+                                  alignment: Alignment.center,
+                                  transform:
+                                      Matrix4.identity()
+                                        ..rotateZ(
+                                          _rotationDeg * 3.14159265 / 180,
+                                        )
+                                        ..scale(_scale),
+                                  child: Center(
+                                    child: Image.memory(
+                                      _workingBytes,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            LayoutBuilder(builder: (ctx, c) {
-                              final w = c.maxWidth;
-                              final h = c.maxHeight;
-                              final r = Rect.fromLTWH(
-                                _cropFrac.left * w,
-                                _cropFrac.top * h,
-                                _cropFrac.width * w,
-                                _cropFrac.height * h,
-                              );
-                              return GestureDetector(
-                                onPanStart: (_) => setState(() => _draggingCrop = true),
-                                onPanUpdate: (d) {
-                                  if (!_draggingCrop) return;
-                                  final dx = d.delta.dx / w;
-                                  final dy = d.delta.dy / h;
-                                  final next = Rect.fromLTWH(
-                                    (_cropFrac.left + dx).clamp(0.0, 1.0 - _cropFrac.width),
-                                    (_cropFrac.top + dy).clamp(0.0, 1.0 - _cropFrac.height),
-                                    _cropFrac.width,
-                                    _cropFrac.height,
+                              LayoutBuilder(
+                                builder: (ctx, c) {
+                                  final w = c.maxWidth;
+                                  final h = c.maxHeight;
+                                  final r = Rect.fromLTWH(
+                                    _cropFrac.left * w,
+                                    _cropFrac.top * h,
+                                    _cropFrac.width * w,
+                                    _cropFrac.height * h,
                                   );
-                                  setState(() => _cropFrac = next);
-                                },
-                                onPanEnd: (_) => setState(() => _draggingCrop = false),
-                                child: Stack(children: [
-                                  Positioned.fill(
-                                    child: IgnorePointer(
-                                      child: Container(
-                                        decoration: ShapeDecoration(
-                                          shape: _CropOverlayShape(r),
+                                  return GestureDetector(
+                                    onPanStart:
+                                        (_) => setState(
+                                          () => _draggingCrop = true,
                                         ),
-                                      ),
+                                    onPanUpdate: (d) {
+                                      if (!_draggingCrop) return;
+                                      final dx = d.delta.dx / w;
+                                      final dy = d.delta.dy / h;
+                                      final next = Rect.fromLTWH(
+                                        (_cropFrac.left + dx).clamp(
+                                          0.0,
+                                          1.0 - _cropFrac.width,
+                                        ),
+                                        (_cropFrac.top + dy).clamp(
+                                          0.0,
+                                          1.0 - _cropFrac.height,
+                                        ),
+                                        _cropFrac.width,
+                                        _cropFrac.height,
+                                      );
+                                      setState(() => _cropFrac = next);
+                                    },
+                                    onPanEnd:
+                                        (_) => setState(
+                                          () => _draggingCrop = false,
+                                        ),
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: IgnorePointer(
+                                            child: Container(
+                                              decoration: ShapeDecoration(
+                                                shape: _CropOverlayShape(r),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: r.left,
+                                          top: r.top,
+                                          child: Container(
+                                            width: r.width,
+                                            height: r.height,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                width: 2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Positioned(
-                                    left: r.left,
-                                    top: r.top,
-                                    child: Container(
-                                      width: r.width,
-                                      height: r.height,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
-                                      ),
-                                    ),
-                                  ),
-                                ]),
-                              );
-                            }),
-                          ]),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -200,17 +242,18 @@ class _ImageEditorDialogState extends State<ImageEditorDialog> {
     );
   }
 
-  Widget _buildControl(String label, double value, double min, double max, ValueChanged<double> onChanged) {
+  Widget _buildControl(
+    String label,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double> onChanged,
+  ) {
     return Row(
       children: [
         SizedBox(width: 60, child: Text(label)),
         Expanded(
-          child: Slider(
-            min: min,
-            max: max,
-            value: value,
-            onChanged: onChanged,
-          ),
+          child: Slider(min: min, max: max, value: value, onChanged: onChanged),
         ),
         SizedBox(
           width: 50,
@@ -231,19 +274,22 @@ class _CropOverlayShape extends ShapeBorder {
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.zero;
   @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => Path()..addRect(rect);
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
+      Path()..addRect(rect);
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     final p = Path()..addRect(rect);
     final hole = Path()..addRect(cropRect);
     return Path.combine(PathOperation.difference, p, hole);
   }
+
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
     final paint = Paint()..color = Colors.black.withOpacity(0.35);
     final path = getOuterPath(rect, textDirection: textDirection);
     canvas.drawPath(path, paint);
   }
+
   @override
   ShapeBorder scale(double t) => this;
 }

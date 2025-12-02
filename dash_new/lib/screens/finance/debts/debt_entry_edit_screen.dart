@@ -39,32 +39,49 @@ class _DebtEntryEditScreenState extends State<DebtEntryEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo apunte' : 'Editar apunte')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo apunte' : 'Editar apunte'),
+      ),
       body: TaskFormTheme(
         child: Form(
           key: _form,
           child: ListView(
             padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
             children: [
-              Text('Persona: ${person?.name ?? ''}', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Persona: ${person?.name ?? ''}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _concept,
                 decoration: const InputDecoration(labelText: 'Concepto'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amount,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                decoration: const InputDecoration(labelText: 'Importe (+ te debe / - tú debes)'),
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Inválido' : null,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Importe (+ te debe / - tú debes)',
+                ),
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Inválido'
+                            : null,
               ),
               const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.event),
-                title: Text('Fecha: ${_date.toLocal().toString().split(' ').first}'),
+                title: Text(
+                  'Fecha: ${_date.toLocal().toString().split(' ').first}',
+                ),
                 onTap: () async {
                   final d = await showDatePicker(
                     context: context,
@@ -106,7 +123,7 @@ class _DebtEntryEditScreenState extends State<DebtEntryEditScreen> {
                     if (mounted) Navigator.pop(context);
                   },
                 ),
-              ]
+              ],
             ],
           ),
         ),

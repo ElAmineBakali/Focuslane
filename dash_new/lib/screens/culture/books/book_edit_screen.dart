@@ -69,29 +69,35 @@ class _BookEditScreenState extends State<BookEditScreen> {
 
       final picked = result.files.single;
       final uid = FirebaseAuth.instance.currentUser!.uid;
-      final baseName = picked.name.toLowerCase().endsWith('.pdf')
-          ? picked.name
-          : '${picked.name}.pdf';
+      final baseName =
+          picked.name.toLowerCase().endsWith('.pdf')
+              ? picked.name
+              : '${picked.name}.pdf';
       final safeName = baseName.replaceAll(RegExp(r"[^a-zA-Z0-9_\.-]"), '_');
-      final filePath = 'users/$uid/books/${DateTime.now().millisecondsSinceEpoch}_$safeName';
+      final filePath =
+          'users/$uid/books/${DateTime.now().millisecondsSinceEpoch}_$safeName';
       final storage = Supabase.instance.client.storage;
 
       if (kIsWeb || picked.path == null) {
         final bytes = picked.bytes;
         if (bytes == null) throw Exception('Bytes no disponibles para el PDF.');
-        await storage.from('notes-media').uploadBinary(
-          filePath,
-          bytes,
-          fileOptions: FileOptions(contentType: 'application/pdf'),
-        );
+        await storage
+            .from('notes-media')
+            .uploadBinary(
+              filePath,
+              bytes,
+              fileOptions: FileOptions(contentType: 'application/pdf'),
+            );
       } else {
         final file = File(picked.path!);
         final fileBytes = await file.readAsBytes();
-        await storage.from('notes-media').uploadBinary(
-          filePath,
-          fileBytes,
-          fileOptions: FileOptions(contentType: 'application/pdf'),
-        );
+        await storage
+            .from('notes-media')
+            .uploadBinary(
+              filePath,
+              fileBytes,
+              fileOptions: FileOptions(contentType: 'application/pdf'),
+            );
       }
       final url = storage.from('notes-media').getPublicUrl(filePath);
 
@@ -107,9 +113,9 @@ class _BookEditScreenState extends State<BookEditScreen> {
     } catch (e) {
       setState(() => _uploadingPdf = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir PDF: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al subir PDF: $e')));
       }
     }
   }
@@ -118,7 +124,9 @@ class _BookEditScreenState extends State<BookEditScreen> {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo libro' : 'Editar libro')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo libro' : 'Editar libro'),
+      ),
       body: TaskFormTheme(
         child: Form(
           key: _form,
@@ -128,20 +136,42 @@ class _BookEditScreenState extends State<BookEditScreen> {
               TextFormField(
                 controller: _title,
                 decoration: const InputDecoration(labelText: 'Título'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
-              TextFormField(controller: _author, decoration: const InputDecoration(labelText: 'Autor')),
-              TextFormField(controller: _genre, decoration: const InputDecoration(labelText: 'Género')),
-              TextFormField(controller: _year, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Año')),
-              TextFormField(controller: _pages, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Páginas totales')),
-              TextFormField(controller: _cover, decoration: const InputDecoration(labelText: 'Cover URL (opcional)')),
+              TextFormField(
+                controller: _author,
+                decoration: const InputDecoration(labelText: 'Autor'),
+              ),
+              TextFormField(
+                controller: _genre,
+                decoration: const InputDecoration(labelText: 'Género'),
+              ),
+              TextFormField(
+                controller: _year,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Año'),
+              ),
+              TextFormField(
+                controller: _pages,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Páginas totales'),
+              ),
+              TextFormField(
+                controller: _cover,
+                decoration: const InputDecoration(
+                  labelText: 'Cover URL (opcional)',
+                ),
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       controller: _pdfUrl,
-                      decoration: const InputDecoration(labelText: 'PDF URL (o selecciona archivo)'),
+                      decoration: const InputDecoration(
+                        labelText: 'PDF URL (o selecciona archivo)',
+                      ),
                       enabled: !_uploadingPdf,
                     ),
                   ),
@@ -149,17 +179,24 @@ class _BookEditScreenState extends State<BookEditScreen> {
                   _uploadingPdf
                       ? const CircularProgressIndicator()
                       : IconButton(
-                          icon: const Icon(Icons.upload_file),
-                          onPressed: _pickAndUploadPdf,
-                          tooltip: 'Seleccionar PDF',
-                        ),
+                        icon: const Icon(Icons.upload_file),
+                        onPressed: _pickAndUploadPdf,
+                        tooltip: 'Seleccionar PDF',
+                      ),
                 ],
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<ItemStatus>(
                 initialValue: _status,
-                items: ItemStatus.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name))).toList(),
-                onChanged: (v) => setState(() => _status = v ?? ItemStatus.pending),
+                items:
+                    ItemStatus.values
+                        .map(
+                          (e) =>
+                              DropdownMenuItem(value: e, child: Text(e.name)),
+                        )
+                        .toList(),
+                onChanged:
+                    (v) => setState(() => _status = v ?? ItemStatus.pending),
                 decoration: const InputDecoration(labelText: 'Estado'),
               ),
               ListTile(
@@ -168,8 +205,12 @@ class _BookEditScreenState extends State<BookEditScreen> {
                 trailing: SizedBox(
                   width: 100,
                   child: TextField(
-                    controller: TextEditingController(text: _rating?.toStringAsFixed(1) ?? ''),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    controller: TextEditingController(
+                      text: _rating?.toStringAsFixed(1) ?? '',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     onChanged: (v) => _rating = double.tryParse(v),
                     decoration: const InputDecoration(hintText: 'ej 8.5'),
                   ),
@@ -184,14 +225,22 @@ class _BookEditScreenState extends State<BookEditScreen> {
                   final b = Book(
                     id: editing?.id ?? '',
                     title: _title.text.trim(),
-                    author: _author.text.trim().isEmpty ? null : _author.text.trim(),
-                    genre: _genre.text.trim().isEmpty ? null : _genre.text.trim(),
+                    author:
+                        _author.text.trim().isEmpty
+                            ? null
+                            : _author.text.trim(),
+                    genre:
+                        _genre.text.trim().isEmpty ? null : _genre.text.trim(),
                     year: int.tryParse(_year.text),
                     pagesTotal: int.tryParse(_pages.text),
                     status: _status,
                     rating: _rating,
-                    coverUrl: _cover.text.trim().isEmpty ? null : _cover.text.trim(),
-                    pdfUrl: _pdfUrl.text.trim().isEmpty ? null : _pdfUrl.text.trim(),
+                    coverUrl:
+                        _cover.text.trim().isEmpty ? null : _cover.text.trim(),
+                    pdfUrl:
+                        _pdfUrl.text.trim().isEmpty
+                            ? null
+                            : _pdfUrl.text.trim(),
                   );
                   if (editing == null) {
                     await svc.addBook(b);

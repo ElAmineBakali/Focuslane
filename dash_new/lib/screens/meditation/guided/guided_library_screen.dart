@@ -19,7 +19,8 @@ class GuidedLibraryScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Añadir audio',
-            onPressed: () => Navigator.pushNamed(context, GuidedEditScreen.route),
+            onPressed:
+                () => Navigator.pushNamed(context, GuidedEditScreen.route),
           ),
         ],
       ),
@@ -31,7 +32,9 @@ class GuidedLibraryScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (data.isEmpty) {
-            return const Center(child: Text('Sin audios. Pulsa + para añadir uno.'));
+            return const Center(
+              child: Text('Sin audios. Pulsa + para añadir uno.'),
+            );
           }
           return ListView.separated(
             itemCount: data.length,
@@ -44,14 +47,21 @@ class GuidedLibraryScreen extends StatelessWidget {
                 confirmDismiss: (_) async {
                   final ok = await showDialog<bool>(
                     context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Eliminar'),
-                      content: Text('¿Eliminar "${g.title}"?'),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                        FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-                      ],
-                    ),
+                    builder:
+                        (_) => AlertDialog(
+                          title: const Text('Eliminar'),
+                          content: Text('¿Eliminar "${g.title}"?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancelar'),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Eliminar'),
+                            ),
+                          ],
+                        ),
                   );
                   return ok ?? false;
                 },
@@ -59,12 +69,24 @@ class GuidedLibraryScreen extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.play_circle_outline),
                   title: Text(g.title),
-                  subtitle: Text('${(g.durationSec/60).round()} min  •  ${g.url.startsWith("assets/") ? "Asset" : "URL"}'),
+                  subtitle: Text(
+                    '${(g.durationSec / 60).round()} min  •  ${g.url.startsWith("assets/") ? "Asset" : "URL"}',
+                  ),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => Navigator.pushNamed(context, GuidedEditScreen.route, arguments: g),
+                    onPressed:
+                        () => Navigator.pushNamed(
+                          context,
+                          GuidedEditScreen.route,
+                          arguments: g,
+                        ),
                   ),
-                  onTap: () => Navigator.pushNamed(context, GuidedPlayerScreen.route, arguments: g),
+                  onTap:
+                      () => Navigator.pushNamed(
+                        context,
+                        GuidedPlayerScreen.route,
+                        arguments: g,
+                      ),
                 ),
               );
             },

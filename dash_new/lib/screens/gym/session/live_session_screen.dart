@@ -30,7 +30,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
   // ---- IDs fijos para notificaciones programadas ----
   static const int _inactivityId = 22001; // aviso X días sin entrenar
-  static const int _inactivityDays = 3;   // puedes cambiarlo rápido aquí
+  static const int _inactivityDays = 3; // puedes cambiarlo rápido aquí
 
   int _restNotifId(String exName) =>
       ('gym_rest_${widget.routine.id}_${widget.day.id}_$exName').hashCode;
@@ -87,28 +87,52 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   Future<void> _addSetDialog(String exName) async {
-    final last = (_performed[exName] ?? []).isNotEmpty ? _performed[exName]!.last : null;
-    final wCtrl = TextEditingController(text: last?.weight.toStringAsFixed(1) ?? '');
+    final last =
+        (_performed[exName] ?? []).isNotEmpty ? _performed[exName]!.last : null;
+    final wCtrl = TextEditingController(
+      text: last?.weight.toStringAsFixed(1) ?? '',
+    );
     final rCtrl = TextEditingController(text: last?.reps.toString() ?? '');
     final rpeCtrl = TextEditingController(text: last?.rpe?.toString() ?? '');
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Añadir serie – $exName'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: wCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Peso (kg)')),
-            TextField(controller: rCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Reps')),
-            TextField(controller: rpeCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'RPE (opcional)')),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Añadir')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: Text('Añadir serie – $exName'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: wCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Peso (kg)'),
+                ),
+                TextField(
+                  controller: rCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Reps'),
+                ),
+                TextField(
+                  controller: rpeCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'RPE (opcional)',
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Añadir'),
+              ),
+            ],
+          ),
     );
     if (ok == true) {
       final set = SessionSet(
@@ -144,9 +168,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   Future<void> _saveSession() async {
-    final exercises = _performed.entries.map((kv) {
-      return PerformedExercise(name: kv.key, sets: kv.value);
-    }).toList();
+    final exercises =
+        _performed.entries.map((kv) {
+          return PerformedExercise(name: kv.key, sets: kv.value);
+        }).toList();
 
     final prs = await _detectPRs(exercises);
 
@@ -184,9 +209,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => SessionSummaryScreen(session: doc),
-      ),
+      MaterialPageRoute(builder: (_) => SessionSummaryScreen(session: doc)),
     );
   }
 
@@ -207,9 +230,11 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
       body: StreamBuilder<List<RoutineExercise>>(
         stream: svc.streamDayExercises(widget.routine.id, widget.day.id),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final exs = snap.data!;
-          if (exs.isEmpty) return const Center(child: Text('Añade ejercicios a este día'));
+          if (exs.isEmpty)
+            return const Center(child: Text('Añade ejercicios a este día'));
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
@@ -217,7 +242,9 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               const SizedBox(height: 8),
               TextField(
                 controller: _notesCtrl,
-                decoration: const InputDecoration(labelText: 'Notas de la sesión'),
+                decoration: const InputDecoration(
+                  labelText: 'Notas de la sesión',
+                ),
                 maxLines: 3,
               ),
               const SizedBox(height: 80),
@@ -240,50 +267,68 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Expanded(
-                child: Text(
-                  exName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    exName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: 'Eliminar ejercicio del día',
-                onPressed: () async {
-                  final ok = await showDialog<bool>(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Eliminar ejercicio'),
-                      content: Text('¿Eliminar "$exName" de este día?'),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                        FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-                      ],
-                    ),
-                  );
-                  if (ok == true) {
-                    await widget.svc.deleteRoutineExercise(widget.routine.id, widget.day.id, e.id);
-                    setState(() {
-                      _performed.remove(exName);
-                      _restLeft.remove(exName);
-                    });
-                    await NotificationService.I.cancel(_restNotifId(exName));
-                  }
-                },
-                icon: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent),
-              ),
-              if (e.targetRPE != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Chip(label: Text('RPE ${e.targetRPE}')),
+                IconButton(
+                  tooltip: 'Eliminar ejercicio del día',
+                  onPressed: () async {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder:
+                          (_) => AlertDialog(
+                            title: const Text('Eliminar ejercicio'),
+                            content: Text('¿Eliminar "$exName" de este día?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancelar'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Eliminar'),
+                              ),
+                            ],
+                          ),
+                    );
+                    if (ok == true) {
+                      await widget.svc.deleteRoutineExercise(
+                        widget.routine.id,
+                        widget.day.id,
+                        e.id,
+                      );
+                      setState(() {
+                        _performed.remove(exName);
+                        _restLeft.remove(exName);
+                      });
+                      await NotificationService.I.cancel(_restNotifId(exName));
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.delete_forever_rounded,
+                    color: Colors.redAccent,
+                  ),
                 ),
-              if (e.targetPercent1RM != null)
-                Chip(label: Text('%1RM ${e.targetPercent1RM}')),
-            ]),
+                if (e.targetRPE != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Chip(label: Text('RPE ${e.targetRPE}')),
+                  ),
+                if (e.targetPercent1RM != null)
+                  Chip(label: Text('%1RM ${e.targetPercent1RM}')),
+              ],
+            ),
             const SizedBox(height: 4),
-            Text('${e.targetSets} x ${e.targetReps}'
-                '${e.restSec != null ? ' • Descanso: ${e.restSec}s' : ''}'
-                '${(e.tempo ?? '').isNotEmpty ? ' • Tempo: ${e.tempo}' : ''}'),
+            Text(
+              '${e.targetSets} x ${e.targetReps}'
+              '${e.restSec != null ? ' • Descanso: ${e.restSec}s' : ''}'
+              '${(e.tempo ?? '').isNotEmpty ? ' • Tempo: ${e.tempo}' : ''}',
+            ),
             const SizedBox(height: 8),
             Wrap(
               runSpacing: 8,
@@ -300,7 +345,11 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     foregroundColor: theme.colorScheme.secondary,
                     side: BorderSide(color: theme.colorScheme.secondary),
                   ),
-                  child: Text(restLeft > 0 ? 'Descanso: ${restLeft}s' : 'Iniciar descanso'),
+                  child: Text(
+                    restLeft > 0
+                        ? 'Descanso: ${restLeft}s'
+                        : 'Iniciar descanso',
+                  ),
                 ),
                 if (restLeft > 0)
                   TextButton(
@@ -323,8 +372,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     ListTile(
                       dense: true,
                       leading: Text('#${i + 1}'),
-                      title: Text('${sets[i].weight.toStringAsFixed(1)} kg  ×  ${sets[i].reps} reps'),
-                      subtitle: Text('E1RM: ${sets[i].e1rm.toStringAsFixed(1)}'),
+                      title: Text(
+                        '${sets[i].weight.toStringAsFixed(1)} kg  ×  ${sets[i].reps} reps',
+                      ),
+                      subtitle: Text(
+                        'E1RM: ${sets[i].e1rm.toStringAsFixed(1)}',
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -335,12 +388,21 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                               setState(() {
                                 final s = sets[i];
                                 _performed.putIfAbsent(exName, () => []);
-                                _performed[exName]!.add(SessionSet(weight: s.weight, reps: s.reps, rpe: s.rpe));
+                                _performed[exName]!.add(
+                                  SessionSet(
+                                    weight: s.weight,
+                                    reps: s.reps,
+                                    rpe: s.rpe,
+                                  ),
+                                );
                               });
                             },
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.redAccent,
+                            ),
                             tooltip: 'Eliminar serie',
                             onPressed: () {
                               setState(() {
@@ -352,7 +414,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                       ),
                     ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     child: Text(
                       'Volumen $exName: ${sets.fold<double>(0, (a, s) => a + s.weight * s.reps).toStringAsFixed(1)} kg',
                       style: const TextStyle(fontStyle: FontStyle.italic),

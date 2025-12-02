@@ -30,14 +30,16 @@ class _ReminderManagerState extends State<ReminderManager> {
       context: context,
       initialTime: const TimeOfDay(hour: 9, minute: 0),
     );
-    
+
     if (time != null) {
       setState(() {
-        _reminders.add(HabitReminder(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          time: time,
-          enabled: true,
-        ));
+        _reminders.add(
+          HabitReminder(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            time: time,
+            enabled: true,
+          ),
+        );
         widget.onRemindersChanged(_reminders);
       });
     }
@@ -65,7 +67,7 @@ class _ReminderManagerState extends State<ReminderManager> {
       context: context,
       initialTime: currentReminder.time,
     );
-    
+
     if (time != null) {
       setState(() {
         _reminders[index] = currentReminder.copyWith(time: time);
@@ -96,7 +98,9 @@ class _ReminderManagerState extends State<ReminderManager> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               child: Row(
                 children: [
@@ -106,12 +110,16 @@ class _ReminderManagerState extends State<ReminderManager> {
                       children: [
                         Text(
                           'Recordatorios',
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Configura hasta 5 recordatorios',
-                          style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -126,110 +134,124 @@ class _ReminderManagerState extends State<ReminderManager> {
 
             // Lista de recordatorios
             Expanded(
-              child: _reminders.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.notifications_off_outlined,
-                            size: 64,
-                            color: cs.onSurfaceVariant.withOpacity(0.5),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Sin recordatorios',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: cs.onSurfaceVariant,
+              child:
+                  _reminders.isEmpty
+                      ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.notifications_off_outlined,
+                              size: 64,
+                              color: cs.onSurfaceVariant.withOpacity(0.5),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Toca + para agregar uno',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ReorderableListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _reminders.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) newIndex--;
-                        setState(() {
-                          final reminder = _reminders.removeAt(oldIndex);
-                          _reminders.insert(newIndex, reminder);
-                          widget.onRemindersChanged(_reminders);
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        final reminder = _reminders[index];
-                        return Card(
-                          key: ValueKey(reminder.id),
-                          elevation: 0,
-                          color: cs.surfaceContainerHigh,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 12 : 14)),
-                          child: ListTile(
-                            leading: Container(
-                              width: isMobile ? 40 : 44,
-                              height: isMobile ? 40 : 44,
-                              decoration: BoxDecoration(
-                                color: reminder.enabled 
-                                    ? cs.primaryContainer 
-                                    : cs.surfaceContainer,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.access_time_rounded,
-                                color: reminder.enabled 
-                                    ? cs.onPrimaryContainer 
-                                    : cs.onSurfaceVariant,
-                                size: isMobile ? 20 : 22,
-                              ),
-                            ),
-                            title: Text(
-                              _formatTime(reminder.time),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Sin recordatorios',
                               style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: isMobile ? 15 : 16,
-                                color: reminder.enabled ? cs.onSurface : cs.onSurfaceVariant,
-                              ),
-                            ),
-                            subtitle: Text(
-                              reminder.enabled ? 'Activo' : 'Pausado',
-                              style: TextStyle(
-                                fontSize: isMobile ? 12 : 13,
                                 color: cs.onSurfaceVariant,
                               ),
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    reminder.enabled 
-                                        ? Icons.notifications_active_rounded 
-                                        : Icons.notifications_off_rounded,
-                                    size: isMobile ? 20 : 22,
-                                  ),
-                                  onPressed: () => _toggleReminder(index),
-                                  tooltip: reminder.enabled ? 'Pausar' : 'Activar',
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete_outline, size: isMobile ? 20 : 22),
-                                  onPressed: () => _removeReminder(index),
-                                  tooltip: 'Eliminar',
-                                ),
-                              ],
+                            const SizedBox(height: 8),
+                            Text(
+                              'Toca + para agregar uno',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
                             ),
-                            onTap: () => _editReminder(index),
-                          ),
-                        );
-                      },
-                    ),
+                          ],
+                        ),
+                      )
+                      : ReorderableListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _reminders.length,
+                        onReorder: (oldIndex, newIndex) {
+                          if (newIndex > oldIndex) newIndex--;
+                          setState(() {
+                            final reminder = _reminders.removeAt(oldIndex);
+                            _reminders.insert(newIndex, reminder);
+                            widget.onRemindersChanged(_reminders);
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final reminder = _reminders[index];
+                          return Card(
+                            key: ValueKey(reminder.id),
+                            elevation: 0,
+                            color: cs.surfaceContainerHigh,
+                            margin: const EdgeInsets.only(bottom: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                isMobile ? 12 : 14,
+                              ),
+                            ),
+                            child: ListTile(
+                              leading: Container(
+                                width: isMobile ? 40 : 44,
+                                height: isMobile ? 40 : 44,
+                                decoration: BoxDecoration(
+                                  color:
+                                      reminder.enabled
+                                          ? cs.primaryContainer
+                                          : cs.surfaceContainer,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.access_time_rounded,
+                                  color:
+                                      reminder.enabled
+                                          ? cs.onPrimaryContainer
+                                          : cs.onSurfaceVariant,
+                                  size: isMobile ? 20 : 22,
+                                ),
+                              ),
+                              title: Text(
+                                _formatTime(reminder.time),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: isMobile ? 15 : 16,
+                                  color:
+                                      reminder.enabled
+                                          ? cs.onSurface
+                                          : cs.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                reminder.enabled ? 'Activo' : 'Pausado',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 12 : 13,
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      reminder.enabled
+                                          ? Icons.notifications_active_rounded
+                                          : Icons.notifications_off_rounded,
+                                      size: isMobile ? 20 : 22,
+                                    ),
+                                    onPressed: () => _toggleReminder(index),
+                                    tooltip:
+                                        reminder.enabled ? 'Pausar' : 'Activar',
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.delete_outline,
+                                      size: isMobile ? 20 : 22,
+                                    ),
+                                    onPressed: () => _removeReminder(index),
+                                    tooltip: 'Eliminar',
+                                  ),
+                                ],
+                              ),
+                              onTap: () => _editReminder(index),
+                            ),
+                          );
+                        },
+                      ),
             ),
 
             // Footer
@@ -237,7 +259,9 @@ class _ReminderManagerState extends State<ReminderManager> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
                 border: Border(top: BorderSide(color: cs.outlineVariant)),
               ),
               child: Row(
@@ -245,7 +269,9 @@ class _ReminderManagerState extends State<ReminderManager> {
                 children: [
                   Text(
                     '${_reminders.length}/5 recordatorios',
-                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                   Row(
                     children: [

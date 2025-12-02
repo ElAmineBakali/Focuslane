@@ -26,7 +26,10 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
             tooltip: 'Objetivos (globales)',
             icon: const Icon(Icons.flag),
             onPressed: () async {
-              final kcal = await _promptNumber(context, 'Kcal objetivo (vacío para ignorar)');
+              final kcal = await _promptNumber(
+                context,
+                'Kcal objetivo (vacío para ignorar)',
+              );
               final p = await _promptNumber(context, 'Proteínas (g, opcional)');
               final c = await _promptNumber(context, 'Carbos (g, opcional)');
               final f = await _promptNumber(context, 'Grasas (g, opcional)');
@@ -51,8 +54,13 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
         children: [
           _DayHeader(
             date: _date,
-            onPrev: () => setState(() => _date = _date.subtract(const Duration(days: 1))),
-            onNext: () => setState(() => _date = _date.add(const Duration(days: 1))),
+            onPrev:
+                () => setState(
+                  () => _date = _date.subtract(const Duration(days: 1)),
+                ),
+            onNext:
+                () =>
+                    setState(() => _date = _date.add(const Duration(days: 1))),
           ),
           Expanded(
             // 🔗 combinamos día + objetivos globales (stream)
@@ -69,8 +77,15 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                     final d = snap.data!;
 
                     // Merge: si en el día falta algo -> toma global
-                    Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
-                    for (final k in ['kcal','protein','carbs','fat','fiber']) {
+                    Map<String, double?> mergedTargets =
+                        Map<String, double?>.from(d.targets);
+                    for (final k in [
+                      'kcal',
+                      'protein',
+                      'carbs',
+                      'fat',
+                      'fiber',
+                    ]) {
                       mergedTargets[k] ??= globalTargets[k];
                     }
                     // Agua: si no hay objetivo por día, usa global (o 2000 por defecto al renderizar)
@@ -107,10 +122,17 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                                     await widget.svc.deleteEntry(dayId, e.key);
                                   }
                                 },
-                                itemBuilder: (_) => const [
-                                  PopupMenuItem(value: 'dup', child: Text('Duplicar')),
-                                  PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                                ],
+                                itemBuilder:
+                                    (_) => const [
+                                      PopupMenuItem(
+                                        value: 'dup',
+                                        child: Text('Duplicar'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'del',
+                                        child: Text('Eliminar'),
+                                      ),
+                                    ],
                               ),
                             ),
                           ),
@@ -122,8 +144,12 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                           onAdd250: () => widget.svc.incrementWater(dayId, 250),
                           onAdd500: () => widget.svc.incrementWater(dayId, 500),
                           onCustom: () async {
-                            final add = await _promptInt(context, 'Añadir agua (ml)');
-                            if (add != null) await widget.svc.incrementWater(dayId, add);
+                            final add = await _promptInt(
+                              context,
+                              'Añadir agua (ml)',
+                            );
+                            if (add != null)
+                              await widget.svc.incrementWater(dayId, add);
                           },
                         ),
                         const SizedBox(height: 16),
@@ -145,14 +171,24 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
     final c = TextEditingController();
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(label),
-        content: TextField(controller: c, keyboardType: TextInputType.number),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('OK')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: Text(label),
+            content: TextField(
+              controller: c,
+              keyboardType: TextInputType.number,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
     );
     if (ok == true) return double.tryParse(c.text);
     return null;
@@ -168,7 +204,11 @@ class _DayHeader extends StatelessWidget {
   final DateTime date;
   final VoidCallback onPrev;
   final VoidCallback onNext;
-  const _DayHeader({required this.date, required this.onPrev, required this.onNext});
+  const _DayHeader({
+    required this.date,
+    required this.onPrev,
+    required this.onNext,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +238,7 @@ class _TotalsCard extends StatelessWidget {
   double _pct(double v, double? t) {
     if (t == null || t <= 0) return 0;
     return (v / t).clamp(0, 1);
-    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,17 +247,23 @@ class _TotalsCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Totales', style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          _row('Kcal', t['kcal'] ?? 0, g['kcal']),
-          _row('Proteína', t['protein'] ?? 0, g['protein']),
-          _row('Carbohidratos', t['carbs'] ?? 0, g['carbs']),
-          _row('Grasas', t['fat'] ?? 0, g['fat']),
-          _row('Fibra', t['fiber'] ?? 0, g['fiber']),
-          const SizedBox(height: 8),
-          Text('Sodio: ${(t['sodium'] ?? 0).toStringAsFixed(0)} mg'),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Totales',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _row('Kcal', t['kcal'] ?? 0, g['kcal']),
+            _row('Proteína', t['protein'] ?? 0, g['protein']),
+            _row('Carbohidratos', t['carbs'] ?? 0, g['carbs']),
+            _row('Grasas', t['fat'] ?? 0, g['fat']),
+            _row('Fibra', t['fiber'] ?? 0, g['fiber']),
+            const SizedBox(height: 8),
+            Text('Sodio: ${(t['sodium'] ?? 0).toStringAsFixed(0)} mg'),
+          ],
+        ),
       ),
     );
   }
@@ -225,10 +271,15 @@ class _TotalsCard extends StatelessWidget {
   Widget _row(String label, double val, double? target) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}'),
-        LinearProgressIndicator(value: _pct(val, target)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}',
+          ),
+          LinearProgressIndicator(value: _pct(val, target)),
+        ],
+      ),
     );
   }
 }
@@ -275,13 +326,17 @@ class _WaterBar extends StatelessWidget {
                 const SizedBox(height: 8),
                 narrow
                     ? Wrap(spacing: 6, runSpacing: 6, children: buttons)
-                    : Row(children: [
-                        ...buttons.map((b) => Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: b,
-                            )),
+                    : Row(
+                      children: [
+                        ...buttons.map(
+                          (b) => Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: b,
+                          ),
+                        ),
                         const Spacer(),
-                      ]),
+                      ],
+                    ),
               ],
             );
           },
@@ -328,7 +383,10 @@ class _QuickAddOrFullSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('¿Cómo quieres añadir?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              '¿Cómo quieres añadir?',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.flash_on),
@@ -365,62 +423,73 @@ class _QuickAddOrFullSheet extends StatelessWidget {
 
     await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Quick Add'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Nombre (ej: Snack)'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: kcalCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Calorías'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: proteinCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Proteína (g) - opcional'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () async {
-              final name = nameCtrl.text.trim().isEmpty ? 'Quick add' : nameCtrl.text.trim();
-              final kcal = double.tryParse(kcalCtrl.text) ?? 0;
-              final protein = double.tryParse(proteinCtrl.text) ?? 0;
-
-              await svc.addEntry(
-                dayId,
-                IntakeEntry(
-                  id: '',
-                  type: FavoriteType.food,
-                  refId: 'quickadd',
-                  qty: 1,
-                  unit: UnitKind.unit,
-                  nameSnapshot: name,
-                  macrosSnapshot: {
-                    'kcal': kcal,
-                    'protein': protein,
-                    'carbs': 0.0,
-                    'fat': 0.0,
-                    'fiber': 0.0,
-                    'sodium': 0.0,
-                  },
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Quick Add'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre (ej: Snack)',
+                  ),
                 ),
-              );
-              if (ctx.mounted) Navigator.pop(ctx);
-            },
-            child: const Text('Añadir'),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: kcalCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Calorías'),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: proteinCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Proteína (g) - opcional',
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  final name =
+                      nameCtrl.text.trim().isEmpty
+                          ? 'Quick add'
+                          : nameCtrl.text.trim();
+                  final kcal = double.tryParse(kcalCtrl.text) ?? 0;
+                  final protein = double.tryParse(proteinCtrl.text) ?? 0;
+
+                  await svc.addEntry(
+                    dayId,
+                    IntakeEntry(
+                      id: '',
+                      type: FavoriteType.food,
+                      refId: 'quickadd',
+                      qty: 1,
+                      unit: UnitKind.unit,
+                      nameSnapshot: name,
+                      macrosSnapshot: {
+                        'kcal': kcal,
+                        'protein': protein,
+                        'carbs': 0.0,
+                        'fat': 0.0,
+                        'fiber': 0.0,
+                        'sodium': 0.0,
+                      },
+                    ),
+                  );
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: const Text('Añadir'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -440,7 +509,6 @@ class _AddEntrySheet extends StatefulWidget {
 // (no lo repito para no saturar: usa exactamente el que ya tenías).
 // ============================================================================
 
-
 class _AddEntrySheetState extends State<_AddEntrySheet> {
   String _tab = 'fav'; // fav | food | recipe
   String _query = '';
@@ -453,24 +521,39 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 12, right: 12, top: 12,
+          left: 12,
+          right: 12,
+          top: 12,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ToggleButtons(
               isSelected: [_tab == 'fav', _tab == 'food', _tab == 'recipe'],
-              onPressed: (i) => setState(() => _tab = ['fav', 'food', 'recipe'][i]),
+              onPressed:
+                  (i) => setState(() => _tab = ['fav', 'food', 'recipe'][i]),
               children: const [
-                Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Favoritos')),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Alimentos')),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Recetas')),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Favoritos'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Alimentos'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Recetas'),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             TextField(
               onChanged: (v) => setState(() => _query = v),
-              decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar...'),
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Buscar...',
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -488,7 +571,10 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
                   items: const [
                     DropdownMenuItem(value: UnitKind.g, child: Text('g')),
                     DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
-                    DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
+                    DropdownMenuItem(
+                      value: UnitKind.unit,
+                      child: Text('unidad'),
+                    ),
                   ],
                   onChanged: (v) => setState(() => _unit = v ?? UnitKind.g),
                 ),
@@ -497,11 +583,24 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
             const SizedBox(height: 8),
             SizedBox(
               height: 360,
-              child: _tab == 'fav'
-                  ? _FavList(svc: widget.svc, query: _query, onPick: _addFav)
-                  : _tab == 'food'
-                      ? _FoodList(svc: widget.svc, query: _query, onPick: _addFood)
-                      : _RecipeList(svc: widget.svc, query: _query, onPick: _addRecipe),
+              child:
+                  _tab == 'fav'
+                      ? _FavList(
+                        svc: widget.svc,
+                        query: _query,
+                        onPick: _addFav,
+                      )
+                      : _tab == 'food'
+                      ? _FoodList(
+                        svc: widget.svc,
+                        query: _query,
+                        onPick: _addFood,
+                      )
+                      : _RecipeList(
+                        svc: widget.svc,
+                        query: _query,
+                        onPick: _addRecipe,
+                      ),
             ),
           ],
         ),
@@ -516,10 +615,20 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
       final foods = await widget.svc.streamFoods().first;
       final food = foods.firstWhere(
         (x) => x.id == f.refId,
-        orElse: () => Food(
-          id: f.refId, name: f.alias ?? 'Alimento', perUnit: unit, unitSize: 100,
-          kcal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sodium: 0, isSupplement: false,
-        ),
+        orElse:
+            () => Food(
+              id: f.refId,
+              name: f.alias ?? 'Alimento',
+              perUnit: unit,
+              unitSize: 100,
+              kcal: 0,
+              protein: 0,
+              carbs: 0,
+              fat: 0,
+              fiber: 0,
+              sodium: 0,
+              isSupplement: false,
+            ),
       );
       final mac = food.macrosFor(qty);
       await widget.svc.addEntry(
@@ -538,7 +647,13 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
       final recs = await widget.svc.streamRecipes().first;
       final r = recs.firstWhere(
         (x) => x.id == f.refId,
-        orElse: () => Recipe(id: f.refId, name: 'Receta', servings: 1, ingredients: const []),
+        orElse:
+            () => Recipe(
+              id: f.refId,
+              name: 'Receta',
+              servings: 1,
+              ingredients: const [],
+            ),
       );
       final perServing = {
         'kcal': (r.kcal ?? 0) / (r.servings == 0 ? 1 : r.servings),
@@ -615,18 +730,26 @@ class _FavList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Favorite> onPick;
-  const _FavList({required this.svc, required this.query, required this.onPick});
+  const _FavList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Favorite>>(
       stream: svc.streamFavorites(),
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+        if (!snap.hasData)
+          return const Center(child: CircularProgressIndicator());
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
-          list = list.where((f) => (f.alias ?? '').toLowerCase().contains(ql)).toList();
+          list =
+              list
+                  .where((f) => (f.alias ?? '').toLowerCase().contains(ql))
+                  .toList();
         }
         if (list.isEmpty) return const Center(child: Text('Sin favoritos'));
         return ListView.builder(
@@ -634,9 +757,15 @@ class _FavList extends StatelessWidget {
           itemBuilder: (_, i) {
             final f = list[i];
             return ListTile(
-              leading: Icon(f.type == FavoriteType.food ? Icons.restaurant : Icons.menu_book),
+              leading: Icon(
+                f.type == FavoriteType.food
+                    ? Icons.restaurant
+                    : Icons.menu_book,
+              ),
               title: Text(f.alias ?? '${f.type.name} • ${f.refId}'),
-              subtitle: Text('Default: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}'),
+              subtitle: Text(
+                'Default: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
+              ),
               onTap: () => onPick(f),
             );
           },
@@ -650,14 +779,19 @@ class _FoodList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Food> onPick;
-  const _FoodList({required this.svc, required this.query, required this.onPick});
+  const _FoodList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Food>>(
       stream: svc.streamFoods(query: query),
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+        if (!snap.hasData)
+          return const Center(child: CircularProgressIndicator());
         final list = snap.data!;
         if (list.isEmpty) return const Center(child: Text('Sin resultados'));
         return ListView.builder(
@@ -665,9 +799,14 @@ class _FoodList extends StatelessWidget {
           itemBuilder: (_, i) {
             final f = list[i];
             return ListTile(
-              leading: Icon(Icons.restaurant, color: f.color ?? Theme.of(context).colorScheme.primary),
+              leading: Icon(
+                Icons.restaurant,
+                color: f.color ?? Theme.of(context).colorScheme.primary,
+              ),
               title: Text(f.name),
-              subtitle: Text('${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}'),
+              subtitle: Text(
+                '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
+              ),
               onTap: () => onPick(f),
             );
           },
@@ -681,14 +820,19 @@ class _RecipeList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Recipe> onPick;
-  const _RecipeList({required this.svc, required this.query, required this.onPick});
+  const _RecipeList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Recipe>>(
       stream: svc.streamRecipes(),
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+        if (!snap.hasData)
+          return const Center(child: CircularProgressIndicator());
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();

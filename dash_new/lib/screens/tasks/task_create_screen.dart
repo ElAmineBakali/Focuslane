@@ -18,7 +18,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
   final _descController = TextEditingController();
   final _tagsController = TextEditingController();
   final _categoryController = TextEditingController();
-  
+
   TaskPriority _priority = TaskPriority.medium;
   DateTime? _dueDate;
   TimeOfDay? _dueTime;
@@ -80,16 +80,18 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
       finalDue = _combine(_dueDate!, _dueTime);
     }
 
-    final remindAt = (_enableReminder && _remindDate != null) 
-        ? _combine(_remindDate!, _remindTime) 
-        : null;
+    final remindAt =
+        (_enableReminder && _remindDate != null)
+            ? _combine(_remindDate!, _remindTime)
+            : null;
 
     // Parsear tags (separadas por coma)
-    final tags = _tagsController.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final tags =
+        _tagsController.text
+            .split(',')
+            .map((t) => t.trim())
+            .where((t) => t.isNotEmpty)
+            .toList();
 
     final task = Task(
       id: '',
@@ -97,9 +99,10 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
       description: _descController.text.trim(),
       dueDate: finalDue,
       priority: _priority,
-      category: _categoryController.text.trim().isNotEmpty 
-          ? _categoryController.text.trim() 
-          : null,
+      category:
+          _categoryController.text.trim().isNotEmpty
+              ? _categoryController.text.trim()
+              : null,
       completed: false,
       tags: tags,
       remindAt: remindAt,
@@ -156,7 +159,11 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Escribe un título' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? 'Escribe un título'
+                              : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -164,13 +171,12 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 const SizedBox(height: 5),
                 DropdownButtonFormField<RepeatRule>(
                   initialValue: _repeatRule,
-                  items: RepeatRule.values.map((r) {
-                    return DropdownMenuItem(
-                      value: r,
-                      child: Text(r.label),
-                    );
-                  }).toList(),
-                  onChanged: (v) => setState(() => _repeatRule = v ?? RepeatRule.none),
+                  items:
+                      RepeatRule.values.map((r) {
+                        return DropdownMenuItem(value: r, child: Text(r.label));
+                      }).toList(),
+                  onChanged:
+                      (v) => setState(() => _repeatRule = v ?? RepeatRule.none),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: colorScheme.surface,
@@ -188,7 +194,8 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 ),
 
                 Tooltip(
-                  message: 'Esta opción afectará al módulo Calendario próximamente',
+                  message:
+                      'Esta opción afectará al módulo Calendario próximamente',
                   child: SwitchListTile(
                     value: _isCalendarVisible,
                     onChanged: null, // desactivado por ahora
@@ -209,7 +216,11 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                             Expanded(
                               child: TextFormField(
                                 initialValue: _subtasks[i].title,
-                                onChanged: (t) => _subtasks[i] = _subtasks[i].copyWith(title: t),
+                                onChanged:
+                                    (t) =>
+                                        _subtasks[i] = _subtasks[i].copyWith(
+                                          title: t,
+                                        ),
                                 decoration: InputDecoration(
                                   hintText: 'Título de subtarea',
                                   filled: true,
@@ -222,7 +233,8 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline),
-                              onPressed: () => setState(() => _subtasks.removeAt(i)),
+                              onPressed:
+                                  () => setState(() => _subtasks.removeAt(i)),
                             ),
                           ],
                         ),
@@ -232,10 +244,14 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                       child: TextButton.icon(
                         onPressed: () {
                           setState(() {
-                            _subtasks.add(Subtask(
-                              id: DateTime.now().microsecondsSinceEpoch.toString(),
-                              title: '',
-                            ));
+                            _subtasks.add(
+                              Subtask(
+                                id:
+                                    DateTime.now().microsecondsSinceEpoch
+                                        .toString(),
+                                title: '',
+                              ),
+                            );
                           });
                         },
                         icon: const Icon(Icons.add),
@@ -297,18 +313,21 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 const SizedBox(height: 5),
                 DropdownButtonFormField<TaskPriority>(
                   initialValue: _priority,
-                  items: TaskPriority.values.map((p) {
-                    return DropdownMenuItem(
-                      value: p,
-                      child: Row(
-                        children: [
-                          Icon(Icons.flag, color: p.getColor(), size: 18),
-                          const SizedBox(width: 8),
-                          Text(p.label[0].toUpperCase() + p.label.substring(1)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      TaskPriority.values.map((p) {
+                        return DropdownMenuItem(
+                          value: p,
+                          child: Row(
+                            children: [
+                              Icon(Icons.flag, color: p.getColor(), size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                p.label[0].toUpperCase() + p.label.substring(1),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                   onChanged: (value) => setState(() => _priority = value!),
                   decoration: InputDecoration(
                     filled: true,
@@ -325,9 +344,11 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(_dueDate == null
-                          ? 'Sin fecha seleccionada'
-                          : DateFormat('dd/MM/yyyy').format(_dueDate!)),
+                      child: Text(
+                        _dueDate == null
+                            ? 'Sin fecha seleccionada'
+                            : DateFormat('dd/MM/yyyy').format(_dueDate!),
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: _pickDueDate,
@@ -342,9 +363,11 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(_dueTime == null
-                          ? 'Sin hora seleccionada'
-                          : _dueTime!.format(context)),
+                      child: Text(
+                        _dueTime == null
+                            ? 'Sin hora seleccionada'
+                            : _dueTime!.format(context),
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: _pickDueTime,
@@ -361,9 +384,14 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                     setState(() {
                       _enableReminder = v;
                       if (v) {
-                        final now = DateTime.now().add(const Duration(hours: 1));
-                        _remindDate ??= _dueDate ?? DateTime(now.year, now.month, now.day);
-                        _remindTime ??= _dueTime ?? TimeOfDay(hour: now.hour, minute: now.minute);
+                        final now = DateTime.now().add(
+                          const Duration(hours: 1),
+                        );
+                        _remindDate ??=
+                            _dueDate ?? DateTime(now.year, now.month, now.day);
+                        _remindTime ??=
+                            _dueTime ??
+                            TimeOfDay(hour: now.hour, minute: now.minute);
                       }
                     });
                   },
@@ -374,19 +402,23 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(_remindDate == null
-                            ? 'Elegir fecha'
-                            : DateFormat('dd/MM/yyyy').format(_remindDate!)),
+                        child: Text(
+                          _remindDate == null
+                              ? 'Elegir fecha'
+                              : DateFormat('dd/MM/yyyy').format(_remindDate!),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () async {
                           final picked = await showDatePicker(
                             context: context,
-                            initialDate: _remindDate ?? (_dueDate ?? DateTime.now()),
+                            initialDate:
+                                _remindDate ?? (_dueDate ?? DateTime.now()),
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null) setState(() => _remindDate = picked);
+                          if (picked != null)
+                            setState(() => _remindDate = picked);
                         },
                         icon: const Icon(Icons.event),
                         label: const Text('Fecha recordatorio'),
@@ -397,9 +429,11 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(_remindTime == null
-                            ? 'Elegir hora'
-                            : _remindTime!.format(context)),
+                        child: Text(
+                          _remindTime == null
+                              ? 'Elegir hora'
+                              : _remindTime!.format(context),
+                        ),
                       ),
                       TextButton.icon(
                         onPressed: () async {
@@ -407,7 +441,8 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                             context: context,
                             initialTime: _remindTime ?? TimeOfDay.now(),
                           );
-                          if (picked != null) setState(() => _remindTime = picked);
+                          if (picked != null)
+                            setState(() => _remindTime = picked);
                         },
                         icon: const Icon(Icons.alarm),
                         label: const Text('Hora recordatorio'),

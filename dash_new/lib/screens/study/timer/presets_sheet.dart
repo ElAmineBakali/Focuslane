@@ -15,7 +15,12 @@ class _PresetsSheetState extends State<PresetsSheet> {
   final _name = TextEditingController(text: 'Pomodoro 25/5');
   StudyMethod _method = StudyMethod.pomodoro;
   // params por defecto
-  final Map<String, dynamic> _params = {'work': 25, 'short': 5, 'long': 15, 'cycles': 4};
+  final Map<String, dynamic> _params = {
+    'work': 25,
+    'short': 5,
+    'long': 15,
+    'cycles': 4,
+  };
 
   void _setDefaults(StudyMethod m) {
     switch (m) {
@@ -37,10 +42,12 @@ class _PresetsSheetState extends State<PresetsSheet> {
       case StudyMethod.custom:
         _params
           ..clear()
-          ..addAll({'sequence': [
-            {'label': 'W1', 'work': 40, 'rest': 10},
-            {'label': 'W2', 'work': 40, 'rest': 10},
-          ]});
+          ..addAll({
+            'sequence': [
+              {'label': 'W1', 'work': 40, 'rest': 10},
+              {'label': 'W2', 'work': 40, 'rest': 10},
+            ],
+          });
         break;
       case StudyMethod.simple:
         _params
@@ -64,7 +71,10 @@ class _PresetsSheetState extends State<PresetsSheet> {
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
-                const Text('Presets de estudio', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Presets de estudio',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Expanded(
                   child: StreamBuilder<List<TimerPreset>>(
@@ -81,7 +91,10 @@ class _PresetsSheetState extends State<PresetsSheet> {
                               title: Text(p.name),
                               subtitle: Text('${p.method.name} • ${p.params}'),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                                icon: const Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.redAccent,
+                                ),
                                 onPressed: () => widget.svc.deletePreset(p.id),
                               ),
                               onTap: () => Navigator.pop(context, p),
@@ -93,11 +106,22 @@ class _PresetsSheetState extends State<PresetsSheet> {
                   ),
                 ),
                 const Divider(),
-                TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre del preset')),
+                TextField(
+                  controller: _name,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del preset',
+                  ),
+                ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<StudyMethod>(
                   initialValue: _method,
-                  items: StudyMethod.values.map((m) => DropdownMenuItem(value: m, child: Text(m.name))).toList(),
+                  items:
+                      StudyMethod.values
+                          .map(
+                            (m) =>
+                                DropdownMenuItem(value: m, child: Text(m.name)),
+                          )
+                          .toList(),
                   onChanged: (v) {
                     setState(() {
                       _method = v ?? _method;
@@ -116,19 +140,27 @@ class _PresetsSheetState extends State<PresetsSheet> {
                       onPressed: () async {
                         final p = TimerPreset(
                           id: '',
-                          name: _name.text.trim().isEmpty ? 'Preset' : _name.text.trim(),
+                          name:
+                              _name.text.trim().isEmpty
+                                  ? 'Preset'
+                                  : _name.text.trim(),
                           method: _method,
                           params: Map<String, dynamic>.from(_params),
                           courseId: widget.courseId,
                         );
                         await widget.svc.savePreset(p);
-                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preset guardado')));
+                        if (mounted)
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Preset guardado')),
+                          );
                       },
                       child: const Text('Guardar'),
                     ),
                   ],
                 ),
-                SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 24),
+                SizedBox(
+                  height: MediaQuery.of(context).viewPadding.bottom + 24,
+                ),
               ],
             ),
           ),
@@ -159,17 +191,32 @@ class _ParamsEditorState extends State<_ParamsEditor> {
           _num('Ciclos', 'cycles'),
         ]);
       case StudyMethod.flowtime:
-        return _numRows([ _num('Ratio descanso/trabajo (0.2 = 20%)', 'ratio') ]);
+        return _numRows([_num('Ratio descanso/trabajo (0.2 = 20%)', 'ratio')]);
       case StudyMethod.timeboxing:
-        return _numRows([ _num('Bloque (min)', 'block'), _num('Descanso (min)', 'rest') ]);
+        return _numRows([
+          _num('Bloque (min)', 'block'),
+          _num('Descanso (min)', 'rest'),
+        ]);
       case StudyMethod.custom:
-        return Text('Secuencia: edita en Firestore (por sencillez aquí). Actual: ${widget.params['sequence']}');
+        return Text(
+          'Secuencia: edita en Firestore (por sencillez aquí). Actual: ${widget.params['sequence']}',
+        );
       case StudyMethod.simple:
-        return _numRows([ _num('Objetivo (minutos)', 'target') ]);
+        return _numRows([_num('Objetivo (minutos)', 'target')]);
     }
   }
 
-  Widget _numRows(List<Widget> children) => Column(children: children.map((w) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: w)).toList());
+  Widget _numRows(List<Widget> children) => Column(
+    children:
+        children
+            .map(
+              (w) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: w,
+              ),
+            )
+            .toList(),
+  );
 
   Widget _num(String label, String key) {
     final ctrl = TextEditingController(text: '${widget.params[key] ?? ''}');

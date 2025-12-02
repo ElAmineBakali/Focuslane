@@ -9,7 +9,8 @@ class DepositMovementEditScreen extends StatefulWidget {
   static const route = '/finance/deposits/movement';
 
   @override
-  State<DepositMovementEditScreen> createState() => _DepositMovementEditScreenState();
+  State<DepositMovementEditScreen> createState() =>
+      _DepositMovementEditScreenState();
 }
 
 class _DepositMovementEditScreenState extends State<DepositMovementEditScreen> {
@@ -37,23 +38,47 @@ class _DepositMovementEditScreenState extends State<DepositMovementEditScreen> {
           child: ListView(
             padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
             children: [
-              Text('Depósito: ${deposit?.name ?? ""}', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Depósito: ${deposit?.name ?? ""}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amount,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                decoration: const InputDecoration(labelText: 'Cantidad (+ entrada / - salida)'),
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Inválido' : null,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Cantidad (+ entrada / - salida)',
+                ),
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Inválido'
+                            : null,
               ),
               const SizedBox(height: 8),
-              TextFormField(controller: _reason, decoration: const InputDecoration(labelText: 'Motivo (opcional)')),
+              TextFormField(
+                controller: _reason,
+                decoration: const InputDecoration(
+                  labelText: 'Motivo (opcional)',
+                ),
+              ),
               const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.event),
-                title: Text('Fecha: ${_date.toLocal().toString().split(' ').first}'),
+                title: Text(
+                  'Fecha: ${_date.toLocal().toString().split(' ').first}',
+                ),
                 onTap: () async {
-                  final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime(2020), lastDate: DateTime(2100));
+                  final d = await showDatePicker(
+                    context: context,
+                    initialDate: _date,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2100),
+                  );
                   if (d != null) setState(() => _date = d);
                 },
               ),
@@ -64,7 +89,15 @@ class _DepositMovementEditScreenState extends State<DepositMovementEditScreen> {
                 onPressed: () async {
                   if (deposit == null) return;
                   if (!_form.currentState!.validate()) return;
-                  await svc.addDepositMovement(deposit!.id, amount: double.parse(_amount.text), date: _date, reason: _reason.text.trim().isEmpty?null:_reason.text.trim());
+                  await svc.addDepositMovement(
+                    deposit!.id,
+                    amount: double.parse(_amount.text),
+                    date: _date,
+                    reason:
+                        _reason.text.trim().isEmpty
+                            ? null
+                            : _reason.text.trim(),
+                  );
                   if (mounted) Navigator.pop(context);
                 },
               ),

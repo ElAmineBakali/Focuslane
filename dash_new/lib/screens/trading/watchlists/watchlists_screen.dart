@@ -17,7 +17,8 @@ class WatchlistsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, WatchlistEditScreen.route),
+            onPressed:
+                () => Navigator.pushNamed(context, WatchlistEditScreen.route),
           ),
         ],
       ),
@@ -25,8 +26,10 @@ class WatchlistsScreen extends StatelessWidget {
         stream: svc.watchWatchlists(),
         builder: (_, s) {
           final lists = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (lists.isEmpty) return const Center(child: Text('Crea tu primera watchlist'));
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
+          if (lists.isEmpty)
+            return const Center(child: Text('Crea tu primera watchlist'));
           return ListView.separated(
             itemCount: lists.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -45,24 +48,43 @@ class WatchlistsScreen extends StatelessWidget {
                       }
                       return Column(
                         children: [
-                          ...syms.map((x) => ListTile(
-                            leading: CircleAvatar(child: Text('${x.priority}')),
-                            title: Text(x.ticker),
-                            subtitle: x.note!=null ? Text(x.note!) : null,
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(icon: const Icon(Icons.edit), onPressed: () =>
-                                  Navigator.pushNamed(context, SymbolEditScreen.route, arguments: {'wl': wl, 'sym': x})),
-                                IconButton(icon: const Icon(Icons.delete_outline), onPressed: () =>
-                                  svc.deleteSymbol(wl.id, x.id)),
-                              ],
+                          ...syms.map(
+                            (x) => ListTile(
+                              leading: CircleAvatar(
+                                child: Text('${x.priority}'),
+                              ),
+                              title: Text(x.ticker),
+                              subtitle: x.note != null ? Text(x.note!) : null,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed:
+                                        () => Navigator.pushNamed(
+                                          context,
+                                          SymbolEditScreen.route,
+                                          arguments: {'wl': wl, 'sym': x},
+                                        ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed:
+                                        () => svc.deleteSymbol(wl.id, x.id),
+                                  ),
+                                ],
+                              ),
                             ),
-                          )),
+                          ),
                           ListTile(
                             leading: const Icon(Icons.add),
                             title: const Text('Añadir símbolo'),
-                            onTap: () => Navigator.pushNamed(context, SymbolEditScreen.route, arguments: {'wl': wl}),
+                            onTap:
+                                () => Navigator.pushNamed(
+                                  context,
+                                  SymbolEditScreen.route,
+                                  arguments: {'wl': wl},
+                                ),
                           ),
                           const SizedBox(height: 8),
                         ],
@@ -74,12 +96,20 @@ class WatchlistsScreen extends StatelessWidget {
                       TextButton.icon(
                         icon: const Icon(Icons.edit),
                         label: const Text('Editar lista'),
-                        onPressed: () => Navigator.pushNamed(context, WatchlistEditScreen.route, arguments: wl),
+                        onPressed:
+                            () => Navigator.pushNamed(
+                              context,
+                              WatchlistEditScreen.route,
+                              arguments: wl,
+                            ),
                       ),
                       TextButton.icon(
                         icon: const Icon(Icons.delete_outline),
                         label: const Text('Eliminar'),
-                        onPressed: () => TradingFirestoreService.I.deleteWatchlist(wl.id),
+                        onPressed:
+                            () => TradingFirestoreService.I.deleteWatchlist(
+                              wl.id,
+                            ),
                       ),
                     ],
                   ),

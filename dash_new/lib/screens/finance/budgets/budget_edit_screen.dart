@@ -39,7 +39,11 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo presupuesto' : 'Editar presupuesto')),
+      appBar: AppBar(
+        title: Text(
+          editing == null ? 'Nuevo presupuesto' : 'Editar presupuesto',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
@@ -49,19 +53,28 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
               TextFormField(
                 controller: _name,
                 decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _category,
-                decoration: const InputDecoration(labelText: 'Categoría (vacío = global)'),
+                decoration: const InputDecoration(
+                  labelText: 'Categoría (vacío = global)',
+                ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _limit,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Límite'),
-                validator: (v) => (v == null || double.tryParse(v) == null) ? 'Inválido' : null,
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Inválido'
+                            : null,
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
@@ -69,7 +82,10 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
                 items: const [
                   DropdownMenuItem(value: 'monthly', child: Text('Mensual')),
                   DropdownMenuItem(value: 'weekly', child: Text('Semanal')),
-                  DropdownMenuItem(value: 'custom', child: Text('Personalizado')),
+                  DropdownMenuItem(
+                    value: 'custom',
+                    child: Text('Personalizado'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _period = v ?? 'monthly'),
                 decoration: const InputDecoration(labelText: 'Periodo'),
@@ -81,7 +97,13 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
                   DropdownButton<int>(
                     value: _startDay,
                     onChanged: (v) => setState(() => _startDay = v ?? 1),
-                    items: List.generate(28, (i) => i + 1).map((d) => DropdownMenuItem(value: d, child: Text('$d'))).toList(),
+                    items:
+                        List.generate(28, (i) => i + 1)
+                            .map(
+                              (d) =>
+                                  DropdownMenuItem(value: d, child: Text('$d')),
+                            )
+                            .toList(),
                   ),
                 ],
               ),
@@ -99,7 +121,10 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
                   final obj = Budget(
                     id: editing?.id ?? '',
                     name: _name.text.trim(),
-                    category: _category.text.trim().isEmpty ? null : _category.text.trim(),
+                    category:
+                        _category.text.trim().isEmpty
+                            ? null
+                            : _category.text.trim(),
                     limit: double.parse(_limit.text),
                     period: _period,
                     startDayOfPeriod: _startDay,
@@ -123,7 +148,7 @@ class _BudgetEditScreenState extends State<BudgetEditScreen> {
                     if (mounted) Navigator.pop(context);
                   },
                 ),
-              ]
+              ],
             ],
           ),
         ),

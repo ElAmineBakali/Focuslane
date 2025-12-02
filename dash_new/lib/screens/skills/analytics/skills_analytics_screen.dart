@@ -15,7 +15,8 @@ class SkillsAnalyticsScreen extends StatelessWidget {
         stream: svc.watchSkills(),
         builder: (_, s) {
           final skills = s.data ?? [];
-          if (skills.isEmpty) return const Center(child: Text('Sin habilidades aún'));
+          if (skills.isEmpty)
+            return const Center(child: Text('Sin habilidades aún'));
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: skills.length,
@@ -29,8 +30,10 @@ class SkillsAnalyticsScreen extends StatelessWidget {
                     child: ListTile(
                       leading: const Icon(Icons.insights),
                       title: Text(k.name),
-                      subtitle: Text('Horas ${m['totalHours']?.toStringAsFixed(1) ?? '0.0'} • '
-                          'Días activos ${m['activeDays'] ?? 0} • Sesiones ${m['sessions'] ?? 0}'),
+                      subtitle: Text(
+                        'Horas ${m['totalHours']?.toStringAsFixed(1) ?? '0.0'} • '
+                        'Días activos ${m['activeDays'] ?? 0} • Sesiones ${m['sessions'] ?? 0}',
+                      ),
                     ),
                   );
                 },

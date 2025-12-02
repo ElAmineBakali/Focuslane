@@ -17,17 +17,16 @@ class SupabaseMediaService {
     final id = const Uuid().v4();
     final ext = p.extension(file.path).toLowerCase();
     final path = '$folder/$id$ext';
-    
+
     try {
       final bytes = await file.readAsBytes();
-      await _storage.from(_bucketName).uploadBinary(
-        path,
-        bytes,
-        fileOptions: const FileOptions(
-          cacheControl: '3600',
-          upsert: false,
-        ),
-      );
+      await _storage
+          .from(_bucketName)
+          .uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          );
       final url = _storage.from(_bucketName).getPublicUrl(path);
       return url;
     } catch (e) {
@@ -46,10 +45,14 @@ class SupabaseMediaService {
         return null;
       }
       final f = result.files.first;
-      
+
       if (f.bytes != null) {
         try {
-          final url = await uploadBytes(f.bytes!, fileName: f.name, pathPrefix: pathPrefix);
+          final url = await uploadBytes(
+            f.bytes!,
+            fileName: f.name,
+            pathPrefix: pathPrefix,
+          );
           return url;
         } catch (e) {
           AppToast.error(context, e.toString().replaceFirst('Exception: ', ''));
@@ -67,11 +70,20 @@ class SupabaseMediaService {
   }
 
   /// Sube bytes directamente a Supabase
-  Future<String> uploadBytes(Uint8List data, {required String fileName, String pathPrefix = 'notes'}) async {
+  Future<String> uploadBytes(
+    Uint8List data, {
+    required String fileName,
+    String pathPrefix = 'notes',
+  }) async {
     try {
       final maxImageBytes = 500 * 1024;
-      final isImage = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-          .contains(p.extension(fileName.toLowerCase()));
+      final isImage = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.webp',
+      ].contains(p.extension(fileName.toLowerCase()));
       if (isImage && data.length > maxImageBytes) {
         final decoded = img.decodeImage(data);
         if (decoded != null) {
@@ -89,26 +101,30 @@ class SupabaseMediaService {
               fileName = p.setExtension(fileName, '.jpg');
             }
           } else {
-            throw Exception('La imagen supera el límite de 500KB incluso tras comprimir');
+            throw Exception(
+              'La imagen supera el límite de 500KB incluso tras comprimir',
+            );
           }
         } else {
-          throw Exception('Formato de imagen no soportado para comprimir (>500KB)');
+          throw Exception(
+            'Formato de imagen no soportado para comprimir (>500KB)',
+          );
         }
       }
 
       final id = const Uuid().v4();
-      final ext = p.extension(fileName.isNotEmpty ? fileName : 'file').toLowerCase();
+      final ext =
+          p.extension(fileName.isNotEmpty ? fileName : 'file').toLowerCase();
       final path = '$pathPrefix/$id$ext';
-      
-      await _storage.from(_bucketName).uploadBinary(
-        path,
-        data,
-        fileOptions: const FileOptions(
-          cacheControl: '3600',
-          upsert: false,
-        ),
-      );
-      
+
+      await _storage
+          .from(_bucketName)
+          .uploadBinary(
+            path,
+            data,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          );
+
       final url = _storage.from(_bucketName).getPublicUrl(path);
       return url;
     } catch (e) {

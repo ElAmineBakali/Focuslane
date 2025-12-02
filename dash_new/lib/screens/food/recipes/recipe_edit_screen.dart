@@ -72,75 +72,86 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
           child: ListView(
             padding: EdgeInsets.fromLTRB(16, 16, 16, screenPad(context)),
             children: [
-            TextField(
-              controller: _name,
-              decoration: const InputDecoration(labelText: 'Nombre'),
-            ),
-            TextField(
-              controller: _desc,
-              decoration: const InputDecoration(labelText: 'Descripción'),
-              minLines: 3,
-              maxLines: 6,
-            ),
-
-            const SizedBox(height: 8),
-            DropdownButtonFormField<int>(
-              initialValue: _servings,
-              decoration: const InputDecoration(labelText: 'Raciones'),
-              items: List.generate(
-                10,
-                (i) => DropdownMenuItem(value: i + 1, child: Text('${i + 1}')),
+              TextField(
+                controller: _name,
+                decoration: const InputDecoration(labelText: 'Nombre'),
               ),
-              onChanged: (v) => setState(() => _servings = v ?? _servings),
-            ),
+              TextField(
+                controller: _desc,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+                minLines: 3,
+                maxLines: 6,
+              ),
 
-            const SizedBox(height: 12),
-            Text('Ingredientes', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 6),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                initialValue: _servings,
+                decoration: const InputDecoration(labelText: 'Raciones'),
+                items: List.generate(
+                  10,
+                  (i) =>
+                      DropdownMenuItem(value: i + 1, child: Text('${i + 1}')),
+                ),
+                onChanged: (v) => setState(() => _servings = v ?? _servings),
+              ),
 
-            if (_ings.isEmpty) const Text('Añade ingredientes con el botón +'),
-            ..._ings.asMap().entries.map((e) {
-              final i = e.value;
-              return Card(
-                child: ListTile(
-                  title: Text(i.foodId != null ? 'Food: ${i.foodId}' : (i.freeName ?? 'Ingrediente')),
-                  subtitle: Text('${i.qty.toStringAsFixed(0)} ${i.unit.name}'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
-                    onPressed: () => setState(() => _ings.removeAt(e.key)),
+              const SizedBox(height: 12),
+              Text(
+                'Ingredientes',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 6),
+
+              if (_ings.isEmpty)
+                const Text('Añade ingredientes con el botón +'),
+              ..._ings.asMap().entries.map((e) {
+                final i = e.value;
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      i.foodId != null
+                          ? 'Food: ${i.foodId}'
+                          : (i.freeName ?? 'Ingrediente'),
+                    ),
+                    subtitle: Text(
+                      '${i.qty.toStringAsFixed(0)} ${i.unit.name}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () => setState(() => _ings.removeAt(e.key)),
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
 
-            const SizedBox(height: 8),
-            TextField(
-              controller: _steps,
-              decoration: const InputDecoration(labelText: 'Pasos'),
-              minLines: 6,
-              maxLines: null,
-            ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _steps,
+                decoration: const InputDecoration(labelText: 'Pasos'),
+                minLines: 6,
+                maxLines: null,
+              ),
 
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _save,
-                  child: Text(isEdit ? 'Guardar' : 'Crear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _save,
+                    child: Text(isEdit ? 'Guardar' : 'Crear'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
-      )
     );
   }
 
@@ -151,59 +162,68 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Ingrediente (rápido)'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre libre (o FoodId)',
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: qtyCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<UnitKind>(
-                initialValue: unit,
-                decoration: const InputDecoration(labelText: 'Unidad'),
-                items: const [
-                  DropdownMenuItem(value: UnitKind.g, child: Text('g')),
-                  DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
-                  DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Ingrediente (rápido)'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre libre (o FoodId)',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: qtyCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Cantidad'),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<UnitKind>(
+                    initialValue: unit,
+                    decoration: const InputDecoration(labelText: 'Unidad'),
+                    items: const [
+                      DropdownMenuItem(value: UnitKind.g, child: Text('g')),
+                      DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                      DropdownMenuItem(
+                        value: UnitKind.unit,
+                        child: Text('unidad'),
+                      ),
+                    ],
+                    onChanged: (v) => unit = v ?? UnitKind.g,
+                  ),
                 ],
-                onChanged: (v) => unit = v ?? UnitKind.g,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Añadir'),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Añadir'),
-          ),
-        ],
-      ),
     );
 
     if (ok == true) {
       setState(() {
-        _ings.add(RecipeIngredient(
-          foodId: null,
-          freeName: nameCtrl.text.trim().isEmpty ? 'Ingrediente' : nameCtrl.text.trim(),
-          qty: double.tryParse(qtyCtrl.text) ?? 0,
-          unit: unit,
-        ));
+        _ings.add(
+          RecipeIngredient(
+            foodId: null,
+            freeName:
+                nameCtrl.text.trim().isEmpty
+                    ? 'Ingrediente'
+                    : nameCtrl.text.trim(),
+            qty: double.tryParse(qtyCtrl.text) ?? 0,
+            unit: unit,
+          ),
+        );
       });
     }
   }

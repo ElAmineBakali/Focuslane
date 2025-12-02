@@ -44,27 +44,64 @@ class _DepositEditScreenState extends State<DepositEditScreen> {
   Widget build(BuildContext context) {
     final svc = FinanceFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo depósito' : 'Editar depósito')),
+      appBar: AppBar(
+        title: Text(editing == null ? 'Nuevo depósito' : 'Editar depósito'),
+      ),
       body: TaskFormTheme(
         child: Form(
           key: _form,
           child: ListView(
             padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
             children: [
-              TextFormField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre'), validator: (v) => (v==null||v.trim().isEmpty)?'Requerido':null),
+              TextFormField(
+                controller: _name,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _where, decoration: const InputDecoration(labelText: 'Dónde está'), validator: (v) => (v==null||v.trim().isEmpty)?'Requerido':null),
+              TextFormField(
+                controller: _where,
+                decoration: const InputDecoration(labelText: 'Dónde está'),
+                validator:
+                    (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Cantidad'),
-                validator: (v)=> (v==null||double.tryParse(v)==null)?'Inválido':null),
+              TextFormField(
+                controller: _amount,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Cantidad'),
+                validator:
+                    (v) =>
+                        (v == null || double.tryParse(v) == null)
+                            ? 'Inválido'
+                            : null,
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _currency, decoration: const InputDecoration(labelText: 'Divisa')),
+              TextFormField(
+                controller: _currency,
+                decoration: const InputDecoration(labelText: 'Divisa'),
+              ),
               const SizedBox(height: 8),
-              SwitchListTile(title: const Text('Es mío'), value: _isMine, onChanged: (v)=>setState(()=>_isMine=v)),
+              SwitchListTile(
+                title: const Text('Es mío'),
+                value: _isMine,
+                onChanged: (v) => setState(() => _isMine = v),
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _category, decoration: const InputDecoration(labelText: 'Categoría (cash/bank/third-party/escrow)')),
+              TextFormField(
+                controller: _category,
+                decoration: const InputDecoration(
+                  labelText: 'Categoría (cash/bank/third-party/escrow)',
+                ),
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _ownerNote, decoration: const InputDecoration(labelText: 'Nota')),
+              TextFormField(
+                controller: _ownerNote,
+                decoration: const InputDecoration(labelText: 'Nota'),
+              ),
               const SizedBox(height: 12),
               FilledButton.icon(
                 icon: const Icon(Icons.save),
@@ -76,10 +113,19 @@ class _DepositEditScreenState extends State<DepositEditScreen> {
                     name: _name.text.trim(),
                     where: _where.text.trim(),
                     amount: double.parse(_amount.text),
-                    currency: _currency.text.trim().isEmpty?'EUR':_currency.text.trim(),
+                    currency:
+                        _currency.text.trim().isEmpty
+                            ? 'EUR'
+                            : _currency.text.trim(),
                     isMine: _isMine,
-                    category: _category.text.trim().isEmpty?null:_category.text.trim(),
-                    ownerNote: _ownerNote.text.trim().isEmpty?null:_ownerNote.text.trim(),
+                    category:
+                        _category.text.trim().isEmpty
+                            ? null
+                            : _category.text.trim(),
+                    ownerNote:
+                        _ownerNote.text.trim().isEmpty
+                            ? null
+                            : _ownerNote.text.trim(),
                   );
                   if (editing == null) {
                     await svc.addDeposit(obj);
@@ -94,9 +140,14 @@ class _DepositEditScreenState extends State<DepositEditScreen> {
                 OutlinedButton.icon(
                   icon: const Icon(Icons.compare_arrows),
                   label: const Text('Movimiento (+/-)'),
-                  onPressed: () => Navigator.pushNamed(context, DepositMovementEditScreen.route, arguments: editing),
+                  onPressed:
+                      () => Navigator.pushNamed(
+                        context,
+                        DepositMovementEditScreen.route,
+                        arguments: editing,
+                      ),
                 ),
-              ]
+              ],
             ],
           ),
         ),

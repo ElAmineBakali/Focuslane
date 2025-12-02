@@ -75,99 +75,107 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
-            bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: StatefulBuilder(
-            builder: (ctx, setStateSB) => SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Editar colección',
-                      style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: 8),
+      builder:
+          (_) => SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: StatefulBuilder(
+                builder:
+                    (ctx, setStateSB) => SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Editar colección',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
 
-                  TextField(
-                    controller: name,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
-                  ),
-                  TextField(
-                    controller: desc,
-                    decoration:
-                        const InputDecoration(labelText: 'Descripción'),
-                  ),
-                  const SizedBox(height: 8),
-
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.event),
-                    title: Text(
-                      'Fecha objetivo: ${target != null ? target!.toLocal().toString().split(" ").first : "—"}',
-                    ),
-                    onTap: () async {
-                      final d = await showDatePicker(
-                        context: context,
-                        initialDate: target ?? DateTime.now(),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2100),
-                      );
-                      if (d != null) setStateSB(() => target = d);
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Cancelar'),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton(
-                        onPressed: () async {
-                          await svc.updateCollection(
-                            CultureCollection(
-                              id: c.id,
-                              name: name.text.trim().isEmpty
-                                  ? c.name
-                                  : name.text.trim(),
-                              description: desc.text.trim().isEmpty
-                                  ? null
-                                  : desc.text.trim(),
-                              targetDate: target,
-                              items: c.items,
+                          TextField(
+                            controller: name,
+                            decoration: const InputDecoration(
+                              labelText: 'Nombre',
                             ),
-                          );
-                          if (context.mounted) Navigator.pop(context);
-                        },
-                        child: const Text('Guardar'),
-                      ),
-                    ],
-                  ),
+                          ),
+                          TextField(
+                            controller: desc,
+                            decoration: const InputDecoration(
+                              labelText: 'Descripción',
+                            ),
+                          ),
+                          const SizedBox(height: 8),
 
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.delete_outline),
-                    label: const Text('Eliminar'),
-                    onPressed: () async {
-                      await svc.deleteCollection(c.id);
-                      if (context.mounted) Navigator.pop(context);
-                    },
-                  ),
-                ],
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.event),
+                            title: Text(
+                              'Fecha objetivo: ${target != null ? target!.toLocal().toString().split(" ").first : "—"}',
+                            ),
+                            onTap: () async {
+                              final d = await showDatePicker(
+                                context: context,
+                                initialDate: target ?? DateTime.now(),
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2100),
+                              );
+                              if (d != null) setStateSB(() => target = d);
+                            },
+                          ),
+
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancelar'),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton(
+                                onPressed: () async {
+                                  await svc.updateCollection(
+                                    CultureCollection(
+                                      id: c.id,
+                                      name:
+                                          name.text.trim().isEmpty
+                                              ? c.name
+                                              : name.text.trim(),
+                                      description:
+                                          desc.text.trim().isEmpty
+                                              ? null
+                                              : desc.text.trim(),
+                                      targetDate: target,
+                                      items: c.items,
+                                    ),
+                                  );
+                                  if (context.mounted) Navigator.pop(context);
+                                },
+                                child: const Text('Guardar'),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.delete_outline),
+                            label: const Text('Eliminar'),
+                            onPressed: () async {
+                              await svc.deleteCollection(c.id);
+                              if (context.mounted) Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }
-

@@ -58,17 +58,26 @@ class CalendarService {
   Future<void> savePrefs(PlannerPrefs p) async {
     final uid = await _ensureUid();
     if (uid == null) return;
-    await _plannerDoc(uid).collection('meta').doc('prefs')
-        .set(p.toMap(), SetOptions(merge: true));
+    await _plannerDoc(
+      uid,
+    ).collection('meta').doc('prefs').set(p.toMap(), SetOptions(merge: true));
   }
 
   Stream<List<CalendarEvent>> watchRange(DateTime from, DateTime to) {
     return _withUserStream((uid) {
       return _eventsCol(uid)
-          .where('start', isGreaterThanOrEqualTo:
-              Timestamp.fromDate(DateTime(from.year, from.month, from.day)))
-          .where('start', isLessThanOrEqualTo:
-              Timestamp.fromDate(DateTime(to.year, to.month, to.day, 23, 59, 59)))
+          .where(
+            'start',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(
+              DateTime(from.year, from.month, from.day),
+            ),
+          )
+          .where(
+            'start',
+            isLessThanOrEqualTo: Timestamp.fromDate(
+              DateTime(to.year, to.month, to.day, 23, 59, 59),
+            ),
+          )
           .snapshots()
           .map((s) => s.docs.map(CalendarEvent.fromSnap).toList());
     });
@@ -99,17 +108,25 @@ class CalendarService {
     if (e.end != null) return e;
     if (e.allDay) {
       return CalendarEvent(
-        id: e.id, title: e.title, type: e.type, priority: e.priority,
+        id: e.id,
+        title: e.title,
+        type: e.type,
+        priority: e.priority,
         start: e.start,
         end: DateTime(e.start.year, e.start.month, e.start.day, 23, 59),
-        allDay: true, notes: e.notes,
+        allDay: true,
+        notes: e.notes,
       );
     } else {
       return CalendarEvent(
-        id: e.id, title: e.title, type: e.type, priority: e.priority,
+        id: e.id,
+        title: e.title,
+        type: e.type,
+        priority: e.priority,
         start: e.start,
         end: e.start.add(const Duration(hours: 1)),
-        allDay: false, notes: e.notes,
+        allDay: false,
+        notes: e.notes,
       );
     }
   }
@@ -144,7 +161,9 @@ class CalendarService {
 
   Stream<List<TimetableSlot>> watchSlots(String timetableId) {
     return _withUserStream((uid) {
-      return _timetableCol(uid).doc(timetableId).collection('slots')
+      return _timetableCol(uid)
+          .doc(timetableId)
+          .collection('slots')
           .orderBy('day')
           .orderBy('startMin')
           .snapshots()
@@ -155,32 +174,37 @@ class CalendarService {
   Future<String?> addSlot(String timetableId, TimetableSlot s) async {
     final uid = await _ensureUid();
     if (uid == null) return null;
-    final data = s.toMap()
-      ..['start']    = _norm(s.start)
-      ..['end']      = _norm(s.end)
-      ..['startMin'] = _minOf(s.start)
-      ..['endMin']   = _minOf(s.end);
-    final d = await _timetableCol(uid).doc(timetableId)
-        .collection('slots').add(data);
+    final data =
+        s.toMap()
+          ..['start'] = _norm(s.start)
+          ..['end'] = _norm(s.end)
+          ..['startMin'] = _minOf(s.start)
+          ..['endMin'] = _minOf(s.end);
+    final d = await _timetableCol(
+      uid,
+    ).doc(timetableId).collection('slots').add(data);
     return d.id;
   }
 
   Future<void> updateSlot(String timetableId, TimetableSlot s) async {
     final uid = await _ensureUid();
     if (uid == null) return;
-    final data = s.toMap()
-      ..['start']    = _norm(s.start)
-      ..['end']      = _norm(s.end)
-      ..['startMin'] = _minOf(s.start)
-      ..['endMin']   = _minOf(s.end);
-    await _timetableCol(uid).doc(timetableId)
-        .collection('slots').doc(s.id).update(data);
+    final data =
+        s.toMap()
+          ..['start'] = _norm(s.start)
+          ..['end'] = _norm(s.end)
+          ..['startMin'] = _minOf(s.start)
+          ..['endMin'] = _minOf(s.end);
+    await _timetableCol(
+      uid,
+    ).doc(timetableId).collection('slots').doc(s.id).update(data);
   }
 
   Future<void> deleteSlot(String timetableId, String slotId) async {
     final uid = await _ensureUid();
     if (uid == null) return;
-    await _timetableCol(uid).doc(timetableId)
-        .collection('slots').doc(slotId).delete();
+    await _timetableCol(
+      uid,
+    ).doc(timetableId).collection('slots').doc(slotId).delete();
   }
 }

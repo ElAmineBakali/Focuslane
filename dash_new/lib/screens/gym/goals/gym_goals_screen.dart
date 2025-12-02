@@ -10,10 +10,7 @@ SnackBar _niceBar(String text, {IconData? icon}) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     content: Row(
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-        ],
+        if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
         Expanded(child: Text(text)),
       ],
     ),
@@ -47,10 +44,14 @@ class GymGoalsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Objetivo de peso corporal (kg)',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Objetivo de peso corporal (kg)',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 8),
-                        Text('Actual: ${g.bodyWeightTarget?.toStringAsFixed(1) ?? '-'}'),
+                        Text(
+                          'Actual: ${g.bodyWeightTarget?.toStringAsFixed(1) ?? '-'}',
+                        ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -68,7 +69,8 @@ class GymGoalsScreen extends StatelessWidget {
                                     return 'Introduce un valor o usa Quitar';
                                   }
                                   final v = double.tryParse(
-                                      (s ?? '').replaceAll(',', '.'));
+                                    (s ?? '').replaceAll(',', '.'),
+                                  );
                                   if (v == null) return 'Número válido';
                                   if (v <= 0) return 'Mayor que 0';
                                   return null;
@@ -78,15 +80,19 @@ class GymGoalsScreen extends StatelessWidget {
                             const SizedBox(width: 8),
                             FilledButton.icon(
                               onPressed: () async {
-                                if (formKey.currentState?.validate() != true) return;
-                                final v =
-                                    double.parse(ctrl.text.replaceAll(',', '.'));
+                                if (formKey.currentState?.validate() != true)
+                                  return;
+                                final v = double.parse(
+                                  ctrl.text.replaceAll(',', '.'),
+                                );
                                 await svc.setBodyWeightTarget(v);
                                 ctrl.clear();
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    _niceBar('Objetivo actualizado 🎯',
-                                        icon: Icons.check_circle_rounded),
+                                    _niceBar(
+                                      'Objetivo actualizado 🎯',
+                                      icon: Icons.check_circle_rounded,
+                                    ),
                                   );
                                 }
                               },
@@ -105,7 +111,7 @@ class GymGoalsScreen extends StatelessWidget {
                               },
                               icon: const Icon(Icons.clear),
                               label: const Text('Quitar'),
-                            )
+                            ),
                           ],
                         ),
                       ],
@@ -114,7 +120,9 @@ class GymGoalsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text('Próximamente: objetivos por ejercicio (peso/reps/volumen)…'),
+              const Text(
+                'Próximamente: objetivos por ejercicio (peso/reps/volumen)…',
+              ),
             ],
           );
         },

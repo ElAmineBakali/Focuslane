@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class HabitReminder {
   final String id; // ID único del recordatorio
   final TimeOfDay time; // Hora del recordatorio
-  final List<int> daysOfWeek; // Días activos (1=lun, 7=dom), vacío = todos los días
+  final List<int>
+  daysOfWeek; // Días activos (1=lun, 7=dom), vacío = todos los días
   final bool enabled; // Si está activo o no
 
   HabitReminder({
@@ -68,7 +69,7 @@ class Habit {
   bool daily;
   DateTime lastUpdated;
   String colorHex; // '0xFFxxxxxx'
-  
+
   // 🆕 Nuevos campos para personalización y motivación
   String? emoji; // Emoji opcional para el hábito
   String? iconCode; // Código del icono (ej. 'book', 'fitness', etc.)
@@ -146,12 +147,15 @@ class Habit {
     List<HabitReminder> parseReminders(dynamic v) {
       if (v == null) return [];
       if (v is! List) return [];
-      return v.map((e) {
-        if (e is Map<String, dynamic>) {
-          return HabitReminder.fromMap(e);
-        }
-        return null;
-      }).whereType<HabitReminder>().toList();
+      return v
+          .map((e) {
+            if (e is Map<String, dynamic>) {
+              return HabitReminder.fromMap(e);
+            }
+            return null;
+          })
+          .whereType<HabitReminder>()
+          .toList();
     }
 
     return Habit(

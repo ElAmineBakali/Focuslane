@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 double screenPad(BuildContext context, {double extra = 24}) {
-  final vInsets = MediaQuery.of(context).viewInsets.bottom;   
-  final vPad    = MediaQuery.of(context).viewPadding.bottom;
+  final vInsets = MediaQuery.of(context).viewInsets.bottom;
+  final vPad = MediaQuery.of(context).viewPadding.bottom;
   return extra + vPad + (vInsets > 0 ? 12 : 0);
 }
 
@@ -39,9 +39,14 @@ class TaskFormTheme extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: cs.outlineVariant.withOpacity(.4)),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
         ),
-        textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: cs.secondary)),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: cs.secondary),
+        ),
       ),
       child: child,
     );

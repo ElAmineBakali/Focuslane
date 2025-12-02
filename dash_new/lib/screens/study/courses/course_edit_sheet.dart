@@ -22,8 +22,14 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
   final _attendancePct = TextEditingController();
 
   static const _swatches = <int>[
-    0xFF2962FF, 0xFF00BFA5, 0xFF43A047, 0xFFF9A825,
-    0xFFEF6C00, 0xFFE53935, 0xFF8E24AA, 0xFF546E7A,
+    0xFF2962FF,
+    0xFF00BFA5,
+    0xFF43A047,
+    0xFFF9A825,
+    0xFFEF6C00,
+    0xFFE53935,
+    0xFF8E24AA,
+    0xFF546E7A,
   ];
 
   @override
@@ -58,30 +64,58 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16, right: 16, top: 16,
+        left: 16,
+        right: 16,
+        top: 16,
       ),
       child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(isEdit ? 'Editar curso' : 'Nuevo curso',
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                isEdit ? 'Editar curso' : 'Nuevo curso',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 8),
 
-              TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre')),
-              TextField(controller: _teacher, decoration: const InputDecoration(labelText: 'Profesor (opcional)')),
-              TextField(controller: _credits, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Créditos (opcional)')),
-              TextField(controller: _goalHours, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Objetivo de horas (opcional)')),
+              TextField(
+                controller: _name,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
+                controller: _teacher,
+                decoration: const InputDecoration(
+                  labelText: 'Profesor (opcional)',
+                ),
+              ),
+              TextField(
+                controller: _credits,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Créditos (opcional)',
+                ),
+              ),
+              TextField(
+                controller: _goalHours,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Objetivo de horas (opcional)',
+                ),
+              ),
 
               const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Color', style: Theme.of(context).textTheme.titleMedium),
+                child: Text(
+                  'Color',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               const SizedBox(height: 6),
               Wrap(
-                spacing: 8, runSpacing: 8,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   ChoiceChip(
                     label: const Text('Sin color'),
@@ -95,14 +129,20 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       selected: sel,
                       label: const SizedBox(width: 0, height: 0),
                       avatar: Container(
-                        width: 22, height: 22,
+                        width: 22,
+                        height: 22,
                         decoration: BoxDecoration(
                           color: c,
                           borderRadius: BorderRadius.circular(999),
                           border: Border.all(color: Colors.black12),
                         ),
                       ),
-                      onSelected: (_) => setState(() => _colorHex.text = '0x${hex.toRadixString(16).toUpperCase()}'),
+                      onSelected:
+                          (_) => setState(
+                            () =>
+                                _colorHex.text =
+                                    '0x${hex.toRadixString(16).toUpperCase()}',
+                          ),
                     );
                   }),
                 ],
@@ -125,7 +165,8 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   const SizedBox(width: 8),
                   CircleAvatar(
                     radius: 12,
-                    backgroundColor: previewColor ?? Theme.of(context).colorScheme.primary,
+                    backgroundColor:
+                        previewColor ?? Theme.of(context).colorScheme.primary,
                   ),
                 ],
               ),
@@ -134,22 +175,33 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: () async {
                       final name = _name.text.trim();
                       if (name.isEmpty) return;
 
-                      final attendance = double.tryParse(_attendancePct.text.trim());
+                      final attendance = double.tryParse(
+                        _attendancePct.text.trim(),
+                      );
 
                       final payload = Course(
                         id: widget.initial?.id ?? '',
                         name: name,
-                        teacher: _teacher.text.trim().isEmpty ? null : _teacher.text.trim(),
+                        teacher:
+                            _teacher.text.trim().isEmpty
+                                ? null
+                                : _teacher.text.trim(),
                         credits: double.tryParse(_credits.text),
                         goalHours: double.tryParse(_goalHours.text),
-                        colorHex: _colorHex.text.trim().isEmpty ? null : _colorHex.text.trim(),
+                        colorHex:
+                            _colorHex.text.trim().isEmpty
+                                ? null
+                                : _colorHex.text.trim(),
                         attendanceRequired: attendance,
                       );
 

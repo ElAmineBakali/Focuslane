@@ -14,24 +14,29 @@ class PrendaCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: prenda.imagenes['thumb'] != null
-                ? ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: Image.network(
-                      prenda.imagenes['thumb']!,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child:
+                prenda.imagenes['thumb'] != null
+                    ? ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(16),
                       ),
+                      child: Image.network(
+                        prenda.imagenes['thumb']!,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                    : Container(
+                      decoration: BoxDecoration(
+                        color:
+                            Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                      ),
+                      child: const Icon(Icons.checkroom, size: 48),
                     ),
-                    child: const Icon(Icons.checkroom, size: 48),
-                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(8),

@@ -8,7 +8,8 @@ class IntegratedCalendarScreen extends StatefulWidget {
   const IntegratedCalendarScreen({super.key, required this.svc});
 
   @override
-  State<IntegratedCalendarScreen> createState() => _IntegratedCalendarScreenState();
+  State<IntegratedCalendarScreen> createState() =>
+      _IntegratedCalendarScreenState();
 }
 
 class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
@@ -31,15 +32,20 @@ class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
               lastDay: DateTime(_focusedDay.year + 1, 12, 31),
               focusedDay: _focusedDay,
               selectedDayPredicate: (d) => isSameDay(d, _selectedDay),
-              onDaySelected: (selected, focused) => setState(() { _selectedDay = selected; _focusedDay = focused; }),
+              onDaySelected:
+                  (selected, focused) => setState(() {
+                    _selectedDay = selected;
+                    _focusedDay = focused;
+                  }),
               calendarFormat: CalendarFormat.month,
               startingDayOfWeek: StartingDayOfWeek.monday,
-              headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+              ),
             ),
           ),
-          Expanded(
-            child: _DayEventsList(svc: svc, day: _selectedDay),
-          ),
+          Expanded(child: _DayEventsList(svc: svc, day: _selectedDay)),
         ],
       ),
     );
@@ -57,42 +63,83 @@ class _DayEventsList extends StatelessWidget {
     return StreamBuilder<List<StudyTask>>(
       stream: svc.streamTasks(),
       builder: (context, taskSnap) {
-        final tasks = (taskSnap.data ?? const []).where((t) => t.due != null && DateTime(t.due!.year, t.due!.month, t.due!.day) == key).toList();
+        final tasks =
+            (taskSnap.data ?? const [])
+                .where(
+                  (t) =>
+                      t.due != null &&
+                      DateTime(t.due!.year, t.due!.month, t.due!.day) == key,
+                )
+                .toList();
         return StreamBuilder<List<StudySession>>(
           stream: svc.streamSessions(limit: 500),
           builder: (context, sessSnap) {
-            final sessions = (sessSnap.data ?? const []).where((s) => DateTime(s.date.year, s.date.month, s.date.day) == key).toList();
+            final sessions =
+                (sessSnap.data ?? const [])
+                    .where(
+                      (s) =>
+                          DateTime(s.date.year, s.date.month, s.date.day) ==
+                          key,
+                    )
+                    .toList();
             return StreamBuilder<List<StudyClassBlock>>(
               stream: svc.streamSchedule(),
               builder: (context, schedSnap) {
-                final classes = (schedSnap.data ?? const []).where((c) => c.daysOfWeek.contains(_weekday(key)) ).toList();
+                final classes =
+                    (schedSnap.data ?? const [])
+                        .where((c) => c.daysOfWeek.contains(_weekday(key)))
+                        .toList();
                 final items = <Widget>[];
                 if (tasks.isNotEmpty) {
                   items.add(_SectionHeader(title: 'Tareas/Exámenes'));
-                  items.addAll(tasks.map((t)=>ListTile(
-                    leading: Icon(t.type == StudyItemType.exam ? Icons.event_available : Icons.task_alt),
-                    title: Text(t.title),
-                    subtitle: Text('vence: ${t.due} • prio: ${t.priority.name} • estado: ${t.status.name}'),
-                  )));
+                  items.addAll(
+                    tasks.map(
+                      (t) => ListTile(
+                        leading: Icon(
+                          t.type == StudyItemType.exam
+                              ? Icons.event_available
+                              : Icons.task_alt,
+                        ),
+                        title: Text(t.title),
+                        subtitle: Text(
+                          'vence: ${t.due} • prio: ${t.priority.name} • estado: ${t.status.name}',
+                        ),
+                      ),
+                    ),
+                  );
                 }
                 if (classes.isNotEmpty) {
                   items.add(_SectionHeader(title: 'Clases'));
-                  items.addAll(classes.map((c)=>ListTile(
-                    leading: const Icon(Icons.class_),
-                    title: Text('Curso: ${c.courseId}'),
-                    subtitle: Text('${c.start.format(context)} - ${c.end.format(context)}${c.room!=null? ' • ${c.room}':''}'),
-                  )));
+                  items.addAll(
+                    classes.map(
+                      (c) => ListTile(
+                        leading: const Icon(Icons.class_),
+                        title: Text('Curso: ${c.courseId}'),
+                        subtitle: Text(
+                          '${c.start.format(context)} - ${c.end.format(context)}${c.room != null ? ' • ${c.room}' : ''}',
+                        ),
+                      ),
+                    ),
+                  );
                 }
                 if (sessions.isNotEmpty) {
                   items.add(_SectionHeader(title: 'Sesiones de estudio'));
-                  items.addAll(sessions.map((s)=>ListTile(
-                    leading: const Icon(Icons.timer),
-                    title: Text('Curso: ${s.courseId}'),
-                    subtitle: Text('${s.method.name} • ${s.minutes} min'),
-                  )));
+                  items.addAll(
+                    sessions.map(
+                      (s) => ListTile(
+                        leading: const Icon(Icons.timer),
+                        title: Text('Curso: ${s.courseId}'),
+                        subtitle: Text('${s.method.name} • ${s.minutes} min'),
+                      ),
+                    ),
+                  );
                 }
-                if (items.isEmpty) return const Center(child: Text('Sin eventos en este día'));
-                return ListView(padding: const EdgeInsets.all(12), children: items);
+                if (items.isEmpty)
+                  return const Center(child: Text('Sin eventos en este día'));
+                return ListView(
+                  padding: const EdgeInsets.all(12),
+                  children: items,
+                );
               },
             );
           },
@@ -113,9 +160,11 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
+          Expanded(
+            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: Divider())
+          Expanded(child: Divider()),
         ],
       ),
     );

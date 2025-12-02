@@ -13,7 +13,7 @@ class TimetablesListScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Horarios (semanales)')),
       body: StreamBuilder<List<Timetable>>(
         stream: svc.watchTimetables(),
-        initialData: const <Timetable>[],            // ← clave
+        initialData: const <Timetable>[], // ← clave
         builder: (context, s) {
           final data = s.data ?? const <Timetable>[];
           if (data.isEmpty) {
@@ -26,10 +26,13 @@ class TimetablesListScreen extends StatelessWidget {
                   FilledButton.icon(
                     icon: const Icon(Icons.add),
                     label: const Text('Crear horario'),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const TimetableEditorScreen()),
-                    ),
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const TimetableEditorScreen(),
+                          ),
+                        ),
                   ),
                 ],
               ),
@@ -43,20 +46,28 @@ class TimetablesListScreen extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.view_week),
                 title: Text(t.name),
-                subtitle: Text('${t.days.join(', ')} • ${t.startHour}–${t.endHour} • ${t.slotMinutes}\''),
-                trailing: Icon(t.isDefault ? Icons.star : Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => TimetableEditorScreen(timetable: t)),
+                subtitle: Text(
+                  '${t.days.join(', ')} • ${t.startHour}–${t.endHour} • ${t.slotMinutes}\'',
                 ),
+                trailing: Icon(t.isDefault ? Icons.star : Icons.chevron_right),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TimetableEditorScreen(timetable: t),
+                      ),
+                    ),
               );
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context, MaterialPageRoute(builder: (_) => const TimetableEditorScreen())),
+        onPressed:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TimetableEditorScreen()),
+            ),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo'),
       ),

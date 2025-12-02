@@ -32,10 +32,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   StreamSubscription<PlannerPrefs>? _prefsSub;
 
   // Alturas fijas para evitar overflow y dar cabida a la “lista de 2 eventos”
-  static const double _monthRowHeight = 40;     // altura de cada fila del mes
-  static const double _eventsHeaderH  = 44;     // cabecera “Eventos de hoy”
-  static const double _eventsBodyH    = 150;    // ~2 ListTile con subtítulo
-  static const double _eventsCardH    = _eventsHeaderH + _eventsBodyH;
+  static const double _monthRowHeight = 40; // altura de cada fila del mes
+  static const double _eventsHeaderH = 44; // cabecera “Eventos de hoy”
+  static const double _eventsBodyH = 150; // ~2 ListTile con subtítulo
+  static const double _eventsCardH = _eventsHeaderH + _eventsBodyH;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   void _watchMonth(DateTime anchor) {
     final from = DateTime(anchor.year, anchor.month, 1);
-    final to   = DateTime(anchor.year, anchor.month + 1, 0, 23, 59, 59);
+    final to = DateTime(anchor.year, anchor.month + 1, 0, 23, 59, 59);
     _monthSub?.cancel();
     _monthSub = _agg.combined(from, to).listen((list) {
       final by = <DateTime, List<CalendarEvent>>{};
@@ -92,11 +92,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
             IconButton(
               tooltip: 'Hoy',
               icon: const Icon(Icons.today),
-              onPressed: () => setState(() {
-                _focused = DateTime.now();
-                _selected = DateTime.now();
-                _watchMonth(_focused);
-              }),
+              onPressed:
+                  () => setState(() {
+                    _focused = DateTime.now();
+                    _selected = DateTime.now();
+                    _watchMonth(_focused);
+                  }),
             ),
           ],
         ),
@@ -115,8 +116,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           icon: const Icon(Icons.add),
           label: const Text('Evento'),
         ),
-        bottomNavigationBar:
-            const SizedBox(height: 50),
+        bottomNavigationBar: const SizedBox(height: 50),
       ),
     );
   }
@@ -124,7 +124,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ------- MES -------
   Widget _buildMonth() {
     final s = Theme.of(context).colorScheme;
-    final eventsToday = _eventsFor(_selected)..sort((a, b) => a.start.compareTo(b.start));
+    final eventsToday = _eventsFor(_selected)
+      ..sort((a, b) => a.start.compareTo(b.start));
 
     // YMD de hoy para comparar días (00:00)
     final now = DateTime.now();
@@ -139,14 +140,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
             lastDay: DateTime(2100),
             focusedDay: _focused,
             startingDayOfWeek: StartingDayOfWeek.monday,
-            selectedDayPredicate: (d) =>
-                d.year == _selected.year &&
-                d.month == _selected.month &&
-                d.day == _selected.day,
-            onDaySelected: (sel, foc) => setState(() {
-              _selected = sel;
-              _focused = foc;
-            }),
+            selectedDayPredicate:
+                (d) =>
+                    d.year == _selected.year &&
+                    d.month == _selected.month &&
+                    d.day == _selected.day,
+            onDaySelected:
+                (sel, foc) => setState(() {
+                  _selected = sel;
+                  _focused = foc;
+                }),
             onPageChanged: (f) {
               _focused = f;
               _watchMonth(f);
@@ -165,7 +168,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               // Estas decoraciones no se usan cuando hay *builders* personalizados,
               // pero las dejamos por compatibilidad.
-              todayDecoration: const BoxDecoration(), // hueco -> lo pinta todayBuilder
+              todayDecoration:
+                  const BoxDecoration(), // hueco -> lo pinta todayBuilder
               selectedDecoration: BoxDecoration(
                 color: s.primary,
                 shape: BoxShape.circle,
@@ -228,7 +232,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               },
               markerBuilder: (context, day, events) {
                 if (events.isEmpty) return null;
-                final high = events.any((e) => e.priority == CalendarPriority.high);
+                final high = events.any(
+                  (e) => e.priority == CalendarPriority.high,
+                );
                 return Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
@@ -268,8 +274,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   child: Row(
                     children: const [
                       SizedBox(width: 12),
-                      Text('Eventos de hoy',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        'Eventos de hoy',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       Spacer(),
                     ],
                   ),
@@ -312,49 +320,63 @@ class _CalendarScreenState extends State<CalendarScreen> {
       avatar: Icon(icon, size: 18),
       onSelected: (v) {
         final set = {...enabled};
-        if (v) { set.add(t); } else { set.remove(t); }
-        _svc.savePrefs(PlannerPrefs(
-          enabled: set,
-          highOnly: p.highOnly,
-          defaultTimetableId: p.defaultTimetableId,
-        ));
+        if (v) {
+          set.add(t);
+        } else {
+          set.remove(t);
+        }
+        _svc.savePrefs(
+          PlannerPrefs(
+            enabled: set,
+            highOnly: p.highOnly,
+            defaultTimetableId: p.defaultTimetableId,
+          ),
+        );
       },
     );
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Row(children: [
-        chip(CalendarType.task, 'Tareas', Icons.checklist),
-        const SizedBox(width: 6),
-        chip(CalendarType.study, 'Estudio', Icons.school),
-        const SizedBox(width: 6),
-        chip(CalendarType.gym, 'Gym', Icons.fitness_center),
-        const SizedBox(width: 6),
-        chip(CalendarType.finance, 'Pagos', Icons.payments),
-        const SizedBox(width: 6),
-        chip(CalendarType.food, 'Comidas', Icons.restaurant),
-        const SizedBox(width: 6),
-        chip(CalendarType.other, 'Otros', Icons.event_note),
-        const SizedBox(width: 12),
-        FilterChip(
-          label: const Text('Solo prioridad alta'),
-          selected: p.highOnly,
-          avatar: const Icon(Icons.priority_high),
-          onSelected: (v) {
-            _svc.savePrefs(PlannerPrefs(
-              enabled: enabled,
-              highOnly: v,
-              defaultTimetableId: p.defaultTimetableId,
-            ));
-          },
-        ),
-      ]),
+      child: Row(
+        children: [
+          chip(CalendarType.task, 'Tareas', Icons.checklist),
+          const SizedBox(width: 6),
+          chip(CalendarType.study, 'Estudio', Icons.school),
+          const SizedBox(width: 6),
+          chip(CalendarType.gym, 'Gym', Icons.fitness_center),
+          const SizedBox(width: 6),
+          chip(CalendarType.finance, 'Pagos', Icons.payments),
+          const SizedBox(width: 6),
+          chip(CalendarType.food, 'Comidas', Icons.restaurant),
+          const SizedBox(width: 6),
+          chip(CalendarType.other, 'Otros', Icons.event_note),
+          const SizedBox(width: 12),
+          FilterChip(
+            label: const Text('Solo prioridad alta'),
+            selected: p.highOnly,
+            avatar: const Icon(Icons.priority_high),
+            onSelected: (v) {
+              _svc.savePrefs(
+                PlannerPrefs(
+                  enabled: enabled,
+                  highOnly: v,
+                  defaultTimetableId: p.defaultTimetableId,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
   // ------- editor (bottom sheet tipo tareas) -------
-  Future<void> _editEvent(BuildContext context, CalendarEvent? e, {DateTime? defaultDay}) async {
+  Future<void> _editEvent(
+    BuildContext context,
+    CalendarEvent? e, {
+    DateTime? defaultDay,
+  }) async {
     final title = TextEditingController(text: e?.title ?? '');
     CalendarType type = e?.type ?? CalendarType.other;
     CalendarPriority prio = e?.priority ?? CalendarPriority.normal;
@@ -366,185 +388,249 @@ class _CalendarScreenState extends State<CalendarScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setS) {
-          final bottom = MediaQuery.of(ctx).viewInsets.bottom;
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + bottom),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+      builder:
+          (ctx) => StatefulBuilder(
+            builder: (ctx, setS) {
+              final bottom = MediaQuery.of(ctx).viewInsets.bottom;
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + bottom),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(e == null ? 'Nuevo evento' : 'Editar evento',
-                            style: Theme.of(ctx).textTheme.titleMedium),
-                        const Spacer(),
-                        IconButton(
-                          tooltip: 'Cerrar',
-                          onPressed: () => Navigator.pop(ctx),
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: title,
-                      decoration: const InputDecoration(labelText: 'Título del evento'),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<CalendarType>(
-                            initialValue: type,
-                            items: CalendarType.values
-                                .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                                .toList(),
-                            onChanged: (v) => setS(() => type = v ?? type),
-                            decoration: const InputDecoration(labelText: 'Tipo'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: DropdownButtonFormField<CalendarPriority>(
-                            initialValue: prio,
-                            items: CalendarPriority.values
-                                .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                                .toList(),
-                            onChanged: (v) => setS(() => prio = v ?? prio),
-                            decoration: const InputDecoration(labelText: 'Prioridad'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    SwitchListTile(
-                      value: allDay,
-                      onChanged: (v) => setS(() => allDay = v),
-                      title: const Text('Todo el día'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.event),
-                      title: Text(_humanDateTime(when, allDay)),
-                      onTap: () async {
-                        final d = await showDatePicker(
-                          context: ctx, initialDate: when,
-                          firstDate: DateTime(2020), lastDate: DateTime(2100),
-                        );
-                        if (d != null) {
-                          if (!allDay) {
-                            final t = await showTimePicker(
-                              context: ctx, initialTime: TimeOfDay.fromDateTime(when),
-                            );
-                            setS(() => when = DateTime(d.year, d.month, d.day, t?.hour ?? 9, t?.minute ?? 0));
-                          } else {
-                            setS(() => when = DateTime(d.year, d.month, d.day));
-                          }
-                        }
-                      },
-                    ),
-                    TextField(
-                      controller: notes,
-                      maxLines: 3,
-                      decoration: const InputDecoration(labelText: 'Notas / detalles'),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        if (e != null)
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              textStyle: const TextStyle(fontSize: 13),
-                              minimumSize: const Size(0, 40),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
+                        Row(
+                          children: [
+                            Text(
+                              e == null ? 'Nuevo evento' : 'Editar evento',
+                              style: Theme.of(ctx).textTheme.titleMedium,
                             ),
-                            onPressed: () async {
-                              await CalendarService.I.deleteEvent(e.id);
-                              await NotificationService.I.cancel(e.id.hashCode);
-                              if (ctx.mounted) Navigator.pop(ctx);
-                            },
-                            child: const Text('Eliminar'),
-                          ),
-                        const Spacer(),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            textStyle: const TextStyle(fontSize: 13),
-                            minimumSize: const Size(0, 40),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Cancelar'),
+                            const Spacer(),
+                            IconButton(
+                              tooltip: 'Cerrar',
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: const Icon(Icons.close),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        FilledButton(
-                          style: FilledButton.styleFrom(
-                            textStyle: const TextStyle(fontSize: 13),
-                            minimumSize: const Size(0, 40),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: title,
+                          decoration: const InputDecoration(
+                            labelText: 'Título del evento',
                           ),
-                          onPressed: () async {
-                            final data = CalendarEvent(
-                              id: e?.id ?? '',
-                              title: title.text.trim().isEmpty ? 'Evento' : title.text.trim(),
-                              type: type, priority: prio, start: when, allDay: allDay,
-                              end: e?.end,
-                              notes: notes.text.trim().isNotEmpty ? notes.text.trim() : null,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<CalendarType>(
+                                initialValue: type,
+                                items:
+                                    CalendarType.values
+                                        .map(
+                                          (t) => DropdownMenuItem(
+                                            value: t,
+                                            child: Text(t.name),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (v) => setS(() => type = v ?? type),
+                                decoration: const InputDecoration(
+                                  labelText: 'Tipo',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: DropdownButtonFormField<CalendarPriority>(
+                                initialValue: prio,
+                                items:
+                                    CalendarPriority.values
+                                        .map(
+                                          (t) => DropdownMenuItem(
+                                            value: t,
+                                            child: Text(t.name),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (v) => setS(() => prio = v ?? prio),
+                                decoration: const InputDecoration(
+                                  labelText: 'Prioridad',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        SwitchListTile(
+                          value: allDay,
+                          onChanged: (v) => setS(() => allDay = v),
+                          title: const Text('Todo el día'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.event),
+                          title: Text(_humanDateTime(when, allDay)),
+                          onTap: () async {
+                            final d = await showDatePicker(
+                              context: ctx,
+                              initialDate: when,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2100),
                             );
-
-                            if (e == null) {
-                              final newId = await CalendarService.I.addEvent(data);
-                              final notifId = (newId ?? data.id).hashCode;
-                              if (!allDay && when.isAfter(DateTime.now().add(const Duration(seconds: 1)))) {
-                                await NotificationService.I.scheduleOnce(
-                                  id: notifId,
-                                  title: data.title,
-                                  body: data.notes ?? 'Recordatorio',
-                                  whenLocal: when,
-                                  useExact: true,
-                                  payload: 'OPEN_CALENDAR',
+                            if (d != null) {
+                              if (!allDay) {
+                                final t = await showTimePicker(
+                                  context: ctx,
+                                  initialTime: TimeOfDay.fromDateTime(when),
                                 );
-                                await NotificationService.I.debugStatus();
-                              }
-                            } else {
-                              await CalendarService.I.updateEvent(data);
-                              final notifId = data.id.hashCode;
-                              await NotificationService.I.cancel(notifId);
-                              if (!allDay && when.isAfter(DateTime.now().add(const Duration(seconds: 1)))) {
-                                await NotificationService.I.scheduleOnce(
-                                  id: notifId,
-                                  title: data.title,
-                                  body: data.notes ?? 'Recordatorio',
-                                  whenLocal: when,
-                                  useExact: true,
-                                  payload: 'OPEN_CALENDAR',
+                                setS(
+                                  () =>
+                                      when = DateTime(
+                                        d.year,
+                                        d.month,
+                                        d.day,
+                                        t?.hour ?? 9,
+                                        t?.minute ?? 0,
+                                      ),
                                 );
-                                await NotificationService.I.debugStatus();
+                              } else {
+                                setS(
+                                  () => when = DateTime(d.year, d.month, d.day),
+                                );
                               }
                             }
-                            _focused = DateTime(when.year, when.month, 15);
-                            _selected = DateTime(when.year, when.month, when.day);
-                            _watchMonth(_focused);
-                            if (ctx.mounted) Navigator.pop(ctx);
                           },
-                          child: const Text('Guardar'),
+                        ),
+                        TextField(
+                          controller: notes,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            labelText: 'Notas / detalles',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            if (e != null)
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  textStyle: const TextStyle(fontSize: 13),
+                                  minimumSize: const Size(0, 40),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                                onPressed: () async {
+                                  await CalendarService.I.deleteEvent(e.id);
+                                  await NotificationService.I.cancel(
+                                    e.id.hashCode,
+                                  );
+                                  if (ctx.mounted) Navigator.pop(ctx);
+                                },
+                                child: const Text('Eliminar'),
+                              ),
+                            const Spacer(),
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                textStyle: const TextStyle(fontSize: 13),
+                                minimumSize: const Size(0, 40),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancelar'),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                textStyle: const TextStyle(fontSize: 13),
+                                minimumSize: const Size(0, 40),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              onPressed: () async {
+                                final data = CalendarEvent(
+                                  id: e?.id ?? '',
+                                  title:
+                                      title.text.trim().isEmpty
+                                          ? 'Evento'
+                                          : title.text.trim(),
+                                  type: type,
+                                  priority: prio,
+                                  start: when,
+                                  allDay: allDay,
+                                  end: e?.end,
+                                  notes:
+                                      notes.text.trim().isNotEmpty
+                                          ? notes.text.trim()
+                                          : null,
+                                );
+
+                                if (e == null) {
+                                  final newId = await CalendarService.I
+                                      .addEvent(data);
+                                  final notifId = (newId ?? data.id).hashCode;
+                                  if (!allDay &&
+                                      when.isAfter(
+                                        DateTime.now().add(
+                                          const Duration(seconds: 1),
+                                        ),
+                                      )) {
+                                    await NotificationService.I.scheduleOnce(
+                                      id: notifId,
+                                      title: data.title,
+                                      body: data.notes ?? 'Recordatorio',
+                                      whenLocal: when,
+                                      useExact: true,
+                                      payload: 'OPEN_CALENDAR',
+                                    );
+                                    await NotificationService.I.debugStatus();
+                                  }
+                                } else {
+                                  await CalendarService.I.updateEvent(data);
+                                  final notifId = data.id.hashCode;
+                                  await NotificationService.I.cancel(notifId);
+                                  if (!allDay &&
+                                      when.isAfter(
+                                        DateTime.now().add(
+                                          const Duration(seconds: 1),
+                                        ),
+                                      )) {
+                                    await NotificationService.I.scheduleOnce(
+                                      id: notifId,
+                                      title: data.title,
+                                      body: data.notes ?? 'Recordatorio',
+                                      whenLocal: when,
+                                      useExact: true,
+                                      payload: 'OPEN_CALENDAR',
+                                    );
+                                    await NotificationService.I.debugStatus();
+                                  }
+                                }
+                                _focused = DateTime(when.year, when.month, 15);
+                                _selected = DateTime(
+                                  when.year,
+                                  when.month,
+                                  when.day,
+                                );
+                                _watchMonth(_focused);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              },
+                              child: const Text('Guardar'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -564,29 +650,17 @@ class _DayNumberCell extends StatelessWidget {
   final int day;
   final Color? bg;
   final Color? fg;
-  const _DayNumberCell({
-    required this.day,
-    this.bg,
-    this.fg,
-  });
+  const _DayNumberCell({required this.day, this.bg, this.fg});
 
   @override
   Widget build(BuildContext context) {
-    final child = Center(
-      child: Text(
-        '$day',
-        style: TextStyle(color: fg),
-      ),
-    );
+    final child = Center(child: Text('$day', style: TextStyle(color: fg)));
     if (bg == null) return child;
     return Center(
       child: Container(
         width: 32,
         height: 32,
-        decoration: BoxDecoration(
-          color: bg,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
         child: child,
       ),
     );
@@ -615,10 +689,7 @@ class _DayNumberRing extends StatelessWidget {
           border: Border.all(color: border, width: 2),
         ),
         alignment: Alignment.center,
-        child: Text(
-          '$day',
-          style: TextStyle(color: textColor),
-        ),
+        child: Text('$day', style: TextStyle(color: textColor)),
       ),
     );
   }
@@ -651,9 +722,10 @@ class _DayEventList extends StatelessWidget {
     final list = ListView.separated(
       padding: EdgeInsets.zero,
       shrinkWrap: !scrollable,
-      physics: scrollable
-          ? const BouncingScrollPhysics()
-          : const NeverScrollableScrollPhysics(),
+      physics:
+          scrollable
+              ? const BouncingScrollPhysics()
+              : const NeverScrollableScrollPhysics(),
       itemCount: events.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, i) {
@@ -668,15 +740,18 @@ class _DayEventList extends StatelessWidget {
         };
         final color =
             e.priority == CalendarPriority.high ? Colors.redAccent : s.primary;
-        final timeLabel = e.allDay
-            ? 'Todo el día'
-            : '${e.start.hour.toString().padLeft(2, '0')}:${e.start.minute.toString().padLeft(2, '0')}';
+        final timeLabel =
+            e.allDay
+                ? 'Todo el día'
+                : '${e.start.hour.toString().padLeft(2, '0')}:${e.start.minute.toString().padLeft(2, '0')}';
 
         // ✅ Ahora solo se tacha/atenúa si es tarea y viene marcada como completada
-        final isCompleted = (e.type == CalendarType.task) && (e.completed == true);
+        final isCompleted =
+            (e.type == CalendarType.task) && (e.completed == true);
 
         final baseTitle = TextStyle(
-          decoration: isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
+          decoration:
+              isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
           color: isCompleted ? s.onSurface.withOpacity(.65) : null,
         );
         final baseSub = TextStyle(
@@ -688,7 +763,9 @@ class _DayEventList extends StatelessWidget {
         return ListTile(
           dense: false,
           leading: CircleAvatar(
-              backgroundColor: avatarBg, child: Icon(icon, color: avatarFg)),
+            backgroundColor: avatarBg,
+            child: Icon(icon, color: avatarFg),
+          ),
           title: Text(e.title, style: baseTitle),
           subtitle: Text(
             [timeLabel, if ((e.notes ?? '').isNotEmpty) e.notes!].join(' • '),

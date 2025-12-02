@@ -1,7 +1,8 @@
 // lib/screens/meditation/models/meditation_models.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-String yyyymm(DateTime d) => "${d.year.toString().padLeft(4,'0')}-${d.month.toString().padLeft(2,'0')}";
+String yyyymm(DateTime d) =>
+    "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
 
 /// ====== Sessions ======
 enum SessionType { guided, timer, breath }
@@ -15,7 +16,7 @@ class MeditationSession {
   final String? notes;
   final List<String> tags;
   final int? moodBefore; // 1..5
-  final int? moodAfter;  // 1..5
+  final int? moodAfter; // 1..5
   final String? location;
   final bool streakKept;
 
@@ -51,7 +52,9 @@ class MeditationSession {
     return MeditationSession(
       id: s.id,
       title: (d['title'] ?? '') as String,
-      type: SessionType.values.firstWhere((e) => e.name == (d['type'] ?? 'timer')),
+      type: SessionType.values.firstWhere(
+        (e) => e.name == (d['type'] ?? 'timer'),
+      ),
       durationSec: (d['durationSec'] ?? 0) as int,
       date: (d['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
       notes: d['notes'],
@@ -115,7 +118,6 @@ class ProgramDay {
   final int recommendedDurationSec;
   final String status; // pending|done|skipped
   final String? guidedAudioId; // 👈 NUEVO (audio guiado opcional para este día)
-
 
   ProgramDay({
     required this.id,
@@ -211,7 +213,7 @@ class MeditationReminder {
   MeditationReminder({
     required this.id,
     required this.timeOfDay,
-    this.daysOfWeek = const [1,2,3,4,5,6,7],
+    this.daysOfWeek = const [1, 2, 3, 4, 5, 6, 7],
     this.enabled = true,
   });
 
@@ -226,7 +228,9 @@ class MeditationReminder {
     return MeditationReminder(
       id: s.id,
       timeOfDay: d['timeOfDay'] ?? '08:30',
-      daysOfWeek: (d['daysOfWeek'] as List?)?.map((e) => (e as num).toInt()).toList() ?? [1,2,3,4,5,6,7],
+      daysOfWeek:
+          (d['daysOfWeek'] as List?)?.map((e) => (e as num).toInt()).toList() ??
+          [1, 2, 3, 4, 5, 6, 7],
       enabled: d['enabled'] ?? true,
     );
   }
@@ -238,17 +242,13 @@ class SimpleTag {
   final String name;
   final String? color;
 
-  SimpleTag({ required this.id, required this.name, this.color });
+  SimpleTag({required this.id, required this.name, this.color});
 
-  Map<String, dynamic> toMap() => { 'name': name, 'color': color };
+  Map<String, dynamic> toMap() => {'name': name, 'color': color};
 
   static SimpleTag fromSnap(DocumentSnapshot s) {
     final d = s.data() as Map<String, dynamic>;
-    return SimpleTag(
-      id: s.id,
-      name: d['name'] ?? '',
-      color: d['color'],
-    );
+    return SimpleTag(id: s.id, name: d['name'] ?? '', color: d['color']);
   }
 }
 

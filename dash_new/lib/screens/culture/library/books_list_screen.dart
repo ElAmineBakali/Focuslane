@@ -24,19 +24,26 @@ class _BooksListScreenState extends State<BooksListScreen> {
           PopupMenuButton<ItemStatus?>(
             initialValue: _status,
             onSelected: (v) => setState(() => _status = v),
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: null, child: Text('Todos')),
-              ...ItemStatus.values.map((e) => PopupMenuItem(value: e, child: Text(e.name))),
-            ],
+            itemBuilder:
+                (_) => [
+                  const PopupMenuItem(value: null, child: Text('Todos')),
+                  ...ItemStatus.values.map(
+                    (e) => PopupMenuItem(value: e, child: Text(e.name)),
+                  ),
+                ],
           ),
-          IconButton(icon: const Icon(Icons.add), onPressed: () => Navigator.pushNamed(context, '/culture/book/edit')),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => Navigator.pushNamed(context, '/culture/book/edit'),
+          ),
         ],
       ),
       body: StreamBuilder<List<Book>>(
         stream: svc.watchBooks(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin libros'));
           return ListView.separated(
             itemCount: data.length,
@@ -47,7 +54,9 @@ class _BooksListScreenState extends State<BooksListScreen> {
               return ListTile(
                 leading: const Icon(Icons.menu_book_outlined),
                 title: Text(b.title),
-                subtitle: Text('${b.author ?? "—"} • ${b.genre ?? ""} • ${b.status.name}'),
+                subtitle: Text(
+                  '${b.author ?? "—"} • ${b.genre ?? ""} • ${b.status.name}',
+                ),
                 trailing: SizedBox(
                   width: 80,
                   child: Column(
@@ -58,7 +67,12 @@ class _BooksListScreenState extends State<BooksListScreen> {
                     ],
                   ),
                 ),
-                onTap: () => Navigator.pushNamed(context, '/culture/book', arguments: b),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      '/culture/book',
+                      arguments: b,
+                    ),
               );
             },
           );

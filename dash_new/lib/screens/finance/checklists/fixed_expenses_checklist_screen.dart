@@ -7,10 +7,12 @@ class FixedExpensesChecklistScreen extends StatefulWidget {
   static const route = '/finance/checklist/fixed';
 
   @override
-  State<FixedExpensesChecklistScreen> createState() => _FixedExpensesChecklistScreenState();
+  State<FixedExpensesChecklistScreen> createState() =>
+      _FixedExpensesChecklistScreenState();
 }
 
-class _FixedExpensesChecklistScreenState extends State<FixedExpensesChecklistScreen> {
+class _FixedExpensesChecklistScreenState
+    extends State<FixedExpensesChecklistScreen> {
   String _pkNow() => FinanceFirestoreService.I.periodKey(DateTime.now());
 
   @override
@@ -35,25 +37,43 @@ class _FixedExpensesChecklistScreenState extends State<FixedExpensesChecklistScr
             builder: (context, s) {
               final items = s.data ?? [];
               if (items.isEmpty) return const SizedBox.shrink();
-              
+
               return StreamBuilder<List<Map<String, bool>>>(
                 stream: Stream.fromFuture(_getPaidStatusStream(svc, items, pk)),
                 builder: (ctx, paidSnap) {
                   final paidList = paidSnap.data ?? [];
-                  final paid = paidList.isEmpty ? <String, bool>{} : paidList.first;
-                  final total = items.fold<double>(0, (sum, sub) => sum + sub.amount);
-                  final totalPaid = items.where((sub) => paid[sub.id] == true).fold<double>(0, (sum, sub) => sum + sub.amount);
+                  final paid =
+                      paidList.isEmpty ? <String, bool>{} : paidList.first;
+                  final total = items.fold<double>(
+                    0,
+                    (sum, sub) => sum + sub.amount,
+                  );
+                  final totalPaid = items
+                      .where((sub) => paid[sub.id] == true)
+                      .fold<double>(0, (sum, sub) => sum + sub.amount);
                   final pending = total - totalPaid;
-                  
+
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     color: Theme.of(context).colorScheme.secondaryContainer,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('Total: ${total.toStringAsFixed(2)}€', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('Pagado: ${totalPaid.toStringAsFixed(2)}€', style: const TextStyle(color: Colors.green)),
-                        Text('Pendiente: ${pending.toStringAsFixed(2)}€', style: const TextStyle(color: Colors.orange)),
+                        Text(
+                          'Total: ${total.toStringAsFixed(2)}€',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Pagado: ${totalPaid.toStringAsFixed(2)}€',
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                        Text(
+                          'Pendiente: ${pending.toStringAsFixed(2)}€',
+                          style: const TextStyle(color: Colors.orange),
+                        ),
                       ],
                     ),
                   );
@@ -71,11 +91,17 @@ class _FixedExpensesChecklistScreenState extends State<FixedExpensesChecklistScr
           }
           final items = s.data ?? [];
           if (items.isEmpty) {
-            return const Center(child: Text('Aún no tienes gastos fijos. Pulsa + para crear uno.'));
+            return const Center(
+              child: Text(
+                'Aún no tienes gastos fijos. Pulsa + para crear uno.',
+              ),
+            );
           }
 
           return ReorderableListView.builder(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 110),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewPadding.bottom + 110,
+            ),
             itemCount: items.length,
             onReorder: (oldIndex, newIndex) async {
               if (newIndex > oldIndex) newIndex -= 1;
@@ -125,18 +151,29 @@ class _FixedExpensesChecklistScreenState extends State<FixedExpensesChecklistScr
     );
   }
 
-  Future<List<Map<String, bool>>> _getPaidStatusStream(FinanceFirestoreService svc, List<Subscription> items, String pk) async {
+  Future<List<Map<String, bool>>> _getPaidStatusStream(
+    FinanceFirestoreService svc,
+    List<Subscription> items,
+    String pk,
+  ) async {
     final Map<String, bool> result = {};
     for (final sub in items) {
-      result[sub.id] = await svc.watchSubscriptionPaidForMonth(sub.id, pk).first;
+      result[sub.id] =
+          await svc.watchSubscriptionPaidForMonth(sub.id, pk).first;
     }
     return [result];
   }
 
   // -------- Formulario simple (crear/editar) ----------
-  void _openSubForm(BuildContext context, FinanceFirestoreService svc, {Subscription? editing}) {
+  void _openSubForm(
+    BuildContext context,
+    FinanceFirestoreService svc, {
+    Subscription? editing,
+  }) {
     final name = TextEditingController(text: editing?.name ?? '');
-    final amount = TextEditingController(text: editing?.amount.toString() ?? '');
+    final amount = TextEditingController(
+      text: editing?.amount.toString() ?? '',
+    );
     final currency = TextEditingController(text: editing?.currency ?? 'EUR');
     final category = TextEditingController(text: editing?.category ?? 'Other');
     final billingDay = TextEditingController(
@@ -148,88 +185,118 @@ class _FixedExpensesChecklistScreenState extends State<FixedExpensesChecklistScr
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          left: 16, right: 16, top: 16,
-          bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Form(
-          key: form,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(editing == null ? 'Nueva suscripción' : 'Editar suscripción',
-                    style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: name,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: amount,
-                  decoration: const InputDecoration(labelText: 'Importe'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (v) => v == null || double.tryParse(v) == null ? 'Inválido' : null,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: currency,
-                  decoration: const InputDecoration(labelText: 'Divisa'),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: category,
-                  decoration: const InputDecoration(labelText: 'Categoría'),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  initialValue: cycle,
-                  items: const [
-                    DropdownMenuItem(value: 'monthly', child: Text('Mensual')),
-                    DropdownMenuItem(value: 'yearly', child: Text('Anual')),
-                    DropdownMenuItem(value: 'custom', child: Text('Otro')),
+      builder:
+          (_) => Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Form(
+              key: form,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      editing == null
+                          ? 'Nueva suscripción'
+                          : 'Editar suscripción',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: name,
+                      decoration: const InputDecoration(labelText: 'Nombre'),
+                      validator:
+                          (v) =>
+                              v == null || v.trim().isEmpty
+                                  ? 'Requerido'
+                                  : null,
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: amount,
+                      decoration: const InputDecoration(labelText: 'Importe'),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator:
+                          (v) =>
+                              v == null || double.tryParse(v) == null
+                                  ? 'Inválido'
+                                  : null,
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: currency,
+                      decoration: const InputDecoration(labelText: 'Divisa'),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: category,
+                      decoration: const InputDecoration(labelText: 'Categoría'),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      initialValue: cycle,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'monthly',
+                          child: Text('Mensual'),
+                        ),
+                        DropdownMenuItem(value: 'yearly', child: Text('Anual')),
+                        DropdownMenuItem(value: 'custom', child: Text('Otro')),
+                      ],
+                      onChanged: (v) => cycle = v ?? 'monthly',
+                      decoration: const InputDecoration(
+                        labelText: 'Ciclo de facturación',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: billingDay,
+                      decoration: const InputDecoration(
+                        labelText: 'Día de cobro (opcional)',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      icon: const Icon(Icons.save),
+                      label: const Text('Guardar'),
+                      onPressed: () async {
+                        if (!form.currentState!.validate()) return;
+                        final sub = Subscription(
+                          id: editing?.id ?? '',
+                          name: name.text.trim(),
+                          amount: double.parse(amount.text),
+                          currency:
+                              currency.text.trim().isEmpty
+                                  ? 'EUR'
+                                  : currency.text.trim(),
+                          category:
+                              category.text.trim().isEmpty
+                                  ? 'Other'
+                                  : category.text.trim(),
+                          billingCycle: cycle,
+                          billingDay: int.tryParse(billingDay.text.trim()),
+                          isFixed: true,
+                        );
+                        if (editing == null) {
+                          await svc.addSubscription(sub);
+                        } else {
+                          await svc.updateSubscription(sub);
+                        }
+                        if (Navigator.canPop(context)) Navigator.pop(context);
+                      },
+                    ),
                   ],
-                  onChanged: (v) => cycle = v ?? 'monthly',
-                  decoration: const InputDecoration(labelText: 'Ciclo de facturación'),
                 ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: billingDay,
-                  decoration: const InputDecoration(labelText: 'Día de cobro (opcional)'),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                FilledButton.icon(
-                  icon: const Icon(Icons.save),
-                  label: const Text('Guardar'),
-                  onPressed: () async {
-                    if (!form.currentState!.validate()) return;
-                    final sub = Subscription(
-                      id: editing?.id ?? '',
-                      name: name.text.trim(),
-                      amount: double.parse(amount.text),
-                      currency: currency.text.trim().isEmpty ? 'EUR' : currency.text.trim(),
-                      category: category.text.trim().isEmpty ? 'Other' : category.text.trim(),
-                      billingCycle: cycle,
-                      billingDay: int.tryParse(billingDay.text.trim()),
-                      isFixed: true,
-                    );
-                    if (editing == null) {
-                      await svc.addSubscription(sub);
-                    } else {
-                      await svc.updateSubscription(sub);
-                    }
-                    if (Navigator.canPop(context)) Navigator.pop(context);
-                  },
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 }
@@ -261,7 +328,10 @@ class _SubscriptionRowState extends State<_SubscriptionRow> {
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
       key: ValueKey('sb-${widget.sub.id}-${widget.pk}'),
-      stream: widget.svc.watchSubscriptionPaidForMonth(widget.sub.id, widget.pk),
+      stream: widget.svc.watchSubscriptionPaidForMonth(
+        widget.sub.id,
+        widget.pk,
+      ),
       builder: (context, paidSnap) {
         final paidFromStream = paidSnap.data ?? false;
         final paid = _optimisticPaid ?? paidFromStream;
@@ -281,16 +351,24 @@ class _SubscriptionRowState extends State<_SubscriptionRow> {
                   setState(() => _optimisticPaid = v);
                   try {
                     if (v == true) {
-                      await widget.svc.markSubscriptionPaidForMonth(widget.sub, DateTime.now());
+                      await widget.svc.markSubscriptionPaidForMonth(
+                        widget.sub,
+                        DateTime.now(),
+                      );
                     } else {
-                      await widget.svc.unmarkSubscriptionPaidForMonth(widget.sub, DateTime.now());
+                      await widget.svc.unmarkSubscriptionPaidForMonth(
+                        widget.sub,
+                        DateTime.now(),
+                      );
                     }
                   } catch (e) {
-                    setState(() => _optimisticPaid = null); // revertir al stream
+                    setState(
+                      () => _optimisticPaid = null,
+                    ); // revertir al stream
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text('Error: $e')));
                     }
                   }
                 },
@@ -309,22 +387,31 @@ class _SubscriptionRowState extends State<_SubscriptionRow> {
               } else if (op == 'delete') {
                 final ok = await showDialog<bool>(
                   context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Eliminar'),
-                    content: Text('¿Eliminar "${widget.sub.name}"?'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                      FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
-                    ],
-                  ),
+                  builder:
+                      (_) => AlertDialog(
+                        title: const Text('Eliminar'),
+                        content: Text('¿Eliminar "${widget.sub.name}"?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancelar'),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Eliminar'),
+                          ),
+                        ],
+                      ),
                 );
-                if (ok == true) await widget.svc.deleteSubscription(widget.sub.id);
+                if (ok == true)
+                  await widget.svc.deleteSubscription(widget.sub.id);
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'edit', child: Text('Editar')),
-              PopupMenuItem(value: 'delete', child: Text('Eliminar')),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Editar')),
+                  PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+                ],
           ),
         );
       },

@@ -31,11 +31,12 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => const GoalEditSheet(),
-            ),
+            onPressed:
+                () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => const GoalEditSheet(),
+                ),
           ),
         ],
       ),
@@ -47,7 +48,9 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (data.isEmpty) {
-            return const Center(child: Text('Crea tu primera meta con el botón +'));
+            return const Center(
+              child: Text('Crea tu primera meta con el botón +'),
+            );
           }
           return ReorderableListView.builder(
             padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
@@ -62,11 +65,12 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
             buildDefaultDragHandles: false,
             itemBuilder: (_, i) {
               final x = data[i];
-              final num? pct = (x.progress != null &&
-                      x.progressTarget != null &&
-                      x.progressTarget! > 0)
-                  ? (x.progress! / x.progressTarget!).clamp(0, 1.0)
-                  : null;
+              final num? pct =
+                  (x.progress != null &&
+                          x.progressTarget != null &&
+                          x.progressTarget! > 0)
+                      ? (x.progress! / x.progressTarget!).clamp(0, 1.0)
+                      : null;
               return Card(
                 key: ValueKey(x.id),
                 child: ListTile(
@@ -79,9 +83,10 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                       ),
                       const SizedBox(width: 8),
                       CircleAvatar(
-                        backgroundColor: (x.colorHex != null)
-                            ? Color(int.parse(x.colorHex!))
-                            : Theme.of(context).colorScheme.primary,
+                        backgroundColor:
+                            (x.colorHex != null)
+                                ? Color(int.parse(x.colorHex!))
+                                : Theme.of(context).colorScheme.primary,
                         child: const Icon(Icons.flag, color: Colors.white),
                       ),
                     ],
@@ -127,32 +132,34 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                       } else if (v == 'del') {
                         final ok = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Eliminar meta'),
-                            content: Text('¿Eliminar "${x.title}"?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, false),
-                                child: const Text('Cancelar'),
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Eliminar meta'),
+                                content: Text('¿Eliminar "${x.title}"?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  FilledButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    child: const Text('Eliminar'),
+                                  ),
+                                ],
                               ),
-                              FilledButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, true),
-                                child: const Text('Eliminar'),
-                              ),
-                            ],
-                          ),
                         );
                         if (ok == true) {
                           await GoalsFirestoreService.I.deleteGoal(x.id);
                         }
                       }
                     },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'edit', child: Text('Editar')),
-                      PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                    ],
+                    itemBuilder:
+                        (_) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Editar')),
+                          PopupMenuItem(value: 'del', child: Text('Eliminar')),
+                        ],
                   ),
                 ),
               );

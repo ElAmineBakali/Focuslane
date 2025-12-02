@@ -19,8 +19,7 @@ class Routine {
     this.colorHex,
   });
 
-  Color get color =>
-      Color(int.tryParse(colorHex ?? '') ?? Colors.blue.value);
+  Color get color => Color(int.tryParse(colorHex ?? '') ?? Colors.blue.value);
 
   static Routine fromMap(String id, Map<String, dynamic> m) {
     return Routine(
@@ -35,13 +34,13 @@ class Routine {
   }
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        if (description != null) 'description': description,
-        'isDefault': isDefault,
-        'splitType': splitType,
-        'restSecDefault': restSecDefault,
-        if (colorHex != null) 'colorHex': colorHex,
-      };
+    'name': name,
+    if (description != null) 'description': description,
+    'isDefault': isDefault,
+    'splitType': splitType,
+    'restSecDefault': restSecDefault,
+    if (colorHex != null) 'colorHex': colorHex,
+  };
 
   Routine copyWith({
     String? name,
@@ -86,10 +85,10 @@ class RoutineDay {
   }
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'order': order,
-        if (icon != null) 'icon': icon,
-      };
+    'name': name,
+    'order': order,
+    if (icon != null) 'icon': icon,
+  };
 }
 
 class RoutineExercise {
@@ -135,28 +134,29 @@ class RoutineExercise {
       restSec: (m['restSec'] as num?)?.toInt(),
       order: (m['order'] ?? 0) as int,
       tempo: m['tempo'] as String?,
-      targetRPE: (m['targetRPE'] ?? m['rpeTarget']) == null
-          ? null
-          : (m['targetRPE'] ?? m['rpeTarget'] as num).toDouble(),
+      targetRPE:
+          (m['targetRPE'] ?? m['rpeTarget']) == null
+              ? null
+              : (m['targetRPE'] ?? m['rpeTarget'] as num).toDouble(),
       targetPercent1RM: (m['targetPercent1RM'] as num?)?.toDouble(),
       notes: m['notes'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'exerciseId': exerciseId,
-        'name': name,
-        'muscleGroup': muscleGroup,
-        'category': category,
-        'targetSets': targetSets,
-        'targetReps': targetReps,
-        'restSec': restSec,
-        'order': order,
-        if (tempo != null) 'tempo': tempo,
-        if (targetRPE != null) 'targetRPE': targetRPE,
-        if (targetPercent1RM != null) 'targetPercent1RM': targetPercent1RM,
-        if (notes != null) 'notes': notes,
-      };
+    'exerciseId': exerciseId,
+    'name': name,
+    'muscleGroup': muscleGroup,
+    'category': category,
+    'targetSets': targetSets,
+    'targetReps': targetReps,
+    'restSec': restSec,
+    'order': order,
+    if (tempo != null) 'tempo': tempo,
+    if (targetRPE != null) 'targetRPE': targetRPE,
+    if (targetPercent1RM != null) 'targetPercent1RM': targetPercent1RM,
+    if (notes != null) 'notes': notes,
+  };
 }
 
 class SessionSet {
@@ -177,10 +177,10 @@ class SessionSet {
   }
 
   Map<String, dynamic> toMap() => {
-        'weight': weight,
-        'reps': reps,
-        if (rpe != null) 'rpe': rpe,
-      };
+    'weight': weight,
+    'reps': reps,
+    if (rpe != null) 'rpe': rpe,
+  };
 }
 
 class PerformedExercise {
@@ -198,10 +198,13 @@ class PerformedExercise {
       sets.fold<double>(0, (a, s) => a + (s.weight * s.reps));
 
   double? get bestE1rm =>
-      sets.isEmpty ? null : sets.map((s) => s.e1rm).reduce((a, b) => a > b ? a : b);
+      sets.isEmpty
+          ? null
+          : sets.map((s) => s.e1rm).reduce((a, b) => a > b ? a : b);
 
   static PerformedExercise fromMap(Map<String, dynamic> m) {
-    final sets = (m['sets'] as List?)?.map((e) => SessionSet.fromMap(e)).toList() ?? [];
+    final sets =
+        (m['sets'] as List?)?.map((e) => SessionSet.fromMap(e)).toList() ?? [];
     return PerformedExercise(
       name: (m['name'] ?? '') as String,
       exerciseId: m['exerciseId'] as String?,
@@ -210,10 +213,10 @@ class PerformedExercise {
   }
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        if (exerciseId != null) 'exerciseId': exerciseId,
-        'sets': sets.map((s) => s.toMap()).toList(),
-      };
+    'name': name,
+    if (exerciseId != null) 'exerciseId': exerciseId,
+    'sets': sets.map((s) => s.toMap()).toList(),
+  };
 }
 
 class SessionDoc {
@@ -244,9 +247,10 @@ class SessionDoc {
   });
 
   static SessionDoc fromMap(String id, Map<String, dynamic> m) {
-    final ex = (m['exercises'] as List? ?? [])
-        .map((e) => PerformedExercise.fromMap(e as Map<String, dynamic>))
-        .toList();
+    final ex =
+        (m['exercises'] as List? ?? [])
+            .map((e) => PerformedExercise.fromMap(e as Map<String, dynamic>))
+            .toList();
     return SessionDoc(
       id: id,
       routineId: (m['routineId'] ?? '') as String,
@@ -257,23 +261,24 @@ class SessionDoc {
       notes: m['notes'] as String?,
       durationMin: (m['durationMin'] as num?)?.toInt(),
       volumeKg: (m['volumeKg'] as num?)?.toDouble() ?? 0,
-      prList: (m['prList'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      prList:
+          (m['prList'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       exercises: ex,
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'routineId': routineId,
-        'routineName': routineName,
-        'dayId': dayId,
-        'dayName': dayName,
-        'date': date.toIso8601String(),
-        if (notes != null) 'notes': notes,
-        if (durationMin != null) 'durationMin': durationMin,
-        'volumeKg': volumeKg,
-        'prList': prList,
-        'exercises': exercises.map((e) => e.toMap()).toList(),
-      };
+    'routineId': routineId,
+    'routineName': routineName,
+    'dayId': dayId,
+    'dayName': dayName,
+    'date': date.toIso8601String(),
+    if (notes != null) 'notes': notes,
+    if (durationMin != null) 'durationMin': durationMin,
+    'volumeKg': volumeKg,
+    'prList': prList,
+    'exercises': exercises.map((e) => e.toMap()).toList(),
+  };
 }
 
 class BodyWeightEntry {

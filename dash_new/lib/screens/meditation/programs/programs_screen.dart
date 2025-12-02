@@ -16,7 +16,8 @@ class ProgramsScreen extends StatelessWidget {
         stream: MeditationFirestoreService.I.watchPrograms(),
         builder: (context, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin programas'));
           return ListView.separated(
             itemCount: data.length,
@@ -24,11 +25,21 @@ class ProgramsScreen extends StatelessWidget {
             itemBuilder: (_, i) {
               final p = data[i];
               return ListTile(
-                leading: Text(p.emoji ?? '🧘', style: const TextStyle(fontSize: 24)),
+                leading: Text(
+                  p.emoji ?? '🧘',
+                  style: const TextStyle(fontSize: 24),
+                ),
                 title: Text(p.name),
-                subtitle: Text('${p.level} • ${p.isActive ? "Activo" : "Inactivo"}'),
+                subtitle: Text(
+                  '${p.level} • ${p.isActive ? "Activo" : "Inactivo"}',
+                ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, ProgramDetailScreen.route, arguments: p),
+                onTap:
+                    () => Navigator.pushNamed(
+                      context,
+                      ProgramDetailScreen.route,
+                      arguments: p,
+                    ),
               );
             },
           );
@@ -38,16 +49,26 @@ class ProgramsScreen extends StatelessWidget {
         onPressed: () async {
           final name = await _askForName(context);
           if (name == null || name.trim().isEmpty) return;
-          final id = await MeditationFirestoreService.I.addProgram(MeditationProgram(
-            id: '',
-            name: name.trim(),
-            description: '',
-            level: 'beginner',
-            isActive: true,
-          ));
+          final id = await MeditationFirestoreService.I.addProgram(
+            MeditationProgram(
+              id: '',
+              name: name.trim(),
+              description: '',
+              level: 'beginner',
+              isActive: true,
+            ),
+          );
           if (context.mounted) {
-            final p = MeditationProgram(id: id, name: name.trim(), description: '');
-            Navigator.pushNamed(context, ProgramDetailScreen.route, arguments: p);
+            final p = MeditationProgram(
+              id: id,
+              name: name.trim(),
+              description: '',
+            );
+            Navigator.pushNamed(
+              context,
+              ProgramDetailScreen.route,
+              arguments: p,
+            );
           }
         },
         child: const Icon(Icons.add),
@@ -59,19 +80,26 @@ class ProgramsScreen extends StatelessWidget {
     final c = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Nuevo programa'),
-        content: TextField(
-          controller: c,
-          decoration: const InputDecoration(labelText: 'Nombre'),
-          autofocus: true,
-          onSubmitted: (_) => Navigator.pop(ctx, c.text),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, c.text), child: const Text('Crear')),
-        ],
-      ),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Nuevo programa'),
+            content: TextField(
+              controller: c,
+              decoration: const InputDecoration(labelText: 'Nombre'),
+              autofocus: true,
+              onSubmitted: (_) => Navigator.pop(ctx, c.text),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, c.text),
+                child: const Text('Crear'),
+              ),
+            ],
+          ),
     );
   }
 }

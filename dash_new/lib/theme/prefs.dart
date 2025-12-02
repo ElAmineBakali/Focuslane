@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme.dart';
 
-enum BackgroundStyle { none, gradientSunrise, gradientOcean, gradientForest, gradientOrchid }
+enum BackgroundStyle {
+  none,
+  gradientSunrise,
+  gradientOcean,
+  gradientForest,
+  gradientOrchid,
+}
 
 class ThemePrefs {
   static const _kPreset = 'theme_preset';
@@ -22,9 +28,11 @@ class ThemePrefs {
 
   static Future<(ThemePreset, ThemeMode, BackgroundStyle)> load() async {
     final sp = await SharedPreferences.getInstance();
-    final p = ThemePreset.values[sp.getInt(_kPreset) ?? ThemePreset.ocean.index];
+    final p =
+        ThemePreset.values[sp.getInt(_kPreset) ?? ThemePreset.ocean.index];
     final m = ThemeMode.values[sp.getInt(_kMode) ?? ThemeMode.system.index];
-    final b = BackgroundStyle.values[sp.getInt(_kBg) ?? BackgroundStyle.none.index];
+    final b =
+        BackgroundStyle.values[sp.getInt(_kBg) ?? BackgroundStyle.none.index];
     return (p, m, b);
   }
 }

@@ -18,17 +18,21 @@ class DepositsScreen extends StatelessWidget {
         stream: svc.watchDeposits(),
         builder: (context, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (s.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
           if (data.isEmpty) return const Center(child: Text('Sin depósitos'));
           final total = data.fold<double>(0, (p, e) => p + e.amount);
-          final mine = data.where((e) => e.isMine).fold<double>(0, (p, e) => p + e.amount);
+          final mine = data
+              .where((e) => e.isMine)
+              .fold<double>(0, (p, e) => p + e.amount);
           final third = total - mine;
           return Column(
             children: [
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Wrap(
-                  spacing: 12, runSpacing: 12,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
                     _kpi('Total', total),
                     _kpi('Míos', mine),
@@ -45,11 +49,20 @@ class DepositsScreen extends StatelessWidget {
                   itemBuilder: (_, i) {
                     final d = data[i];
                     return ListTile(
-                      leading: Icon(d.isMine ? Icons.lock_open : Icons.lock_outline),
+                      leading: Icon(
+                        d.isMine ? Icons.lock_open : Icons.lock_outline,
+                      ),
                       title: Text('${d.name} • ${d.where}'),
-                      subtitle: Text('${d.amount.toStringAsFixed(2)} ${d.currency}${d.category != null ? " • ${d.category}" : ""}'),
+                      subtitle: Text(
+                        '${d.amount.toStringAsFixed(2)} ${d.currency}${d.category != null ? " • ${d.category}" : ""}',
+                      ),
                       trailing: const Icon(Icons.edit),
-                      onTap: () => Navigator.pushNamed(context, DepositEditScreen.route, arguments: d),
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            DepositEditScreen.route,
+                            arguments: d,
+                          ),
                     );
                   },
                 ),
@@ -67,6 +80,8 @@ class DepositsScreen extends StatelessWidget {
 
   Widget _kpi(String name, double v) => SizedBox(
     width: 180,
-    child: Card(child: ListTile(title: Text(name), subtitle: Text(v.toStringAsFixed(2)))),
+    child: Card(
+      child: ListTile(title: Text(name), subtitle: Text(v.toStringAsFixed(2))),
+    ),
   );
 }

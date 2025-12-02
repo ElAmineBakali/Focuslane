@@ -41,5 +41,4 @@ Map<String, WidgetBuilder> tradingRoutes = {
   TradingTagsScreen.route: (_) => const TradingTagsScreen(),
   OrbToolsScreen.route: (_) => const OrbToolsScreen(),
   CandleEditScreen.route: (_) => const CandleEditScreen(),
-
 };

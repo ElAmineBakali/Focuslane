@@ -30,10 +30,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       try {
         _quillController.document = Document.fromJson(_current!.delta!);
       } catch (_) {
-        _quillController.document = Document()..insert(0, _current?.content ?? '');
+        _quillController.document =
+            Document()..insert(0, _current?.content ?? '');
       }
     } else {
-      _quillController.document = Document()..insert(0, _current?.content ?? '');
+      _quillController.document =
+          Document()..insert(0, _current?.content ?? '');
     }
     _isPinned = _current?.isPinned ?? false;
     if (_current == null && (widget.noteId ?? '').isNotEmpty) {
@@ -120,44 +122,65 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      appBar: _focusMode ? AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => setState(() => _focusMode = false),
-          tooltip: 'Salir de modo enfoque',
-        ),
-      ) : AppBar(
-        title: Text('Nota', style: TextStyle(fontSize: isMobile ? 18 : 20)),
-        actions: [
-          IconButton(
-            icon: Icon(_isPinned ? Icons.push_pin : Icons.push_pin_outlined, size: isMobile ? 22 : 24),
-            onPressed: () => setState(() => _isPinned = !_isPinned),
-            tooltip: 'Fijar',
-          ),
-          IconButton(
-            icon: Icon(Icons.visibility_off_outlined, size: isMobile ? 22 : 24),
-            onPressed: () => setState(() => _focusMode = true),
-            tooltip: 'Modo enfoque',
-          ),
-          IconButton(
-            icon: Icon(Icons.check, size: isMobile ? 22 : 24),
-            onPressed: _save,
-            tooltip: 'Guardar',
-          ),
-          if (_saving)
-            Padding(
-              padding: EdgeInsets.only(right: isMobile ? 8 : 12),
-              child: SizedBox(width: isMobile ? 18 : 20, height: isMobile ? 18 : 20, child: const CircularProgressIndicator(strokeWidth: 2)),
-            ),
-        ],
-      ),
+      appBar:
+          _focusMode
+              ? AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => setState(() => _focusMode = false),
+                  tooltip: 'Salir de modo enfoque',
+                ),
+              )
+              : AppBar(
+                title: Text(
+                  'Nota',
+                  style: TextStyle(fontSize: isMobile ? 18 : 20),
+                ),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                      size: isMobile ? 22 : 24,
+                    ),
+                    onPressed: () => setState(() => _isPinned = !_isPinned),
+                    tooltip: 'Fijar',
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.visibility_off_outlined,
+                      size: isMobile ? 22 : 24,
+                    ),
+                    onPressed: () => setState(() => _focusMode = true),
+                    tooltip: 'Modo enfoque',
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.check, size: isMobile ? 22 : 24),
+                    onPressed: _save,
+                    tooltip: 'Guardar',
+                  ),
+                  if (_saving)
+                    Padding(
+                      padding: EdgeInsets.only(right: isMobile ? 8 : 12),
+                      child: SizedBox(
+                        width: isMobile ? 18 : 20,
+                        height: isMobile ? 18 : 20,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                ],
+              ),
       body: Column(
         children: [
           if (!_focusMode)
             Padding(
-              padding: EdgeInsets.fromLTRB(isMobile ? 16 : 20, isMobile ? 12 : 16, isMobile ? 16 : 20, 0),
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 16 : 20,
+                isMobile ? 12 : 16,
+                isMobile ? 16 : 20,
+                0,
+              ),
               child: TextField(
                 controller: _titleCtrl,
                 style: theme.textTheme.headlineSmall?.copyWith(

@@ -61,62 +61,67 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   void _pickColor() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Selecciona un color'),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: _selectedColor,
-            onColorChanged: (color) => setState(() => _selectedColor = color),
-            enableAlpha: false,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Selecciona un color'),
+            content: SingleChildScrollView(
+              child: ColorPicker(
+                pickerColor: _selectedColor,
+                onColorChanged:
+                    (color) => setState(() => _selectedColor = color),
+                enableAlpha: false,
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cerrar'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cerrar'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
     );
   }
 
   void _pickEmojiIcon() async {
     await showDialog(
       context: context,
-      builder: (context) => EmojiIconPicker(
-        selectedEmoji: _emoji,
-        selectedIconCode: _iconCode,
-        onSelect: (emoji, iconCode) {
-          setState(() {
-            _emoji = emoji;
-            _iconCode = iconCode;
-          });
-        },
-      ),
+      builder:
+          (context) => EmojiIconPicker(
+            selectedEmoji: _emoji,
+            selectedIconCode: _iconCode,
+            onSelect: (emoji, iconCode) {
+              setState(() {
+                _emoji = emoji;
+                _iconCode = iconCode;
+              });
+            },
+          ),
     );
   }
 
   void _manageTags() async {
     await showDialog(
       context: context,
-      builder: (context) => TagSelector(
-        selectedTags: _tags,
-        onTagsChanged: (tags) {
-          setState(() => _tags = tags);
-        },
-      ),
+      builder:
+          (context) => TagSelector(
+            selectedTags: _tags,
+            onTagsChanged: (tags) {
+              setState(() => _tags = tags);
+            },
+          ),
     );
   }
 
   void _manageReminders() async {
     await showDialog(
       context: context,
-      builder: (context) => ReminderManager(
-        reminders: _reminders,
-        onRemindersChanged: (reminders) {
-          setState(() => _reminders = reminders);
-        },
-      ),
+      builder:
+          (context) => ReminderManager(
+            reminders: _reminders,
+            onRemindersChanged: (reminders) {
+              setState(() => _reminders = reminders);
+            },
+          ),
     );
   }
 
@@ -156,10 +161,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
       appBar: AppBar(
         title: const Text('Editar hábito'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveChanges,
-          )
+          IconButton(icon: const Icon(Icons.save), onPressed: _saveChanges),
         ],
       ),
       body: TaskFormTheme(
@@ -173,7 +175,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _pickEmojiIcon,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -187,14 +191,31 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             decoration: BoxDecoration(
                               color: _selectedColor.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: _selectedColor.withOpacity(0.3), width: 1.5),
+                              border: Border.all(
+                                color: _selectedColor.withOpacity(0.3),
+                                width: 1.5,
+                              ),
                             ),
                             child: Center(
-                              child: _emoji != null
-                                  ? Text(_emoji!, style: TextStyle(fontSize: isMobile ? 24 : 28))
-                                  : _iconCode != null
-                                      ? Icon(HabitIcons.getIcon(_iconCode), color: _selectedColor, size: isMobile ? 26 : 30)
-                                      : Icon(Icons.emoji_emotions_outlined, color: cs.onSurfaceVariant, size: isMobile ? 26 : 30),
+                              child:
+                                  _emoji != null
+                                      ? Text(
+                                        _emoji!,
+                                        style: TextStyle(
+                                          fontSize: isMobile ? 24 : 28,
+                                        ),
+                                      )
+                                      : _iconCode != null
+                                      ? Icon(
+                                        HabitIcons.getIcon(_iconCode),
+                                        color: _selectedColor,
+                                        size: isMobile ? 26 : 30,
+                                      )
+                                      : Icon(
+                                        Icons.emoji_emotions_outlined,
+                                        color: cs.onSurfaceVariant,
+                                        size: isMobile ? 26 : 30,
+                                      ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -204,17 +225,25 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               children: [
                                 Text(
                                   'Icono del hábito',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   'Toca para cambiar',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.edit_outlined,
+                            color: cs.onSurfaceVariant,
+                            size: isMobile ? 20 : 22,
+                          ),
                         ],
                       ),
                     ),
@@ -225,7 +254,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Obligatorio' : null,
+                  validator:
+                      (v) =>
+                          v == null || v.trim().isEmpty ? 'Obligatorio' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -235,13 +266,14 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _frequency,
+                  initialValue: _frequency,
                   items: const [
                     DropdownMenuItem(value: 'Diario', child: Text('Diario')),
                     DropdownMenuItem(value: 'Semanal', child: Text('Semanal')),
                     DropdownMenuItem(value: 'Mensual', child: Text('Mensual')),
                   ],
-                  onChanged: (val) => setState(() => _frequency = val ?? 'Diario'),
+                  onChanged:
+                      (val) => setState(() => _frequency = val ?? 'Diario'),
                   decoration: const InputDecoration(labelText: 'Frecuencia'),
                 ),
                 const SizedBox(height: 16),
@@ -250,7 +282,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _manageTags,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -261,15 +295,25 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.label_outlined, color: cs.primary, size: isMobile ? 20 : 22),
+                              Icon(
+                                Icons.label_outlined,
+                                color: cs.primary,
+                                size: isMobile ? 20 : 22,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'Etiquetas (${_tags.length}/3)',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                              Icon(
+                                Icons.edit_outlined,
+                                color: cs.onSurfaceVariant,
+                                size: isMobile ? 20 : 22,
+                              ),
                             ],
                           ),
                           if (_tags.isNotEmpty) ...[
@@ -277,17 +321,18 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
-                              children: _tags.map((tag) {
-                                return Chip(
-                                  label: Text(tag),
-                                  backgroundColor: cs.primaryContainer,
-                                  labelStyle: TextStyle(
-                                    color: cs.onPrimaryContainer,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: isMobile ? 12 : 13,
-                                  ),
-                                );
-                              }).toList(),
+                              children:
+                                  _tags.map((tag) {
+                                    return Chip(
+                                      label: Text(tag),
+                                      backgroundColor: cs.primaryContainer,
+                                      labelStyle: TextStyle(
+                                        color: cs.onPrimaryContainer,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: isMobile ? 12 : 13,
+                                      ),
+                                    );
+                                  }).toList(),
                             ),
                           ],
                         ],
@@ -301,7 +346,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isMobile ? 14 : 16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                  ),
                   child: InkWell(
                     onTap: _manageReminders,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -309,7 +356,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
                       child: Row(
                         children: [
-                          Icon(Icons.notifications_active_outlined, color: cs.primary, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.notifications_active_outlined,
+                            color: cs.primary,
+                            size: isMobile ? 20 : 22,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -317,19 +368,27 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               children: [
                                 Text(
                                   'Recordatorios (${_reminders.length})',
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   _reminders.isEmpty
                                       ? 'Sin recordatorios'
                                       : '${_reminders.where((r) => r.enabled).length} activos',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: isMobile ? 20 : 22),
+                          Icon(
+                            Icons.edit_outlined,
+                            color: cs.onSurfaceVariant,
+                            size: isMobile ? 20 : 22,
+                          ),
                         ],
                       ),
                     ),
@@ -345,7 +404,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 if (_isQuantitative)
                   TextFormField(
                     initialValue: _unit,
-                    decoration: const InputDecoration(labelText: 'Unidad (opcional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Unidad (opcional)',
+                    ),
                     onChanged: (val) => _unit = val,
                   ),
                 const SizedBox(height: 12),

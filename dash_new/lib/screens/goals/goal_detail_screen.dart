@@ -32,10 +32,12 @@ class GoalDetailScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nuevo sub-objetivo',
-        onPressed: () => showModalBottomSheet(
-          context: context, isScrollControlled: true,
-          builder: (_) => SubGoalEditSheet(goalId: goal.id),
-        ),
+        onPressed:
+            () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => SubGoalEditSheet(goalId: goal.id),
+            ),
         child: const Icon(Icons.add_task),
       ),
       body: StreamBuilder<List<SubGoal>>(
@@ -44,9 +46,10 @@ class GoalDetailScreen extends StatelessWidget {
           final subs = (s.data ?? []);
           final sections = <String, List<SubGoal>>{};
           for (final sg in subs) {
-            final key = (sg.section == null || sg.section!.trim().isEmpty)
-                ? 'General'
-                : sg.section!.trim();
+            final key =
+                (sg.section == null || sg.section!.trim().isEmpty)
+                    ? 'General'
+                    : sg.section!.trim();
             sections.putIfAbsent(key, () => []).add(sg);
           }
 
@@ -63,11 +66,10 @@ class GoalDetailScreen extends StatelessWidget {
                     subtitle: Text('Añade el primero con el botón +'),
                   ),
                 ),
-              ...sections.entries.map((e) => _SectionList(
-                    title: e.key,
-                    items: e.value,
-                    goalId: goal.id,
-                  )),
+              ...sections.entries.map(
+                (e) =>
+                    _SectionList(title: e.key, items: e.value, goalId: goal.id),
+              ),
               const SizedBox(height: 80),
             ],
           );
@@ -82,7 +84,9 @@ class _GoalHeaderCard extends StatelessWidget {
   const _GoalHeaderCard({required this.goal});
 
   double? _pct() {
-    if (goal.progress != null && goal.progressTarget != null && goal.progressTarget! > 0) {
+    if (goal.progress != null &&
+        goal.progressTarget != null &&
+        goal.progressTarget! > 0) {
       return (goal.progress! / goal.progressTarget!).clamp(0, 1.0);
     }
     return null;
@@ -91,9 +95,10 @@ class _GoalHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = _pct();
-    final color = (goal.colorHex != null)
-        ? Color(int.parse(goal.colorHex!))
-        : Theme.of(context).colorScheme.primary;
+    final color =
+        (goal.colorHex != null)
+            ? Color(int.parse(goal.colorHex!))
+            : Theme.of(context).colorScheme.primary;
 
     return Card(
       child: Padding(
@@ -101,32 +106,50 @@ class _GoalHeaderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              CircleAvatar(backgroundColor: color, child: const Icon(Icons.flag, color: Colors.white)),
-              const SizedBox(width: 10),
-              Expanded(child: Text(goal.title, style: Theme.of(context).textTheme.titleMedium)),
-            ]),
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: color,
+                  child: const Icon(Icons.flag, color: Colors.white),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    goal.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
             if ((goal.description ?? '').isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(goal.description!),
             ],
             const SizedBox(height: 8),
-            Wrap(spacing: 12, runSpacing: 8, children: [
-              Chip(
-                avatar: const Icon(Icons.category_outlined, size: 18),
-                label: Text(goal.status.name),
-              ),
-              if (goal.targetDate != null)
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: [
                 Chip(
-                  avatar: const Icon(Icons.event, size: 18),
-                  label: Text('Límite: ${goal.targetDate!.toLocal().toString().split(' ').first}'),
+                  avatar: const Icon(Icons.category_outlined, size: 18),
+                  label: Text(goal.status.name),
                 ),
-              if (goal.progressTarget != null)
-                Chip(
-                  avatar: const Icon(Icons.speed_outlined, size: 18),
-                  label: Text('Progreso ${goal.progress?.toStringAsFixed(1) ?? 0} / ${goal.progressTarget} ${goal.unit ?? ""}'),
-                ),
-            ]),
+                if (goal.targetDate != null)
+                  Chip(
+                    avatar: const Icon(Icons.event, size: 18),
+                    label: Text(
+                      'Límite: ${goal.targetDate!.toLocal().toString().split(' ').first}',
+                    ),
+                  ),
+                if (goal.progressTarget != null)
+                  Chip(
+                    avatar: const Icon(Icons.speed_outlined, size: 18),
+                    label: Text(
+                      'Progreso ${goal.progress?.toStringAsFixed(1) ?? 0} / ${goal.progressTarget} ${goal.unit ?? ""}',
+                    ),
+                  ),
+              ],
+            ),
             if (pct != null) ...[
               const SizedBox(height: 6),
               LinearProgressIndicator(value: pct, minHeight: 6),
@@ -161,57 +184,79 @@ class _SectionList extends StatelessWidget {
             ListTile(
               leading: Checkbox(
                 value: sg.isDone,
-                onChanged: (_) => svc.setSubGoalStatus(
-                  goalId,
-                  sg.id,
-                  sg.isDone ? GoalStatus.inProgress : GoalStatus.completed,
+                onChanged:
+                    (_) => svc.setSubGoalStatus(
+                      goalId,
+                      sg.id,
+                      sg.isDone ? GoalStatus.inProgress : GoalStatus.completed,
+                    ),
+              ),
+              title: Text(
+                sg.title,
+                style: TextStyle(
+                  decoration: sg.isDone ? TextDecoration.lineThrough : null,
                 ),
               ),
-              title: Text(sg.title, style: TextStyle(
-                decoration: sg.isDone ? TextDecoration.lineThrough : null,
-              )),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if ((sg.description ?? '').isNotEmpty) Text(sg.description!),
                   if (sg.dueDate != null)
-                    Text('Fecha: ${sg.dueDate!.toLocal().toString().split(" ").first}'),
+                    Text(
+                      'Fecha: ${sg.dueDate!.toLocal().toString().split(" ").first}',
+                    ),
                   if (sg.progressTarget != null)
-                    Text('Progreso: ${(sg.progress ?? 0).toStringAsFixed(1)} / ${sg.progressTarget} ${sg.unit ?? ""}'),
+                    Text(
+                      'Progreso: ${(sg.progress ?? 0).toStringAsFixed(1)} / ${sg.progressTarget} ${sg.unit ?? ""}',
+                    ),
                 ],
               ),
               trailing: PopupMenuButton<String>(
                 onSelected: (v) async {
                   if (v == 'edit') {
                     await showModalBottomSheet(
-                      context: context, isScrollControlled: true,
-                      builder: (_) => SubGoalEditSheet(goalId: goalId, initial: sg),
+                      context: context,
+                      isScrollControlled: true,
+                      builder:
+                          (_) => SubGoalEditSheet(goalId: goalId, initial: sg),
                     );
                   } else if (v == 'del') {
                     final ok = await showDialog<bool>(
                       context: context,
-                      builder: (_) => AlertDialog(
-                        title: const Text('Eliminar sub-objetivo'),
-                        content: Text('¿Eliminar "${sg.title}"?'),
-                        actions: [
-                          TextButton(onPressed: ()=>Navigator.pop(context,false), child: const Text('Cancelar')),
-                          FilledButton(onPressed: ()=>Navigator.pop(context,true), child: const Text('Eliminar')),
-                        ],
-                      ),
+                      builder:
+                          (_) => AlertDialog(
+                            title: const Text('Eliminar sub-objetivo'),
+                            content: Text('¿Eliminar "${sg.title}"?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancelar'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Eliminar'),
+                              ),
+                            ],
+                          ),
                     );
                     if (ok == true) await svc.deleteSubGoal(goalId, sg.id);
                   } else if (v == 'plus') {
-                    await svc.bumpSubGoalProgress(goalId, sg.id, 1); // +1 unidad rápida
+                    await svc.bumpSubGoalProgress(
+                      goalId,
+                      sg.id,
+                      1,
+                    ); // +1 unidad rápida
                   } else if (v == 'minus') {
                     await svc.bumpSubGoalProgress(goalId, sg.id, -1);
                   }
                 },
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'edit', child: Text('Editar')),
-                  PopupMenuItem(value: 'plus', child: Text('Progreso +1')),
-                  PopupMenuItem(value: 'minus', child: Text('Progreso -1')),
-                  PopupMenuItem(value: 'del', child: Text('Eliminar')),
-                ],
+                itemBuilder:
+                    (_) => const [
+                      PopupMenuItem(value: 'edit', child: Text('Editar')),
+                      PopupMenuItem(value: 'plus', child: Text('Progreso +1')),
+                      PopupMenuItem(value: 'minus', child: Text('Progreso -1')),
+                      PopupMenuItem(value: 'del', child: Text('Eliminar')),
+                    ],
               ),
             ),
           const SizedBox(height: 8),

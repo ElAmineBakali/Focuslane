@@ -25,7 +25,8 @@ class _TradesListScreenState extends State<TradesListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, TradeEditScreen.route),
+            onPressed:
+                () => Navigator.pushNamed(context, TradeEditScreen.route),
           ),
         ],
       ),
@@ -35,33 +36,57 @@ class _TradesListScreenState extends State<TradesListScreen> {
           Padding(
             padding: const EdgeInsets.all(8),
             child: Wrap(
-              spacing: 8, runSpacing: 8,
+              spacing: 8,
+              runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 SizedBox(
                   width: 160,
                   child: TextField(
                     decoration: const InputDecoration(labelText: 'Símbolo'),
-                    onChanged: (v) => setState(() => _symbol = v.trim().isEmpty ? null : v.trim().toUpperCase()),
+                    onChanged:
+                        (v) => setState(
+                          () =>
+                              _symbol =
+                                  v.trim().isEmpty
+                                      ? null
+                                      : v.trim().toUpperCase(),
+                        ),
                   ),
                 ),
                 SizedBox(
                   width: 160,
                   child: TextField(
-                    decoration: const InputDecoration(labelText: 'Estrategia ID'),
-                    onChanged: (v) => setState(() => _strategy = v.trim().isEmpty ? null : v.trim()),
+                    decoration: const InputDecoration(
+                      labelText: 'Estrategia ID',
+                    ),
+                    onChanged:
+                        (v) => setState(
+                          () => _strategy = v.trim().isEmpty ? null : v.trim(),
+                        ),
                   ),
                 ),
                 DropdownButton<Outcome>(
                   hint: const Text('Outcome'),
                   value: _outcome,
-                  items: Outcome.values.map((o) => DropdownMenuItem(value: o, child: Text(o.name))).toList(),
+                  items:
+                      Outcome.values
+                          .map(
+                            (o) =>
+                                DropdownMenuItem(value: o, child: Text(o.name)),
+                          )
+                          .toList(),
                   onChanged: (v) => setState(() => _outcome = v),
                 ),
                 TextButton.icon(
                   icon: const Icon(Icons.clear),
                   label: const Text('Limpiar'),
-                  onPressed: () => setState(() { _symbol=null; _strategy=null; _outcome=null; }),
+                  onPressed:
+                      () => setState(() {
+                        _symbol = null;
+                        _strategy = null;
+                        _outcome = null;
+                      }),
                 ),
               ],
             ),
@@ -69,13 +94,18 @@ class _TradesListScreenState extends State<TradesListScreen> {
           const Divider(height: 1),
           Expanded(
             child: StreamBuilder<List<Trade>>(
-              stream: svc.watchTrades(symbol: _symbol, strategyId: _strategy, outcome: _outcome),
+              stream: svc.watchTrades(
+                symbol: _symbol,
+                strategyId: _strategy,
+                outcome: _outcome,
+              ),
               builder: (_, s) {
                 final data = s.data ?? [];
                 if (s.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                if (data.isEmpty) return const Center(child: Text('Sin trades'));
+                if (data.isEmpty)
+                  return const Center(child: Text('Sin trades'));
                 return ListView.separated(
                   itemCount: data.length,
                   separatorBuilder: (_, __) => const Divider(height: 1),
@@ -83,15 +113,27 @@ class _TradesListScreenState extends State<TradesListScreen> {
                     final t = data[i];
                     return ListTile(
                       leading: Icon(
-                        t.outcome == Outcome.win ? Icons.trending_up :
-                        t.outcome == Outcome.loss ? Icons.trending_down :
-                        t.outcome == Outcome.breakeven ? Icons.horizontal_rule :
-                        Icons.hourglass_empty,
+                        t.outcome == Outcome.win
+                            ? Icons.trending_up
+                            : t.outcome == Outcome.loss
+                            ? Icons.trending_down
+                            : t.outcome == Outcome.breakeven
+                            ? Icons.horizontal_rule
+                            : Icons.hourglass_empty,
                       ),
-                      title: Text('${t.symbol} • ${t.direction.name.toUpperCase()} • ${t.size.toStringAsFixed(2)}'),
-                      subtitle: Text('${t.entryDate.toLocal().toString().split(" ").first} • P&L ${t.pnl.toStringAsFixed(2)} • R ${t.rMultiple?.toStringAsFixed(2) ?? "-"}'),
+                      title: Text(
+                        '${t.symbol} • ${t.direction.name.toUpperCase()} • ${t.size.toStringAsFixed(2)}',
+                      ),
+                      subtitle: Text(
+                        '${t.entryDate.toLocal().toString().split(" ").first} • P&L ${t.pnl.toStringAsFixed(2)} • R ${t.rMultiple?.toStringAsFixed(2) ?? "-"}',
+                      ),
                       trailing: const Icon(Icons.edit),
-                      onTap: () => Navigator.pushNamed(context, TradeEditScreen.route, arguments: t),
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            TradeEditScreen.route,
+                            arguments: t,
+                          ),
                     );
                   },
                 );

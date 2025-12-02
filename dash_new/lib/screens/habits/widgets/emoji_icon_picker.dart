@@ -18,11 +18,12 @@ class EmojiIconPicker extends StatefulWidget {
   State<EmojiIconPicker> createState() => _EmojiIconPickerState();
 }
 
-class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProviderStateMixin {
+class _EmojiIconPickerState extends State<EmojiIconPicker>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? _tempEmoji;
   String? _tempIconCode;
-  
+
   // Emojis comunes para hábitos organizados por categoría
   static const Map<String, List<String>> emojiCategories = {
     'Salud': ['💪', '🏃', '🧘', '💧', '🥗', '😴', '❤️', '🩺', '💊'],
@@ -53,7 +54,7 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    
+
     return Dialog(
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
@@ -63,14 +64,18 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       'Selecciona un ícono',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -90,17 +95,16 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [
-                  _buildEmojiGrid(),
-                  _buildIconGrid(),
-                ],
+                children: [_buildEmojiGrid(), _buildIconGrid()],
               ),
             ),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -132,66 +136,71 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
   Widget _buildEmojiGrid() {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    
+
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: emojiCategories.entries.map((entry) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                entry.key,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: cs.primary,
-                ),
-              ),
-            ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 60,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: entry.value.length,
-              itemBuilder: (context, index) {
-                final emoji = entry.value[index];
-                final isSelected = _tempEmoji == emoji && _tempIconCode == null;
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      _tempEmoji = emoji;
-                      _tempIconCode = null;
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isSelected ? cs.primaryContainer : cs.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected ? cs.primary : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        emoji,
-                        style: const TextStyle(fontSize: 28),
-                      ),
+      children:
+          emojiCategories.entries.map((entry) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    entry.key,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: cs.primary,
                     ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
-        );
-      }).toList(),
+                ),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 60,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: entry.value.length,
+                  itemBuilder: (context, index) {
+                    final emoji = entry.value[index];
+                    final isSelected =
+                        _tempEmoji == emoji && _tempIconCode == null;
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _tempEmoji = emoji;
+                          _tempIconCode = null;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              isSelected
+                                  ? cs.primaryContainer
+                                  : cs.surfaceContainerHigh,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? cs.primary : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            emoji,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }).toList(),
     );
   }
 
@@ -199,7 +208,7 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final icons = HabitIcons.icons;
-    
+
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -213,7 +222,7 @@ class _EmojiIconPickerState extends State<EmojiIconPicker> with SingleTickerProv
         final code = entry.key;
         final icon = entry.value;
         final isSelected = _tempIconCode == code && _tempEmoji == null;
-        
+
         return InkWell(
           onTap: () {
             setState(() {

@@ -20,12 +20,12 @@ enum TaskGroup {
 class TaskGrouper {
   static TaskGroup getGroup(Task task) {
     if (task.dueDate == null) return TaskGroup.noDate;
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final endOfWeek = today.add(Duration(days: 7 - today.weekday));
-    
+
     final dueDay = DateTime(
       task.dueDate!.year,
       task.dueDate!.month,
@@ -38,7 +38,8 @@ class TaskGrouper {
       return TaskGroup.today;
     } else if (dueDay.isAtSameMomentAs(tomorrow)) {
       return TaskGroup.tomorrow;
-    } else if (dueDay.isAfter(tomorrow) && dueDay.isBefore(endOfWeek.add(const Duration(days: 1)))) {
+    } else if (dueDay.isAfter(tomorrow) &&
+        dueDay.isBefore(endOfWeek.add(const Duration(days: 1)))) {
       return TaskGroup.thisWeek;
     } else {
       return TaskGroup.later;
@@ -50,12 +51,12 @@ class TaskGrouper {
     for (final group in TaskGroup.values) {
       groups[group] = [];
     }
-    
+
     for (final task in tasks) {
       final group = getGroup(task);
       groups[group]!.add(task);
     }
-    
+
     return groups;
   }
 
@@ -77,7 +78,7 @@ class TaskGrouper {
       }
       if (a.dueDate == null) return 1;
       if (b.dueDate == null) return -1;
-      
+
       final dateComp = a.dueDate!.compareTo(b.dueDate!);
       if (dateComp != 0) return dateComp;
       // 2. Prioridad si misma fecha
@@ -93,7 +94,7 @@ class TaskGrouper {
 class TaskFormatter {
   static String formatDueDate(DateTime? dueDate) {
     if (dueDate == null) return 'Sin fecha';
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));

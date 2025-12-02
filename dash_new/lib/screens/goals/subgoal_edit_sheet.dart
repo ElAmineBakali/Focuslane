@@ -45,7 +45,9 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
     return TaskFormTheme(
       child: Padding(
         padding: EdgeInsets.only(
-          left: 16, right: 16, top: 16,
+          left: 16,
+          right: 16,
+          top: 16,
           bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Form(
@@ -54,17 +56,23 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(isEdit ? 'Editar sub-objetivo' : 'Nuevo sub-objetivo',
-                    style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  isEdit ? 'Editar sub-objetivo' : 'Nuevo sub-objetivo',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(labelText: 'Título'),
-                  validator: (v)=> (v==null || v.trim().isEmpty) ? 'Requerido' : null,
+                  validator:
+                      (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 TextFormField(
                   controller: _desc,
-                  decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción (opcional)',
+                  ),
                   maxLines: 3,
                 ),
                 const SizedBox(height: 8),
@@ -73,16 +81,24 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                     Expanded(
                       child: TextFormField(
                         controller: _progress,
-                        decoration: const InputDecoration(labelText: 'Progreso'),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Progreso',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextFormField(
                         controller: _progressTarget,
-                        decoration: const InputDecoration(labelText: 'Objetivo'),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Objetivo',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -98,21 +114,29 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _section,
-                  decoration: const InputDecoration(labelText: 'Sección (agrupación)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Sección (agrupación)',
+                  ),
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<GoalStatus>(
                   initialValue: _status,
-                  items: GoalStatus.values
-                      .map((e)=>DropdownMenuItem(value: e, child: Text(e.name)))
-                      .toList(),
-                  onChanged: (v)=> setState(()=> _status = v ?? _status),
+                  items:
+                      GoalStatus.values
+                          .map(
+                            (e) =>
+                                DropdownMenuItem(value: e, child: Text(e.name)),
+                          )
+                          .toList(),
+                  onChanged: (v) => setState(() => _status = v ?? _status),
                   decoration: const InputDecoration(labelText: 'Estado'),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
-                  title: Text('Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "—"}'),
+                  title: Text(
+                    'Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "—"}',
+                  ),
                   onTap: () async {
                     final d = await showDatePicker(
                       context: context,
@@ -120,14 +144,17 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                       firstDate: DateTime(2020),
                       lastDate: DateTime(2100),
                     );
-                    if (d != null) setState(()=> _due = d);
+                    if (d != null) setState(() => _due = d);
                   },
                 ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: ()=>Navigator.pop(context), child: const Text('Cancelar')),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: () async {
@@ -135,18 +162,33 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                         final sg = SubGoal(
                           id: widget.initial?.id ?? '',
                           title: _title.text.trim(),
-                          description: _desc.text.trim().isEmpty ? null : _desc.text.trim(),
+                          description:
+                              _desc.text.trim().isEmpty
+                                  ? null
+                                  : _desc.text.trim(),
                           status: _status,
                           dueDate: _due,
                           progress: double.tryParse(_progress.text),
                           progressTarget: double.tryParse(_progressTarget.text),
-                          unit: _unit.text.trim().isEmpty ? null : _unit.text.trim(),
-                          section: _section.text.trim().isEmpty ? null : _section.text.trim(),
+                          unit:
+                              _unit.text.trim().isEmpty
+                                  ? null
+                                  : _unit.text.trim(),
+                          section:
+                              _section.text.trim().isEmpty
+                                  ? null
+                                  : _section.text.trim(),
                         );
                         if (widget.initial == null) {
-                          await GoalsFirestoreService.I.addSubGoal(widget.goalId, sg);
+                          await GoalsFirestoreService.I.addSubGoal(
+                            widget.goalId,
+                            sg,
+                          );
                         } else {
-                          await GoalsFirestoreService.I.updateSubGoal(widget.goalId, sg);
+                          await GoalsFirestoreService.I.updateSubGoal(
+                            widget.goalId,
+                            sg,
+                          );
                         }
                         if (mounted) Navigator.pop(context);
                       },
