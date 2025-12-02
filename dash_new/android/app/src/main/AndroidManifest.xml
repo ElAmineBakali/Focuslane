@@ -1,0 +1,78 @@
+<!-- android/app/src/main/AndroidManifest.xml -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permisos habituales -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Visibilidad de paquetes / intent queries (Android 11+) -->
+    <queries>
+        <!-- Mapas -->
+        <package android:name="com.google.android.apps.maps" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+
+        <!-- Atajos (todos los packages que pasaste) -->
+        <package android:name="com.netflix.mediaclient" />
+        <package android:name="com.crunchyroll.crunchyroid" />
+        <package android:name="com.soundcloud.android" />
+        <package android:name="com.valvesoftware.android.steam.community" />
+        <package android:name="net.metaquotes.metatrader4" />
+        <package android:name="de.traderepublic.app" />
+        <package android:name="com.imaginbank.app" />
+        <package android:name="com.chess" />
+        <package android:name="nz.co.vista.android.movie.cinesa" />
+        <package android:name="com.google.android.apps.translate" />
+        <package android:name="com.alibaba.aliexpresshd" />
+        <package android:name="com.ovelin.guitartuna" />
+        <package android:name="com.glovo" />
+        <package android:name="com.amazon.mShop.android.shopping" />
+        <package android:name="jp.miyavi.androiod.gnws" />
+        <package android:name="com.zzkko" />
+        <package android:name="com.instructure.candroid" />
+        <package android:name="com.scee.psxandroid" />
+        <package android:name="com.fusionmedia.investing" />
+        <package android:name="com.dgt.midgt" />
+        <package android:name="com.openai.chatgpt" />
+        <package android:name="de.zalando.mobile" />
+        <package android:name="com.exness.android.pa" />
+        <package android:name="com.discord" />
+        <!-- Alternativa de ajedrez -->
+        <package android:name="org.lichess.mobileapp" />
+    </queries>
+
+    <application
+        android:label="FocusLane"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+
+        <receiver android:name=".ExactAlarmReceiver" android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data android:name="flutterEmbedding" android:value="2" />
+    </application>
+</manifest>

@@ -1,0 +1,51 @@
+# Flutter/Dart
+**/build/
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.metadata
+.melos_tool/**
+
+# Android
+**/.gradle/
+**/local.properties
+**/captures/
+**/app/*.iml
+**/*.apk
+**/*.aab
+**/outputs/
+
+# iOS/macOS
+**/Pods/
+**/DerivedData/
+**/*.xcworkspace/
+**/*.xcodeproj/project.xcworkspace/
+**/*.xcodeproj/xcuserdata/
+**/*.xcodeproj/xcshareddata/
+**/*.xcodeproj/project.xcsettings
+**/*.pbxproj
+
+# VS Code
+.vscode/
+
+# IntelliJ/Android Studio
+*.iml
+.idea/
+
+# Logs
+*.log
+*.zip
+
+# Flutter asset/generated
+**/flutter_assets/
+**/native_assets/
+
+# Firebase/Google Services (keep jsons if needed)
+# Uncomment if you prefer not to commit service files
+# **/google-services.json
+# **/GoogleService-Info.plist
+
+# Misc
+.DS_Store
+Thumbs.db
