@@ -71,7 +71,7 @@ class ReminderService {
 
     DateTime? target = task.remindAt;
 
-    if (target.isBefore(DateTime.now())) {
+    if (target == null || target.isBefore(DateTime.now())) {
       await NotificationService.I.cancelNotificationById(id);
       return;
     }
