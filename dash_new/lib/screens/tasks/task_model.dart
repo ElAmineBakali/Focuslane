@@ -56,6 +56,12 @@ class Task {
   final List<Subtask> subtasks;
   final bool isCalendarVisible;
   final String? linkedNoteId;
+  
+  /// ✅ NUEVO: Si la categoría es "Study", este campo guarda el courseId asociado
+  final String? linkedStudyCourseId;
+  
+  /// ✅ NUEVO: Si esta tarea está sincronizada desde Study, guarda el StudyTask id
+  final String? syncedStudyTaskId;
 
   Task({
     required this.id,
@@ -74,6 +80,8 @@ class Task {
     this.subtasks = const [],
     this.isCalendarVisible = true,
     this.linkedNoteId,
+    this.linkedStudyCourseId,
+    this.syncedStudyTaskId,
   });
 
   Task copyWith({
@@ -93,6 +101,8 @@ class Task {
     List<Subtask>? subtasks,
     bool? isCalendarVisible,
     String? linkedNoteId,
+    String? linkedStudyCourseId,
+    String? syncedStudyTaskId,
   }) {
     return Task(
       id: id ?? this.id,
@@ -111,6 +121,8 @@ class Task {
       subtasks: subtasks ?? this.subtasks,
       isCalendarVisible: isCalendarVisible ?? this.isCalendarVisible,
       linkedNoteId: linkedNoteId ?? this.linkedNoteId,
+      linkedStudyCourseId: linkedStudyCourseId ?? this.linkedStudyCourseId,
+      syncedStudyTaskId: syncedStudyTaskId ?? this.syncedStudyTaskId,
     );
   }
 
@@ -134,6 +146,8 @@ class Task {
       'subtasks': subtasks.map((s) => s.toMap()).toList(),
       'isCalendarVisible': isCalendarVisible,
       'linkedNoteId': linkedNoteId,
+      'linkedStudyCourseId': linkedStudyCourseId,
+      'syncedStudyTaskId': syncedStudyTaskId,
     };
   }
 
@@ -217,6 +231,8 @@ class Task {
       subtasks: parsedSubs,
       isCalendarVisible: (map['isCalendarVisible'] ?? true) as bool,
       linkedNoteId: map['linkedNoteId'] as String?,
+      linkedStudyCourseId: map['linkedStudyCourseId'] as String?,
+      syncedStudyTaskId: map['syncedStudyTaskId'] as String?,
     );
   }
 }

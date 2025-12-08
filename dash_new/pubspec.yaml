@@ -100,7 +100,6 @@ flutter:
     - assets/audio/ambience/forest.mp3
     - assets/audio/ambience/fireplace.mp3
     - assets/audio/ambience/river.mp3
-    - assets/audio/guided/
     - assets/home/
 
   # The following line ensures that the Material Icons font is

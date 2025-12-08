@@ -54,12 +54,13 @@ class Course {
         if (v == null) return null;
         if (v is DateTime) return v;
         // Firestore Timestamp
-        // ignore: unnecessary_type_check
-        final toDate =
-            v is dynamic && v.toString().contains('Timestamp')
-                ? v.toDate()
-                : null;
-        if (toDate is DateTime) return toDate;
+        try {
+          if (v.toString().contains('Timestamp')) {
+            return v.toDate();
+          }
+        } catch (_) {
+          // Not a Timestamp, continue
+        }
         return DateTime.tryParse(v.toString());
       } catch (_) {
         return null;
@@ -101,6 +102,10 @@ class StudyTask {
   final TaskStatus status;
   final String? notes;
   final DateTime? createdAt;
+  
+  /// ✅ NUEVO: ID de la tarea sincronizada en el módulo general Tasks
+  /// Si es null, esta tarea no está sincronizada
+  final String? syncedTaskId;
 
   const StudyTask({
     required this.id,
@@ -112,6 +117,7 @@ class StudyTask {
     this.status = TaskStatus.todo,
     this.notes,
     this.createdAt,
+    this.syncedTaskId,
   });
 
   factory StudyTask.fromMap(String id, Map<String, dynamic> m) {
@@ -143,6 +149,7 @@ class StudyTask {
       ),
       notes: m['notes'],
       createdAt: parseTs(m['createdAt']),
+      syncedTaskId: m['syncedTaskId'],
     );
   }
 
@@ -154,6 +161,7 @@ class StudyTask {
     'priority': priority.name,
     'status': status.name,
     if (notes != null) 'notes': notes,
+    if (syncedTaskId != null) 'syncedTaskId': syncedTaskId,
   };
 }
 
