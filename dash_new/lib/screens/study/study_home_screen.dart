@@ -4,6 +4,7 @@ import 'tasks/study_tasks_screen.dart';
 import 'timer/study_timer_screen.dart';
 import 'analytics/study_analytics_screen.dart';
 import 'schedule/schedule_screen.dart';
+import 'attendance/attendance_screen.dart';
 import 'services/study_firestore_service.dart';
 import 'services/study_notifications.dart';
 import 'models/study_models.dart';
@@ -171,18 +172,31 @@ class _AttendanceCard extends StatelessWidget {
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      course.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AttendanceScreen(
+                    svc: svc,
+                    course: course,
+                  ),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        course.name,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -231,6 +245,7 @@ class _AttendanceCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           ),
         );
       },

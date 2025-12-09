@@ -9,7 +9,8 @@ class ScheduleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final days = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Horario académico')),
       floatingActionButton: FloatingActionButton(
@@ -33,8 +34,48 @@ class ScheduleScreen extends StatelessWidget {
               if (!snap.hasData)
                 return const Center(child: CircularProgressIndicator());
               final blocks = snap.data!;
-              return CustomScrollView(
-                slivers: [
+              
+              // Vista móvil: día por día con PageView
+              if (isMobile) {
+                return _MobileDayByDaySchedule(
+                  blocks: blocks,
+                  courseById: byId,
+                  svc: svc,
+                );
+              }
+              
+              // Vista web/tablet: semanal completa
+              return _WeeklyScheduleView(
+                blocks: blocks,
+                courseById: byId,
+                svc: svc,
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Vista semanal completa para web/tablet
+class _WeeklyScheduleView extends StatelessWidget {
+  final List<StudyClassBlock> blocks;
+  final Map<String, Course> courseById;
+  final StudyFirestoreService svc;
+
+  const _WeeklyScheduleView({
+    required this.blocks,
+    required this.courseById,
+    required this.svc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final days = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    
+    return CustomScrollView(
+      slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
@@ -104,7 +145,7 @@ class ScheduleScreen extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children:
                                           here.map((b) {
-                                            final c = byId[b.courseId];
+                                            final c = courseById[b.courseId];
                                             final name =
                                                 (c?.name ?? b.courseId).trim();
                                             final label =
@@ -232,11 +273,266 @@ class ScheduleScreen extends StatelessWidget {
                     ),
                   ),
                 ],
+    );
+  }
+}
+
+/// Vista móvil día por día con PageView
+class _MobileDayByDaySchedule extends StatefulWidget {
+  final List<StudyClassBlock> blocks;
+  final Map<String, Course> courseById;
+  final StudyFirestoreService svc;
+
+  const _MobileDayByDaySchedule({
+    required this.blocks,
+    required this.courseById,
+    required this.svc,
+  });
+
+  @override
+  State<_MobileDayByDaySchedule> createState() => _MobileDayByDayScheduleState();
+}
+
+class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
+  final PageController _pageController = PageController(initialPage: DateTime.now().weekday - 1);
+  late int _currentDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDay = DateTime.now().weekday; // 1=Lun, 7=Dom
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dayNames = const ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    
+    return Column(
+      children: [
+        // Indicador de día actual
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: _currentDay > 1 ? () {
+                  _pageController.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                } : null,
+              ),
+              Text(
+                dayNames[_currentDay - 1],
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: _currentDay < 7 ? () {
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                } : null,
+              ),
+            ],
+          ),
+        ),
+        
+        // Indicador de días (puntitos)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(7, (index) {
+              final dayIndex = index + 1;
+              final isSelected = dayIndex == _currentDay;
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isSelected ? 24 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: isSelected 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              );
+            }),
+          ),
+        ),
+        
+        // PageView con scroll horizontal
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentDay = index + 1;
+              });
+            },
+            itemCount: 7,
+            itemBuilder: (context, pageIndex) {
+              final dayOfWeek = pageIndex + 1; // 1=Lun, 7=Dom
+              
+              // Filtrar bloques para este día
+              final dayBlocks = widget.blocks
+                  .where((b) => b.daysOfWeek.contains(dayOfWeek))
+                  .toList()
+                ..sort((a, b) {
+                  final aMinutes = a.start.hour * 60 + a.start.minute;
+                  final bMinutes = b.start.hour * 60 + b.start.minute;
+                  return aMinutes.compareTo(bMinutes);
+                });
+              
+              if (dayBlocks.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.event_busy,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No hay clases programadas',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: dayBlocks.length,
+                itemBuilder: (context, index) {
+                  final block = dayBlocks[index];
+                  final course = widget.courseById[block.courseId];
+                  final courseName = course?.name ?? block.courseId;
+                  final courseColor = course?.color ?? Theme.of(context).colorScheme.primary;
+                  
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: InkWell(
+                      onTap: () async {
+                        await showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => _EditBlockSheet(
+                            svc: widget.svc,
+                            initial: block,
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(
+                              color: courseColor,
+                              width: 6,
+                            ),
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    courseName,
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: courseColor.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${block.start.format(context)} - ${block.end.format(context)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: courseColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (block.room != null) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.room,
+                                    size: 16,
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    block.room!,
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                            if (course?.teacher != null) ...[
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.person_outline,
+                                    size: 16,
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    course!.teacher!,
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               );
             },
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 }
