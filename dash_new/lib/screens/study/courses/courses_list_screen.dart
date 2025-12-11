@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'course_edit_sheet.dart';
@@ -74,25 +76,74 @@ class CoursesListScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.school_rounded,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.outline,
+                  Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                          Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                        ],
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.school_rounded,
+                      size: 70,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
                   Text(
-                    'Sin cursos aún',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    '¡Empieza tu jornada!',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Text(
-                    'Crea tu primer curso con el botón +',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
+                    'Crea tu primer curso para comenzar a organizar tu estudio',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      final created = await showModalBottomSheet<Course?>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => CourseEditSheet(svc: svc),
+                      );
+                      if (created != null && context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CourseDetailScreen(svc: svc, course: created),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Crear primer curso'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
                 ],
-              ),
+              ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
             );
           }
 

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../timer/study_timer_screen.dart';
@@ -98,7 +101,58 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                   return const Center(child: CircularProgressIndicator());
                 final tasks = snap.data!;
                 if (tasks.isEmpty)
-                  return const Center(child: Text('Nada por aquí'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.task_alt_rounded,
+                          size: 120,
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          '¡Todo despejado!',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No hay tareas que coincidan con tus filtros',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        FilledButton.icon(
+                          onPressed: () async {
+                            await showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
+                            );
+                          },
+                          icon: const Icon(Icons.add_rounded),
+                          label: const Text('Crear nueva tarea'),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
+                  );
 
                 // Grouping
                 final Map<String, List<StudyTask>> groups = {};
@@ -122,65 +176,121 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     groups.entries.toList()
                       ..sort((a, b) => a.key.compareTo(b.key));
 
-                return CustomScrollView(
-                  slivers: [
-                    for (final e in entries) ...[
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-                          child: Text(
-                            _groupBy == 'course'
-                                ? 'Curso: ${e.key}'
-                                : (e.key == 'Sin fecha'
-                                    ? e.key
-                                    : e.key.substring(0, 10)),
-                            style: Theme.of(context).textTheme.titleMedium,
+                return AnimationLimiter(
+                  child: CustomScrollView(
+                    slivers: [
+                      for (final e in entries) ...[
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                            child: Text(
+                              _groupBy == 'course'
+                                  ? 'Curso: ${e.key}'
+                                  : (e.key == 'Sin fecha'
+                                      ? e.key
+                                      : e.key.substring(0, 10)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
                           ),
                         ),
-                      ),
-                      SliverList.separated(
-                        itemBuilder:
-                            (_, i) => _TaskCard(
-                              task: e.value[i],
-                              onEdit: () async {
-                                await showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder:
-                                      (_) => TaskEditSheet(
-                                        svc: svc,
-                                        initial: e.value[i],
-                                      ),
-                                );
-                              },
-                              onChangeStatus: (status) async {
-                                await svc.updateTask(e.value[i].id, {
-                                  'status': status.name,
-                                });
-                              },
-                              onDelete: () async {
-                                await svc.deleteTask(e.value[i].id);
-                              },
-                              onOpenTimer: () {
-                                final t = e.value[i];
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => StudyTimerScreen(
-                                          svc: svc,
-                                          initialCourseId: t.courseId,
-                                          initialTaskId: t.id,
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, i) {
+                                return AnimationConfiguration.staggeredList(
+                                  position: i,
+                                  duration: const Duration(milliseconds: 400),
+                                  child: SlideAnimation(
+                                    verticalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(bottom: 12),
+                                        child: _TaskCard(
+                                          task: e.value[i],
+                                          onEdit: () async {
+                                            await showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              backgroundColor: Colors.transparent,
+                                              builder:
+                                                  (_) => TaskEditSheet(
+                                                    svc: svc,
+                                                    initial: e.value[i],
+                                                  ),
+                                            );
+                                          },
+                                          onChangeStatus: (status) async {
+                                            await svc.updateTask(e.value[i].id, {
+                                              'status': status.name,
+                                            });
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    const Icon(Icons.check_circle, color: Colors.white),
+                                                    const SizedBox(width: 12),
+                                                    Text('Estado actualizado a ${status.name}'),
+                                                  ],
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onDelete: () async {
+                                            await svc.deleteTask(e.value[i].id);
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: const Row(
+                                                  children: [
+                                                    Icon(Icons.delete_outline, color: Colors.white),
+                                                    SizedBox(width: 12),
+                                                    Text('Tarea eliminada'),
+                                                  ],
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onOpenTimer: () {
+                                            final t = e.value[i];
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => StudyTimerScreen(
+                                                      svc: svc,
+                                                      initialCourseId: t.courseId,
+                                                      initialTaskId: t.id,
+                                                    ),
+                                              ),
+                                            );
+                                          },
                                         ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
+                              childCount: e.value.length,
                             ),
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemCount: e.value.length,
-                      ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 );
               },
             ),
@@ -208,11 +318,11 @@ class _TaskCard extends StatelessWidget {
   Color _priorityColor(BuildContext context) {
     switch (task.priority) {
       case Priority.high:
-        return Colors.redAccent;
+        return Theme.of(context).colorScheme.error;
       case Priority.normal:
         return Theme.of(context).colorScheme.primary;
       case Priority.low:
-        return Colors.teal;
+        return Theme.of(context).colorScheme.tertiary;
     }
   }
 
@@ -221,147 +331,316 @@ class _TaskCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final icon =
         task.type == StudyItemType.exam
-            ? Icons.event_available
-            : Icons.task_alt;
+            ? Icons.school_rounded
+            : Icons.assignment_rounded;
     final prioColor = _priorityColor(context);
+    
     return Card(
-      surfaceTintColor: cs.surfaceTint,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: prioColor.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: prioColor.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [
+              prioColor.withOpacity(0.08),
+              cs.surface,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: prioColor.withOpacity(.15),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: prioColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(icon, color: prioColor, size: 28),
                   ),
-                  child: Icon(icon, color: prioColor),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task.title,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: cs.onSurface,
+                          ),
+                        ),
+                        if (task.syncedTaskId != null && task.syncedTaskId!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.sync_rounded,
+                                  size: 14,
+                                  color: cs.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Sincronizado',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: cs.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert_rounded, color: cs.onSurfaceVariant),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onSelected: (v) async {
+                      if (v == 'edit') onEdit();
+                      if (v == 'todo') onChangeStatus(TaskStatus.todo);
+                      if (v == 'doing') onChangeStatus(TaskStatus.doing);
+                      if (v == 'done') onChangeStatus(TaskStatus.done);
+                      if (v == 'delete') onDelete();
+                    },
+                    itemBuilder:
+                        (_) => const [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit_outlined),
+                                SizedBox(width: 12),
+                                Text('Editar'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'todo',
+                            child: Row(
+                              children: [
+                                Icon(Icons.circle_outlined),
+                                SizedBox(width: 12),
+                                Text('Por hacer'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'doing',
+                            child: Row(
+                              children: [
+                                Icon(Icons.pending_outlined),
+                                SizedBox(width: 12),
+                                Text('En progreso'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'done',
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle_outline),
+                                SizedBox(width: 12),
+                                Text('Hecha'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_outline, color: Colors.red),
+                                SizedBox(width: 12),
+                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (task.due != null)
+                    _ModernChip(
+                      icon: Icons.event_rounded,
+                      label: _formatDueDate(task.due!),
+                      color: _isDueSoon(task.due!) ? cs.error : cs.tertiary,
+                    ),
+                  _ModernChip(
+                    icon: Icons.flag_rounded,
+                    label: task.priority.name.toUpperCase(),
+                    color: prioColor,
+                  ),
+                  _ModernChip(
+                    icon: _statusIcon(task.status),
+                    label: _statusLabel(task.status),
+                    color: _statusColor(task.status, cs),
+                  ),
+                  if ((task.notes ?? '').isNotEmpty)
+                    _ModernChip(
+                      icon: Icons.notes_rounded,
+                      label: 'Notas',
+                      color: cs.secondary,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: onOpenTimer,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: prioColor,
+                        foregroundColor: cs.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.timer_rounded),
+                      label: Text(
+                        'Estudiar',
+                        style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (task.syncedTaskId != null && task.syncedTaskId!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.sync_rounded,
-                                size: 14,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Sincronizado',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (v) async {
-                    if (v == 'edit') onEdit();
-                    if (v == 'todo') onChangeStatus(TaskStatus.todo);
-                    if (v == 'doing') onChangeStatus(TaskStatus.doing);
-                    if (v == 'done') onChangeStatus(TaskStatus.done);
-                    if (v == 'delete') onDelete();
-                  },
-                  itemBuilder:
-                      (_) => const [
-                        PopupMenuItem(value: 'edit', child: Text('Editar')),
-                        PopupMenuItem(
-                          value: 'todo',
-                          child: Text('Marcar por hacer'),
-                        ),
-                        PopupMenuItem(
-                          value: 'doing',
-                          child: Text('Marcar en progreso'),
-                        ),
-                        PopupMenuItem(
-                          value: 'done',
-                          child: Text('Marcar hecha'),
-                        ),
-                        PopupMenuItem(value: 'delete', child: Text('Eliminar')),
-                      ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (task.due != null)
-                  _Chip(icon: Icons.event, label: 'Vence: ${task.due}'),
-                _Chip(
-                  icon: Icons.flag,
-                  label: 'Prioridad: ${task.priority.name}',
-                ),
-                _Chip(icon: Icons.info, label: 'Estado: ${task.status.name}'),
-                if ((task.notes ?? '').isNotEmpty)
-                  _Chip(icon: Icons.notes, label: 'Notas'),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                FilledButton.icon(
-                  onPressed: onOpenTimer,
-                  icon: const Icon(Icons.timer),
-                  label: const Text('Estudiar'),
-                ),
-                const SizedBox(width: 8),
-                OutlinedButton(onPressed: onEdit, child: const Text('Editar')),
-                const Spacer(),
-                if (task.status != TaskStatus.done)
-                  TextButton.icon(
-                    onPressed: () => onChangeStatus(TaskStatus.done),
-                    icon: const Icon(Icons.check),
-                    label: const Text('Marcar hecha'),
-                  ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 8),
+                  if (task.status != TaskStatus.done)
+                    IconButton.filledTonal(
+                      onPressed: () => onChangeStatus(TaskStatus.done),
+                      icon: const Icon(Icons.check_circle_rounded),
+                      tooltip: 'Marcar como hecha',
+                      style: IconButton.styleFrom(
+                        backgroundColor: cs.secondaryContainer,
+                        padding: const EdgeInsets.all(14),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  String _formatDueDate(DateTime date) {
+    final now = DateTime.now();
+    final diff = date.difference(now).inDays;
+    if (diff == 0) return 'Hoy';
+    if (diff == 1) return 'Mañana';
+    if (diff < 0) return 'Vencida';
+    return '${diff}d';
+  }
+
+  bool _isDueSoon(DateTime date) {
+    final diff = date.difference(DateTime.now()).inDays;
+    return diff <= 2;
+  }
+
+  IconData _statusIcon(TaskStatus status) {
+    switch (status) {
+      case TaskStatus.todo:
+        return Icons.circle_outlined;
+      case TaskStatus.doing:
+        return Icons.pending_outlined;
+      case TaskStatus.done:
+        return Icons.check_circle_rounded;
+    }
+  }
+
+  String _statusLabel(TaskStatus status) {
+    switch (status) {
+      case TaskStatus.todo:
+        return 'Por hacer';
+      case TaskStatus.doing:
+        return 'En progreso';
+      case TaskStatus.done:
+        return 'Hecha';
+    }
+  }
+
+  Color _statusColor(TaskStatus status, ColorScheme cs) {
+    switch (status) {
+      case TaskStatus.todo:
+        return cs.outline;
+      case TaskStatus.doing:
+        return cs.secondary;
+      case TaskStatus.done:
+        return cs.primary;
+    }
+  }
 }
 
-class _Chip extends StatelessWidget {
+class _ModernChip extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _Chip({required this.icon, required this.label});
+  final Color color;
+  const _ModernChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+  
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(999),
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [Icon(icon, size: 16), const SizedBox(width: 6), Text(label)],
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

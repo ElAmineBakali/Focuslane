@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'courses/courses_list_screen.dart';
 import 'tasks/study_tasks_screen.dart';
 import 'timer/study_timer_screen.dart';
@@ -75,39 +77,47 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
       onDestinationSelected: (index) {
         setState(() => _selectedIndex = index);
       },
+      animationDuration: const Duration(milliseconds: 400),
+      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.school_rounded),
+          icon: Icon(Icons.school_outlined),
+          selectedIcon: Icon(Icons.school_rounded),
           label: 'Cursos',
           tooltip: 'Mis cursos',
         ),
         NavigationDestination(
-          icon: Icon(Icons.checklist_rounded),
+          icon: Icon(Icons.checklist_outlined),
+          selectedIcon: Icon(Icons.checklist_rounded),
           label: 'Tareas',
           tooltip: 'Tareas y exámenes',
         ),
         NavigationDestination(
-          icon: Icon(Icons.timer_rounded),
+          icon: Icon(Icons.timer_outlined),
+          selectedIcon: Icon(Icons.timer_rounded),
           label: 'Estudio',
           tooltip: 'Temporizador',
         ),
         NavigationDestination(
-          icon: Icon(Icons.bar_chart_rounded),
+          icon: Icon(Icons.bar_chart_outlined),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
           label: 'Analíticas',
           tooltip: 'Estadísticas',
         ),
         NavigationDestination(
           icon: Icon(Icons.checklist_outlined),
+          selectedIcon: Icon(Icons.checklist),
           label: 'Asistencia',
           tooltip: 'Asistencia',
         ),
         NavigationDestination(
-          icon: Icon(Icons.schedule_rounded),
+          icon: Icon(Icons.schedule_outlined),
+          selectedIcon: Icon(Icons.schedule_rounded),
           label: 'Horario',
           tooltip: 'Horario semanal',
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 300.ms);
   }
 }
 
@@ -169,9 +179,19 @@ class _AttendanceCard extends StatelessWidget {
         final percent = total == 0 ? 0.0 : (attended * 100.0 / total);
         final target = course.attendanceRequired ?? 0.0;
         final meets = percent >= target;
+        final colorScheme = Theme.of(context).colorScheme;
+        final courseColor = course.color ?? colorScheme.primary;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+              width: 1,
+            ),
+          ),
           child: InkWell(
             onTap: () {
               Navigator.push(
@@ -184,70 +204,111 @@ class _AttendanceCard extends StatelessWidget {
                 ),
               );
             },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        course.name,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: meets
-                            ? Colors.green.withOpacity(0.2)
-                            : Colors.red.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${percent.toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: meets ? Colors.green : Colors.red,
-                        ),
-                      ),
-                    ),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [
+                    courseColor.withOpacity(0.05),
+                    colorScheme.surface,
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: percent / 100,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.withOpacity(0.2),
-                    valueColor: AlwaysStoppedAnimation(
-                      meets ? Colors.green : Colors.red,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _StatItem(label: 'Asistencias', value: '$attended'),
-                    _StatItem(label: 'Faltas', value: '$absent'),
-                    if (target > 0)
-                      _StatItem(
-                        label: 'Requerido',
-                        value: '${target.toInt()}%',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            course.name,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: meets
+                                ? colorScheme.primaryContainer
+                                : colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${percent.toStringAsFixed(1)}%',
+                            style: GoogleFonts.jetBrainsMono(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: meets 
+                                  ? colorScheme.onPrimaryContainer
+                                  : colorScheme.onErrorContainer,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: percent / 100),
+                        duration: const Duration(milliseconds: 800),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, _) {
+                          return LinearProgressIndicator(
+                            value: value,
+                            minHeight: 10,
+                            backgroundColor: colorScheme.surfaceContainerHighest,
+                            valueColor: AlwaysStoppedAnimation(
+                              meets ? courseColor : colorScheme.error,
+                            ),
+                          );
+                        },
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _StatItem(
+                          label: 'Asistencias',
+                          value: '$attended',
+                          icon: Icons.check_circle_outline_rounded,
+                          color: colorScheme.primary,
+                        ),
+                        _StatItem(
+                          label: 'Faltas',
+                          value: '$absent',
+                          icon: Icons.cancel_outlined,
+                          color: colorScheme.error,
+                        ),
+                        if (target > 0)
+                          _StatItem(
+                            label: 'Requerido',
+                            value: '${target.toInt()}%',
+                            icon: Icons.flag_outlined,
+                            color: colorScheme.tertiary,
+                          ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-          ),
-        );
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0);
       },
     );
   }
@@ -256,24 +317,44 @@ class _AttendanceCard extends StatelessWidget {
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;
-  const _StatItem({required this.label, required this.value});
+  final IconData icon;
+  final Color color;
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: color.withOpacity(0.8),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

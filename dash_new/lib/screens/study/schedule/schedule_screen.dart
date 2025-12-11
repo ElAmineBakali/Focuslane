@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../services/study_notifications.dart';
+import 'schedule_widgets.dart';
 
 class ScheduleScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -312,64 +316,104 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
   @override
   Widget build(BuildContext context) {
     final dayNames = const ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    final dayNamesShort = const ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+    final colorScheme = Theme.of(context).colorScheme;
     
     return Column(
       children: [
-        // Indicador de día actual
+        // Header con gradient
         Container(
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                colorScheme.primaryContainer,
+                colorScheme.surface,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Column(
             children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: _currentDay > 1 ? () {
-                  _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                } : null,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton.filled(
+                    icon: const Icon(Icons.chevron_left_rounded),
+                    onPressed: _currentDay > 1 ? () {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    } : null,
+                  ),
+                  Text(
+                    dayNames[_currentDay - 1],
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
+                    ),
+                  ).animate(key: ValueKey(_currentDay)).fadeIn().slideX(),
+                  IconButton.filled(
+                    icon: const Icon(Icons.chevron_right_rounded),
+                    onPressed: _currentDay < 7 ? () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    } : null,
+                  ),
+                ],
               ),
-              Text(
-                dayNames[_currentDay - 1],
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: _currentDay < 7 ? () {
-                  _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
+              const SizedBox(height: 16),
+              // Indicador de días con letras
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(7, (index) {
+                  final dayIndex = index + 1;
+                  final isSelected = dayIndex == _currentDay;
+                  final isToday = dayIndex == DateTime.now().weekday;
+                  return GestureDetector(
+                    onTap: () {
+                      _pageController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected 
+                            ? colorScheme.primary
+                            : isToday
+                                ? colorScheme.primaryContainer
+                                : Colors.transparent,
+                        border: isToday && !isSelected
+                            ? Border.all(color: colorScheme.primary, width: 2)
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          dayNamesShort[index],
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected 
+                                ? colorScheme.onPrimary
+                                : colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
                   );
-                } : null,
+                }),
               ),
             ],
-          ),
-        ),
-        
-        // Indicador de días (puntitos)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(7, (index) {
-              final dayIndex = index + 1;
-              final isSelected = dayIndex == _currentDay;
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: isSelected ? 24 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: isSelected 
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              );
-            }),
           ),
         ),
         
@@ -397,24 +441,15 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                 });
               
               if (dayBlocks.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.event_busy,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No hay clases programadas',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
+                return EmptyScheduleState(
+                  onAddClass: () async {
+                    await showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => _EditBlockSheet(svc: widget.svc),
+                    );
+                  },
                 );
               }
               
@@ -424,108 +459,69 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                 itemBuilder: (context, index) {
                   final block = dayBlocks[index];
                   final course = widget.courseById[block.courseId];
-                  final courseName = course?.name ?? block.courseId;
-                  final courseColor = course?.color ?? Theme.of(context).colorScheme.primary;
                   
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () async {
-                        await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => _EditBlockSheet(
-                            svc: widget.svc,
-                            initial: block,
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            left: BorderSide(
-                              color: courseColor,
-                              width: 6,
-                            ),
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                  return ModernClassBlock(
+                    block: block,
+                    course: course,
+                    onTap: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => _EditBlockSheet(
+                          svc: widget.svc,
+                          initial: block,
                         ),
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    courseName,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: courseColor.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    '${block.start.format(context)} - ${block.end.format(context)}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: courseColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      );
+                    },
+                    onLongPress: () async {
+                      final ok = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Eliminar clase'),
+                          content: Text(
+                            '¿Eliminar "${course?.name ?? block.courseId}"?',
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancelar'),
                             ),
-                            if (block.room != null) ...[
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.room,
-                                    size: 16,
-                                    color: Theme.of(context).colorScheme.outline,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    block.room!,
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                ],
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: colorScheme.error,
                               ),
-                            ],
-                            if (course?.teacher != null) ...[
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.person_outline,
-                                    size: 16,
-                                    color: Theme.of(context).colorScheme.outline,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    course!.teacher!,
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              child: const Text('Eliminar'),
+                            ),
                           ],
                         ),
-                      ),
-                    ),
+                      );
+                      if (ok == true && context.mounted) {
+                        await widget.svc.deleteScheduleBlock(block.id);
+                        await StudyNotifications(widget.svc).scheduleTodayClasses();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Row(
+                                children: [
+                                  Icon(Icons.check_circle, color: Colors.white),
+                                  SizedBox(width: 12),
+                                  Text('Clase eliminada'),
+                                ],
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
                   );
                 },
               );
