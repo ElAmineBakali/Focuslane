@@ -1,240 +1,380 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
+import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
+import 'package:mi_dashboard_personal/widgets/external_link_picker_widget.dart';
 
+/// Formulario de creación/edición de curso con diseño TaskFormTheme
 class CourseEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course? initial;
-  const CourseEditSheet({super.key, required this.svc, this.initial});
+  
+  const CourseEditSheet({
+    super.key,
+    required this.svc,
+    this.initial,
+  });
 
   @override
   State<CourseEditSheet> createState() => _CourseEditSheetState();
 }
 
 class _CourseEditSheetState extends State<CourseEditSheet> {
-  final _name = TextEditingController();
-  final _teacher = TextEditingController();
-  final _credits = TextEditingController();
-  final _goalHours = TextEditingController();
-  final _colorHex = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nameController;
+  late TextEditingController _teacherController;
+  late TextEditingController _creditsController;
+  late TextEditingController _goalHoursController;
+  late TextEditingController _attendancePctController;
 
-  /// ✅ NUEVO: % asistencia requerida (0–100)
-  final _attendancePct = TextEditingController();
-
-  static const _swatches = <int>[
-    0xFF2962FF,
-    0xFF00BFA5,
-    0xFF43A047,
-    0xFFF9A825,
-    0xFFEF6C00,
-    0xFFE53935,
-    0xFF8E24AA,
-    0xFF546E7A,
-  ];
+  Color _selectedColor = Colors.blue;
+  String? _externalLink;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    final c = widget.initial;
-    if (c != null) {
-      _name.text = c.name;
-      _teacher.text = c.teacher ?? '';
-      _credits.text = c.credits?.toString() ?? '';
-      _goalHours.text = c.goalHours?.toString() ?? '';
-      _colorHex.text = c.colorHex ?? '';
-      _attendancePct.text = c.attendanceRequired?.toString() ?? ''; // ✅
+    final course = widget.initial;
+    
+    _nameController = TextEditingController(text: course?.name ?? '');
+    _teacherController = TextEditingController(text: course?.teacher ?? '');
+    _creditsController = TextEditingController(
+      text: course?.credits?.toString() ?? '',
+    );
+    _goalHoursController = TextEditingController(
+      text: course?.goalHours?.toString() ?? '',
+    );
+    _attendancePctController = TextEditingController(
+      text: course?.attendanceRequired?.toStringAsFixed(0) ?? '',
+    );
+    
+    if (course?.color != null) {
+      _selectedColor = course!.color!;
     }
   }
 
-  Color? _selectedColorOrNull() {
-    final raw = _colorHex.text.trim();
-    if (raw.isEmpty) return null;
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _teacherController.dispose();
+    _creditsController.dispose();
+    _goalHoursController.dispose();
+    _attendancePctController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveCourse() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+
     try {
-      return Color(int.parse(raw));
-    } catch (_) {
-      return null;
+      final course = Course(
+        id: widget.initial?.id ?? '',
+        name: _nameController.text.trim(),
+        teacher: _teacherController.text.trim().isEmpty
+            ? null
+            : _teacherController.text.trim(),
+        credits: int.tryParse(_creditsController.text.trim())?.toDouble(),
+        colorHex: '#${_selectedColor.value.toRadixString(16).substring(2)}',
+        goalHours: int.tryParse(_goalHoursController.text.trim())?.toDouble(),
+        attendanceRequired: double.tryParse(_attendancePctController.text.trim()),
+      );
+
+      Course? result;
+      if (widget.initial == null) {
+        final id = await widget.svc.createCourse(course);
+        result = Course(
+          id: id,
+          name: course.name,
+          teacher: course.teacher,
+          credits: course.credits,
+          colorHex: course.colorHex,
+          goalHours: course.goalHours,
+          attendanceRequired: course.attendanceRequired,
+        );
+      } else {
+        await widget.svc.updateCourse(widget.initial!.id, {
+          'name': course.name,
+          'teacher': course.teacher,
+          'credits': course.credits,
+          'goalHours': course.goalHours,
+          'colorHex': course.colorHex,
+          'attendanceRequired': course.attendanceRequired,
+        });
+        result = course;
+      }
+
+      if (mounted) {
+        Navigator.pop(context, result);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red.shade600,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isEdit = widget.initial != null;
-    final previewColor = _selectedColorOrNull();
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 16,
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                isEdit ? 'Editar curso' : 'Nuevo curso',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-
-              TextField(
-                controller: _name,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-              ),
-              TextField(
-                controller: _teacher,
-                decoration: const InputDecoration(
-                  labelText: 'Profesor (opcional)',
-                ),
-              ),
-              TextField(
-                controller: _credits,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Créditos (opcional)',
-                ),
-              ),
-              TextField(
-                controller: _goalHours,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Objetivo de horas (opcional)',
-                ),
-              ),
-
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Color',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24,
+            right: 24,
+            top: 24,
+          ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ChoiceChip(
-                    label: const Text('Sin color'),
-                    selected: _colorHex.text.trim().isEmpty,
-                    onSelected: (_) => setState(() => _colorHex.text = ''),
-                  ),
-                  ..._swatches.map((hex) {
-                    final c = Color(hex);
-                    final sel = (previewColor?.toARGB32()) == c.toARGB32();
-                    return ChoiceChip(
-                      selected: sel,
-                      label: const SizedBox(width: 0, height: 0),
-                      avatar: Container(
-                        width: 22,
-                        height: 22,
+                  // Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: c,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: Colors.black12),
+                          color: _selectedColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.school_rounded,
+                          color: _selectedColor,
+                          size: 28,
                         ),
                       ),
-                      onSelected:
-                          (_) => setState(
-                            () =>
-                                _colorHex.text =
-                                    '0x${hex.toRadixString(16).toUpperCase()}',
-                          ),
-                    );
-                  }),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-              TextField(
-                controller: _attendancePct,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Asistencia requerida (%)',
-                  helperText: 'Ejemplo: 50 = 50% (opcional)',
-                ),
-              ),
-
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Text('Vista previa:'),
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 12,
-                    backgroundColor:
-                        previewColor ?? Theme.of(context).colorScheme.primary,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isEdit ? 'Editar curso' : 'Nuevo curso',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              'Configura tu materia',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                  const SizedBox(height: 24),
 
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: () async {
-                      final name = _name.text.trim();
-                      if (name.isEmpty) return;
-
-                      final attendance = double.tryParse(
-                        _attendancePct.text.trim(),
-                      );
-
-                      final payload = Course(
-                        id: widget.initial?.id ?? '',
-                        name: name,
-                        teacher:
-                            _teacher.text.trim().isEmpty
-                                ? null
-                                : _teacher.text.trim(),
-                        credits: double.tryParse(_credits.text),
-                        goalHours: double.tryParse(_goalHours.text),
-                        colorHex:
-                            _colorHex.text.trim().isEmpty
-                                ? null
-                                : _colorHex.text.trim(),
-                        attendanceRequired: attendance,
-                      );
-
-                      if (widget.initial == null) {
-                        final id = await widget.svc.createCourse(payload);
-                        final created = Course(
-                          id: id,
-                          name: payload.name,
-                          teacher: payload.teacher,
-                          credits: payload.credits,
-                          goalHours: payload.goalHours,
-                          colorHex: payload.colorHex,
-                          attendanceRequired: payload.attendanceRequired,
-                        );
-                        Navigator.pop(context, created);
-                      } else {
-                        await widget.svc.updateCourse(widget.initial!.id, {
-                          'name': payload.name,
-                          'teacher': payload.teacher,
-                          'credits': payload.credits,
-                          'goalHours': payload.goalHours,
-                          'colorHex': payload.colorHex,
-                          'attendanceRequired': payload.attendanceRequired,
-                        });
-                        if (mounted) Navigator.pop(context, null);
+                  // Campo: Nombre
+                  _TaskFormTextField(
+                    controller: _nameController,
+                    label: 'Nombre del curso',
+                    icon: Icons.book_rounded,
+                    validator: (value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'El nombre es obligatorio';
                       }
+                      return null;
                     },
-                    child: Text(isEdit ? 'Guardar' : 'Crear'),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Campo: Profesor
+                  _TaskFormTextField(
+                    controller: _teacherController,
+                    label: 'Profesor',
+                    icon: Icons.person_rounded,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Campos en fila: Créditos y Horas meta
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _TaskFormTextField(
+                          controller: _creditsController,
+                          label: 'Créditos',
+                          icon: Icons.star_rounded,
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _TaskFormTextField(
+                          controller: _goalHoursController,
+                          label: 'Horas meta',
+                          icon: Icons.access_time_rounded,
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Campo: Asistencia requerida
+                  _TaskFormTextField(
+                    controller: _attendancePctController,
+                    label: 'Asistencia requerida (%)',
+                    icon: Icons.how_to_reg_rounded,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value?.trim().isNotEmpty ?? false) {
+                        final pct = double.tryParse(value!.trim());
+                        if (pct == null || pct < 0 || pct > 100) {
+                          return 'Debe ser entre 0 y 100';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Selector de color
+                  GlobalColorPickerWidget(
+                    initialColor: _selectedColor,
+                    onColorSelected: (color) {
+                      setState(() => _selectedColor = color);
+                    },
+                    label: 'Color del curso',
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Selector de enlaces externos
+                  ExternalLinkPickerWidget(
+                    initialLink: _externalLink,
+                    onLinkSelected: (link) {
+                      setState(() => _externalLink = link);
+                    },
+                    label: 'Enlaces rápidos',
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Botón de guardar
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: FilledButton(
+                      onPressed: _isSaving ? null : _saveCourse,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _selectedColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              isEdit ? 'Guardar cambios' : 'Crear curso',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
-              const SizedBox(height: 12),
-            ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// TextField con estilo TaskFormTheme consistente
+class _TaskFormTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+
+  const _TaskFormTextField({
+    required this.controller,
+    required this.label,
+    required this.icon,
+    this.keyboardType,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
           ),
         ),
       ),

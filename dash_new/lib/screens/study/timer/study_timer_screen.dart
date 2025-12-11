@@ -366,36 +366,6 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               if (picked != null) _loadPreset(picked);
             },
           ),
-          IconButton(
-            tooltip: 'Tareas',
-            icon: const Icon(Icons.checklist_rounded),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (_) => StudyTasksScreen(
-                        svc: svc,
-                        initialCourseId: _courseId,
-                      ),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            tooltip: 'Analytics',
-            icon: const Icon(Icons.bar_chart_rounded),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (_) =>
-                          StudyAnalyticsScreen(svc: svc, courseId: _courseId),
-                ),
-              );
-            },
-          ),
         ],
       ),
       body: Stack(
@@ -672,23 +642,113 @@ class _HeaderSelectors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return StreamBuilder<List<Course>>(
       stream: svc.streamCourses(),
       builder: (context, csnap) {
         final courses = csnap.data ?? const [];
+        
+        // FIX: Validar que el courseId existe en la lista actual
+        final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
+        if (validCourseId != courseId && validCourseId == null && courseId != null) {
+          // Resetear el courseId si ya no existe
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            onCourseChanged(null);
+          });
+        }
+        
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: DropdownButtonFormField<String?>(
-                initialValue: courseId,
-                hint: const Text('Curso'),
-                items: [
-                  ...courses.map(
-                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Selecciona un curso',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
+                  const SizedBox(height: 12),
+                  if (courses.isEmpty)
+                    Text(
+                      'No hay cursos disponibles',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: colorScheme.error,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: courses.map((course) {
+                        final isSelected = validCourseId == course.id;
+                        final courseColor = course.color ?? colorScheme.primary;
+                        
+                        return InkWell(
+                          onTap: () => onCourseChanged(course.id),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? courseColor.withOpacity(0.15)
+                                  : colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected
+                                    ? courseColor
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 14,
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    color: courseColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: courseColor.withOpacity(0.4),
+                                              blurRadius: 8,
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  course.name,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 15,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? courseColor
+                                        : colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                 ],
-                onChanged: onCourseChanged,
               ),
             ),
             if (courseId != null)

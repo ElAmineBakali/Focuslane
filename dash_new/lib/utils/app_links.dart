@@ -52,6 +52,11 @@ class AppLinks {
   static Future<bool> openZalando() => _openPackage('de.zalando.mobile');
   static Future<bool> openExness() => _openPackage('com.exness.android.pa');
   static Future<bool> openDiscord() => _openPackage('com.discord');
+  static Future<bool> openYoutube() => _openPackage('com.google.android.youtube');
+  static Future<bool> openWikipedia() => _openPackage('org.wikipedia');
+  static Future<bool> openGithub() => _openPackage('com.github.android');
+  static Future<bool> openWolframAlpha() => _openPackage('com.wolfram.android.alpha');
+  static Future<bool> openGoogleScholar() => _openPackage('com.google.android.apps.scholar');
 
   static Future<bool> openMapQuery(String query) =>
       _openPackage('com.google.android.apps.maps');

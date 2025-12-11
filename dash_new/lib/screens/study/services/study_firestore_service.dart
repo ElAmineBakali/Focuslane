@@ -62,41 +62,63 @@ class StudyFirestoreService {
     DateTime? from,
     DateTime? to,
   }) {
-    Query q = _root.collection('tasks');
+    // Si hay múltiples filtros, cargar todo y filtrar en memoria
+    // para evitar problemas con índices compuestos de Firestore
+    final needsMemoryFiltering = [
+      courseId != null,
+      status != null,
+      highPriorityOnly,
+      from != null,
+      to != null,
+    ].where((x) => x).length > 1;
 
-    int whereCount = 0;
-    if (courseId != null) {
-      q = q.where('courseId', isEqualTo: courseId);
-      whereCount++;
-    }
-    if (status != null) {
-      q = q.where('status', isEqualTo: status.name);
-      whereCount++;
-    }
-    if (highPriorityOnly) {
-      q = q.where('priority', isEqualTo: Priority.high.name);
-      whereCount++;
-    }
-    if (from != null) {
-      q = q.where('due', isGreaterThanOrEqualTo: from.toIso8601String());
-      whereCount++;
-    }
-    if (to != null) {
-      q = q.where('due', isLessThanOrEqualTo: to.toIso8601String());
-      whereCount++;
-    }
+    Query q = _root.collection('tasks').orderBy('due', descending: false);
 
-    if (whereCount <= 1) q = q.orderBy('due', descending: false);
+    // Si solo hay un filtro o ninguno, aplicarlo en la query
+    if (!needsMemoryFiltering) {
+      if (courseId != null) {
+        q = q.where('courseId', isEqualTo: courseId);
+      }
+      if (status != null) {
+        q = q.where('status', isEqualTo: status.name);
+      }
+      if (highPriorityOnly) {
+        q = q.where('priority', isEqualTo: Priority.high.name);
+      }
+      if (from != null) {
+        q = q.where('due', isGreaterThanOrEqualTo: from.toIso8601String());
+      }
+      if (to != null) {
+        q = q.where('due', isLessThanOrEqualTo: to.toIso8601String());
+      }
+    }
 
     return q.snapshots().map((s) {
-      final list =
+      var list =
           s.docs
               .map(
                 (d) =>
                     StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>),
               )
               .toList();
-      if (whereCount > 1) {
+
+      // Filtrar en memoria si es necesario
+      if (needsMemoryFiltering) {
+        if (courseId != null) {
+          list = list.where((t) => t.courseId == courseId).toList();
+        }
+        if (status != null) {
+          list = list.where((t) => t.status == status).toList();
+        }
+        if (highPriorityOnly) {
+          list = list.where((t) => t.priority == Priority.high).toList();
+        }
+        if (from != null) {
+          list = list.where((t) => t.due != null && (t.due!.isAfter(from) || t.due!.isAtSameMomentAs(from))).toList();
+        }
+        if (to != null) {
+          list = list.where((t) => t.due != null && (t.due!.isBefore(to) || t.due!.isAtSameMomentAs(to))).toList();
+        }
         list.sort((a, b) {
           final ad = a.due?.millisecondsSinceEpoch ?? 0;
           final bd = b.due?.millisecondsSinceEpoch ?? 0;

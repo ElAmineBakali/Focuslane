@@ -48,17 +48,6 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
               );
             },
           ),
-          IconButton(
-            tooltip: 'Ajustes de Study',
-            icon: const Icon(Icons.settings),
-            onPressed: () async {
-              await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => StudySettingsSheet(svc: svc),
-              );
-            },
-          ),
         ],
       ),
       body: Column(
@@ -667,56 +656,175 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<List<Course>>(
       stream: svc.streamCourses(),
       builder: (context, snap) {
-        final courses = snap.data ?? const [];
-        // FIX: si el valor seleccionado no existe en items, forzamos null (evita assert del Dropdown)
-        final valid = courses.any((c) => c.id == selectedCourseId);
-        final dropdownValue = valid ? selectedCourseId : null;
-
-        return Padding(
-          padding: const EdgeInsets.all(12),
-          child: Wrap(
-            runSpacing: 8,
-            spacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+        final courses = snap.data ?? const <Course>[];
+        
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 1,
+              ),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DropdownButton<String?>(
-                value: dropdownValue, // FIX
-                hint: const Text('Curso'),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('Todos')),
-                  ...courses.map(
-                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+              // Filtro de cursos con chips
+              Row(
+                children: [
+                  Icon(
+                    Icons.book_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Curso',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
-                onChanged: onCourseChanged,
               ),
-              DropdownButton<TaskStatus?>(
-                value: selectedStatus, // enum => ya válido
-                hint: const Text('Estado'),
-                items: const [
-                  DropdownMenuItem(value: null, child: Text('Todos')),
-                  DropdownMenuItem(
-                    value: TaskStatus.todo,
-                    child: Text('Por hacer'),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  // Chip "Todos"
+                  FilterChip(
+                    label: const Text('Todos los cursos'),
+                    selected: selectedCourseId == null,
+                    onSelected: (selected) {
+                      if (selected) onCourseChanged(null);
+                    },
+                    avatar: selectedCourseId == null
+                        ? const Icon(Icons.check_circle, size: 18)
+                        : null,
                   ),
-                  DropdownMenuItem(
-                    value: TaskStatus.doing,
-                    child: Text('En progreso'),
+                  // Chips por curso
+                  ...courses.map((course) {
+                    final isSelected = selectedCourseId == course.id;
+                    return FilterChip(
+                      label: Text(course.name),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        onCourseChanged(selected ? course.id : null);
+                      },
+                      avatar: isSelected
+                          ? const Icon(Icons.check_circle, size: 18)
+                          : Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: course.color ?? Colors.grey,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                    );
+                  }),
+                ],
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // Filtro de estado con segmented button
+              Row(
+                children: [
+                  Icon(
+                    Icons.task_alt_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  DropdownMenuItem(
-                    value: TaskStatus.done,
-                    child: Text('Hechas'),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Estado',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
-                onChanged: onStatusChanged,
               ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(
+                      value: 'all',
+                      label: Text('Todos'),
+                      icon: Icon(Icons.select_all_rounded, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: 'todo',
+                      label: Text('Por hacer'),
+                      icon: Icon(Icons.radio_button_unchecked, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: 'doing',
+                      label: Text('En progreso'),
+                      icon: Icon(Icons.pending_rounded, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: 'done',
+                      label: Text('Completadas'),
+                      icon: Icon(Icons.check_circle_rounded, size: 18),
+                    ),
+                  ],
+                  selected: {
+                    selectedStatus == null
+                        ? 'all'
+                        : selectedStatus == TaskStatus.todo
+                            ? 'todo'
+                            : selectedStatus == TaskStatus.doing
+                                ? 'doing'
+                                : 'done'
+                  },
+                  onSelectionChanged: (Set<String> newSelection) {
+                    final value = newSelection.first;
+                    if (value == 'all') {
+                      onStatusChanged(null);
+                    } else if (value == 'todo') {
+                      onStatusChanged(TaskStatus.todo);
+                    } else if (value == 'doing') {
+                      onStatusChanged(TaskStatus.doing);
+                    } else {
+                      onStatusChanged(TaskStatus.done);
+                    }
+                  },
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Filtro de alta prioridad
               FilterChip(
-                label: const Text('Alta prioridad'),
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.priority_high_rounded,
+                      size: 16,
+                      color: onlyHigh ? Colors.white : Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Solo alta prioridad'),
+                  ],
+                ),
                 selected: onlyHigh,
                 onSelected: onOnlyHighChanged,
+                selectedColor: Colors.red.shade600,
+                checkmarkColor: Colors.white,
               ),
             ],
           ),

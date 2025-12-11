@@ -563,132 +563,416 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
   }
 
   @override
+  void dispose() {
+    _room.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        left: 24,
+        right: 24,
         top: 16,
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.initial == null ? 'Nuevo bloque' : 'Editar bloque',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            StreamBuilder<List<Course>>(
-              stream: widget.svc.streamCourses(includeArchived: false),
-              builder: (context, snap) {
-                final courses = snap.data ?? const <Course>[];
-                final valid = courses.any((c) => c.id == _courseId);
-                final value = valid ? _courseId : null;
-                return DropdownButtonFormField<String>(
-                  initialValue: value,
-                  isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Curso'),
-                  items: [
-                    ...courses.map(
-                      (c) => DropdownMenuItem(
-                        value: c.id,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 10,
-                              height: 10,
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: c.color ?? Colors.grey,
-                                shape: BoxShape.circle,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              
+              // Title with icon
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                          Theme.of(context).colorScheme.secondary.withOpacity(0.15),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      widget.initial == null ? Icons.add_rounded : Icons.edit_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      widget.initial == null ? 'Nuevo bloque' : 'Editar bloque',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Course selector with visual chips
+              Text(
+                'Curso',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              StreamBuilder<List<Course>>(
+                stream: widget.svc.streamCourses(includeArchived: false),
+                builder: (context, snap) {
+                  final courses = snap.data ?? const <Course>[];
+                  if (courses.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'No hay cursos disponibles',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    );
+                  }
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: courses.map((course) {
+                      final isSelected = _courseId == course.id;
+                      return GestureDetector(
+                        onTap: () => setState(() => _courseId = course.id),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: isSelected
+                                ? LinearGradient(
+                                    colors: [
+                                      course.color?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3),
+                                      course.color?.withOpacity(0.15) ?? Colors.grey.withOpacity(0.15),
+                                    ],
+                                  )
+                                : null,
+                            color: !isSelected
+                                ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                : null,
+                            borderRadius: BorderRadius.circular(12),
+                            border: isSelected
+                                ? Border.all(color: course.color ?? Colors.grey, width: 2)
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: course.color ?? Colors.grey,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            Text(c.name),
-                          ],
+                              const SizedBox(width: 8),
+                              Text(
+                                course.name,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 28),
+              
+              // Days selector
+              Text(
+                'Días de la semana',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: List.generate(7, (i) {
+                  final labels = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+                  final label = labels[i];
+                  final sel = _days.contains(i + 1);
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (sel) {
+                          _days.remove(i + 1);
+                        } else {
+                          _days.add(i + 1);
+                        }
+                      });
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: sel
+                            ? LinearGradient(
+                                colors: [
+                                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                  Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                                ],
+                              )
+                            : null,
+                        color: !sel
+                            ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                        border: sel
+                            ? Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          label,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: sel ? FontWeight.w600 : FontWeight.w500,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
-                  ],
-                  onChanged: (v) => setState(() => _courseId = v),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              children: List.generate(7, (i) {
-                final label = const ['L', 'M', 'X', 'J', 'V', 'S', 'D'][i];
-                final sel = _days.contains(i + 1);
-                return FilterChip(
-                  label: Text(label),
-                  selected: sel,
-                  onSelected: (v) {
-                    setState(() {
-                      if (v) {
-                        _days.add(i + 1);
-                      } else {
-                        _days.remove(i + 1);
-                      }
-                    });
-                  },
-                );
-              }),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: ListTile(
-                    title: const Text('Inicio'),
-                    subtitle: Text(_start.format(context)),
-                    onTap: () async {
-                      final t = await showTimePicker(
-                        context: context,
-                        initialTime: _start,
-                      );
-                      if (t != null) setState(() => _start = t);
-                    },
+                  );
+                }),
+              ),
+              
+              const SizedBox(height: 28),
+              
+              // Time pickers
+              Row(
+                children: [
+                  Expanded(
+                    child: _TimePickerButton(
+                      label: 'Inicio',
+                      time: _start,
+                      icon: Icons.access_time_rounded,
+                      onTap: () async {
+                        final t = await showTimePicker(
+                          context: context,
+                          initialTime: _start,
+                        );
+                        if (t != null) setState(() => _start = t);
+                      },
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ListTile(
-                    title: const Text('Fin'),
-                    subtitle: Text(_end.format(context)),
-                    onTap: () async {
-                      final t = await showTimePicker(
-                        context: context,
-                        initialTime: _end,
-                      );
-                      if (t != null) setState(() => _end = t);
-                    },
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _TimePickerButton(
+                      label: 'Fin',
+                      time: _end,
+                      icon: Icons.access_time_filled_rounded,
+                      onTap: () async {
+                        final t = await showTimePicker(
+                          context: context,
+                          initialTime: _end,
+                        );
+                        if (t != null) setState(() => _end = t);
+                      },
+                    ),
                   ),
+                ],
+              ),
+              
+              const SizedBox(height: 28),
+              
+              // Room field
+              Text(
+                'Aula (opcional)',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-              ],
-            ),
-            TextField(
-              controller: _room,
-              decoration: const InputDecoration(labelText: 'Aula (opcional)'),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _room,
+                decoration: InputDecoration(
+                  hintText: 'Ej: Aula 201, Lab A',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () async {
+                style: GoogleFonts.plusJakartaSans(),
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Action buttons
+              Row(
+                children: [
+                  // Botón eliminar (solo si estamos editando)
+                  if (widget.initial != null)
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(
+                                'Eliminar bloque',
+                                style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                              ),
+                              content: Text(
+                                '¿Estás seguro de que deseas eliminar este bloque del horario?',
+                                style: GoogleFonts.plusJakartaSans(),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.red.shade600,
+                                  ),
+                                  child: const Text('Eliminar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          
+                          if (confirm == true && mounted) {
+                            try {
+                              await widget.svc.deleteScheduleBlock(widget.initial!.id);
+                              if (mounted) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Bloque eliminado',
+                                      style: GoogleFonts.plusJakartaSans(),
+                                    ),
+                                    backgroundColor: Colors.green.shade600,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Error al eliminar: $e',
+                                      style: GoogleFonts.plusJakartaSans(),
+                                    ),
+                                    backgroundColor: Colors.red.shade600,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red.shade600,
+                          side: BorderSide(color: Colors.red.shade600),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: const Icon(Icons.delete_outline_rounded),
+                        label: Text(
+                          'Eliminar',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (widget.initial != null) const SizedBox(width: 12),
+                  
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton(
+                      onPressed: () async {
                     // Validaciones básicas
                     if ((_courseId == null || _courseId!.trim().isEmpty) ||
                         _days.isEmpty) {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Completa curso y días de la semana'),
+                          SnackBar(
+                            content: Text(
+                              'Completa curso y días de la semana',
+                              style: GoogleFonts.plusJakartaSans(),
+                            ),
+                            backgroundColor: Colors.orange.shade600,
+                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }
@@ -699,10 +983,13 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     if (endMinutes <= startMinutes) {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
                               'La hora de fin debe ser posterior al inicio',
+                              style: GoogleFonts.plusJakartaSans(),
                             ),
+                            backgroundColor: Colors.orange.shade600,
+                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }
@@ -749,22 +1036,112 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       if (mounted) Navigator.pop(context);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Bloque guardado')),
+                          SnackBar(
+                            content: Text(
+                              'Bloque guardado correctamente',
+                              style: GoogleFonts.plusJakartaSans(),
+                            ),
+                            backgroundColor: Colors.green.shade600,
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
                       }
                     } catch (e) {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error guardando: $e')),
+                          SnackBar(
+                            content: Text(
+                              'Error guardando: $e',
+                              style: GoogleFonts.plusJakartaSans(),
+                            ),
+                            backgroundColor: Colors.red.shade600,
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
                       }
                     }
                   },
-                  child: const Text('Guardar'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Guardar bloque',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w600,
+                    ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Helper widget for time picker buttons
+class _TimePickerButton extends StatelessWidget {
+  final String label;
+  final TimeOfDay time;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _TimePickerButton({
+    required this.label,
+    required this.time,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            Text(
+              time.format(context),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       ),

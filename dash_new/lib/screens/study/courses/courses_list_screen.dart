@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'course_edit_sheet.dart';
-import 'course_detail_screen.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
+import 'course_detail_editable_screen.dart';
+import 'external_links_sheet.dart';
+import '../settings/study_settings_sheet.dart';
 
 class CoursesListScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -18,19 +19,29 @@ class CoursesListScreen extends StatelessWidget {
         title: const Text('Cursos'),
         elevation: 0,
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.link_rounded),
-            onSelected: (v) {
-              if (v == 'Canvas') AppLinks.openCanvas();
-              if (v == 'ChatGPT') AppLinks.openChatGPT();
-              if (v == 'Translate') AppLinks.openTranslate();
+          IconButton(
+            tooltip: 'Ajustes de Study',
+            icon: const Icon(Icons.settings_rounded),
+            onPressed: () async {
+              await showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => StudySettingsSheet(svc: svc),
+              );
             },
-            itemBuilder:
-                (_) => const [
-                  PopupMenuItem(value: 'Canvas', child: Text('Canvas')),
-                  PopupMenuItem(value: 'ChatGPT', child: Text('ChatGPT')),
-                  PopupMenuItem(value: 'Translate', child: Text('Traductor')),
-                ],
+          ),
+          IconButton(
+            tooltip: 'Enlaces externos',
+            icon: const Icon(Icons.link_rounded),
+            onPressed: () async {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                builder: (_) => const ExternalLinksSheet(),
+              );
+            },
           ),
           IconButton(
             tooltip: 'Archivados',
@@ -57,7 +68,7 @@ class CoursesListScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CourseDetailScreen(svc: svc, course: created),
+                builder: (_) => CourseDetailEditableScreen(svc: svc, course: created),
               ),
             );
           }
@@ -125,7 +136,7 @@ class CoursesListScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => CourseDetailScreen(svc: svc, course: created),
+                            builder: (_) => CourseDetailEditableScreen(svc: svc, course: created),
                           ),
                         );
                       }
@@ -167,7 +178,7 @@ class CoursesListScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) =>
-                          CourseDetailScreen(svc: svc, course: course),
+                          CourseDetailEditableScreen(svc: svc, course: course),
                     ),
                   );
                 },
@@ -253,61 +264,6 @@ class _CourseCard extends StatelessWidget {
                             ],
                           ],
                         ),
-                      ),
-                      PopupMenuButton<String>(
-                        onSelected: (v) async {
-                          if (v == 'edit') {
-                            await showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (_) =>
-                                  CourseEditSheet(svc: svc, initial: course),
-                            );
-                          }
-                          if (v == 'archive') {
-                            await svc.updateCourse(
-                              course.id,
-                              {'isArchived': true},
-                            );
-                          }
-                          if (v == 'delete') {
-                            final ok = await _confirmDelete(context, course.name);
-                            if (ok) await svc.deleteCourse(course.id);
-                          }
-                        },
-                        itemBuilder:
-                            (_) => const [
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.edit_rounded, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Editar'),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 'archive',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.archive_rounded, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Archivar'),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.delete_rounded, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Eliminar'),
-                                  ],
-                                ),
-                              ),
-                            ],
                       ),
                     ],
                   ),
@@ -449,3 +405,6 @@ class _ArchivedCoursesScreen extends StatelessWidget {
     );
   }
 }
+
+/// Pantalla de ajustes de Study (inline para evitar dependencia)
+
