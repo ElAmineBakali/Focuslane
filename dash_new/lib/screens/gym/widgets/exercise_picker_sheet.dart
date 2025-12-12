@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/gym_models.dart';
 import '../models/exercise_library_data.dart';
 
@@ -33,118 +35,374 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final results =
-        kExerciseLibrary.where((e) {
-          if (_query.isEmpty) return true;
-          return e.name.toLowerCase().contains(_query.toLowerCase()) ||
-              e.muscleGroup.toLowerCase().contains(_query.toLowerCase());
-        }).toList();
+    final s = Theme.of(context).colorScheme;
+    final results = kExerciseLibrary.where((e) {
+      if (_query.isEmpty) return true;
+      return e.name.toLowerCase().contains(_query.toLowerCase()) ||
+          e.muscleGroup.toLowerCase().contains(_query.toLowerCase());
+    }).toList();
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: s.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(title: const Text('Añadir ejercicio')),
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Buscar ejercicio',
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.topRight,
+                colors: [
+                  s.primaryContainer,
+                  s.secondaryContainer.withOpacity(0.8),
+                ],
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: s.onSurfaceVariant.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Text(
+                  'Añadir ejercicio',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: s.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  autofocus: true,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    hintText: 'Buscar por nombre o grupo muscular...',
+                    filled: true,
+                    fillColor: s.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                   onChanged: (v) => setState(() => _query = v),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: results.length,
-                  itemBuilder: (_, i) {
-                    final ex = results[i];
-                    return ListTile(
-                      title: Text(ex.name),
-                      subtitle: Text('${ex.category} • ${ex.muscleGroup}'),
-                      onTap: () => _configureAndReturn(ex),
-                    );
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: results.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 64,
+                          color: s.onSurfaceVariant.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No se encontraron ejercicios',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: s.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: results.length,
+                    itemBuilder: (_, i) {
+                      final ex = results[i];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              s.surfaceContainerHighest,
+                              s.surfaceContainer,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => _configureAndReturn(ex),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: s.primaryContainer,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.fitness_center_rounded,
+                                      color: s.primary,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          ex.name,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: s.onSurface,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: s.secondaryContainer,
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                ex.category,
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: s.onSecondaryContainer,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              ex.muscleGroup,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: s.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                    color: s.onSurfaceVariant,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ).animate().fadeIn(delay: (50 * i).ms, duration: 300.ms);
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
 
   void _configureAndReturn(ExerciseLibraryItem ex) async {
+    final s = Theme.of(context).colorScheme;
+    
     final ok = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: Text(ex.name),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: s.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.fitness_center_rounded, color: s.primary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                ex.name,
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 children: [
-                  TextField(
-                    controller: _setsCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Series'),
-                  ),
-                  TextField(
-                    controller: _repsCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Reps'),
-                  ),
-                  TextField(
-                    controller: _restCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Descanso (s)',
+                  Expanded(
+                    child: TextField(
+                      controller: _setsCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: 'Series',
+                        prefixIcon: const Icon(Icons.repeat_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
-                  TextField(
-                    controller: _tempoCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Tempo (p. ej. 3-1-1)',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _repsCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: 'Reps',
+                        prefixIcon: const Icon(Icons.numbers_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: _rpeCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'RPE objetivo',
-                    ),
-                  ),
-                  TextField(
-                    controller: _p1rmCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: '%1RM objetivo',
-                    ),
-                  ),
-                  TextField(
-                    controller: _notesCtrl,
-                    decoration: const InputDecoration(labelText: 'Notas'),
                   ),
                 ],
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _restCtrl,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(fontSize: 16),
+                decoration: InputDecoration(
+                  labelText: 'Descanso',
+                  suffixText: 'seg',
+                  prefixIcon: const Icon(Icons.timer_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Añadir'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _tempoCtrl,
+                style: const TextStyle(fontSize: 16),
+                decoration: InputDecoration(
+                  labelText: 'Tempo (opcional)',
+                  hintText: '3-1-1',
+                  prefixIcon: const Icon(Icons.speed_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _rpeCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: 'RPE',
+                        hintText: '7-9',
+                        prefixIcon: const Icon(Icons.trending_up_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _p1rmCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: '%1RM',
+                        hintText: '75-85',
+                        prefixIcon: const Icon(Icons.percent_rounded),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _notesCtrl,
+                maxLines: 2,
+                style: const TextStyle(fontSize: 16),
+                decoration: InputDecoration(
+                  labelText: 'Notas (opcional)',
+                  hintText: 'Indicaciones adicionales...',
+                  prefixIcon: const Icon(Icons.note_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ],
           ),
+        ),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context, false),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context, true),
+            icon: const Icon(Icons.check_rounded),
+            label: const Text('Añadir'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+    
     if (ok == true) {
       final e = RoutineExercise(
         id: '',
@@ -157,18 +415,11 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
         restSec: int.tryParse(_restCtrl.text),
         order: widget.order,
         tempo: _tempoCtrl.text.trim().isEmpty ? null : _tempoCtrl.text.trim(),
-        targetRPE:
-            _rpeCtrl.text.trim().isEmpty
-                ? null
-                : double.tryParse(_rpeCtrl.text),
-        targetPercent1RM:
-            _p1rmCtrl.text.trim().isEmpty
-                ? null
-                : double.tryParse(_p1rmCtrl.text),
+        targetRPE: _rpeCtrl.text.trim().isEmpty ? null : double.tryParse(_rpeCtrl.text),
+        targetPercent1RM: _p1rmCtrl.text.trim().isEmpty ? null : double.tryParse(_p1rmCtrl.text),
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       );
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context, e);
+      if (mounted) Navigator.pop(context, e);
     }
   }
 }

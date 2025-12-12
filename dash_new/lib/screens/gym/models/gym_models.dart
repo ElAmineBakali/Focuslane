@@ -105,6 +105,12 @@ class RoutineExercise {
   final double? targetRPE;
   final double? targetPercent1RM;
   final String? notes;
+  
+  // 🔥 Nuevos campos para progresiones automáticas
+  final bool autoProgressionEnabled;
+  final String? progressionType; // 'weight' | 'reps' | 'rpe'
+  final double? progressionIncrement; // ej: 2.5 kg por semana
+  final int? progressionWeeks; // cada cuántas semanas aplicar
 
   const RoutineExercise({
     required this.id,
@@ -120,6 +126,10 @@ class RoutineExercise {
     this.targetRPE,
     this.targetPercent1RM,
     this.notes,
+    this.autoProgressionEnabled = false,
+    this.progressionType,
+    this.progressionIncrement,
+    this.progressionWeeks,
   });
 
   static RoutineExercise fromMap(String id, Map<String, dynamic> m) {
@@ -140,6 +150,10 @@ class RoutineExercise {
               : (m['targetRPE'] ?? m['rpeTarget'] as num).toDouble(),
       targetPercent1RM: (m['targetPercent1RM'] as num?)?.toDouble(),
       notes: m['notes'] as String?,
+      autoProgressionEnabled: (m['autoProgressionEnabled'] ?? false) as bool,
+      progressionType: m['progressionType'] as String?,
+      progressionIncrement: (m['progressionIncrement'] as num?)?.toDouble(),
+      progressionWeeks: (m['progressionWeeks'] as num?)?.toInt(),
     );
   }
 
@@ -152,6 +166,10 @@ class RoutineExercise {
     'targetReps': targetReps,
     'restSec': restSec,
     'order': order,
+    'autoProgressionEnabled': autoProgressionEnabled,
+    if (progressionType != null) 'progressionType': progressionType,
+    if (progressionIncrement != null) 'progressionIncrement': progressionIncrement,
+    if (progressionWeeks != null) 'progressionWeeks': progressionWeeks,
     if (tempo != null) 'tempo': tempo,
     if (targetRPE != null) 'targetRPE': targetRPE,
     if (targetPercent1RM != null) 'targetPercent1RM': targetPercent1RM,
@@ -231,6 +249,11 @@ class SessionDoc {
   final double volumeKg;
   final List<String> prList; // nombres de ejercicios con PR
   final List<PerformedExercise> exercises;
+  
+  // 🧠 Sensaciones post-entreno
+  final int? feelingEnergy; // 1-5
+  final int? feelingFatigue; // 1-5
+  final int? feelingMotivation; // 1-5
 
   const SessionDoc({
     required this.id,
@@ -244,6 +267,9 @@ class SessionDoc {
     this.durationMin,
     this.volumeKg = 0,
     this.prList = const [],
+    this.feelingEnergy,
+    this.feelingFatigue,
+    this.feelingMotivation,
   });
 
   static SessionDoc fromMap(String id, Map<String, dynamic> m) {
@@ -256,6 +282,9 @@ class SessionDoc {
       routineId: (m['routineId'] ?? '') as String,
       routineName: (m['routineName'] ?? '') as String,
       dayId: (m['dayId'] ?? '') as String,
+      feelingEnergy: (m['feelingEnergy'] as num?)?.toInt(),
+      feelingFatigue: (m['feelingFatigue'] as num?)?.toInt(),
+      feelingMotivation: (m['feelingMotivation'] as num?)?.toInt(),
       dayName: (m['dayName'] ?? '') as String,
       date: DateTime.tryParse(m['date'] ?? '') ?? DateTime.now(),
       notes: m['notes'] as String?,
@@ -275,6 +304,9 @@ class SessionDoc {
     'date': date.toIso8601String(),
     if (notes != null) 'notes': notes,
     if (durationMin != null) 'durationMin': durationMin,
+    if (feelingEnergy != null) 'feelingEnergy': feelingEnergy,
+    if (feelingFatigue != null) 'feelingFatigue': feelingFatigue,
+    if (feelingMotivation != null) 'feelingMotivation': feelingMotivation,
     'volumeKg': volumeKg,
     'prList': prList,
     'exercises': exercises.map((e) => e.toMap()).toList(),
@@ -340,4 +372,65 @@ class GymGoals {
       bodyWeightTarget: (m['bodyWeightTarget'] as num?)?.toDouble(),
     );
   }
+}
+
+// 🏋️ Rutinas predefinidas famosas
+class PresetRoutine {
+  final String id;
+  final String name;
+  final String description;
+  final String goal; // 'strength' | 'mass' | 'endurance' | 'general'
+  final String level; // 'beginner' | 'intermediate' | 'advanced'
+  final String? imageAsset;
+  final IconData icon;
+  final List<PresetDay> days;
+
+  const PresetRoutine({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.goal,
+    required this.level,
+    required this.days,
+    this.imageAsset,
+    this.icon = Icons.fitness_center,
+  });
+}
+
+class PresetDay {
+  final String name;
+  final String? icon;
+  final List<PresetExercise> exercises;
+
+  const PresetDay({
+    required this.name,
+    required this.exercises,
+    this.icon,
+  });
+}
+
+class PresetExercise {
+  final String exerciseId;
+  final String name;
+  final String muscleGroup;
+  final String category;
+  final int targetSets;
+  final int targetReps;
+  final int? restSec;
+  final String? tempo;
+  final double? targetRPE;
+  final String? notes;
+
+  const PresetExercise({
+    required this.exerciseId,
+    required this.name,
+    required this.muscleGroup,
+    required this.category,
+    required this.targetSets,
+    required this.targetReps,
+    this.restSec,
+    this.tempo,
+    this.targetRPE,
+    this.notes,
+  });
 }

@@ -79,25 +79,37 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
             ),
           ),
           Expanded(
-            child: StreamBuilder<List<StudyTask>>(
-              stream: svc.streamTasks(
-                courseId: _courseId,
-                status: _status,
-                highPriorityOnly: _onlyHigh,
-              ),
-              builder: (context, snap) {
-                if (!snap.hasData)
-                  return const Center(child: CircularProgressIndicator());
-                final tasks = snap.data!;
-                if (tasks.isEmpty)
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.task_alt_rounded,
-                          size: 120,
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            child: StreamBuilder<List<Course>>(
+              stream: svc.streamCourses(),
+              builder: (context, coursesSnap) {
+                return StreamBuilder<List<StudyTask>>(
+                  stream: svc.streamTasks(
+                    courseId: _courseId,
+                    status: _status,
+                    highPriorityOnly: _onlyHigh,
+                  ),
+                  builder: (context, snap) {
+                    if (!snap.hasData)
+                      return const Center(child: CircularProgressIndicator());
+                    
+                    // Crear mapa de courseId -> courseName
+                    final courseMap = <String, String>{};
+                    if (coursesSnap.hasData) {
+                      for (final course in coursesSnap.data!) {
+                        courseMap[course.id] = course.name;
+                      }
+                    }
+                    
+                    final tasks = snap.data!;
+                    if (tasks.isEmpty)
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.task_alt_rounded,
+                              size: 120,
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -143,49 +155,49 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
                   );
 
-                // Grouping
-                final Map<String, List<StudyTask>> groups = {};
-                if (_groupBy == 'course') {
-                  for (final t in tasks) {
-                    groups.putIfAbsent(t.courseId, () => []).add(t);
-                  }
-                } else {
-                  String key(DateTime? d) {
-                    if (d == null) return 'Sin fecha';
-                    final dd = DateTime(d.year, d.month, d.day);
-                    return dd.toIso8601String();
-                  }
+                    // Grouping
+                    final Map<String, List<StudyTask>> groups = {};
+                    if (_groupBy == 'course') {
+                      for (final t in tasks) {
+                        groups.putIfAbsent(t.courseId, () => []).add(t);
+                      }
+                    } else {
+                      String key(DateTime? d) {
+                        if (d == null) return 'Sin fecha';
+                        final dd = DateTime(d.year, d.month, d.day);
+                        return dd.toIso8601String();
+                      }
 
-                  for (final t in tasks) {
-                    groups.putIfAbsent(key(t.due), () => []).add(t);
-                  }
-                }
+                      for (final t in tasks) {
+                        groups.putIfAbsent(key(t.due), () => []).add(t);
+                      }
+                    }
 
-                final entries =
-                    groups.entries.toList()
-                      ..sort((a, b) => a.key.compareTo(b.key));
+                    final entries =
+                        groups.entries.toList()
+                          ..sort((a, b) => a.key.compareTo(b.key));
 
-                return AnimationLimiter(
-                  child: CustomScrollView(
-                    slivers: [
-                      for (final e in entries) ...[
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: Text(
-                              _groupBy == 'course'
-                                  ? 'Curso: ${e.key}'
-                                  : (e.key == 'Sin fecha'
-                                      ? e.key
-                                      : e.key.substring(0, 10)),
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.primary,
+                    return AnimationLimiter(
+                      child: CustomScrollView(
+                        slivers: [
+                          for (final e in entries) ...[
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                                child: Text(
+                                  _groupBy == 'course'
+                                      ? courseMap[e.key] ?? 'Curso desconocido'
+                                      : (e.key == 'Sin fecha'
+                                          ? e.key
+                                          : e.key.substring(0, 10)),
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
                               ),
-                            ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
-                          ),
-                        ),
+                            ),
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           sliver: SliverList(
@@ -278,8 +290,10 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                           ),
                         ),
                       ],
-                    ],
-                  ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
             ),

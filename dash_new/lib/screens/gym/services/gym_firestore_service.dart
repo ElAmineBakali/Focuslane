@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/gym_models.dart';
 
+export '../models/gym_models.dart';
+
 class GymFirestoreService {
   GymFirestoreService();
 
@@ -521,5 +523,283 @@ class GymFirestoreService {
               .reversed
               .toList(),
     );
+  }
+
+  // 📊 ===== Análisis y estadísticas avanzadas =====
+  
+  /// Obtiene el historial de e1RM de un ejercicio específico
+  Future<List<({DateTime date, double e1rm})>> getExerciseE1rmHistory(
+    String exerciseName, {
+    int lookback = 90,
+  }) async {
+    final results = <({DateTime date, double e1rm})>[];
+    final snap =
+        await _root
+            .collection('sessions')
+            .orderBy('date', descending: true)
+            .limit(lookback)
+            .get();
+    
+    for (final d in snap.docs) {
+      final data = d.data();
+      final date = DateTime.tryParse(data['date'] ?? '');
+      if (date == null) continue;
+      
+      final list =
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      for (final ex in list) {
+        if ((ex['name'] ?? '') == exerciseName) {
+          final sets =
+              (ex['sets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          double? bestInSession;
+          for (final s in sets) {
+            final w = (s['weight'] ?? 0).toDouble();
+            final r = (s['reps'] ?? 0).toInt();
+            final e1 = w * (1 + r / 30.0);
+            if (bestInSession == null || e1 > bestInSession) {
+              bestInSession = e1;
+            }
+          }
+          if (bestInSession != null) {
+            results.add((date: date, e1rm: bestInSession));
+          }
+        }
+      }
+    }
+    
+    results.sort((a, b) => a.date.compareTo(b.date));
+    return results;
+  }
+
+  /// Obtiene el volumen total por sesión de un ejercicio
+  Future<List<({DateTime date, double volume})>> getExerciseVolumeHistory(
+    String exerciseName, {
+    int lookback = 90,
+  }) async {
+    final results = <({DateTime date, double volume})>[];
+    final snap =
+        await _root
+            .collection('sessions')
+            .orderBy('date', descending: true)
+            .limit(lookback)
+            .get();
+    
+    for (final d in snap.docs) {
+      final data = d.data();
+      final date = DateTime.tryParse(data['date'] ?? '');
+      if (date == null) continue;
+      
+      final list =
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      for (final ex in list) {
+        if ((ex['name'] ?? '') == exerciseName) {
+          final sets =
+              (ex['sets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          double volume = 0;
+          for (final s in sets) {
+            final w = (s['weight'] ?? 0).toDouble();
+            final r = (s['reps'] ?? 0).toInt();
+            volume += w * r;
+          }
+          if (volume > 0) {
+            results.add((date: date, volume: volume));
+          }
+        }
+      }
+    }
+    
+    results.sort((a, b) => a.date.compareTo(b.date));
+    return results;
+  }
+
+  /// Obtiene los PRs históricos de un ejercicio
+  Future<List<({DateTime date, double weight, int reps, double e1rm})>> getExercisePRs(
+    String exerciseName, {
+    int limit = 10,
+  }) async {
+    final allRecords = <({DateTime date, double weight, int reps, double e1rm})>[];
+    final snap =
+        await _root
+            .collection('sessions')
+            .orderBy('date', descending: true)
+            .get();
+    
+    for (final d in snap.docs) {
+      final data = d.data();
+      final date = DateTime.tryParse(data['date'] ?? '');
+      if (date == null) continue;
+      
+      final list =
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      for (final ex in list) {
+        if ((ex['name'] ?? '') == exerciseName) {
+          final sets =
+              (ex['sets'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          for (final s in sets) {
+            final w = (s['weight'] ?? 0).toDouble();
+            final r = (s['reps'] ?? 0).toInt();
+            if (w > 0 && r > 0) {
+              final e1 = w * (1 + r / 30.0);
+              allRecords.add((date: date, weight: w, reps: r, e1rm: e1));
+            }
+          }
+        }
+      }
+    }
+    
+    // Ordenar por e1RM y tomar los mejores
+    allRecords.sort((a, b) => b.e1rm.compareTo(a.e1rm));
+    return allRecords.take(limit).toList();
+  }
+
+  /// 📤 Exportar datos del usuario a JSON
+  Future<Map<String, dynamic>> exportAllData() async {
+    // Sessions
+    final sessions = await _root.collection('sessions').get();
+    final sessionsData = sessions.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+    
+    // Body weight
+    final bodyweight = await _root.collection('bodyweight').get();
+    final bodyweightData = bodyweight.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+    
+    // Measurements
+    final measurements = await _root.collection('measurements').get();
+    final measurementsData = measurements.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+    
+    // Routines (con días y ejercicios)
+    final routines = await _root.collection('routines').get();
+    final routinesData = <Map<String, dynamic>>[];
+    for (final r in routines.docs) {
+      final routineData = {'id': r.id, ...r.data()};
+      final days = await r.reference.collection('days').get();
+      final daysData = <Map<String, dynamic>>[];
+      for (final d in days.docs) {
+        final dayData = {'id': d.id, ...d.data()};
+        final exs = await d.reference.collection('exercises').get();
+        dayData['exercises'] = exs.docs.map((e) => {'id': e.id, ...e.data()}).toList();
+        daysData.add(dayData);
+      }
+      routineData['days'] = daysData;
+      routinesData.add(routineData);
+    }
+    
+    return {
+      'exportDate': DateTime.now().toIso8601String(),
+      'userId': _uid,
+      'sessions': sessionsData,
+      'bodyWeight': bodyweightData,
+      'measurements': measurementsData,
+      'routines': routinesData,
+    };
+  }
+
+  /// 📊 Obtener estadísticas por rango de fechas
+  Future<Map<String, dynamic>> getStatsForDateRange(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final sessions =
+        await _root
+            .collection('sessions')
+            .where('date', isGreaterThanOrEqualTo: start.toIso8601String())
+            .where('date', isLessThanOrEqualTo: end.toIso8601String())
+            .get();
+    
+    if (sessions.docs.isEmpty) {
+      return {
+        'totalSessions': 0,
+        'totalVolume': 0.0,
+        'avgDuration': 0,
+        'avgEnergy': 0.0,
+        'avgFatigue': 0.0,
+        'avgMotivation': 0.0,
+      };
+    }
+    
+    double totalVolume = 0;
+    int totalDuration = 0;
+    int durationCount = 0;
+    double totalEnergy = 0;
+    double totalFatigue = 0;
+    double totalMotivation = 0;
+    int feelingsCount = 0;
+    
+    for (final d in sessions.docs) {
+      final data = d.data();
+      totalVolume += (data['volumeKg'] as num?)?.toDouble() ?? 0;
+      final dur = (data['durationMin'] as num?)?.toInt();
+      if (dur != null) {
+        totalDuration += dur;
+        durationCount++;
+      }
+      
+      final energy = (data['feelingEnergy'] as num?)?.toDouble();
+      final fatigue = (data['feelingFatigue'] as num?)?.toDouble();
+      final motivation = (data['feelingMotivation'] as num?)?.toDouble();
+      if (energy != null && fatigue != null && motivation != null) {
+        totalEnergy += energy;
+        totalFatigue += fatigue;
+        totalMotivation += motivation;
+        feelingsCount++;
+      }
+    }
+    
+    return {
+      'totalSessions': sessions.docs.length,
+      'totalVolume': totalVolume,
+      'avgDuration': durationCount > 0 ? totalDuration / durationCount : 0,
+      'avgEnergy': feelingsCount > 0 ? totalEnergy / feelingsCount : 0,
+      'avgFatigue': feelingsCount > 0 ? totalFatigue / feelingsCount : 0,
+      'avgMotivation': feelingsCount > 0 ? totalMotivation / feelingsCount : 0,
+    };
+  }
+
+  /// 🔥 Crear rutina desde preset
+  Future<String> createRoutineFromPreset(
+    String name,
+    String description,
+    String splitType,
+    List<PresetDay> presetDays,
+  ) async {
+    // Primero crear la rutina
+    final routineId = await createRoutine(
+      name: name,
+      description: description,
+      splitType: splitType,
+      restSecDefault: 90,
+    );
+    
+    // Luego crear los días y ejercicios
+    for (int dayIndex = 0; dayIndex < presetDays.length; dayIndex++) {
+      final pd = presetDays[dayIndex];
+      final dayId = await addDay(
+        routineId,
+        pd.name,
+        order: dayIndex,
+        icon: pd.icon,
+      );
+      
+      // Añadir ejercicios al día
+      for (int exIndex = 0; exIndex < pd.exercises.length; exIndex++) {
+        final pe = pd.exercises[exIndex];
+        final routineEx = RoutineExercise(
+          id: '',
+          exerciseId: pe.exerciseId,
+          name: pe.name,
+          muscleGroup: pe.muscleGroup,
+          category: pe.category,
+          targetSets: pe.targetSets,
+          targetReps: pe.targetReps,
+          order: exIndex,
+          restSec: pe.restSec,
+          tempo: pe.tempo,
+          targetRPE: pe.targetRPE,
+          notes: pe.notes,
+        );
+        await addRoutineExercise(routineId, dayId, routineEx);
+      }
+    }
+    
+    return routineId;
   }
 }
