@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
+import '../services/gym_notification_service.dart';
 import '../models/gym_models.dart';
 import 'session_summary_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
@@ -288,22 +289,18 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     await widget.svc.saveSession(doc);
     await widget.svc.markDayCompleted(widget.routine.id, widget.day.id);
 
-    // 🔔 Reprograma aviso de inactividad (X días sin entrenar)
-    await NotificationService.I.cancel(_inactivityId);
-    final base = DateTime.now().add(Duration(days: _inactivityDays));
-    final at = DateTime(base.year, base.month, base.day, 10, 0); // 10:00
-    await NotificationService.I.scheduleOnce(
-      id: _inactivityId,
-      title: 'Vuelve al gym',
-      body: 'Llevas $_inactivityDays días sin entrenar. ¡Toca sesión!',
-      whenLocal: at,
-      useExact: false,
-    );
+    // 🔔 Reprograma aviso de inactividad usando el servicio centralizado
+    await GymNotificationService.I.scheduleInactivityReminder();
 
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => SessionSummaryScreen(session: doc)),
+      MaterialPageRoute(
+        builder: (_) => SessionSummaryScreen(
+          session: doc,
+          svc: widget.svc,
+        ),
+      ),
     );
   }
 
@@ -318,78 +315,91 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           SliverAppBar.large(
             floating: false,
             pinned: true,
-            expandedHeight: 180,
+            expandedHeight: 160,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                widget.day.name,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w700,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-              ),
-              background: Stack(
-                fit: StackFit.expand,
+              titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          widget.routine.color,
-                          widget.routine.color.withOpacity(0.7),
+                  // Nombre del día a la izquierda
+                  Flexible(
+                    child: Text(
+                      widget.day.name,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 8,
+                          ),
                         ],
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Positioned(
-                    right: -40,
-                    top: -40,
-                    child: Icon(
-                      Icons.play_circle_filled_rounded,
-                      size: 160,
-                      color: Colors.white.withOpacity(0.1),
+                  const SizedBox(width: 12),
+                  // Badge "Sesión en vivo" a la derecha
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
                     ),
-                  ),
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.4),
+                        width: 1,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.timer_rounded,
-                            size: 16,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.play_circle_filled_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'En vivo',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Sesión en vivo',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
+              ),
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      widget.routine.color,
+                      widget.routine.color.withOpacity(0.7),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -40,
+                      top: -40,
+                      child: Icon(
+                        Icons.fitness_center_rounded,
+                        size: 160,
+                        color: Colors.white.withOpacity(0.08),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [

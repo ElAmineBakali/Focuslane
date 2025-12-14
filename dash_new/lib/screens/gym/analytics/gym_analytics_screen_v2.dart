@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
+import '../session/session_history_screen.dart';
 import 'exercise_progress_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -47,35 +48,53 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // AppBar moderno
-          SliverAppBar.large(
-            expandedHeight: 180,
+          // AppBar moderno con gradiente
+          SliverAppBar(
+            expandedHeight: 160,
             pinned: true,
-            stretch: true,
-            backgroundColor: colorScheme.primary,
+            backgroundColor: colorScheme.primaryContainer,
             flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 16, bottom: 60),
               title: Text(
                 'Analíticas',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 26,
+                ),
               ),
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [colorScheme.primary, colorScheme.secondary],
+                    colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer.withOpacity(0.8)],
                   ),
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.analytics,
-                    size: 80,
-                    color: Colors.white.withOpacity(0.2),
+                child: SafeArea(
+                  child: Center(
+                    child: Icon(
+                      Icons.analytics,
+                      size: 80,
+                      color: Colors.white.withOpacity(0.15),
+                    ),
                   ),
                 ),
               ),
             ),
             actions: [
+              // Botón de historial
+              IconButton(
+                icon: const Icon(Icons.history_rounded),
+                tooltip: 'Ver historial completo',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SessionHistoryScreen(svc: widget.svc),
+                    ),
+                  );
+                },
+              ),
               // Filtros de periodo
               PopupMenuButton<String>(
                 initialValue: _selectedPeriod,
@@ -211,9 +230,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               // Gráfico de volumen semanal
               _buildSectionTitle('Volumen Semanal'),
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               SizedBox(
-                height: 250,
+                height: 300,
                 child: _buildVolumeWeeklyChart(),
               ).animate().fadeIn(delay: 300.ms),
 
@@ -221,9 +240,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               // Distribución por grupos musculares
               _buildSectionTitle('Grupos Musculares'),
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               SizedBox(
-                height: 200,
+                height: 300,
                 child: _buildMuscleGroupDistribution(),
               ).animate().fadeIn(delay: 400.ms),
             ],
@@ -783,27 +802,49 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
         final sorted = weeklyVolume.entries.toList()
           ..sort((a, b) => a.key.compareTo(b.key));
 
+        final maxY = sorted.isEmpty ? 100.0 : sorted.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.1;
+
         final barGroups = sorted.asMap().entries.map((e) {
           return BarChartGroupData(
             x: e.key,
             barRods: [
               BarChartRodData(
                 toY: e.value.value,
-                color: Colors.blue,
-                width: 20,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
+                  ],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
+                width: 24,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                backDrawRodData: BackgroundBarChartRodData(
+                  show: true,
+                  toY: maxY,
+                  color: Colors.grey.withOpacity(0.1),
+                ),
               ),
             ],
           );
         }).toList();
 
-        final maxY = sorted.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.1;
-
         return BarChart(
           BarChartData(
             maxY: maxY,
             barGroups: barGroups,
-            gridData: const FlGridData(show: false),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: maxY / 5,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Colors.grey.withOpacity(0.2),
+                  strokeWidth: 1,
+                );
+              },
+            ),
             titlesData: FlTitlesData(
               show: true,
               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -814,9 +855,15 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
                     if (index < 0 || index >= sorted.length) return const SizedBox();
-                    return Text(
-                      'S${sorted[index].key}',
-                      style: GoogleFonts.poppins(fontSize: 10),
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        'S${sorted[index].key}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -827,14 +874,43 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   reservedSize: 42,
                   getTitlesWidget: (value, meta) {
                     return Text(
-                      value.toStringAsFixed(0),
-                      style: GoogleFonts.poppins(fontSize: 10),
+                      '${(value / 1000).toStringAsFixed(0)}k',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: Colors.grey[600],
+                      ),
                     );
                   },
                 ),
               ),
             ),
             borderData: FlBorderData(show: false),
+            barTouchData: BarTouchData(
+              enabled: true,
+              touchTooltipData: BarTouchTooltipData(
+                tooltipRoundedRadius: 12,
+                tooltipPadding: const EdgeInsets.all(8),
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  return BarTooltipItem(
+                    'Semana ${sorted[groupIndex].key}\n',
+                    GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '${rod.toY.toStringAsFixed(0)} kg',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         );
       },
@@ -865,37 +941,66 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           ..sort((a, b) => b.value.compareTo(a.value));
 
         final colors = [
-          Colors.blue,
-          Colors.red,
-          Colors.green,
-          Colors.orange,
-          Colors.purple,
-          Colors.teal,
+          const Color(0xFF6366F1), // Indigo
+          const Color(0xFFEC4899), // Pink
+          const Color(0xFF10B981), // Green
+          const Color(0xFFF59E0B), // Amber
+          const Color(0xFF8B5CF6), // Purple
+          const Color(0xFF14B8A6), // Teal
         ];
+
+        int touchedIndex = -1;
 
         return Row(
           children: [
             Expanded(
               flex: 2,
-              child: PieChart(
-                PieChartData(
-                  sections: sorted.take(6).toList().asMap().entries.map((e) {
-                    final percentage = (e.value.value / sorted.fold<double>(0, (sum, item) => sum + item.value) * 100);
-                    return PieChartSectionData(
-                      value: e.value.value,
-                      title: '${percentage.toStringAsFixed(0)}%',
-                      color: colors[e.key % colors.length],
-                      radius: 80,
-                      titleStyle: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+              child: StatefulBuilder(
+                builder: (context, setState) {
+                  return PieChart(
+                    PieChartData(
+                      sections: sorted.take(6).toList().asMap().entries.map((e) {
+                        final isTouched = e.key == touchedIndex;
+                        final percentage = (e.value.value / sorted.fold<double>(0, (sum, item) => sum + item.value) * 100);
+                        return PieChartSectionData(
+                          value: e.value.value,
+                          title: '${percentage.toStringAsFixed(0)}%',
+                          color: colors[e.key % colors.length],
+                          radius: isTouched ? 80 : 70,
+                          titleStyle: GoogleFonts.poppins(
+                            fontSize: isTouched ? 16 : 13,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            shadows: [
+                              const Shadow(
+                                color: Colors.black38,
+                                blurRadius: 3,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          borderSide: isTouched
+                              ? const BorderSide(color: Colors.white, width: 3)
+                              : null,
+                        );
+                      }).toList(),
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 50,
+                      pieTouchData: PieTouchData(
+                        touchCallback: (event, response) {
+                          setState(() {
+                            if (response != null && response.touchedSection != null) {
+                              touchedIndex = response.touchedSection!.touchedSectionIndex;
+                            } else {
+                              touchedIndex = -1;
+                            }
+                          });
+                        },
+                        enabled: true,
                       ),
-                    );
-                  }).toList(),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
-                ),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 16),
@@ -948,7 +1053,16 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
     return LineChart(
       LineChartData(
-        gridData: const FlGridData(show: true, drawVerticalLine: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Colors.grey.withOpacity(0.15),
+              strokeWidth: 1,
+            );
+          },
+        ),
         titlesData: FlTitlesData(
           show: true,
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -961,9 +1075,15 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 final index = value.toInt();
                 if (index < 0 || index >= weights.length) return const SizedBox();
                 final date = weights[index].date;
-                return Text(
-                  DateFormat('d/M').format(date),
-                  style: GoogleFonts.poppins(fontSize: 10),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    DateFormat('d/M').format(date),
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: Colors.grey[600],
+                    ),
+                  ),
                 );
               },
             ),
@@ -974,8 +1094,11 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               reservedSize: 42,
               getTitlesWidget: (value, meta) {
                 return Text(
-                  value.toStringAsFixed(1),
-                  style: GoogleFonts.poppins(fontSize: 10),
+                  '${value.toStringAsFixed(1)} kg',
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
                 );
               },
             ),
@@ -984,23 +1107,77 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
         borderData: FlBorderData(show: false),
         minY: minY,
         maxY: maxY,
+        lineTouchData: LineTouchData(
+          enabled: true,
+          touchTooltipData: LineTouchTooltipData(
+            tooltipRoundedRadius: 12,
+            tooltipPadding: const EdgeInsets.all(8),
+            getTooltipItems: (spots) {
+              return spots.map((spot) {
+                final index = spot.x.toInt();
+                if (index < 0 || index >= weights.length) return null;
+                final date = weights[index].date;
+                return LineTooltipItem(
+                  '${DateFormat('d/M/yy').format(date)}\n',
+                  GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '${spot.y.toStringAsFixed(1)} kg',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                );
+              }).toList();
+            },
+          ),
+        ),
         lineBarsData: [
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            color: Colors.blue,
-            barWidth: 3,
-            dotData: const FlDotData(show: true),
+            curveSmoothness: 0.4,
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+            ),
+            barWidth: 4,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 5,
+                  color: Colors.white,
+                  strokeWidth: 3,
+                  strokeColor: Theme.of(context).colorScheme.primary,
+                );
+              },
+            ),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  Colors.blue.withOpacity(0.3),
-                  Colors.blue.withOpacity(0.0),
+                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                  Colors.transparent,
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
+            ),
+            shadow: Shadow(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              offset: const Offset(0, 2),
+              blurRadius: 4,
             ),
           ),
         ],
@@ -1042,43 +1219,195 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
   Future<void> _quickAddWeight(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     final ctrl = TextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Añadir peso (kg)', style: GoogleFonts.poppins()),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: ctrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: 'Ej: 72.4',
-              prefixIcon: Icon(Icons.monitor_weight_outlined),
-              labelText: 'Peso (kg)',
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header con icono
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        Icons.monitor_weight_rounded,
+                        color: colorScheme.primary,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Registrar Peso',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            'Añade tu peso actual',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Campo de entrada
+                TextFormField(
+                  controller: ctrl,
+                  autofocus: true,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Peso corporal',
+                    hintText: '72.4',
+                    suffixText: 'kg',
+                    suffixStyle: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.monitor_weight_outlined,
+                      color: colorScheme.primary,
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.outlineVariant,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.error,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  validator: (s) {
+                    final v = double.tryParse((s ?? '').replaceAll(',', '.'));
+                    if (v == null) return 'Introduce un número válido';
+                    if (v <= 0 || v > 300) return 'Peso no válido (1-300 kg)';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+
+                // Información adicional
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Registra tu peso por la mañana, antes de desayunar',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Botones
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: () {
+                        if (formKey.currentState?.validate() == true) {
+                          Navigator.pop(ctx, true);
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.check, size: 20),
+                      label: Text(
+                        'Guardar',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            validator: (s) {
-              final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-              if (v == null) return 'Introduce un número válido';
-              if (v <= 0) return 'Debe ser mayor que 0';
-              return null;
-            },
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() == true) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
       ),
     );
 
@@ -1107,58 +1436,236 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     final formKey = GlobalKey<FormState>();
     final muscleCtrl = TextEditingController();
     final valCtrl = TextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
     String site = 'avg';
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Añadir medida (cm)', style: GoogleFonts.poppins()),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: muscleCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Músculo',
-                  hintText: 'Ej: brazo',
-                  prefixIcon: Icon(Icons.fitness_center_outlined),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 450),
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header con icono
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        Icons.straighten,
+                        color: colorScheme.secondary,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Registrar Medida',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            'Medición corporal',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                validator: (s) => (s ?? '').trim().isEmpty ? 'Escribe un músculo' : null,
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: valCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Valor (cm)',
-                  prefixIcon: Icon(Icons.straighten),
+                const SizedBox(height: 24),
+
+                // Campo de músculo
+                TextFormField(
+                  controller: muscleCtrl,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.words,
+                  style: GoogleFonts.poppins(fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Grupo muscular',
+                    hintText: 'Ej: Brazo, Pecho, Cintura...',
+                    prefixIcon: Icon(
+                      Icons.fitness_center_outlined,
+                      color: colorScheme.secondary,
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.outlineVariant,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.secondary,
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.error,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  validator: (s) => (s ?? '').trim().isEmpty ? 'Escribe el nombre del músculo' : null,
                 ),
-                validator: (s) {
-                  final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-                  if (v == null) return 'Número válido';
-                  if (v <= 0) return 'Mayor que 0';
-                  return null;
-                },
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Campo de valor
+                TextFormField(
+                  controller: valCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Medida',
+                    hintText: '35.0',
+                    suffixText: 'cm',
+                    suffixStyle: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.secondary,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.straighten,
+                      color: colorScheme.secondary,
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.outlineVariant,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.secondary,
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: colorScheme.error,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  validator: (s) {
+                    final v = double.tryParse((s ?? '').replaceAll(',', '.'));
+                    if (v == null) return 'Introduce un número válido';
+                    if (v <= 0 || v > 200) return 'Medida no válida (1-200 cm)';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+
+                // Chips sugerencias
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    'Biceps',
+                    'Triceps',
+                    'Pecho',
+                    'Espalda',
+                    'Pierna'
+                  ].map((muscle) {
+                    return ActionChip(
+                      label: Text(
+                        muscle,
+                        style: GoogleFonts.poppins(fontSize: 11),
+                      ),
+                      onPressed: () {
+                        muscleCtrl.text = muscle;
+                      },
+                      backgroundColor: colorScheme.surfaceContainerHighest,
+                      side: BorderSide(color: colorScheme.outlineVariant),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+
+                // Botones
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: () {
+                        if (formKey.currentState?.validate() == true) {
+                          Navigator.pop(ctx, true);
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.check, size: 20),
+                      label: Text(
+                        'Guardar',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState?.validate() == true) {
-                Navigator.pop(context, true);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
       ),
     );
 

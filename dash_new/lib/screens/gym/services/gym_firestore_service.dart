@@ -345,6 +345,75 @@ class GymFirestoreService {
     } catch (_) {}
   }
 
+  /// Actualiza las sensaciones de una sesión existente
+  Future<void> updateSessionFeelings(
+    String sessionId,
+    int energy,
+    int fatigue,
+    int motivation,
+  ) async {
+    await _root.collection('sessions').doc(sessionId).update({
+      'feelingEnergy': energy,
+      'feelingFatigue': fatigue,
+      'feelingMotivation': motivation,
+    });
+  }
+
+  /// Elimina una sesión del historial
+  /// IMPORTANTE: Actualiza las estadísticas y no rompe métricas
+  Future<void> deleteSession(String sessionId) async {
+    // Obtener datos de la sesión antes de eliminarla
+    final sessionDoc = await _root.collection('sessions').doc(sessionId).get();
+    if (!sessionDoc.exists) return;
+
+    final sessionData = sessionDoc.data() as Map<String, dynamic>;
+    final routineId = sessionData['routineId'] as String?;
+    final dayId = sessionData['dayId'] as String?;
+
+    // Eliminar la sesión
+    await _root.collection('sessions').doc(sessionId).delete();
+
+    // Si hay rutina y día, recalcular lastDone
+    if (routineId != null && dayId != null) {
+      try {
+        final remainingSessions = await _root
+            .collection('sessions')
+            .where('routineId', isEqualTo: routineId)
+            .where('dayId', isEqualTo: dayId)
+            .orderBy('date', descending: true)
+            .limit(1)
+            .get();
+
+        if (remainingSessions.docs.isNotEmpty) {
+          final lastSession = SessionDoc.fromMap(
+            remainingSessions.docs.first.id,
+            remainingSessions.docs.first.data(),
+          );
+          await _root
+              .collection('routines')
+              .doc(routineId)
+              .collection('days')
+              .doc(dayId)
+              .update({
+            'lastDone': FieldValue.serverTimestamp(),
+            'lastDoneLocal': lastSession.date.toIso8601String(),
+          });
+        } else {
+          // No quedan sesiones, limpiar lastDone
+          await _root
+              .collection('routines')
+              .doc(routineId)
+              .collection('days')
+              .doc(dayId)
+              .update({
+            'lastDone': FieldValue.delete(),
+            'lastDoneLocal': FieldValue.delete(),
+          });
+        }
+      } catch (_) {}
+    }
+  }
+
   Stream<List<SessionDoc>> streamSessions({
     String? routineId,
     String? dayId,

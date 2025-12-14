@@ -7,6 +7,7 @@ import 'routines/routines_list_screen.dart';
 import 'routines/routine_detail_screen.dart';
 import 'routines/preset_routines_screen.dart';
 import 'analytics/gym_analytics_screen_v2.dart';
+import 'session/session_history_screen.dart';
 import 'widgets/export_data_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:intl/intl.dart';
@@ -77,6 +78,36 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     );
   }
 
+  void _showNotificationSettings(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _NotificationSettingsSheet(
+        onSave: () async {
+          await _scheduleGymReminders();
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Recordatorios actualizados',
+                      style: GoogleFonts.poppins(),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,7 +127,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             expandedHeight: 200,
             pinned: true,
             stretch: true,
-            backgroundColor: colorScheme.primary,
+            backgroundColor: colorScheme.primaryContainer,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Gimnasio',
@@ -111,8 +142,8 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colorScheme.primary,
-                      colorScheme.secondary,
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withOpacity(0.8),
                     ],
                   ),
                 ),
@@ -134,25 +165,8 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined),
-                tooltip: 'Reprogramar recordatorios',
-                onPressed: () {
-                  _scheduleGymReminders();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.white),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Recordatorios actualizados',
-                            style: GoogleFonts.poppins(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                tooltip: 'Configurar notificaciones',
+                onPressed: () => _showNotificationSettings(context),
               ),
             ],
           ),
@@ -555,7 +569,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => GymAnalyticsScreenV2(svc: widget.svc),
+                    builder: (_) => SessionHistoryScreen(svc: widget.svc),
                   ),
                 );
               },
@@ -720,6 +734,340 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// 🔔 Widget de configuración de notificaciones
+class _NotificationSettingsSheet extends StatefulWidget {
+  final VoidCallback onSave;
+  const _NotificationSettingsSheet({required this.onSave});
+
+  @override
+  State<_NotificationSettingsSheet> createState() => _NotificationSettingsSheetState();
+}
+
+class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> {
+  bool _enableWeightReminder = true;
+  bool _enableMeasurementsReminder = true;
+  bool _enableInactivityReminder = true;
+  int _inactivityDays = 3;
+  int _weightReminderDay = DateTime.monday;
+  TimeOfDay _weightReminderTime = const TimeOfDay(hour: 8, minute: 0);
+  TimeOfDay _measurementsReminderTime = const TimeOfDay(hour: 9, minute: 0);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Título
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.notifications_active_rounded,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Configurar Notificaciones',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          'Personaliza tus recordatorios',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Divider(height: 1, color: Colors.grey[300]),
+
+            // Opciones
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(20),
+                children: [
+                  // Recordatorio de peso
+                  _buildSection(
+                    icon: Icons.monitor_weight_outlined,
+                    title: 'Control de Peso Semanal',
+                    subtitle: 'Recordatorio para registrar tu peso',
+                    value: _enableWeightReminder,
+                    onChanged: (v) => setState(() => _enableWeightReminder = v),
+                    colorScheme: colorScheme,
+                    child: _enableWeightReminder
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              ListTile(
+                                dense: true,
+                                leading: Icon(Icons.calendar_today, size: 20, color: colorScheme.primary),
+                                title: Text('Día de la semana', style: GoogleFonts.poppins(fontSize: 14)),
+                                trailing: DropdownButton<int>(
+                                  value: _weightReminderDay,
+                                  onChanged: (v) => setState(() => _weightReminderDay = v!),
+                                  items: const [
+                                    DropdownMenuItem(value: DateTime.monday, child: Text('Lunes')),
+                                    DropdownMenuItem(value: DateTime.tuesday, child: Text('Martes')),
+                                    DropdownMenuItem(value: DateTime.wednesday, child: Text('Miércoles')),
+                                    DropdownMenuItem(value: DateTime.thursday, child: Text('Jueves')),
+                                    DropdownMenuItem(value: DateTime.friday, child: Text('Viernes')),
+                                    DropdownMenuItem(value: DateTime.saturday, child: Text('Sábado')),
+                                    DropdownMenuItem(value: DateTime.sunday, child: Text('Domingo')),
+                                  ],
+                                ),
+                              ),
+                              ListTile(
+                                dense: true,
+                                leading: Icon(Icons.access_time, size: 20, color: colorScheme.primary),
+                                title: Text('Hora', style: GoogleFonts.poppins(fontSize: 14)),
+                                trailing: TextButton(
+                                  onPressed: () async {
+                                    final time = await showTimePicker(
+                                      context: context,
+                                      initialTime: _weightReminderTime,
+                                    );
+                                    if (time != null) {
+                                      setState(() => _weightReminderTime = time);
+                                    }
+                                  },
+                                  child: Text(
+                                    '${_weightReminderTime.hour.toString().padLeft(2, '0')}:${_weightReminderTime.minute.toString().padLeft(2, '0')}',
+                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Recordatorio de medidas
+                  _buildSection(
+                    icon: Icons.straighten,
+                    title: 'Medidas Físicas Semanales',
+                    subtitle: 'Recordatorio para medidas corporales',
+                    value: _enableMeasurementsReminder,
+                    onChanged: (v) => setState(() => _enableMeasurementsReminder = v),
+                    colorScheme: colorScheme,
+                    child: _enableMeasurementsReminder
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              ListTile(
+                                dense: true,
+                                leading: Icon(Icons.access_time, size: 20, color: colorScheme.primary),
+                                title: Text('Hora (Lunes)', style: GoogleFonts.poppins(fontSize: 14)),
+                                trailing: TextButton(
+                                  onPressed: () async {
+                                    final time = await showTimePicker(
+                                      context: context,
+                                      initialTime: _measurementsReminderTime,
+                                    );
+                                    if (time != null) {
+                                      setState(() => _measurementsReminderTime = time);
+                                    }
+                                  },
+                                  child: Text(
+                                    '${_measurementsReminderTime.hour.toString().padLeft(2, '0')}:${_measurementsReminderTime.minute.toString().padLeft(2, '0')}',
+                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Recordatorio de inactividad
+                  _buildSection(
+                    icon: Icons.notifications_active,
+                    title: 'Alerta de Inactividad',
+                    subtitle: 'Aviso cuando llevas días sin entrenar',
+                    value: _enableInactivityReminder,
+                    onChanged: (v) => setState(() => _enableInactivityReminder = v),
+                    colorScheme: colorScheme,
+                    child: _enableInactivityReminder
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              ListTile(
+                                dense: true,
+                                leading: Icon(Icons.timer_outlined, size: 20, color: colorScheme.primary),
+                                title: Text('Días de inactividad', style: GoogleFonts.poppins(fontSize: 14)),
+                                subtitle: Slider(
+                                  value: _inactivityDays.toDouble(),
+                                  min: 1,
+                                  max: 7,
+                                  divisions: 6,
+                                  label: '$_inactivityDays días',
+                                  onChanged: (v) => setState(() => _inactivityDays = v.round()),
+                                ),
+                                trailing: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '$_inactivityDays días',
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+
+            // Botones
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text('Cancelar', style: GoogleFonts.poppins()),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton(
+                      onPressed: () {
+                        widget.onSave();
+                        Navigator.pop(context);
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text('Guardar y Activar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    required ColorScheme colorScheme,
+    Widget? child,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: colorScheme.primary, size: 20),
+            ),
+            title: Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            value: value,
+            onChanged: onChanged,
+          ),
+          if (child != null) ...[
+            Divider(height: 1, color: Colors.grey[200]),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: child,
+            ),
+          ],
+        ],
       ),
     );
   }

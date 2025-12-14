@@ -40,7 +40,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             expandedHeight: 200,
             pinned: true,
             stretch: true,
-            backgroundColor: colorScheme.primary,
+            backgroundColor: colorScheme.primaryContainer,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Rutinas Destacadas',
@@ -54,8 +54,8 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colorScheme.primary,
-                      colorScheme.secondary,
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withOpacity(0.8),
                     ],
                   ),
                 ),
