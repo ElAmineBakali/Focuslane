@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../widgets/global_ui_components.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
+/// 📅 PLANIFICADOR - REDISEÑADO
 class FoodPlannerScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodPlannerScreen({super.key, required this.svc});
@@ -20,7 +23,15 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Menú'),
+        title: Text(
+          'Planificador',
+          style: FocusTypography.heading2(context).copyWith(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.green,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           DropdownButton<ShoppingScope>(
             value: _scope,

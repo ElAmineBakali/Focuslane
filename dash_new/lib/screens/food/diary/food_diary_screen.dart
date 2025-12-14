@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../theme/global_ui_theme.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
+import 'package:intl/intl.dart';
 
-// ===================== DIARIO =====================
+/// 📝 DIARIO DE ALIMENTACIÓN - REDISEÑO COMPLETO PREMIUM
+/// Vista diaria con diseño moderno, formularios hermosos y microanimaciones
 class FoodDiaryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodDiaryScreen({super.key, required this.svc});
@@ -14,621 +18,1105 @@ class FoodDiaryScreen extends StatefulWidget {
 class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
   DateTime _date = DateTime.now();
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
+  
+  final Map<String, String> _mealTitles = {
+    'breakfast': '🌅 Desayuno',
+    'snack1': '🍎 Media Mañana',
+    'lunch': '🍽️ Almuerzo',
+    'snack2': '🥤 Merienda',
+    'dinner': '🌙 Cena',
+    'other': '➕ Otros',
+  };
 
   @override
   Widget build(BuildContext context) {
     final dayId = _dayId(_date);
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Diario'),
+      appBar: ModernGradientAppBar(
+        title: 'Diario de Alimentación',
+        icon: Icons.restaurant_menu,
+        primaryColor: AppColors.food,
+        secondaryColor: AppColors.warning,
         actions: [
           IconButton(
-            tooltip: 'Objetivos (globales)',
-            icon: const Icon(Icons.flag),
-            onPressed: () async {
-              final kcal = await _promptNumber(
-                context,
-                'Kcal objetivo (vacío para ignorar)',
-              );
-              final p = await _promptNumber(context, 'Proteínas (g, opcional)');
-              final c = await _promptNumber(context, 'Carbos (g, opcional)');
-              final f = await _promptNumber(context, 'Grasas (g, opcional)');
-              final fi = await _promptNumber(context, 'Fibra (g, opcional)');
-              final water = await _promptInt(context, 'Agua (ml, opcional)');
-
-              // 👉 objetivos GLOBALes
-              await widget.svc.setGlobalTargets(
-                kcal: kcal,
-                protein: p,
-                carbs: c,
-                fat: f,
-                fiber: fi,
-                waterMl: water,
+            tooltip: 'Objetivos Nutricionales',
+            icon: const Icon(Icons.flag_outlined, color: Colors.white),
+            onPressed: () => _showGoalsSheet(context),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddEntrySheet(context, dayId),
+        backgroundColor: AppColors.food,
+        icon: const Icon(Icons.add),
+        label: const Text('Añadir'),
+      ).animate().scale(delay: 300.ms, duration: 200.ms),
+      body: StreamBuilder<Map<String, double?>>(
+        stream: widget.svc.streamGlobalTargets(),
+        builder: (context, globalSnap) {
+          final globalTargets = globalSnap.data ?? const {};
+          
+          return StreamBuilder<DailyIntakeDoc>(
+            stream: widget.svc.streamDay(dayId),
+            builder: (context, snap) {
+              if (!snap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              
+              final d = snap.data!;
+              
+              // Merge: si en el día falta algo -> toma global
+              Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
+              for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
+                mergedTargets[k] ??= globalTargets[k];
+                    }
+              // Agua: si no hay objetivo por día, usa global (o 2000 por defecto al renderizar)
+              mergedTargets['water'] ??= globalTargets['water'];
+              
+              return CustomScrollView(
+                slivers: [
+                  // Selector de día moderno
+                  SliverToBoxAdapter(
+                    child: _ModernDaySelector(
+                      date: _date,
+                      onPrev: () => setState(() => _date = _date.subtract(const Duration(days: 1))),
+                      onNext: () => setState(() => _date = _date.add(const Duration(days: 1))),
+                      onToday: () => setState(() => _date = DateTime.now()),
+                    ).animate().slideY(begin: -0.2, duration: 300.ms),
+                  ),
+                  
+                  // Resumen de macros actual
+                  SliverToBoxAdapter(
+                    child: _MacrosSummary(
+                      day: d,
+                      mergedTargets: mergedTargets,
+                    ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, duration: 300.ms),
+                  ),
+                  
+                  // Barra de agua
+                  SliverToBoxAdapter(
+                    child: _ModernWaterCard(
+                      water: d.waterMl,
+                      waterTarget: (mergedTargets['water'] ?? 2000).toInt(),
+                      onAdd: (ml) => widget.svc.incrementWater(dayId, ml),
+                    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, duration: 300.ms),
+                  ),
+                  
+                  // Entradas por comida
+                  if (d.entries.isEmpty)
+                    SliverFillRemaining(
+                      child: ModernEmptyState(
+                        icon: Icons.restaurant_outlined,
+                        message: 'No hay entradas para este día',
+                        subtitle: 'Toca el botón + para añadir tu primera comida',
+                        actionLabel: 'Añadir entrada',
+                        onAction: () => _showAddEntrySheet(context, dayId),
+                      ),
+                    )
+                  else
+                    ..._buildMealSections(d.entries, dayId),
+                  
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               );
             },
-          ),
-        ],
+          );
+        },
       ),
-      floatingActionButton: _Fab(svc: widget.svc, dayId: dayId),
-      body: Column(
-        children: [
-          _DayHeader(
-            date: _date,
-            onPrev:
-                () => setState(
-                  () => _date = _date.subtract(const Duration(days: 1)),
+    );
+  }
+  
+  List<Widget> _buildMealSections(List<IntakeEntry> entries, String dayId) {
+    // Agrupamos entradas por comida (o usamos un campo meal si existe)
+    // Por ahora mostramos todas en "Entradas del día"
+    return [
+      SliverPadding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final entry = entries[index];
+              return _EntryCard(
+                entry: entry,
+                onDuplicate: () => widget.svc.addEntry(
+                  dayId,
+                  IntakeEntry(
+                    id: '',
+                    type: entry.type,
+                    refId: entry.refId,
+                    qty: entry.qty,
+                    unit: entry.unit,
+                    nameSnapshot: entry.nameSnapshot,
+                    macrosSnapshot: entry.macrosSnapshot,
+                  ),
                 ),
-            onNext:
-                () =>
-                    setState(() => _date = _date.add(const Duration(days: 1))),
+                onDelete: () => widget.svc.deleteEntry(dayId, index),
+              ).animate()
+                .fadeIn(delay: (300 + index * 50).ms)
+                .slideX(begin: -0.2, duration: 300.ms);
+            },
+            childCount: entries.length,
           ),
-          Expanded(
-            // 🔗 combinamos día + objetivos globales (stream)
-            child: StreamBuilder<Map<String, double?>>(
-              stream: widget.svc.streamGlobalTargets(),
-              builder: (context, globalSnap) {
-                final globalTargets = globalSnap.data ?? const {};
-                return StreamBuilder<DailyIntakeDoc>(
-                  stream: widget.svc.streamDay(dayId),
-                  builder: (context, snap) {
-                    if (!snap.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final d = snap.data!;
-
-                    // Merge: si en el día falta algo -> toma global
-                    Map<String, double?> mergedTargets =
-                        Map<String, double?>.from(d.targets);
-                    for (final k in [
-                      'kcal',
-                      'protein',
-                      'carbs',
-                      'fat',
-                      'fiber',
-                    ]) {
-                      mergedTargets[k] ??= globalTargets[k];
-                    }
-                    // Agua: si no hay objetivo por día, usa global (o 2000 por defecto al renderizar)
-                    mergedTargets['water'] ??= globalTargets['water'];
-
-                    return ListView(
-                      padding: const EdgeInsets.all(12),
-                      children: [
-                        ...d.entries.asMap().entries.map(
-                          (e) => Card(
-                            child: ListTile(
-                              title: Text(e.value.nameSnapshot),
-                              subtitle: Text(
-                                'Porción: ${e.value.qty.toStringAsFixed(0)} ${e.value.unit.name} • '
-                                'Kcal ${e.value.macrosSnapshot['kcal']?.toStringAsFixed(0) ?? '0'}',
-                              ),
-                              trailing: PopupMenuButton<String>(
-                                onSelected: (v) async {
-                                  if (v == 'dup') {
-                                    await widget.svc.addEntry(
-                                      dayId,
-                                      IntakeEntry(
-                                        id: '',
-                                        type: e.value.type,
-                                        refId: e.value.refId,
-                                        qty: e.value.qty,
-                                        unit: e.value.unit,
-                                        nameSnapshot: e.value.nameSnapshot,
-                                        macrosSnapshot: e.value.macrosSnapshot,
-                                      ),
-                                    );
-                                  }
-                                  if (v == 'del') {
-                                    await widget.svc.deleteEntry(dayId, e.key);
-                                  }
-                                },
-                                itemBuilder:
-                                    (_) => const [
-                                      PopupMenuItem(
-                                        value: 'dup',
-                                        child: Text('Duplicar'),
-                                      ),
-                                      PopupMenuItem(
-                                        value: 'del',
-                                        child: Text('Eliminar'),
-                                      ),
-                                    ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        _WaterBar(
-                          water: d.waterMl,
-                          waterTarget: (mergedTargets['water'] ?? 2000).toInt(),
-                          onAdd250: () => widget.svc.incrementWater(dayId, 250),
-                          onAdd500: () => widget.svc.incrementWater(dayId, 500),
-                          onCustom: () async {
-                            final add = await _promptInt(
-                              context,
-                              'Añadir agua (ml)',
-                            );
-                            if (add != null)
-                              await widget.svc.incrementWater(dayId, add);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _TotalsCard(day: d, mergedTargets: mergedTargets),
-                        const SizedBox(height: 100),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+        ),
       ),
-    );
+    ];
   }
-
-  Future<double?> _promptNumber(BuildContext context, String label) async {
-    final c = TextEditingController();
-    final ok = await showDialog<bool>(
+  
+  void _showGoalsSheet(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: Text(label),
-            content: TextField(
-              controller: c,
-              keyboardType: TextInputType.number,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ModernGoalsSheet(svc: widget.svc),
     );
-    if (ok == true) return double.tryParse(c.text);
-    return null;
   }
-
-  Future<int?> _promptInt(BuildContext context, String label) async {
-    final v = await _promptNumber(context, label);
-    return v?.toInt();
+  
+  void _showAddEntrySheet(BuildContext context, String dayId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ModernAddEntrySheet(svc: widget.svc, dayId: dayId),
+    );
   }
 }
 
-class _DayHeader extends StatelessWidget {
+/// Selector de día moderno con chips
+class _ModernDaySelector extends StatelessWidget {
   final DateTime date;
   final VoidCallback onPrev;
   final VoidCallback onNext;
-  const _DayHeader({
+  final VoidCallback onToday;
+  
+  const _ModernDaySelector({
     required this.date,
     required this.onPrev,
     required this.onNext,
+    required this.onToday,
   });
-
+  
   @override
   Widget build(BuildContext context) {
-    final dstr = date.toIso8601String().substring(0, 10);
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
+    final isToday = _isToday(date);
+    final dateStr = DateFormat('EEEE, d MMMM', 'es').format(date);
+    
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.grey100,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      ),
+      child: Column(
         children: [
-          IconButton(onPressed: onPrev, icon: const Icon(Icons.chevron_left)),
-          Expanded(
-            child: Center(
-              child: Text(dstr, style: Theme.of(context).textTheme.titleMedium),
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: onPrev,
+                icon: const Icon(Icons.chevron_left),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        dateStr,
+                        style: AppTypography.heading4(context),
+                        textAlign: TextAlign.center,
+                      ),
+                      if (isToday)
+                        ModernBadge(
+                          label: 'HOY',
+                          color: AppColors.food,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: onNext,
+                icon: const Icon(Icons.chevron_right),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            ],
           ),
-          IconButton(onPressed: onNext, icon: const Icon(Icons.chevron_right)),
+          if (!isToday) ...[
+            const SizedBox(height: AppSpacing.sm),
+            ModernPrimaryButton(
+              label: 'Ir a hoy',
+              icon: Icons.today,
+              onPressed: onToday,
+              color: AppColors.food,
+            ),
+          ],
         ],
       ),
     );
   }
+  
+  bool _isToday(DateTime date) {
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
+  }
 }
 
-class _TotalsCard extends StatelessWidget {
+/// Resumen de macros con tarjetas modernas
+class _MacrosSummary extends StatelessWidget {
   final DailyIntakeDoc day;
-  final Map<String, double?> mergedTargets; // 👈 objetivos ya mezclados
-  const _TotalsCard({required this.day, required this.mergedTargets});
-
-  double _pct(double v, double? t) {
-    if (t == null || t <= 0) return 0;
-    return (v / t).clamp(0, 1);
-  }
-
+  final Map<String, double?> mergedTargets;
+  
+  const _MacrosSummary({
+    required this.day,
+    required this.mergedTargets,
+  });
+  
   @override
   Widget build(BuildContext context) {
     final t = day.totals;
     final g = mergedTargets;
+    
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Nutrición del Día',
+            style: AppTypography.heading3(context),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          
+          // Card principal de calorías
+          Card(
+            elevation: AppSpacing.elevationMd,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.foodGradient,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              ),
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Calorías',
+                        style: AppTypography.heading3(context, color: Colors.white),
+                      ),
+                      Icon(Icons.local_fire_department, color: Colors.white, size: 32),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        (t['kcal'] ?? 0).toStringAsFixed(0),
+                        style: AppTypography.heading1(context, color: Colors.white).copyWith(fontSize: 48),
+                      ),
+                      if (g['kcal'] != null) ...[
+                        Text(
+                          ' / ${g['kcal']!.toStringAsFixed(0)}',
+                          style: AppTypography.heading3(context, color: Colors.white70),
+                        ),
+                      ],
+                      Text(
+                        ' kcal',
+                        style: AppTypography.body(context, color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (g['kcal'] != null)
+                    ModernProgressBar(
+                      value: _pct(t['kcal'] ?? 0, g['kcal']),
+                      color: Colors.white,
+                      backgroundColor: Colors.white30,
+                      height: 8,
+                    ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: AppSpacing.md),
+          
+          // Grid de macros
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: AppSpacing.md,
+            crossAxisSpacing: AppSpacing.md,
+            childAspectRatio: 1.5,
+            children: [
+              _MacroCard(
+                label: 'Proteínas',
+                value: t['protein'] ?? 0,
+                target: g['protein'],
+                unit: 'g',
+                color: AppColors.error,
+                icon: Icons.fitness_center,
+              ),
+              _MacroCard(
+                label: 'Carbohidratos',
+                value: t['carbs'] ?? 0,
+                target: g['carbs'],
+                unit: 'g',
+                color: AppColors.warning,
+                icon: Icons.bakery_dining,
+              ),
+              _MacroCard(
+                label: 'Grasas',
+                value: t['fat'] ?? 0,
+                target: g['fat'],
+                unit: 'g',
+                color: AppColors.gym,
+                icon: Icons.water_drop,
+              ),
+              _MacroCard(
+                label: 'Fibra',
+                value: t['fiber'] ?? 0,
+                target: g['fiber'],
+                unit: 'g',
+                color: AppColors.success,
+                icon: Icons.eco,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  double _pct(double v, double? t) {
+    if (t == null || t <= 0) return 0;
+    return (v / t).clamp(0, 1);
+  }
+}
+
+/// Tarjeta individual de macro
+class _MacroCard extends StatelessWidget {
+  final String label;
+  final double value;
+  final double? target;
+  final String unit;
+  final Color color;
+  final IconData icon;
+  
+  const _MacroCard({
+    required this.label,
+    required this.value,
+    this.target,
+    required this.unit,
+    required this.color,
+    required this.icon,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final pct = target != null && target! > 0 ? (value / target!).clamp(0.0, 1.0).toDouble() : 0.0;
+    
     return Card(
+      elevation: AppSpacing.elevationSm,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Totales',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: AppTypography.caption(context),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            _row('Kcal', t['kcal'] ?? 0, g['kcal']),
-            _row('Proteína', t['protein'] ?? 0, g['protein']),
-            _row('Carbohidratos', t['carbs'] ?? 0, g['carbs']),
-            _row('Grasas', t['fat'] ?? 0, g['fat']),
-            _row('Fibra', t['fiber'] ?? 0, g['fiber']),
-            const SizedBox(height: 8),
-            Text('Sodio: ${(t['sodium'] ?? 0).toStringAsFixed(0)} mg'),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  value.toStringAsFixed(0),
+                  style: AppTypography.heading2(context, color: color),
+                ),
+                if (target != null) ...[
+                  Text(
+                    '/${target!.toStringAsFixed(0)}',
+                    style: AppTypography.body(context),
+                  ),
+                ],
+                Text(
+                  unit,
+                  style: AppTypography.caption(context),
+                ),
+              ],
+            ),
+            if (target != null)
+              ModernProgressBar(
+                value: pct,
+                color: color,
+                height: 4,
+              ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _row(String label, double val, double? target) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}',
+/// Tarjeta moderna de agua con acciones rápidas
+class _ModernWaterCard extends StatelessWidget {
+  final int water;
+  final int waterTarget;
+  final Function(int) onAdd;
+  
+  const _ModernWaterCard({
+    required this.water,
+    required this.waterTarget,
+    required this.onAdd,
+  });
+  
+  double _pct() {
+    if (waterTarget <= 0) return 0;
+    return (water / waterTarget).clamp(0, 1).toDouble();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    final remaining = waterTarget - water;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Card(
+        elevation: AppSpacing.elevationMd,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                    child: const Icon(Icons.water_drop, color: AppColors.info, size: 24),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Hidratación', style: AppTypography.heading4(context)),
+                        Text(
+                          '$water / $waterTarget ml',
+                          style: AppTypography.body(context),
+                        ),
+                        if (remaining > 0)
+                          Text(
+                            'Faltan ${remaining}ml',
+                            style: AppTypography.caption(context, color: AppColors.warning),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${(_pct() * 100).toStringAsFixed(0)}%',
+                    style: AppTypography.heading3(context, color: AppColors.info),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              ModernProgressBar(
+                value: _pct(),
+                color: AppColors.info,
+                height: 8,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => onAdd(250),
+                      icon: const Icon(Icons.add),
+                      label: const Text('250ml'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.info,
+                        side: const BorderSide(color: AppColors.info),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => onAdd(500),
+                      icon: const Icon(Icons.add),
+                      label: const Text('500ml'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.info,
+                        side: const BorderSide(color: AppColors.info),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  ElevatedButton(
+                    onPressed: () => _showCustomWaterDialog(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.info,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Icon(Icons.edit),
+                  ),
+                ],
+              ),
+            ],
           ),
-          LinearProgressIndicator(value: _pct(val, target)),
+        ),
+      ),
+    );
+  }
+  
+  void _showCustomWaterDialog(BuildContext context) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Añadir agua personalizada', style: AppTypography.heading3(ctx)),
+        content: ModernTextField(
+          label: 'Cantidad (ml)',
+          hint: 'Ej: 750',
+          controller: controller,
+          keyboardType: TextInputType.number,
+          prefixIcon: Icons.water_drop,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final ml = int.tryParse(controller.text);
+              if (ml != null && ml > 0) {
+                onAdd(ml);
+                Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Añadir'),
+          ),
         ],
       ),
     );
   }
 }
 
-// ===== Agua responsivo (S22 OK) ==============================================
-class _WaterBar extends StatelessWidget {
-  final int water;
-  final int waterTarget;
-  final VoidCallback onAdd250;
-  final VoidCallback onAdd500;
-  final VoidCallback onCustom;
-  const _WaterBar({
-    required this.water,
-    required this.waterTarget,
-    required this.onAdd250,
-    required this.onAdd500,
-    required this.onCustom,
+/// Tarjeta de entrada individual
+class _EntryCard extends StatelessWidget {
+  final IntakeEntry entry;
+  final VoidCallback onDuplicate;
+  final VoidCallback onDelete;
+  
+  const _EntryCard({
+    required this.entry,
+    required this.onDuplicate,
+    required this.onDelete,
   });
-
-  double _pct() {
-    if (waterTarget <= 0) return 0;
-    return (water / waterTarget).clamp(0, 1).toDouble();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
+    final kcal = entry.macrosSnapshot['kcal'] ?? 0;
+    final protein = entry.macrosSnapshot['protein'] ?? 0;
+    final carbs = entry.macrosSnapshot['carbs'] ?? 0;
+    final fat = entry.macrosSnapshot['fat'] ?? 0;
+    
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: LayoutBuilder(
-          builder: (_, cts) {
-            final narrow = cts.maxWidth < 380;
-            final buttons = [
-              OutlinedButton(onPressed: onAdd250, child: const Text('+250')),
-              OutlinedButton(onPressed: onAdd500, child: const Text('+500')),
-              FilledButton(onPressed: onCustom, child: const Text('Custom')),
-            ];
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Agua: $water / $waterTarget ml'),
-                const SizedBox(height: 6),
-                LinearProgressIndicator(value: _pct()),
-                const SizedBox(height: 8),
-                narrow
-                    ? Wrap(spacing: 6, runSpacing: 6, children: buttons)
-                    : Row(
+      elevation: AppSpacing.elevationSm,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        onTap: () {}, // TODO: Editar entrada
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: AppColors.food.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                    child: Icon(
+                      entry.type == FavoriteType.food ? Icons.restaurant : Icons.menu_book,
+                      color: AppColors.food,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ...buttons.map(
-                          (b) => Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: b,
-                          ),
+                        Text(
+                          entry.nameSnapshot,
+                          style: AppTypography.heading4(context),
                         ),
-                        const Spacer(),
+                        Text(
+                          '${entry.qty.toStringAsFixed(0)} ${entry.unit.name}',
+                          style: AppTypography.caption(context),
+                        ),
                       ],
                     ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-// ============================================================================
-
-/// FAB con quick add
-class _Fab extends StatelessWidget {
-  final FoodFirestoreService svc;
-  final String dayId;
-  const _Fab({required this.svc, required this.dayId});
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
-      icon: const Icon(Icons.add),
-      label: const Text('Añadir'),
-      onPressed: () async {
-        await showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => _QuickAddOrFullSheet(svc: svc, dayId: dayId),
-        );
-      },
-    );
-  }
-}
-
-/// Primera hoja: elección entre Quick Add o búsqueda completa
-class _QuickAddOrFullSheet extends StatelessWidget {
-  final FoodFirestoreService svc;
-  final String dayId;
-  const _QuickAddOrFullSheet({required this.svc, required this.dayId});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '¿Cómo quieres añadir?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.flash_on),
-              title: const Text('Quick Add (solo calorías)'),
-              subtitle: const Text('Añade kcal y proteínas rápido'),
-              onTap: () {
-                Navigator.pop(context);
-                _showQuickAddDialog(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text('Buscar alimento/receta'),
-              subtitle: const Text('Añadir desde tu lista'),
-              onTap: () {
-                Navigator.pop(context);
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => _AddEntrySheet(svc: svc, dayId: dayId),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showQuickAddDialog(BuildContext context) async {
-    final nameCtrl = TextEditingController();
-    final kcalCtrl = TextEditingController();
-    final proteinCtrl = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Quick Add'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre (ej: Snack)',
                   ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: kcalCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Calorías'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: proteinCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Proteína (g) - opcional',
+                  PopupMenuButton<String>(
+                    onSelected: (v) {
+                      if (v == 'dup') onDuplicate();
+                      if (v == 'del') onDelete();
+                    },
+                    itemBuilder: (_) => [
+                      const PopupMenuItem(
+                        value: 'dup',
+                        child: Row(
+                          children: [
+                            Icon(Icons.copy),
+                            SizedBox(width: 8),
+                            Text('Duplicar'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'del',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: AppColors.error),
+                            SizedBox(width: 8),
+                            Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancelar'),
+                ],
               ),
-              FilledButton(
-                onPressed: () async {
-                  final name =
-                      nameCtrl.text.trim().isEmpty
-                          ? 'Quick add'
-                          : nameCtrl.text.trim();
-                  final kcal = double.tryParse(kcalCtrl.text) ?? 0;
-                  final protein = double.tryParse(proteinCtrl.text) ?? 0;
-
-                  await svc.addEntry(
-                    dayId,
-                    IntakeEntry(
-                      id: '',
-                      type: FavoriteType.food,
-                      refId: 'quickadd',
-                      qty: 1,
-                      unit: UnitKind.unit,
-                      nameSnapshot: name,
-                      macrosSnapshot: {
-                        'kcal': kcal,
-                        'protein': protein,
-                        'carbs': 0.0,
-                        'fat': 0.0,
-                        'fiber': 0.0,
-                        'sodium': 0.0,
-                      },
-                    ),
-                  );
-                  if (ctx.mounted) Navigator.pop(ctx);
-                },
-                child: const Text('Añadir'),
+              const SizedBox(height: AppSpacing.md),
+              const Divider(),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _MacroChip(label: '${kcal.toStringAsFixed(0)} kcal', icon: Icons.local_fire_department, color: AppColors.food),
+                  _MacroChip(label: '${protein.toStringAsFixed(0)}g P', icon: Icons.fitness_center, color: AppColors.error),
+                  _MacroChip(label: '${carbs.toStringAsFixed(0)}g C', icon: Icons.bakery_dining, color: AppColors.warning),
+                  _MacroChip(label: '${fat.toStringAsFixed(0)}g G', icon: Icons.water_drop, color: AppColors.info),
+                ],
               ),
             ],
           ),
+        ),
+      ),
     );
   }
 }
 
-// ======= hoja para añadir (la misma que ya tenías) ===========================
-// Copio todo lo tuyo tal cual, asegurando que _AddEntrySheet exista aquí.
-class _AddEntrySheet extends StatefulWidget {
-  final FoodFirestoreService svc;
-  final String dayId;
-  const _AddEntrySheet({required this.svc, required this.dayId});
-
-  @override
-  State<_AddEntrySheet> createState() => _AddEntrySheetState();
-}
-
-// … pega aquí el MISMO cuerpo de tu _AddEntrySheetState, _FavList, _FoodList, _RecipeList
-// (no lo repito para no saturar: usa exactamente el que ya tenías).
-// ============================================================================
-
-class _AddEntrySheetState extends State<_AddEntrySheet> {
-  String _tab = 'fav'; // fav | food | recipe
-  String _query = '';
-  final _qtyCtrl = TextEditingController(text: '100');
-  UnitKind _unit = UnitKind.g;
-
+class _MacroChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  
+  const _MacroChip({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+  
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 12,
-          right: 12,
-          top: 12,
-        ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: AppTypography.caption(context)),
+      ],
+    );
+  }
+}
+
+/// Sheet moderno para añadir entradas con tabs hermosas
+class _ModernAddEntrySheet extends StatefulWidget {
+  final FoodFirestoreService svc;
+  final String dayId;
+  
+  const _ModernAddEntrySheet({required this.svc, required this.dayId});
+  
+  @override
+  State<_ModernAddEntrySheet> createState() => _ModernAddEntrySheetState();
+}
+
+class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final _nameController = TextEditingController();
+  final _kcalController = TextEditingController();
+  final _proteinController = TextEditingController();
+  final _qtyController = TextEditingController(text: '100');
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+  UnitKind _unit = UnitKind.g;
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ToggleButtons(
-              isSelected: [_tab == 'fav', _tab == 'food', _tab == 'recipe'],
-              onPressed:
-                  (i) => setState(() => _tab = ['fav', 'food', 'recipe'][i]),
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Favoritos'),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Alimentos'),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Recetas'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              onChanged: (v) => setState(() => _query = v),
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Buscar...',
+            // Handle
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.grey300,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _qtyCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Cantidad'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                DropdownButton<UnitKind>(
-                  value: _unit,
-                  items: const [
-                    DropdownMenuItem(value: UnitKind.g, child: Text('g')),
-                    DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
-                    DropdownMenuItem(
-                      value: UnitKind.unit,
-                      child: Text('unidad'),
+            
+            // Título
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Row(
+                children: [
+                  Icon(Icons.add_circle, color: AppColors.food, size: 28),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Text(
+                      'Añadir al Diario',
+                      style: AppTypography.heading2(context),
                     ),
-                  ],
-                  onChanged: (v) => setState(() => _unit = v ?? UnitKind.g),
-                ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: AppSpacing.md),
+            
+            // Tabs
+            TabBar(
+              controller: _tabController,
+              labelColor: AppColors.food,
+              unselectedLabelColor: AppColors.grey600,
+              indicatorColor: AppColors.food,
+              tabs: const [
+                Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
+                Tab(icon: Icon(Icons.star), text: 'Favoritos'),
+                Tab(icon: Icon(Icons.restaurant), text: 'Alimentos'),
+                Tab(icon: Icon(Icons.menu_book), text: 'Recetas'),
               ],
             ),
-            const SizedBox(height: 8),
+            
             SizedBox(
-              height: 360,
-              child:
-                  _tab == 'fav'
-                      ? _FavList(
-                        svc: widget.svc,
-                        query: _query,
-                        onPick: _addFav,
-                      )
-                      : _tab == 'food'
-                      ? _FoodList(
-                        svc: widget.svc,
-                        query: _query,
-                        onPick: _addFood,
-                      )
-                      : _RecipeList(
-                        svc: widget.svc,
-                        query: _query,
-                        onPick: _addRecipe,
-                      ),
+              height: 500,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildQuickAddTab(),
+                  _buildFavoritesTab(),
+                  _buildFoodsTab(),
+                  _buildRecipesTab(),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
-  Future<void> _addFav(Favorite f) async {
-    final qty = double.tryParse(_qtyCtrl.text) ?? f.defaultQty;
+  
+  Widget _buildQuickAddTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Añade calorías rápidamente',
+            style: AppTypography.body(context),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          
+          ModernTextField(
+            label: 'Nombre',
+            hint: 'Ej: Snack casero',
+            controller: _nameController,
+            prefixIcon: Icons.edit,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          
+          Row(
+            children: [
+              Expanded(
+                child: ModernTextField(
+                  label: 'Calorías*',
+                  hint: '250',
+                  controller: _kcalController,
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icons.local_fire_department,
+                  validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: ModernTextField(
+                  label: 'Proteínas (g)',
+                  hint: '20',
+                  controller: _proteinController,
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icons.fitness_center,
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: AppSpacing.xl),
+          
+          ModernPrimaryButton(
+            label: 'Añadir Quick Entry',
+            icon: Icons.check,
+            fullWidth: true,
+            color: AppColors.food,
+            onPressed: _addQuickEntry,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildFavoritesTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ModernTextField(
+            label: 'Buscar favoritos',
+            hint: 'Busca por nombre...',
+            controller: _searchController,
+            prefixIcon: Icons.search,
+            onChanged: (v) => setState(() => _searchQuery = v),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: _buildQuantityRow(),
+        ),
+        Expanded(
+          child: _FavList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (f) => _addFavorite(f),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildFoodsTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ModernTextField(
+            label: 'Buscar alimentos',
+            hint: 'Busca en tu catálogo...',
+            controller: _searchController,
+            prefixIcon: Icons.search,
+            onChanged: (v) => setState(() => _searchQuery = v),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: _buildQuantityRow(),
+        ),
+        Expanded(
+          child: _FoodList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (f) => _addFood(f),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildRecipesTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ModernTextField(
+            label: 'Buscar recetas',
+            hint: 'Busca tus recetas...',
+            controller: _searchController,
+            prefixIcon: Icons.search,
+            onChanged: (v) => setState(() => _searchQuery = v),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: _buildQuantityRow(isRecipe: true),
+        ),
+        Expanded(
+          child: _RecipeList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (r) => _addRecipe(r),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildQuantityRow({bool isRecipe = false}) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: ModernTextField(
+            label: isRecipe ? 'Raciones' : 'Cantidad',
+            controller: _qtyController,
+            keyboardType: TextInputType.number,
+            prefixIcon: Icons.numbers,
+          ),
+        ),
+        if (!isRecipe) ...[
+          const SizedBox(width: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.grey100,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(color: AppColors.grey300),
+            ),
+            child: DropdownButton<UnitKind>(
+              value: _unit,
+              underline: const SizedBox(),
+              items: const [
+                DropdownMenuItem(value: UnitKind.g, child: Text('g')),
+                DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
+              ],
+              onChanged: (v) => setState(() => _unit = v ?? UnitKind.g),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+  
+  Future<void> _addQuickEntry() async {
+    final name = _nameController.text.trim().isEmpty ? 'Quick add' : _nameController.text.trim();
+    final kcal = double.tryParse(_kcalController.text) ?? 0;
+    final protein = double.tryParse(_proteinController.text) ?? 0;
+    
+    if (kcal <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Las calorías son requeridas')),
+      );
+      return;
+    }
+    
+    await widget.svc.addEntry(
+      widget.dayId,
+      IntakeEntry(
+        id: '',
+        type: FavoriteType.food,
+        refId: 'quickadd',
+        qty: 1,
+        unit: UnitKind.unit,
+        nameSnapshot: name,
+        macrosSnapshot: {
+          'kcal': kcal,
+          'protein': protein,
+          'carbs': 0.0,
+          'fat': 0.0,
+          'fiber': 0.0,
+          'sodium': 0.0,
+        },
+      ),
+    );
+    
+    if (mounted) Navigator.pop(context);
+  }
+  
+  Future<void> _addFavorite(Favorite f) async {
+    final qty = double.tryParse(_qtyController.text) ?? f.defaultQty;
     final unit = _unit;
+    
     if (f.type == FavoriteType.food) {
       final foods = await widget.svc.streamFoods().first;
       final food = foods.firstWhere(
         (x) => x.id == f.refId,
-        orElse:
-            () => Food(
-              id: f.refId,
-              name: f.alias ?? 'Alimento',
-              perUnit: unit,
-              unitSize: 100,
-              kcal: 0,
-              protein: 0,
-              carbs: 0,
-              fat: 0,
-              fiber: 0,
-              sodium: 0,
-              isSupplement: false,
-            ),
+        orElse: () => Food(
+          id: f.refId,
+          name: f.alias ?? 'Alimento',
+          perUnit: unit,
+          unitSize: 100,
+          kcal: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          fiber: 0,
+          sodium: 0,
+          isSupplement: false,
+        ),
       );
       final mac = food.macrosFor(qty);
       await widget.svc.addEntry(
@@ -647,22 +1135,14 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
       final recs = await widget.svc.streamRecipes().first;
       final r = recs.firstWhere(
         (x) => x.id == f.refId,
-        orElse:
-            () => Recipe(
-              id: f.refId,
-              name: 'Receta',
-              servings: 1,
-              ingredients: const [],
-            ),
+        orElse: () => Recipe(
+          id: f.refId,
+          name: 'Receta',
+          servings: 1,
+          ingredients: const [],
+        ),
       );
-      final perServing = {
-        'kcal': (r.kcal ?? 0) / (r.servings == 0 ? 1 : r.servings),
-        'protein': (r.protein ?? 0) / (r.servings == 0 ? 1 : r.servings),
-        'carbs': (r.carbs ?? 0) / (r.servings == 0 ? 1 : r.servings),
-        'fat': (r.fat ?? 0) / (r.servings == 0 ? 1 : r.servings),
-        'fiber': (r.fiber ?? 0) / (r.servings == 0 ? 1 : r.servings),
-        'sodium': (r.sodium ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      };
+      final perServing = _calculatePerServing(r);
       final mac = perServing.map((k, v) => MapEntry(k, v * qty));
       await widget.svc.addEntry(
         widget.dayId,
@@ -677,13 +1157,15 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
         ),
       );
     }
+    
     if (mounted) Navigator.pop(context);
   }
-
+  
   Future<void> _addFood(Food f) async {
-    final qty = double.tryParse(_qtyCtrl.text) ?? f.unitSize;
+    final qty = double.tryParse(_qtyController.text) ?? f.unitSize;
     final unit = _unit;
     final mac = f.macrosFor(qty);
+    
     await widget.svc.addEntry(
       widget.dayId,
       IntakeEntry(
@@ -696,20 +1178,15 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
         macrosSnapshot: mac,
       ),
     );
+    
     if (mounted) Navigator.pop(context);
   }
-
+  
   Future<void> _addRecipe(Recipe r) async {
-    final servings = double.tryParse(_qtyCtrl.text) ?? 1;
-    final perServing = {
-      'kcal': (r.kcal ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      'protein': (r.protein ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      'carbs': (r.carbs ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      'fat': (r.fat ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      'fiber': (r.fiber ?? 0) / (r.servings == 0 ? 1 : r.servings),
-      'sodium': (r.sodium ?? 0) / (r.servings == 0 ? 1 : r.servings),
-    };
+    final servings = double.tryParse(_qtyController.text) ?? 1;
+    final perServing = _calculatePerServing(r);
     final mac = perServing.map((k, v) => MapEntry(k, v * servings));
+    
     await widget.svc.addEntry(
       widget.dayId,
       IntakeEntry(
@@ -722,50 +1199,235 @@ class _AddEntrySheetState extends State<_AddEntrySheet> {
         macrosSnapshot: mac,
       ),
     );
+    
     if (mounted) Navigator.pop(context);
+  }
+  
+  Map<String, double> _calculatePerServing(Recipe r) {
+    final div = r.servings == 0 ? 1 : r.servings;
+    return {
+      'kcal': (r.kcal ?? 0) / div,
+      'protein': (r.protein ?? 0) / div,
+      'carbs': (r.carbs ?? 0) / div,
+      'fat': (r.fat ?? 0) / div,
+      'fiber': (r.fiber ?? 0) / div,
+      'sodium': (r.sodium ?? 0) / div,
+    };
   }
 }
 
+/// Sheet moderna para configurar objetivos nutricionales
+class _ModernGoalsSheet extends StatefulWidget {
+  final FoodFirestoreService svc;
+  
+  const _ModernGoalsSheet({required this.svc});
+  
+  @override
+  State<_ModernGoalsSheet> createState() => _ModernGoalsSheetState();
+}
+
+class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
+  final _kcalController = TextEditingController();
+  final _proteinController = TextEditingController();
+  final _carbsController = TextEditingController();
+  final _fatController = TextEditingController();
+  final _fiberController = TextEditingController();
+  final _waterController = TextEditingController();
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.grey300,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  ),
+                ),
+              ),
+              
+              Row(
+                children: [
+                  Icon(Icons.flag, color: AppColors.food, size: 28),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Text(
+                      'Objetivos Nutricionales',
+                      style: AppTypography.heading2(context),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Configura tus objetivos diarios de nutrición',
+                style: AppTypography.body(context),
+              ),
+              
+              const SizedBox(height: AppSpacing.xl),
+              
+              ModernTextField(
+                label: 'Calorías objetivo (kcal)',
+                hint: '2000',
+                controller: _kcalController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.local_fire_department,
+              ),
+              
+              const SizedBox(height: AppSpacing.lg),
+              
+              ModernTextField(
+                label: 'Proteínas (g)',
+                hint: '150',
+                controller: _proteinController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.fitness_center,
+              ),
+              
+              const SizedBox(height: AppSpacing.lg),
+              
+              ModernTextField(
+                label: 'Carbohidratos (g)',
+                hint: '250',
+                controller: _carbsController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.bakery_dining,
+              ),
+              
+              const SizedBox(height: AppSpacing.lg),
+              
+              ModernTextField(
+                label: 'Grasas (g)',
+                hint: '65',
+                controller: _fatController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.water_drop,
+              ),
+              
+              const SizedBox(height: AppSpacing.lg),
+              
+              ModernTextField(
+                label: 'Fibra (g)',
+                hint: '30',
+                controller: _fiberController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.eco,
+              ),
+              
+              const SizedBox(height: AppSpacing.lg),
+              
+              ModernTextField(
+                label: 'Agua (ml)',
+                hint: '2000',
+                controller: _waterController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.water_drop,
+              ),
+              
+              const SizedBox(height: AppSpacing.xxl),
+              
+              ModernPrimaryButton(
+                label: 'Guardar Objetivos',
+                icon: Icons.check,
+                fullWidth: true,
+                color: AppColors.food,
+                onPressed: _saveGoals,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Future<void> _saveGoals() async {
+    await widget.svc.setGlobalTargets(
+      kcal: _kcalController.text.isNotEmpty ? double.tryParse(_kcalController.text) : null,
+      protein: _proteinController.text.isNotEmpty ? double.tryParse(_proteinController.text) : null,
+      carbs: _carbsController.text.isNotEmpty ? double.tryParse(_carbsController.text) : null,
+      fat: _fatController.text.isNotEmpty ? double.tryParse(_fatController.text) : null,
+      fiber: _fiberController.text.isNotEmpty ? double.tryParse(_fiberController.text) : null,
+      waterMl: _waterController.text.isNotEmpty ? int.tryParse(_waterController.text) : null,
+    );
+    
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Objetivos guardados correctamente')),
+      );
+    }
+  }
+}
+
+// ============================================================================
+// WIDGETS DE LISTADOS (FAVORITOS, ALIMENTOS, RECETAS)
+// ============================================================================
+
+/// Lista moderna de favoritos
 class _FavList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Favorite> onPick;
+  
   const _FavList({
     required this.svc,
     required this.query,
     required this.onPick,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Favorite>>(
       stream: svc.streamFavorites(),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
-          list =
-              list
-                  .where((f) => (f.alias ?? '').toLowerCase().contains(ql))
-                  .toList();
+          list = list.where((f) => (f.alias ?? '').toLowerCase().contains(ql)).toList();
         }
-        if (list.isEmpty) return const Center(child: Text('Sin favoritos'));
+        
+        if (list.isEmpty) {
+          return ModernEmptyState(
+            icon: Icons.star_border,
+            message: 'No hay favoritos',
+            subtitle: 'Marca alimentos o recetas como favoritos para verlos aquí',
+          );
+        }
+        
         return ListView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
           itemBuilder: (_, i) {
             final f = list[i];
-            return ListTile(
-              leading: Icon(
-                f.type == FavoriteType.food
-                    ? Icons.restaurant
-                    : Icons.menu_book,
-              ),
-              title: Text(f.alias ?? '${f.type.name} • ${f.refId}'),
-              subtitle: Text(
-                'Default: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
-              ),
+            return ModernListCard(
+              title: f.alias ?? '${f.type.name} • ${f.refId}',
+              subtitle: 'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
+              leadingIcon: f.type == FavoriteType.food ? Icons.restaurant : Icons.menu_book,
+              leadingColor: AppColors.food,
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => onPick(f),
             );
           },
@@ -775,38 +1437,50 @@ class _FavList extends StatelessWidget {
   }
 }
 
+/// Lista moderna de alimentos
 class _FoodList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Food> onPick;
+  
   const _FoodList({
     required this.svc,
     required this.query,
     required this.onPick,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Food>>(
       stream: svc.streamFoods(query: query),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
         final list = snap.data!;
-        if (list.isEmpty) return const Center(child: Text('Sin resultados'));
+        
+        if (list.isEmpty) {
+          return ModernEmptyState(
+            icon: Icons.restaurant_outlined,
+            message: 'No se encontraron alimentos',
+            subtitle: query.isNotEmpty 
+                ? 'Intenta con otro término de búsqueda' 
+                : 'Añade alimentos a tu catálogo',
+          );
+        }
+        
         return ListView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
           itemBuilder: (_, i) {
             final f = list[i];
-            return ListTile(
-              leading: Icon(
-                Icons.restaurant,
-                color: f.color ?? Theme.of(context).colorScheme.primary,
-              ),
-              title: Text(f.name),
-              subtitle: Text(
-                '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
-              ),
+            return ModernListCard(
+              title: f.name,
+              subtitle: '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
+              leadingIcon: Icons.restaurant,
+              leadingColor: f.color ?? AppColors.food,
+              trailing: const Icon(Icons.add, color: AppColors.food),
               onTap: () => onPick(f),
             );
           },
@@ -816,37 +1490,58 @@ class _FoodList extends StatelessWidget {
   }
 }
 
+/// Lista moderna de recetas
 class _RecipeList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Recipe> onPick;
+  
   const _RecipeList({
     required this.svc,
     required this.query,
     required this.onPick,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Recipe>>(
       stream: svc.streamRecipes(),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
           list = list.where((r) => r.name.toLowerCase().contains(ql)).toList();
         }
-        if (list.isEmpty) return const Center(child: Text('Sin recetas'));
+        
+        if (list.isEmpty) {
+          return ModernEmptyState(
+            icon: Icons.menu_book_outlined,
+            message: 'No se encontraron recetas',
+            subtitle: query.isNotEmpty 
+                ? 'Intenta con otro término de búsqueda' 
+                : 'Crea recetas para verlas aquí',
+          );
+        }
+        
         return ListView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
           itemBuilder: (_, i) {
             final r = list[i];
-            return ListTile(
-              leading: const Icon(Icons.menu_book),
-              title: Text(r.name),
-              subtitle: Text('Raciones: ${r.servings}'),
+            final macrosText = r.kcal != null 
+                ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
+                : '${r.servings} raciones';
+            
+            return ModernListCard(
+              title: r.name,
+              subtitle: macrosText,
+              leadingIcon: Icons.menu_book,
+              leadingColor: AppColors.gym,
+              trailing: const Icon(Icons.add, color: AppColors.food),
               onTap: () => onPick(r),
             );
           },

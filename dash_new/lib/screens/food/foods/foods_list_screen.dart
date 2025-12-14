@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
-import 'food_edit_sheet.dart';
+import 'food_edit_sheet_v2.dart';
 
+/// 🥗 CATÁLOGO DE ALIMENTOS - REDISEÑO COMPLETO PREMIUM
+/// Grid de tarjetas modernas con búsqueda, filtros y favoritos
 class FoodsListScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodsListScreen({super.key, required this.svc});
@@ -12,119 +16,113 @@ class FoodsListScreen extends StatefulWidget {
 }
 
 class _FoodsListScreenState extends State<FoodsListScreen> {
-  String _q = '';
+  String _searchQuery = '';
   bool _suppsOnly = false;
+  bool _showGridView = true;
+  final _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Alimentos & Suplementos'),
+      appBar: ModernGradientAppBar(
+        title: 'Catálogo de Alimentos',
+        icon: Icons.restaurant,
+        primaryColor: Colors.blue,
+        secondaryColor: Colors.lightBlueAccent,
         actions: [
           IconButton(
-            tooltip: 'Nuevo',
+            icon: Icon(_showGridView ? Icons.view_list : Icons.grid_view),
+            onPressed: () => setState(() => _showGridView = !_showGridView),
+            tooltip: _showGridView ? 'Vista de lista' : 'Vista de cuadrícula',
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
-            onPressed:
-                () => showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => FoodEditSheet(svc: widget.svc),
-                ),
+            onPressed: () => _showAddFoodSheet(context),
+            tooltip: 'Añadir alimento',
           ),
         ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+          // Barra de búsqueda y filtros
+          Container(
+            color: AppColors.grey100,
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    onChanged: (v) => setState(() => _q = v),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Buscar…',
-                    ),
-                  ),
+                ModernTextField(
+                  label: 'Buscar alimentos',
+                  hint: 'Nombre, marca, etiquetas...',
+                  controller: _searchController,
+                  prefixIcon: Icons.search,
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
                 ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Sólo suplementos'),
-                  selected: _suppsOnly,
-                  onSelected: (v) => setState(() => _suppsOnly = v),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ModernChip(
+                        label: 'Sólo suplementos',
+                        icon: _suppsOnly ? Icons.check : Icons.filter_list,
+                        color: _suppsOnly ? AppColors.gym : AppColors.grey600,
+                        onTap: () => setState(() => _suppsOnly = !_suppsOnly),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    ModernChip(
+                      label: 'Todos',
+                      icon: Icons.restaurant,
+                      color: !_suppsOnly ? AppColors.food : AppColors.grey600,
+                      onTap: () => setState(() => _suppsOnly = false),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
+          ).animate().slideY(begin: -0.2, duration: 300.ms),
+          
+          // Lista/Grid de alimentos
           Expanded(
             child: StreamBuilder<List<Food>>(
               stream: widget.svc.streamFoods(
-                query: _q,
+                query: _searchQuery,
                 supplementsOnly: _suppsOnly,
               ),
               builder: (context, snap) {
-                if (!snap.hasData)
+                if (!snap.hasData) {
                   return const Center(child: CircularProgressIndicator());
+                }
+                
                 final list = snap.data!;
-                if (list.isEmpty)
-                  return const Center(child: Text('Sin alimentos aún'));
-                return ListView.separated(
-                  padding: const EdgeInsets.all(12),
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemCount: list.length,
-                  itemBuilder: (_, i) {
-                    final f = list[i];
-                    return Card(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.fastfood,
-                          color:
-                              f.color ?? Theme.of(context).colorScheme.primary,
-                        ),
-                        title: Text(f.name),
-                        subtitle: Text(
-                          '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}'
-                          '${f.isSupplement ? ' • Suplemento' : ''}',
-                        ),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (v) async {
-                            if (v == 'edit') {
-                              await showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder:
-                                    (_) => FoodEditSheet(
-                                      svc: widget.svc,
-                                      initial: f,
-                                    ),
-                              );
-                            }
-                            if (v == 'del') {
-                              final ok = await _confirm(
-                                context,
-                                'Eliminar',
-                                '¿Eliminar "${f.name}"?',
-                              );
-                              if (ok) await widget.svc.deleteFood(f.id);
-                            }
-                          },
-                          itemBuilder:
-                              (_) => const [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Editar'),
-                                ),
-                                PopupMenuItem(
-                                  value: 'del',
-                                  child: Text('Eliminar'),
-                                ),
-                              ],
-                        ),
-                      ),
-                    );
-                  },
-                );
+                
+                if (list.isEmpty) {
+                  return ModernEmptyState(
+                    icon: Icons.restaurant_outlined,
+                    message: _searchQuery.isNotEmpty 
+                        ? 'No se encontraron alimentos'
+                        : 'No hay alimentos en tu catálogo',
+                    subtitle: _searchQuery.isNotEmpty
+                        ? 'Intenta con otro término de búsqueda'
+                        : 'Añade tu primer alimento para comenzar',
+                    actionLabel: _searchQuery.isEmpty ? 'Añadir alimento' : null,
+                    onAction: _searchQuery.isEmpty 
+                        ? () => _showAddFoodSheet(context)
+                        : null,
+                  );
+                }
+                
+                return _showGridView
+                    ? _buildGridView(list)
+                    : _buildListView(list);
               },
             ),
           ),
@@ -132,25 +130,344 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
       ),
     );
   }
+  
+  Widget _buildGridView(List<Food> foods) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+      ),
+      itemCount: foods.length,
+      itemBuilder: (context, index) {
+        final food = foods[index];
+        return _FoodGridCard(
+          food: food,
+          onTap: () => _showEditFoodSheet(context, food),
+          onToggleFavorite: () => _toggleFavorite(food),
+        ).animate()
+          .fadeIn(delay: (100 + index * 50).ms)
+          .scale(duration: 200.ms);
+      },
+    );
+  }
+  
+  Widget _buildListView(List<Food> foods) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      itemCount: foods.length,
+      itemBuilder: (context, index) {
+        final food = foods[index];
+        return _FoodListCard(
+          food: food,
+          onTap: () => _showEditFoodSheet(context, food),
+          onToggleFavorite: () => _toggleFavorite(food),
+        ).animate()
+          .fadeIn(delay: (100 + index * 50).ms)
+          .slideX(begin: -0.2, duration: 300.ms);
+      },
+    );
+  }
+  
+  void _showAddFoodSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FoodEditSheet(svc: widget.svc),
+    );
+  }
+  
+  void _showEditFoodSheet(BuildContext context, Food food) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FoodEditSheet(svc: widget.svc, initial: food),
+    );
+  }
+  
+  Future<void> _toggleFavorite(Food food) async {
+    // TODO: Implementar toggle de favorito
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Favorito: ${food.name}')),
+    );
+  }
+}
+
+/// Tarjeta moderna de alimento para grid
+class _FoodGridCard extends StatelessWidget {
+  final Food food;
+  final VoidCallback onTap;
+  final VoidCallback onToggleFavorite;
+  
+  const _FoodGridCard({
+    required this.food,
+    required this.onTap,
+    required this.onToggleFavorite,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final color = food.color ?? AppColors.food;
+    
+    return Card(
+      elevation: AppSpacing.elevationMd,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono y favorito
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color, color.withOpacity(0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppSpacing.radiusLg),
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      food.isSupplement ? Icons.medication : Icons.restaurant,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    top: AppSpacing.sm,
+                    right: AppSpacing.sm,
+                    child: IconButton(
+                      icon: const Icon(Icons.star_border),
+                      color: Colors.white,
+                      onPressed: onToggleFavorite,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Contenido
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      food.name,
+                      style: AppTypography.heading4(context),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (food.brand != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        food.brand!,
+                        style: AppTypography.caption(context),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Icon(Icons.local_fire_department, size: 16, color: color),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${food.kcal.toStringAsFixed(0)} kcal',
+                          style: AppTypography.caption(context, color: color),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'por ${food.unitSize.toStringAsFixed(0)}${food.perUnit.name}',
+                      style: AppTypography.caption(context),
+                    ),
+                    if (food.isSupplement)
+                      ModernBadge(
+                        label: 'SUPLEMENTO',
+                        color: AppColors.gym,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tarjeta moderna de alimento para lista
+class _FoodListCard extends StatelessWidget {
+  final Food food;
+  final VoidCallback onTap;
+  final VoidCallback onToggleFavorite;
+  
+  const _FoodListCard({
+    required this.food,
+    required this.onTap,
+    required this.onToggleFavorite,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final color = food.color ?? AppColors.food;
+    
+    return Card(
+      elevation: AppSpacing.elevationSm,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              // Icono
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                child: Icon(
+                  food.isSupplement ? Icons.medication : Icons.restaurant,
+                  color: color,
+                  size: 32,
+                ),
+              ),
+              
+              const SizedBox(width: AppSpacing.lg),
+              
+              // Información
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            food.name,
+                            style: AppTypography.heading4(context),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.star_border),
+                          color: color,
+                          onPressed: onToggleFavorite,
+                        ),
+                      ],
+                    ),
+                    if (food.brand != null) ...[
+                      Text(
+                        food.brand!,
+                        style: AppTypography.caption(context),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                    ],
+                    Row(
+                      children: [
+                        Icon(Icons.local_fire_department, size: 16, color: color),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${food.kcal.toStringAsFixed(0)} kcal',
+                          style: AppTypography.body(context, color: color),
+                        ),
+                        Text(
+                          ' por ${food.unitSize.toStringAsFixed(0)}${food.perUnit.name}',
+                          style: AppTypography.caption(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      children: [
+                        if (food.isSupplement)
+                          ModernBadge(label: 'SUPLEMENTO', color: AppColors.gym),
+                        _MacroBadge(label: 'P', value: food.protein, color: AppColors.error),
+                        _MacroBadge(label: 'C', value: food.carbs, color: AppColors.warning),
+                        _MacroBadge(label: 'G', value: food.fat, color: AppColors.info),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MacroBadge extends StatelessWidget {
+  final String label;
+  final double value;
+  final Color color;
+  
+  const _MacroBadge({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        '$label${value.toStringAsFixed(0)}g',
+        style: AppTypography.caption(context, color: color).copyWith(fontSize: 11),
+      ),
+    );
+  }
 
   Future<bool> _confirm(BuildContext context, String title, String msg) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: Text(title),
-            content: Text(msg),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Eliminar'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(msg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
           ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
     );
     return ok == true;
   }

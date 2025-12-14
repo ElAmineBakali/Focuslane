@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../widgets/global_ui_components.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'shopping_list_detail_screen.dart';
 
+/// 🛍️ LISTAS DE COMPRA - REDISEÑADAS
 class ShoppingListsScreen extends StatelessWidget {
   final FoodFirestoreService svc;
   const ShoppingListsScreen({super.key, required this.svc});
@@ -11,7 +14,15 @@ class ShoppingListsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Listas de compra'),
+        title: Text(
+          'Listas de Compra',
+          style: FocusTypography.heading2(context).copyWith(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.orange,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             tooltip: 'Nueva lista',

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../widgets/global_ui_components.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
+/// 🍳 DESPENSA - REDISEÑADA
 class PantryScreen extends StatelessWidget {
   final FoodFirestoreService svc;
   const PantryScreen({super.key, required this.svc});
@@ -10,7 +13,15 @@ class PantryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Despensa'),
+        title: Text(
+          'Despensa',
+          style: FocusTypography.heading2(context).copyWith(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.brown,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             tooltip: 'Añadir',

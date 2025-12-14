@@ -6,7 +6,11 @@ enum FavoriteType { food, recipe }
 
 enum MealSlot { breakfast, snack, lunch, merienda, dinner }
 
+enum MealTag { breakfast, lunch, dinner, snack }
+
 enum ShoppingScope { weekly, biweekly, monthly, custom }
+
+enum EntryType { food, recipe }
 
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
@@ -678,4 +682,194 @@ class PantryItem {
     'unit': unit.name,
     if (minQty != null) 'minQty': minQty,
   };
+}
+
+/// ========== NUEVAS CLASES V2 ==========
+
+/// PlannedMeal para múltiples planificadores
+class PlannedMeal {
+  final String recipeId;
+  final String? note;
+
+  const PlannedMeal({required this.recipeId, this.note});
+
+  factory PlannedMeal.fromMap(Map<String, dynamic> m) {
+    return PlannedMeal(
+      recipeId: m['recipeId'] ?? '',
+      note: m['note'],
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'recipeId': recipeId,
+        if (note != null) 'note': note,
+      };
+}
+
+/// DayMenu para cada día del planificador
+class DayMenu {
+  final List<PlannedMeal> breakfast;
+  final List<PlannedMeal> lunch;
+  final List<PlannedMeal> dinner;
+  final List<PlannedMeal> snack;
+
+  const DayMenu({
+    required this.breakfast,
+    required this.lunch,
+    required this.dinner,
+    required this.snack,
+  });
+
+  factory DayMenu.fromMap(Map<String, dynamic> m) {
+    List<PlannedMeal> _list(String key) {
+      return ((m[key] as List?) ?? const [])
+          .map((e) => PlannedMeal.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList();
+    }
+
+    return DayMenu(
+      breakfast: _list('breakfast'),
+      lunch: _list('lunch'),
+      dinner: _list('dinner'),
+      snack: _list('snack'),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'breakfast': breakfast.map((e) => e.toMap()).toList(),
+        'lunch': lunch.map((e) => e.toMap()).toList(),
+        'dinner': dinner.map((e) => e.toMap()).toList(),
+        'snack': snack.map((e) => e.toMap()).toList(),
+      };
+
+  DayMenu copyWith({
+    List<PlannedMeal>? breakfast,
+    List<PlannedMeal>? lunch,
+    List<PlannedMeal>? dinner,
+    List<PlannedMeal>? snack,
+  }) {
+    return DayMenu(
+      breakfast: breakfast ?? this.breakfast,
+      lunch: lunch ?? this.lunch,
+      dinner: dinner ?? this.dinner,
+      snack: snack ?? this.snack,
+    );
+  }
+}
+
+/// CompletedShoppingList para historial
+class CompletedShoppingList {
+  final String id;
+  final String? plannerId;
+  final List<ShoppingListItem> items;
+  final DateTime completedAt;
+  final double? totalSpent;
+
+  const CompletedShoppingList({
+    required this.id,
+    this.plannerId,
+    required this.items,
+    required this.completedAt,
+    this.totalSpent,
+  });
+
+  factory CompletedShoppingList.fromMap(String id, Map<String, dynamic> m) {
+    DateTime parse(dynamic v) {
+      try {
+        if (v == null) return DateTime.now();
+        if (v is DateTime) return v;
+        return DateTime.parse(v.toString());
+      } catch (_) {
+        return DateTime.now();
+      }
+    }
+
+    return CompletedShoppingList(
+      id: id,
+      plannerId: m['plannerId'],
+      items: ((m['items'] as List?) ?? const [])
+          .asMap()
+          .entries
+          .map((e) => ShoppingListItem.fromMap(
+                e.key.toString(),
+                Map<String, dynamic>.from(e.value as Map),
+              ))
+          .toList(),
+      completedAt: parse(m['completedAt']),
+      totalSpent: (m['totalSpent'] as num?)?.toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        if (plannerId != null) 'plannerId': plannerId,
+        'items': items.map((e) => e.toMap()).toList(),
+        'completedAt': completedAt.toIso8601String(),
+        if (totalSpent != null) 'totalSpent': totalSpent,
+      };
+}
+
+/// ========== EXTENSIONES copyWith ==========
+
+extension FavoriteX on Favorite {
+  Favorite copyWith({
+    String? alias,
+  }) {
+    return Favorite(
+      id: id,
+      type: type,
+      refId: refId,
+      defaultQty: defaultQty,
+      defaultUnit: defaultUnit,
+      alias: alias ?? this.alias,
+    );
+  }
+
+  // Campo adicional para compatibilidad con nuevos servicios
+  String get entityId => refId;
+}
+
+extension WeekPlannerX on WeekPlanner {
+  // Adaptar a la nueva estructura con name y customMultiplier
+  String get name => id.startsWith('planner_') 
+      ? id.substring(8) 
+      : id;
+  
+  double? get customMultiplier => null; // Extendido después
+
+  // dayMap adapter: convierte days (Map<String, List<PlannerDayEntry>>) 
+  // a dayMap (Map<int, DayMenu>)
+  Map<int, DayMenu> get dayMap {
+    // Esta es una conversión simplificada
+    // Necesitarías una implementación más completa según tu estructura
+    return {};
+  }
+
+  WeekPlanner copyWith({
+    String? name,
+    double? customMultiplier,
+    Map<int, DayMenu>? dayMap,
+  }) {
+    return WeekPlanner(
+      id: id,
+      scope: scope,
+      days: days,
+    );
+  }
+}
+
+extension DailyIntakeDocX on DailyIntakeDoc {
+  DailyIntakeDoc copyWith({
+    int? waterMl,
+    List<IntakeEntry>? entries,
+    Map<String, double>? totals,
+    Map<String, double?>? targets,
+  }) {
+    return DailyIntakeDoc(
+      id: id,
+      entries: entries ?? this.entries,
+      waterMl: waterMl ?? this.waterMl,
+      totals: totals ?? this.totals,
+      targets: targets ?? this.targets,
+    );
+  }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../widgets/global_ui_components.dart';
+import '../../../services/notification_service.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import '../diary/food_diary_screen.dart';
@@ -8,7 +11,10 @@ import '../recipes/recipes_list_screen.dart';
 import '../planner/food_planner_screen.dart';
 import '../shopping/shopping_lists_screen.dart';
 import '../history/food_history_screen.dart';
+import '../pantry/pantry_screen.dart';
 
+/// 🏠 FOOD HOME SCREEN - REDISEÑADO
+/// Dashboard principal del módulo de alimentación con diseño moderno
 class FoodHomeScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHomeScreen({super.key, required this.svc});
@@ -131,236 +137,506 @@ class _FoodHomeScreenState extends State<FoodHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final todayId = _dayId(DateTime.now());
-    final s = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Food'),
-        actions: [
-          IconButton(
-            tooltip: 'Hoy',
-            icon: const Icon(Icons.today),
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FoodDiaryScreen(svc: widget.svc),
-                  ),
-                ),
-          ),
-          IconButton(
-            tooltip: 'Historial',
-            icon: const Icon(Icons.history),
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FoodHistoryScreen(svc: widget.svc),
-                  ),
-                ),
-          ),
-          IconButton(
-            tooltip: 'Recordatorios',
-            icon: const Icon(Icons.notifications_active_outlined),
-            onPressed: () => _openRemindersSheet(context),
-          ),
-        ],
-      ),
-      body: StreamBuilder<DailyIntakeDoc>(
-        stream: widget.svc.streamDay(todayId),
-        builder: (context, snap) {
-          final day =
-              snap.data ??
-              DailyIntakeDoc(
-                id: todayId,
-                entries: const [],
-                waterMl: 0,
-                totals: const {
-                  'kcal': 0.0,
-                  'protein': 0.0,
-                  'carbs': 0.0,
-                  'fat': 0.0,
-                  'fiber': 0.0,
-                  'sodium': 0.0,
-                },
-                targets: const {
-                  'kcal': null,
-                  'protein': null,
-                  'carbs': null,
-                  'fat': null,
-                  'fiber': null,
-                },
-              );
-
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // ---- Controles rápidos bonitos (estado claro) ----
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      FilterChip(
-                        selected: _awakeToday,
-                        label: Text(
-                          _awakeToday ? 'Despierto HOY' : 'Despierto HOY',
-                        ),
-                        avatar: Icon(
-                          _awakeToday
-                              ? Icons.wb_sunny
-                              : Icons.wb_sunny_outlined,
-                        ),
-                        selectedColor: s.primaryContainer,
-                        onSelected: (v) => v ? _iAmAwake() : _cancelAwake(),
-                      ),
-                      FilterChip(
-                        selected: _waterEvery2hOn,
-                        label: Text(
-                          _waterEvery2hOn ? 'Agua c/2h' : 'Agua c/2h',
-                        ),
-                        avatar: Icon(
-                          _waterEvery2hOn
-                              ? Icons.water_drop
-                              : Icons.water_drop_outlined,
-                        ),
-                        selectedColor: s.secondaryContainer,
-                        onSelected:
-                            (v) =>
-                                v
-                                    ? _scheduleWaterEvery2h()
-                                    : _cancelWaterEvery2h(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // 👉 Tappable para abrir Diario
-              InkWell(
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FoodDiaryScreen(svc: widget.svc),
-                      ),
+      body: CustomScrollView(
+        slivers: [
+          // 🎨 AppBar moderno con gradiente
+          FocusGradientAppBar(
+            title: 'Alimentación',
+            icon: Icons.restaurant,
+            primaryColor: FocusColors.food,
+            secondaryColor: FocusColors.warning,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: 'Historial',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FoodHistoryScreen(svc: widget.svc),
                     ),
-                child: _SummaryCard(day: day),
+                  );
+                },
               ),
-              const SizedBox(height: 12),
-              _navRow(
-                context,
-                'Alimentos',
-                Icons.restaurant,
-                FoodsListScreen(svc: widget.svc),
-              ),
-              _navRow(
-                context,
-                'Recetas',
-                Icons.menu_book,
-                RecipesListScreen(svc: widget.svc),
-              ),
-              _navRow(
-                context,
-                'Planner',
-                Icons.calendar_view_week,
-                FoodPlannerScreen(svc: widget.svc),
-              ),
-              _navRow(
-                context,
-                'Listas de compra',
-                Icons.shopping_cart,
-                ShoppingListsScreen(svc: widget.svc),
+              IconButton(
+                icon: const Icon(Icons.notifications_active_outlined),
+                tooltip: 'Recordatorios',
+                onPressed: () => _openRemindersSheet(context),
               ),
             ],
-          );
-        },
+          ),
+
+          // Contenido
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(FocusSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 🔔 Recordatorios visuales
+                  _buildRemindersCard(context),
+                  
+                  const SizedBox(height: FocusSpacing.xl),
+
+                  // 📊 Resumen del día
+                  _buildDaySummaryCard(context, todayId),
+
+                  const SizedBox(height: FocusSpacing.xl),
+
+                  // 🚀 Acciones rápidas
+                  Text(
+                    'Acciones Rápidas',
+                    style: FocusTypography.heading2(context),
+                  ),
+                  const SizedBox(height: FocusSpacing.md),
+                  _buildActionGrid(context),
+
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // ---- hoja de recordatorios (igual que la tuya; sin cambios de UX fuertes) ----
-  Future<void> _openRemindersSheet(BuildContext context) async {
-    // … pega aquí tu implementación actual de _openRemindersSheet() …
-  }
-
-  Widget _navRow(
-    BuildContext ctx,
-    String title,
-    IconData icon,
-    Widget screen,
-  ) => Card(
-    child: ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap:
-          () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => screen)),
-    ),
-  );
-}
-
-// ---- _SummaryCard se queda igual que el tuyo ----
-
-class _SummaryCard extends StatelessWidget {
-  final DailyIntakeDoc day;
-  const _SummaryCard({required this.day});
-
-  double _pct(double? v, double? target) {
-    if (target == null || target <= 0) return 0;
-    final p = (v ?? 0) / target;
-    return p.clamp(0.0, 1.0);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = day.totals;
-    final g = day.targets;
-    final waterTarget = (g['water'] ?? 2000).toDouble();
-
+  // 🔔 Tarjeta de recordatorios moderna
+  Widget _buildRemindersCard(BuildContext context) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(FocusSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Resumen de hoy',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: FocusColors.warning,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: FocusSpacing.md),
+                Text(
+                  'Recordatorios',
+                  style: FocusTypography.heading3(context),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            _row(context, 'Kcal', t['kcal'] ?? 0.0, g['kcal']),
-            _row(context, 'Proteína', t['protein'] ?? 0.0, g['protein']),
-            _row(context, 'Carbohidratos', t['carbs'] ?? 0.0, g['carbs']),
-            _row(context, 'Grasas', t['fat'] ?? 0.0, g['fat']),
-            _row(context, 'Fibra', t['fiber'] ?? 0.0, g['fiber']),
-            const SizedBox(height: 8),
-            Text('Agua: ${day.waterMl} / ${waterTarget.toInt()} ml'),
-            LinearProgressIndicator(
-              value: _pct(day.waterMl.toDouble(), waterTarget),
+            const SizedBox(height: FocusSpacing.md),
+            Wrap(
+              spacing: FocusSpacing.md,
+              runSpacing: FocusSpacing.sm,
+              children: [
+                FilterChip(
+                  selected: _awakeToday,
+                  label: const Text('Despierto HOY'),
+                  avatar: Icon(
+                    _awakeToday ? Icons.wb_sunny : Icons.wb_sunny_outlined,
+                  ),
+                  selectedColor: FocusColors.food.withOpacity(0.2),
+                  onSelected: (v) => v ? _iAmAwake() : _cancelAwake(),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
+                  ),
+                ),
+                FilterChip(
+                  selected: _waterEvery2hOn,
+                  label: const Text('Agua c/2h'),
+                  avatar: Icon(
+                    _waterEvery2hOn
+                        ? Icons.water_drop
+                        : Icons.water_drop_outlined,
+                  ),
+                  selectedColor: Colors.blue.withOpacity(0.2),
+                  onSelected: (v) =>
+                      v ? _scheduleWaterEvery2h() : _cancelWaterEvery2h(),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
+    ).animate().fadeIn().slideY(begin: -0.2, end: 0);
+  }
+
+  // 📊 Tarjeta de resumen del día moderna
+  Widget _buildDaySummaryCard(BuildContext context, String todayId) {
+    return StreamBuilder<DailyIntakeDoc>(
+      stream: widget.svc.streamDay(todayId),
+      builder: (context, snap) {
+        final day = snap.data ??
+            DailyIntakeDoc(
+              id: todayId,
+              entries: const [],
+              waterMl: 0,
+              totals: const {
+                'kcal': 0.0,
+                'protein': 0.0,
+                'carbs': 0.0,
+                'fat': 0.0,
+                'fiber': 0.0,
+                'sodium': 0.0,
+              },
+              targets: const {},
+            );
+
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FoodDiaryScreen(svc: widget.svc),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(FocusSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Resumen de Hoy',
+                        style: FocusTypography.heading3(context),
+                      ),
+                      Icon(Icons.chevron_right, color: FocusColors.grey600),
+                    ],
+                  ),
+                  const SizedBox(height: FocusSpacing.lg),
+                  _buildMacroRow(
+                    context,
+                    'Calorías',
+                    day.totals['kcal'] ?? 0,
+                    day.targets['kcal'],
+                    FocusColors.food,
+                    'kcal',
+                  ),
+                  _buildMacroRow(
+                    context,
+                    'Proteínas',
+                    day.totals['protein'] ?? 0,
+                    day.targets['protein'],
+                    Colors.red,
+                    'g',
+                  ),
+                  _buildMacroRow(
+                    context,
+                    'Carbos',
+                    day.totals['carbs'] ?? 0,
+                    day.targets['carbs'],
+                    Colors.blue,
+                    'g',
+                  ),
+                  _buildMacroRow(
+                    context,
+                    'Grasas',
+                    day.totals['fat'] ?? 0,
+                    day.targets['fat'],
+                    Colors.green,
+                    'g',
+                  ),
+                  const SizedBox(height: FocusSpacing.md),
+                  const Divider(),
+                  const SizedBox(height: FocusSpacing.md),
+                  _buildWaterRow(context, day.waterMl,
+                      (day.targets['water'] ?? 2000).toInt()),
+                ],
+              ),
+            ),
+          ),
+        ).animate().fadeIn().scale();
+      },
     );
   }
 
-  Widget _row(BuildContext ctx, String label, double val, double? target) {
-    final pct = _pct(val, target);
+  Widget _buildMacroRow(
+    BuildContext context,
+    String label,
+    double value,
+    double? target,
+    Color color,
+    String unit,
+  ) {
+    final progress = target != null && target > 0
+        ? (value / target).clamp(0.0, 1.0)
+        : 0.0;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.only(bottom: FocusSpacing.md),
+      child: Row(
         children: [
-          Text(
-            '$label: ${val.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''}',
+          Container(
+            width: 4,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          LinearProgressIndicator(value: pct),
+          const SizedBox(width: FocusSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(label, style: FocusTypography.label(context)),
+                    Text(
+                      '${value.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''} $unit',
+                      style: FocusTypography.caption(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: FocusSpacing.xs),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(FocusSpacing.radiusSm),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: color.withOpacity(0.2),
+                    valueColor: AlwaysStoppedAnimation(color),
+                    minHeight: 6,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWaterRow(BuildContext context, int waterMl, int target) {
+    final progress = target > 0 ? (waterMl / target).clamp(0.0, 1.0) : 0.0;
+
+    return Row(
+      children: [
+        Icon(Icons.water_drop, color: Colors.blue, size: 20),
+        const SizedBox(width: FocusSpacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Agua', style: FocusTypography.label(context)),
+                  Text(
+                    '$waterMl / $target ml',
+                    style: FocusTypography.caption(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: FocusSpacing.xs),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(FocusSpacing.radiusSm),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.blue.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation(Colors.blue),
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 🚀 Grid de acciones modernos
+  Widget _buildActionGrid(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: FocusSpacing.md,
+      crossAxisSpacing: FocusSpacing.md,
+      childAspectRatio: 1.3,
+      children: [
+        FocusActionCard(
+          title: 'Diario',
+          icon: Icons.today,
+          color: FocusColors.food,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FoodDiaryScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 100.ms,
+        ),
+        FocusActionCard(
+          title: 'Alimentos',
+          icon: Icons.restaurant,
+          color: Colors.blue,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FoodsListScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 200.ms,
+        ),
+        FocusActionCard(
+          title: 'Recetas',
+          icon: Icons.menu_book,
+          color: Colors.purple,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RecipesListScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 300.ms,
+        ),
+        FocusActionCard(
+          title: 'Planificador',
+          icon: Icons.calendar_view_week,
+          color: Colors.green,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FoodPlannerScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 400.ms,
+        ),
+        FocusActionCard(
+          title: 'Compras',
+          icon: Icons.shopping_cart,
+          color: Colors.orange,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ShoppingListsScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 500.ms,
+        ),
+        FocusActionCard(
+          title: 'Despensa',
+          icon: Icons.kitchen,
+          color: Colors.brown,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PantryScreen(svc: widget.svc),
+              ),
+            );
+          },
+          animationDelay: 600.ms,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openRemindersSheet(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(FocusSpacing.radiusXl),
+        ),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(FocusSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '🔔 Recordatorios',
+                style: FocusTypography.heading2(context),
+              ),
+              const SizedBox(height: FocusSpacing.lg),
+              SwitchListTile(
+                value: _awakeToday,
+                onChanged: (v) {
+                  Navigator.pop(context);
+                  if (v) {
+                    _iAmAwake();
+                  } else {
+                    _cancelAwake();
+                  }
+                },
+                title: Text(
+                  'Despierto HOY',
+                  style: FocusTypography.heading4(context),
+                ),
+                subtitle: const Text('5 notificaciones para comidas del día'),
+                secondary: Icon(
+                  Icons.wb_sunny,
+                  color: _awakeToday ? FocusColors.food : null,
+                ),
+              ),
+              const Divider(),
+              SwitchListTile(
+                value: _waterEvery2hOn,
+                onChanged: (v) {
+                  Navigator.pop(context);
+                  if (v) {
+                    _scheduleWaterEvery2h();
+                  } else {
+                    _cancelWaterEvery2h();
+                  }
+                },
+                title: Text(
+                  'Agua cada 2h',
+                  style: FocusTypography.heading4(context),
+                ),
+                subtitle: const Text('Recordatorios recurrentes de hidratación'),
+                secondary: Icon(
+                  Icons.water_drop,
+                  color: _waterEvery2hOn ? Colors.blue : null,
+                ),
+              ),
+              const SizedBox(height: FocusSpacing.lg),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cerrar'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
