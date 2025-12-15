@@ -5,17 +5,17 @@ import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'package:intl/intl.dart';
 
-/// 📝 DIARIO DE ALIMENTACIÓN - REDISEÑO COMPLETO PREMIUM
+/// 📝 DIARIO DE ALIMENTACIÓN V2 - REDISEÑO COMPLETO PREMIUM
 /// Vista diaria con diseño moderno, formularios hermosos y microanimaciones
-class FoodDiaryScreen extends StatefulWidget {
+class FoodDiaryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodDiaryScreen({super.key, required this.svc});
+  const FoodDiaryScreenV2({super.key, required this.svc});
 
   @override
-  State<FoodDiaryScreen> createState() => _FoodDiaryScreenState();
+  State<FoodDiaryScreenV2> createState() => _FoodDiaryScreenV2State();
 }
 
-class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
+class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   DateTime _date = DateTime.now();
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
   

@@ -52,14 +52,15 @@ import 'screens/study/timer/study_timer_screen.dart';
 import 'screens/study/analytics/study_analytics_screen.dart';
 import 'screens/study/study_home_screen.dart';
 import 'screens/food/services/food_firestore_service.dart';
-import 'screens/food/dashboard/food_home_screen.dart';
-import 'screens/food/diary/food_diary_screen.dart';
-import 'screens/food/foods/foods_list_screen.dart';
-import 'screens/food/recipes/recipes_list_screen.dart';
-import 'screens/food/planner/food_planner_screen.dart';
-import 'screens/food/shopping/shopping_lists_screen.dart';
-import 'screens/food/pantry/pantry_screen.dart';
-import 'screens/food/history/food_history_screen.dart';
+import 'screens/food/dashboard/food_home_screen_v2.dart';
+import 'screens/food/diary/food_diary_screen_v2.dart';
+import 'screens/food/foods/foods_list_screen_v2.dart';
+import 'screens/food/recipes/recipes_list_screen_v2.dart';
+import 'screens/food/planner/food_planner_screen_v2.dart';
+import 'screens/food/shopping/shopping_lists_screen_v2.dart';
+import 'screens/food/shopping/shopping_list_detail_screen_v2.dart';
+import 'screens/food/pantry/pantry_screen_v2.dart';
+import 'screens/food/history/food_history_screen_v2.dart';
 import 'screens/finance/finance_routes.dart';
 import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
@@ -343,14 +344,14 @@ class _MyAppState extends State<MyApp> {
             '/study/timer': (_) => StudyTimerScreen(svc: _studySvc),
             '/study/analytics': (_) => StudyAnalyticsScreen(svc: _studySvc),
 
-            '/food': (_) => FoodHomeScreen(svc: _foodSvc),
-            '/food/diary': (_) => FoodDiaryScreen(svc: _foodSvc),
-            '/food/foods': (_) => FoodsListScreen(svc: _foodSvc),
-            '/food/recipes': (_) => RecipesListScreen(svc: _foodSvc),
-            '/food/planner': (_) => FoodPlannerScreen(svc: _foodSvc),
-            '/food/shopping': (_) => ShoppingListsScreen(svc: _foodSvc),
-            '/food/pantry': (_) => PantryScreen(svc: _foodSvc),
-            '/food/history': (_) => FoodHistoryScreen(svc: _foodSvc),
+            '/food': (_) => FoodHomeScreenV2(svc: _foodSvc),
+            '/food/diary': (_) => FoodDiaryScreenV2(svc: _foodSvc),
+            '/food/foods': (_) => FoodsListScreenV2(svc: _foodSvc),
+            '/food/recipes': (_) => RecipesListScreenV2(svc: _foodSvc),
+            '/food/planner': (_) => FoodPlannerScreenV2(svc: _foodSvc),
+            '/food/shopping': (_) => ShoppingListsScreenV2(svc: _foodSvc),
+            '/food/pantry': (_) => PantryScreenV2(svc: _foodSvc),
+            '/food/history': (_) => FoodHistoryScreenV2(svc: _foodSvc),
 
             ...financeRoutes,
             ...meditationRoutes,

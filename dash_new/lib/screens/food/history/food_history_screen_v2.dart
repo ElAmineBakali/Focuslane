@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../widgets/global_ui_components.dart';
-import '../services/food_service_facade.dart';
+import '../../../theme/global_ui_theme.dart';
+import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
 /// 📊 FOOD HISTORY SCREEN V2
 /// Historial con gráficas de tendencias y compras completadas
 class FoodHistoryScreenV2 extends StatefulWidget {
-  final FoodServiceFacade svc;
+  final FoodFirestoreService svc;
   const FoodHistoryScreenV2({super.key, required this.svc});
 
   @override
@@ -307,7 +308,8 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                   child: FocusStatCard(
                     label: 'Calorías',
                     value: avgKcal.toStringAsFixed(0),
-                    unit: 'kcal',
+                    subtitle: 'kcal promedio',
+                    icon: Icons.local_fire_department,
                     color: FocusColors.food,
                   ),
                 ),
@@ -316,7 +318,8 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                   child: FocusStatCard(
                     label: 'Proteínas',
                     value: avgProtein.toStringAsFixed(1),
-                    unit: 'g',
+                    subtitle: 'g promedio',
+                    icon: Icons.fitness_center,
                     color: Colors.red,
                   ),
                 ),
@@ -326,7 +329,8 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             FocusStatCard(
               label: 'Agua',
               value: avgWater.toStringAsFixed(0),
-              unit: 'ml',
+              subtitle: 'ml promedio',
+              icon: Icons.water_drop,
               color: Colors.blue,
             ),
           ],
@@ -502,7 +506,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
     for (int i = 0; i < days; i++) {
       final date = now.subtract(Duration(days: i));
       final dayId = date.toIso8601String().substring(0, 10);
-      final doc = await widget.svc.diary.getDay(dayId);
+      final doc = await widget.svc.getDay(dayId);
       if (doc != null) {
         result.add(doc);
       } else {
@@ -527,7 +531,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
   Widget _buildShoppingHistoryTab() {
     return StreamBuilder<List<CompletedShoppingList>>(
-      stream: widget.svc.planner.streamCompletedShoppingLists(),
+      stream: Stream.value([]), // TODO: Implementar historial de compras completadas
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -538,8 +542,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
         if (completed.isEmpty) {
           return const FocusEmptyState(
             icon: Icons.shopping_bag,
-            message: 'Sin compras completadas',
-            subtitle: 'Completa una lista de compras para ver el historial',
+            message: 'Sin compras completadas\nCompleta una lista de compras para ver el historial',
           );
         }
 
@@ -586,7 +589,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
               ),
               if (totalSpent > 0)
                 FocusBadge(
-                  label: '\$${totalSpent.toStringAsFixed(2)}',
+                  text: '\$${totalSpent.toStringAsFixed(2)}',
                   color: FocusColors.success,
                 ),
             ],
@@ -632,7 +635,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             dense: true,
             leading: Icon(
               item.checked ? Icons.check_box : Icons.check_box_outline_blank,
-              color: item.checked ? Colors.green : FocusColors.grey400,
+              color: item.checked ? Colors.green : FocusColors.grey600,
               size: 20,
             ),
             title: Text(
@@ -642,7 +645,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
               ),
             ),
             trailing: Text(
-              '${item.quantity} ${item.unit}',
+              '${item.qty} ${item.unit.name}',
               style: FocusTypography.caption(context),
             ),
           );

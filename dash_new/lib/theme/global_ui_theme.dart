@@ -35,6 +35,11 @@ class AppColors {
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
   
+  // Colores de texto
+  static const Color textPrimary = grey900;
+  static const Color textSecondary = grey600;
+  static const Color borderLight = grey300;
+  
   // Dark Mode
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);

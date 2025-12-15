@@ -43,8 +43,9 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
       _descController.text = r.description ?? '';
       _servingsController.text = r.servings.toString();
       _ingredients = List.from(r.ingredients);
-      _steps = List.from(r.steps ?? []);
-      _tags = List.from(r.tags ?? []);
+      // steps es String, no List
+      if (r.steps.isNotEmpty) _steps = [r.steps];
+      _tags = List.from(r.tags);
       
       if (r.kcal != null) {
         _calculatedMacros = {
@@ -547,7 +548,7 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
         description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
         servings: int.tryParse(_servingsController.text) ?? 1,
         ingredients: _ingredients,
-        steps: _steps,
+        steps: _steps.join('\n'), // Convertir List<String> a String
         tags: _tags,
         kcal: _calculatedMacros?['kcal'],
         protein: _calculatedMacros?['protein'],
@@ -599,12 +600,13 @@ class _IngredientCard extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final name = ingredient.freeName ?? ingredient.foodId ?? 'Ingrediente';
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
         leading: const Icon(Icons.drag_handle),
-        title: Text(ingredient.foodName),
-        subtitle: Text('${ingredient.quantity} ${ingredient.unit.name}'),
+        title: Text(name),
+        subtitle: Text('${ingredient.qty} ${ingredient.unit.name}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

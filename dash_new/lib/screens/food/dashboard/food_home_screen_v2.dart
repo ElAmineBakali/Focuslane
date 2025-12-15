@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/global_ui_components.dart';
-import '../services/food_service_facade.dart';
+import '../../../theme/global_ui_theme.dart';
+import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import '../diary/food_diary_screen_v2.dart';
-import '../favorites/favorites_screen.dart';
 import '../foods/foods_list_screen_v2.dart';
 import '../recipes/recipes_list_screen_v2.dart';
-import '../planner/planner_manager_screen.dart';
+import '../planner/food_planner_screen_v2.dart';
 import '../shopping/shopping_lists_screen_v2.dart';
 import '../pantry/pantry_screen_v2.dart';
 import '../history/food_history_screen_v2.dart';
@@ -16,7 +16,7 @@ import '../history/food_history_screen_v2.dart';
 /// 🏠 FOOD HOME SCREEN V2 - Rediseñado
 /// Dashboard principal del módulo de alimentación con diseño moderno
 class FoodHomeScreenV2 extends StatefulWidget {
-  final FoodServiceFacade svc;
+  final FoodFirestoreService svc;
   const FoodHomeScreenV2({super.key, required this.svc});
 
   @override
@@ -73,9 +73,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                 children: [
                   // Alerta de stock bajo
                   StreamBuilder<int>(
-                    stream: widget.svc.pantry
-                        .getLowStockCount()
-                        .asStream(),
+                    stream: widget.svc.streamPantry().map((items) => items.where((i) => (i.qty ?? 0) < (i.minQty ?? 0)).length),
                     builder: (context, snap) {
                       final count = snap.data ?? 0;
                       if (count == 0) return const SizedBox.shrink();
@@ -133,10 +131,10 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
                   // Resumen del día
                   StreamBuilder<DailyIntakeDoc>(
-                    stream: widget.svc.diary.streamDay(todayId),
+                    stream: widget.svc.streamDay(todayId),
                     builder: (context, daySnap) {
                       return StreamBuilder<Map<String, double?>>(
-                        stream: widget.svc.diary.streamGlobalTargets(),
+                        stream: widget.svc.streamGlobalTargets(),
                         builder: (context, targetsSnap) {
                           final day = daySnap.data ??
                               DailyIntakeDoc(
@@ -183,9 +181,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
                   // Sugerencias inteligentes
                   StreamBuilder<List<String>>(
-                    stream: widget.svc.diary
-                        .generateSuggestions(todayId)
-                        .asStream(),
+                    stream: Stream.value([]),
                     builder: (context, snap) {
                       final suggestions = snap.data ?? [];
                       if (suggestions.isEmpty) return const SizedBox.shrink();
@@ -236,7 +232,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
                   // Favoritos
                   StreamBuilder<List<Favorite>>(
-                    stream: widget.svc.catalog.streamFavorites(),
+                    stream: widget.svc.streamFavorites(),
                     builder: (context, snap) {
                       final favs = snap.data ?? [];
                       if (favs.isEmpty) return const SizedBox.shrink();
@@ -253,13 +249,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.push(
+                                  // TODO: Implementar FavoritesScreen
+                                  /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
                                           FavoritesScreen(svc: widget.svc),
                                     ),
-                                  );
+                                  ); */
                                 },
                                 child: const Text('Ver todos'),
                               ),
@@ -351,7 +348,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  PlannerManagerScreen(svc: widget.svc),
+                                  FoodPlannerScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -377,12 +374,12 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         icon: Icons.kitchen,
                         color: Colors.brown,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PantryScreenV2(svc: widget.svc),
-                            ),
-                          );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PantryScreenV2(svc: widget.svc),
+                              ),
+                            );
                         },
                         animationDelay: 600.ms,
                       ),
@@ -630,7 +627,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
 /// Sheet de configuración de recordatorios
 class _RemindersSheet extends StatelessWidget {
-  final FoodServiceFacade svc;
+  final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
 
   @override
@@ -650,62 +647,50 @@ class _RemindersSheet extends StatelessWidget {
             ),
             const SizedBox(height: FocusSpacing.lg),
 
-            StreamBuilder<Map<String, dynamic>>(
-              stream: svc.reminders.streamConfig(),
-              builder: (context, snap) {
-                final config = snap.data ?? {};
-                final awakeActive = config['awakeDayId'] == todayId;
-                final waterActive = config['waterEvery2h'] == true;
-
-                return Column(
-                  children: [
-                    SwitchListTile(
-                      value: awakeActive,
-                      onChanged: (v) async {
-                        if (v) {
-                          await svc.reminders.activateAwakeReminders(todayId);
-                        } else {
-                          await svc.reminders.deactivateAwakeReminders();
-                        }
-                      },
-                      title: Text(
-                        'Despierto HOY',
-                        style: FocusTypography.heading4(context),
-                      ),
-                      subtitle: const Text(
-                        '5 notificaciones para comidas del día',
-                      ),
-                      secondary: Icon(
-                        Icons.wb_sunny,
-                        color: awakeActive ? FocusColors.food : null,
-                      ),
+            // TODO: Implementar reminders
+            Column(
+              children: [
+                SwitchListTile(
+                  value: false,
+                  onChanged: (v) async {
+                    // TODO: Implementar reminders
+                    /* if (v) {
+                      await svc.reminders.activateAwakeReminders(todayId);
+                    } else {
+                      await svc.reminders.deactivateAwakeReminders();
+                    } */
+                  },
+                  title: Text(
+                    'Despierto HOY',
+                    style: FocusTypography.heading4(context),
+                  ),
+                  subtitle: const Text(
+                    '5 notificaciones para comidas del día',
+                  ),
+                  secondary: const Icon(Icons.wb_sunny),
+                ),
+                  const Divider(),
+                  SwitchListTile(
+                    value: false,
+                    onChanged: (v) async {
+                      // TODO: Implementar reminders
+                      /* if (v) {
+                        await svc.reminders.activateWaterReminders();
+                      } else {
+                        await svc.reminders.deactivateWaterReminders();
+                      } */
+                    },
+                    title: Text(
+                      'Agua cada 2h',
+                      style: FocusTypography.heading4(context),
                     ),
-                    const Divider(),
-                    SwitchListTile(
-                      value: waterActive,
-                      onChanged: (v) async {
-                        if (v) {
-                          await svc.reminders.activateWaterReminders();
-                        } else {
-                          await svc.reminders.deactivateWaterReminders();
-                        }
-                      },
-                      title: Text(
-                        'Agua cada 2h',
-                        style: FocusTypography.heading4(context),
-                      ),
-                      subtitle: const Text(
-                        'Recordatorios recurrentes de hidratación',
-                      ),
-                      secondary: Icon(
-                        Icons.water_drop,
-                        color: waterActive ? Colors.blue : null,
-                      ),
+                    subtitle: const Text(
+                      'Recordatorios recurrentes de hidratación',
                     ),
-                  ],
-                );
-              },
-            ),
+                    secondary: const Icon(Icons.water_drop),
+                  ),
+                ],
+              ),
 
             const SizedBox(height: FocusSpacing.lg),
             Align(

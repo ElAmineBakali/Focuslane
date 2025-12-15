@@ -49,22 +49,21 @@ class _ShoppingListDetailScreenV2State
         );
 
         final visibleItems = _hideCompleted
-            ? list.items.where((i) => !i.purchased).toList()
+            ? list.items.where((i) => !i.checked).toList()
             : list.items;
 
-        final purchasedCount = list.items.where((i) => i.purchased).length;
+        final purchasedCount = list.items.where((i) => i.checked).length;
         final progress = list.items.isEmpty ? 0.0 : purchasedCount / list.items.length;
         final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
         final totalPurchased = list.items
-            .where((i) => i.purchased)
+            .where((i) => i.checked)
             .fold<double>(0, (sum, item) => sum + (item.total ?? 0));
 
         return Scaffold(
           appBar: ModernGradientAppBar(
             title: list.name,
-            gradient: LinearGradient(
-              colors: [Colors.orange.shade700, Colors.orange.shade500],
-            ),
+            primaryColor: AppColors.food,
+            secondaryColor: AppColors.warning,
             actions: [
               IconButton(
                 icon: Icon(_hideCompleted ? Icons.visibility : Icons.visibility_off),
@@ -78,21 +77,10 @@ class _ShoppingListDetailScreenV2State
               ),
               PopupMenuButton<String>(
                 onSelected: (value) {
-                  if (value == 'complete') _completeList(list);
                   if (value == 'clear') _clearPurchased(list);
                   if (value == 'pantry') _sendToPantry(list);
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'complete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_circle, size: 20),
-                        SizedBox(width: AppSpacing.sm),
-                        Text('Completar lista'),
-                      ],
-                    ),
-                  ),
                   const PopupMenuItem(
                     value: 'clear',
                     child: Row(
@@ -125,12 +113,12 @@ class _ShoppingListDetailScreenV2State
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.orange.shade700, Colors.orange.shade500],
+                    colors: [AppColors.food, AppColors.warning],
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withOpacity(0.3),
+                      color: AppColors.food.withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -184,7 +172,7 @@ class _ShoppingListDetailScreenV2State
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         ModernProgressBar(
-                          progress: progress,
+                          value: progress,
                           color: Colors.white,
                           backgroundColor: Colors.white30,
                         ),
@@ -207,8 +195,8 @@ class _ShoppingListDetailScreenV2State
                 child: visibleItems.isEmpty
                     ? ModernEmptyState(
                         icon: Icons.shopping_cart_outlined,
-                        title: _hideCompleted ? 'Todo comprado' : 'Lista vacía',
-                        message: _hideCompleted
+                        message: _hideCompleted ? 'Todo comprado' : 'Lista vacía',
+                        subtitle: _hideCompleted
                             ? '¡Excelente! Has comprado todo'
                             : 'Añade productos con el botón +',
                         actionLabel: _hideCompleted ? null : 'Añadir Producto',
@@ -223,10 +211,10 @@ class _ShoppingListDetailScreenV2State
                           
                           return _ShoppingItemCard(
                             item: item,
-                            onToggle: () => widget.svc.togglePurchased(
+                            onToggle: () => widget.svc.toggleChecked(
                               list.id,
-                              originalIndex,
-                              !item.purchased,
+                              originalIndex.toString(),
+                              !item.checked,
                             ),
                             onEdit: () => _editItemDialog(list, originalIndex, item),
                             onDelete: () => _deleteItem(list, originalIndex),
@@ -241,7 +229,7 @@ class _ShoppingListDetailScreenV2State
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _addItemDialog(list),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.food,
             child: const Icon(Icons.add),
           ),
         );
@@ -254,7 +242,7 @@ class _ShoppingListDetailScreenV2State
     final nameController = TextEditingController();
     final qtyController = TextEditingController(text: '1');
     final priceController = TextEditingController();
-    ShoppingUnit unit = ShoppingUnit.unit;
+    UnitKind unit = UnitKind.unit;
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
@@ -315,17 +303,17 @@ class _ShoppingListDetailScreenV2State
                         border: Border.all(color: AppColors.borderLight),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
-                      child: DropdownButton<ShoppingUnit>(
+                      child: DropdownButton<UnitKind>(
                         value: unit,
                         isExpanded: true,
                         underline: const SizedBox.shrink(),
-                        items: ShoppingUnit.values.map((u) {
+                        items: UnitKind.values.map((u) {
                           return DropdownMenuItem(
                             value: u,
                             child: Text(_getUnitLabel(u)),
                           );
                         }).toList(),
-                        onChanged: (v) => setModalState(() => unit = v ?? ShoppingUnit.unit),
+                        onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
                       ),
                     ),
                   ),
@@ -334,7 +322,7 @@ class _ShoppingListDetailScreenV2State
               const SizedBox(height: AppSpacing.md),
               ModernTextField(
                 controller: priceController,
-                label: 'Precio por unidad (opcional)',
+                label: 'Precio total (opcional)',
                 hint: 'Ej: 2.50',
                 keyboardType: TextInputType.number,
               ),
@@ -356,7 +344,7 @@ class _ShoppingListDetailScreenV2State
                         'unit': unit,
                         'price': double.tryParse(priceController.text),
                       }),
-                      style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.food),
                       child: const Text('Añadir'),
                     ),
                   ),
@@ -368,37 +356,35 @@ class _ShoppingListDetailScreenV2State
       ),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       final name = result['name'] as String;
       if (name.isEmpty) return;
 
-      final item = ShoppingItem(
+      final item = ShoppingListItem(
+        id: '',
         name: name,
         qty: result['qty'] as double,
-        unit: result['unit'] as ShoppingUnit,
+        unit: result['unit'] as UnitKind,
         pricePerUnit: result['price'] as double?,
-        total: result['price'] != null
-            ? (result['qty'] as double) * (result['price'] as double)
-            : null,
+        total: result['price'] as double?,
         checked: false,
-        purchased: false,
       );
 
-      await widget.svc.addShoppingItem(list.id, item);
+      await widget.svc.upsertShoppingItem(list.id, '', item);
     }
   }
 
   Future<void> _editItemDialog(
     ShoppingList list,
     int index,
-    ShoppingItem item,
+    ShoppingListItem item,
   ) async {
     final nameController = TextEditingController(text: item.name);
     final qtyController = TextEditingController(text: item.qty.toString());
     final priceController = TextEditingController(
-      text: item.pricePerUnit?.toString() ?? '',
+      text: item.total?.toString() ?? '',
     );
-    ShoppingUnit unit = item.unit;
+    UnitKind unit = item.unit;
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
@@ -457,17 +443,17 @@ class _ShoppingListDetailScreenV2State
                         border: Border.all(color: AppColors.borderLight),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
-                      child: DropdownButton<ShoppingUnit>(
+                      child: DropdownButton<UnitKind>(
                         value: unit,
                         isExpanded: true,
                         underline: const SizedBox.shrink(),
-                        items: ShoppingUnit.values.map((u) {
+                        items: UnitKind.values.map((u) {
                           return DropdownMenuItem(
                             value: u,
                             child: Text(_getUnitLabel(u)),
                           );
                         }).toList(),
-                        onChanged: (v) => setModalState(() => unit = v ?? ShoppingUnit.unit),
+                        onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
                       ),
                     ),
                   ),
@@ -476,7 +462,7 @@ class _ShoppingListDetailScreenV2State
               const SizedBox(height: AppSpacing.md),
               ModernTextField(
                 controller: priceController,
-                label: 'Precio por unidad (opcional)',
+                label: 'Precio total (opcional)',
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: AppSpacing.md),
@@ -497,7 +483,7 @@ class _ShoppingListDetailScreenV2State
                         'unit': unit,
                         'price': double.tryParse(priceController.text),
                       }),
-                      style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.food),
                       child: const Text('Guardar'),
                     ),
                   ),
@@ -509,23 +495,24 @@ class _ShoppingListDetailScreenV2State
       ),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       final name = result['name'] as String;
       if (name.isEmpty) return;
 
-      final updatedItem = ShoppingItem(
+      final updatedItem = ShoppingListItem(
+        id: item.id,
+        foodId: item.foodId,
         name: name,
         qty: result['qty'] as double,
-        unit: result['unit'] as ShoppingUnit,
+        unit: result['unit'] as UnitKind,
         pricePerUnit: result['price'] as double?,
-        total: result['price'] != null
-            ? (result['qty'] as double) * (result['price'] as double)
-            : null,
+        total: result['price'] as double?,
         checked: item.checked,
-        purchased: item.purchased,
+        tags: item.tags,
+        notes: item.notes,
       );
 
-      await widget.svc.updateShoppingItem(list.id, index, updatedItem);
+      await widget.svc.upsertShoppingItem(list.id, index.toString(), updatedItem);
     }
   }
 
@@ -549,24 +536,13 @@ class _ShoppingListDetailScreenV2State
       ),
     );
 
-    if (confirmed == true) {
-      await widget.svc.removeShoppingItem(list.id, index);
+    if (confirmed == true && mounted) {
+      await widget.svc.removeShoppingItem(list.id, index.toString());
     }
   }
 
-  Future<void> _completeList(ShoppingList list) async {
-    // TODO: Marcar lista como completada y mover al historial
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Lista completada'),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   Future<void> _clearPurchased(ShoppingList list) async {
-    final purchased = list.items.where((i) => i.purchased).toList();
+    final purchased = list.items.where((i) => i.checked).toList();
     if (purchased.isEmpty) return;
 
     final confirmed = await showDialog<bool>(
@@ -587,42 +563,67 @@ class _ShoppingListDetailScreenV2State
       ),
     );
 
-    if (confirmed == true) {
-      // TODO: Implementar limpieza de comprados
+    if (confirmed == true && mounted) {
+      // Eliminar en reversa para no afectar índices
+      for (int i = list.items.length - 1; i >= 0; i--) {
+        if (list.items[i].checked) {
+          await widget.svc.removeShoppingItem(list.id, i.toString());
+        }
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Productos comprados eliminados'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _sendToPantry(ShoppingList list) async {
+    final purchased = list.items.where((i) => i.checked).toList();
+    if (purchased.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Productos comprados eliminados'),
+          content: Text('No hay productos comprados para enviar'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // Enviar cada producto comprado a la despensa
+    for (final item in purchased) {
+      final pantryItem = PantryItem(
+        id: '',
+        foodId: item.foodId,
+        name: item.name,
+        qty: item.qty,
+        unit: item.unit,
+      );
+      await widget.svc.upsertPantry(pantryItem);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${purchased.length} productos enviados a la despensa'),
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
 
-  Future<void> _sendToPantry(ShoppingList list) async {
-    // TODO: Enviar productos comprados a la despensa
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Productos enviados a la despensa'),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  String _getUnitLabel(ShoppingUnit unit) {
+  String _getUnitLabel(UnitKind unit) {
     switch (unit) {
-      case ShoppingUnit.unit:
+      case UnitKind.unit:
         return 'unidades';
-      case ShoppingUnit.kg:
-        return 'kg';
-      case ShoppingUnit.g:
-        return 'g';
-      case ShoppingUnit.l:
-        return 'litros';
-      case ShoppingUnit.ml:
-        return 'ml';
-      case ShoppingUnit.pack:
-        return 'paquetes';
+      case UnitKind.g:
+        return 'gramos';
+      case UnitKind.ml:
+        return 'mililitros';
     }
   }
 }
@@ -664,7 +665,7 @@ class _SummaryItem extends StatelessWidget {
 }
 
 class _ShoppingItemCard extends StatelessWidget {
-  final ShoppingItem item;
+  final ShoppingListItem item;
   final VoidCallback onToggle;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -684,10 +685,10 @@ class _ShoppingItemCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
-          color: item.purchased
+          color: item.checked
               ? AppColors.success.withOpacity(0.5)
               : AppColors.borderLight,
-          width: item.purchased ? 2 : 1,
+          width: item.checked ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -699,36 +700,29 @@ class _ShoppingItemCard extends StatelessWidget {
       ),
       child: ListTile(
         leading: Checkbox(
-          value: item.purchased,
+          value: item.checked,
           onChanged: (_) => onToggle(),
           activeColor: AppColors.success,
         ),
         title: Text(
           item.name,
           style: AppTypography.body(context).copyWith(
-            decoration: item.purchased ? TextDecoration.lineThrough : null,
-            color: item.purchased ? AppColors.textSecondary : AppColors.textPrimary,
+            decoration: item.checked ? TextDecoration.lineThrough : null,
+            color: item.checked ? AppColors.textSecondary : AppColors.textPrimary,
           ),
         ),
         subtitle: Row(
           children: [
             Text(
-              '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+              '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${_getUnitShort(item.unit)}',
               style: AppTypography.caption(context),
             ),
-            if (item.pricePerUnit != null) ...[
-              const Text(' • '),
-              Text(
-                '€${item.pricePerUnit!.toStringAsFixed(2)}/u',
-                style: AppTypography.caption(context),
-              ),
-            ],
             if (item.total != null) ...[
               const Text(' • '),
               Text(
                 'Total: €${item.total!.toStringAsFixed(2)}',
                 style: AppTypography.caption(context).copyWith(
-                  color: Colors.orange,
+                  color: AppColors.food,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -767,20 +761,14 @@ class _ShoppingItemCard extends StatelessWidget {
     );
   }
 
-  String _getUnitLabel(ShoppingUnit unit) {
+  String _getUnitShort(UnitKind unit) {
     switch (unit) {
-      case ShoppingUnit.unit:
+      case UnitKind.unit:
         return 'u';
-      case ShoppingUnit.kg:
-        return 'kg';
-      case ShoppingUnit.g:
+      case UnitKind.g:
         return 'g';
-      case ShoppingUnit.l:
-        return 'L';
-      case ShoppingUnit.ml:
+      case UnitKind.ml:
         return 'ml';
-      case ShoppingUnit.pack:
-        return 'paq';
     }
   }
 }

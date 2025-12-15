@@ -132,6 +132,10 @@ class FoodFirestoreService {
     await _root.collection('favorites').doc(id).delete();
   }
 
+  // Aliases para compatibilidad
+  Future<String> addFavorite(Favorite f) => saveFavorite(f);
+  Future<void> removeFavorite(String id) => deleteFavorite(id);
+
   // ---------- Diary ----------
   DocumentReference<Map<String, dynamic>> _dayRef(String dayId) =>
       _root.collection('intake').doc(dayId);
@@ -290,6 +294,51 @@ class FoodFirestoreService {
     });
   }
 
+  // Alias para facade
+  Stream<DailyIntakeDoc> streamDailyIntake(String dayId) => streamDay(dayId);
+  Future<void> addIntakeEntry(String dayId, IntakeEntry entry) => addEntry(dayId, entry);
+  Future<void> removeIntakeEntry(String dayId, String entryId) async {
+    // entryId es el index convertido a string
+    final index = int.tryParse(entryId);
+    if (index != null) await deleteEntry(dayId, index);
+  }
+  Future<void> addWater(String dayId, int ml) => incrementWater(dayId, ml);
+
+  // Stream de últimos N días
+  Stream<List<DailyIntakeDoc>> streamLastNDays(int n) {
+    final today = DateTime.now();
+    final dayIds = List.generate(n, (i) {
+      final d = today.subtract(Duration(days: i));
+      return d.toIso8601String().substring(0, 10);
+    });
+    
+    return _root.collection('intake').snapshots().map((snap) {
+      final docs = <DailyIntakeDoc>[];
+      for (final dayId in dayIds) {
+        final doc = snap.docs.where((d) => d.id == dayId).firstOrNull;
+        if (doc != null) {
+          docs.add(DailyIntakeDoc.fromMap(doc.id, doc.data()));
+        } else {
+          docs.add(DailyIntakeDoc(
+            id: dayId,
+            entries: const [],
+            waterMl: 0,
+            totals: const {
+              'kcal': 0.0,
+              'protein': 0.0,
+              'carbs': 0.0,
+              'fat': 0.0,
+              'fiber': 0.0,
+              'sodium': 0.0,
+            },
+            targets: const {},
+          ));
+        }
+      }
+      return docs;
+    });
+  }
+
   // ---------- Planner ----------
   DocumentReference<Map<String, dynamic>> _plannerRef(String weekId) =>
       _root.collection('planner').doc(weekId);
@@ -339,6 +388,65 @@ class FoodFirestoreService {
 
   Future<void> saveWeek(WeekPlanner w) async {
     await _plannerRef(w.id).set(w.toMap(), SetOptions(merge: true));
+  }
+
+  // Métodos para múltiples planners (TODO: implementar modelo MealPlanner)
+  Stream<List<dynamic>> streamPlanners() {
+    return Stream.value([]); // Placeholder
+  }
+
+  Future<String> createPlanner(String name) async {
+    final doc = _root.collection('mealPlanners').doc();
+    await doc.set({
+      'name': name,
+      'days': {
+        for (var i = 0; i < 7; i++) '$i': [],
+      },
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    return doc.id;
+  }
+
+  Future<void> deletePlanner(String id) async {
+    await _root.collection('mealPlanners').doc(id).delete();
+  }
+
+  Future<void> updatePlannerName(String id, String name) async {
+    await _root.collection('mealPlanners').doc(id).update({'name': name});
+  }
+
+  Stream<List<PlannerDayEntry>> streamPlannerDay(String plannerId, int dayIndex) {
+    return _root.collection('mealPlanners').doc(plannerId).snapshots().map((snap) {
+      if (!snap.exists) return [];
+      final data = snap.data() as Map<String, dynamic>;
+      final days = data['days'] as Map<String, dynamic>?;
+      if (days == null) return [];
+      final dayData = days['$dayIndex'] as List?;
+      if (dayData == null) return [];
+      return dayData.map((e) => PlannerDayEntry.fromMap(Map<String, dynamic>.from(e as Map))).toList();
+    });
+  }
+
+  Future<void> addPlannerEntry(String plannerId, int dayIndex, PlannerDayEntry entry) async {
+    final ref = _root.collection('mealPlanners').doc(plannerId);
+    final snap = await ref.get();
+    final data = snap.data() ?? {};
+    final days = Map<String, dynamic>.from(data['days'] ?? {});
+    final dayList = List.from(days['$dayIndex'] ?? []);
+    dayList.add(entry.toMap());
+    days['$dayIndex'] = dayList;
+    await ref.update({'days': days});
+  }
+
+  Future<void> removePlannerEntry(String plannerId, int dayIndex, String entryId) async {
+    final ref = _root.collection('mealPlanners').doc(plannerId);
+    final snap = await ref.get();
+    final data = snap.data() ?? {};
+    final days = Map<String, dynamic>.from(data['days'] ?? {});
+    final dayList = List.from(days['$dayIndex'] ?? []);
+    dayList.removeWhere((e) => e['id'] == entryId);
+    days['$dayIndex'] = dayList;
+    await ref.update({'days': days});
   }
 
   // ---------- ShoppingLists ----------
@@ -394,7 +502,12 @@ class FoodFirestoreService {
     await _root.collection('shoppingLists').doc(id).delete();
   }
 
-  Future<void> upsertShoppingItem(
+  // Versión para facade con 3 parámetros
+  Future<void> upsertShoppingItem(String listId, String itemId, ShoppingListItem item) async {
+    await upsertShoppingItemInternal(listId, itemId: itemId, item: item);
+  }
+
+  Future<void> upsertShoppingItemInternal(
     String listId, {
     String? itemId,
     required ShoppingListItem item,
@@ -422,7 +535,13 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  Future<void> removeShoppingItem(String listId, int index) async {
+  // Versión para facade con String itemId
+  Future<void> removeShoppingItem(String listId, String itemId) async {
+    final index = int.tryParse(itemId) ?? -1;
+    await removeShoppingItemByIndex(listId, index);
+  }
+
+  Future<void> removeShoppingItemByIndex(String listId, int index) async {
     final ref = _root.collection('shoppingLists').doc(listId);
     final snap = await ref.get();
     final items =
@@ -437,7 +556,13 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  Future<void> toggleChecked(String listId, int index, bool checked) async {
+  // Versión para facade con String itemId
+  Future<void> toggleChecked(String listId, String itemId, bool checked) async {
+    final index = int.tryParse(itemId) ?? -1;
+    await toggleCheckedByIndex(listId, index, checked);
+  }
+
+  Future<void> toggleCheckedByIndex(String listId, int index, bool checked) async {
     final ref = _root.collection('shoppingLists').doc(listId);
     final snap = await ref.get();
     final items =
@@ -463,7 +588,12 @@ class FoodFirestoreService {
         );
   }
 
-  Future<void> upsertPantry(PantryItem item, {String? id}) async {
+  // Versión para facade sin id opcional
+  Future<void> upsertPantry(PantryItem item) async {
+    await upsertPantryWithId(item, id: item.id.isEmpty ? null : item.id);
+  }
+
+  Future<void> upsertPantryWithId(PantryItem item, {String? id}) async {
     final col = _root.collection('pantry');
     if (id == null) {
       await col.add(item.toMap());

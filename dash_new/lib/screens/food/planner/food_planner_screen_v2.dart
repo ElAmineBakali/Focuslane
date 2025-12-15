@@ -24,7 +24,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     return Scaffold(
       appBar: ModernGradientAppBar(
         title: 'Planificador de Comidas',
-        gradient: AppColors.greenGradient,
+        primaryColor: AppColors.food,
+        secondaryColor: AppColors.warning,
         actions: [
           // Selector de planner actual
           TextButton.icon(
@@ -291,7 +292,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                   ],
                                 ),
                                 ModernBadge(
-                                  text: _getScopeLabel(_scope),
+                                  label: _getScopeLabel(_scope),
                                   color: AppColors.food,
                                 ),
                               ],
@@ -697,17 +698,14 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: AppColors.food.withOpacity(0.2),
-                        child: Text(
-                          food.icon,
-                          style: const TextStyle(fontSize: 20),
-                        ),
+                        child: const Icon(Icons.restaurant, size: 20),
                       ),
                       title: Text(food.name, style: AppTypography.body(context)),
                       subtitle: food.brand != null
                           ? Text(food.brand!, style: AppTypography.caption(context))
                           : null,
                       trailing: Text(
-                        '${food.calories.toStringAsFixed(0)} kcal',
+                        '${food.kcal.toStringAsFixed(0)} kcal',
                         style: AppTypography.label(context).copyWith(color: AppColors.food),
                       ),
                       onTap: () async {
@@ -732,7 +730,12 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     String foodId,
   ) async {
     final dayList = List<PlannerDayEntry>.from(planner.days[dayKey] ?? const []);
-    dayList.add(PlannerDayEntry(slot: slot, refId: foodId));
+    dayList.add(PlannerDayEntry(
+      slot: slot,
+      type: FavoriteType.food,
+      refId: foodId,
+      servings: 1.0,
+    ));
     
     final newDays = Map<String, List<PlannerDayEntry>>.from(planner.days);
     newDays[dayKey] = dayList;

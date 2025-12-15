@@ -35,31 +35,40 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernGradientAppBar(
-        title: 'Listas de Compra',
-        gradient: LinearGradient(
-          colors: [Colors.orange.shade700, Colors.orange.shade500],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
-            tooltip: _isGridView ? 'Vista lista' : 'Vista cuadrícula',
-            onPressed: () => setState(() => _isGridView = !_isGridView),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Nueva lista',
-            onPressed: _createNewList,
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
-            Tab(icon: Icon(Icons.history), text: 'Historial'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 48),
+        child: Column(
+          children: [
+            ModernGradientAppBar(
+              title: 'Listas de Compra',
+              primaryColor: AppColors.food,
+              secondaryColor: AppColors.warning,
+              actions: [
+                IconButton(
+                  icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
+                  tooltip: _isGridView ? 'Vista lista' : 'Vista cuadrícula',
+                  onPressed: () => setState(() => _isGridView = !_isGridView),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  tooltip: 'Nueva lista',
+                  onPressed: _createNewList,
+                ),
+              ],
+            ),
+            Container(
+              color: AppColors.food,
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                tabs: const [
+                  Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
+                  Tab(icon: Icon(Icons.history), text: 'Historial'),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -88,13 +97,13 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
         }
 
         final lists = snapshot.data!;
-        final activeLists = lists.where((l) => !l.isCompleted).toList();
+        final activeLists = lists;
 
         if (activeLists.isEmpty) {
           return ModernEmptyState(
             icon: Icons.shopping_cart_outlined,
-            title: 'Sin listas de compra',
-            message: 'Crea tu primera lista para comenzar',
+            message: 'Sin listas de compra',
+            subtitle: 'Crea tu primera lista para comenzar',
             actionLabel: 'Crear Lista',
             onAction: _createNewList,
           );
@@ -146,109 +155,11 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
   }
 
   Widget _buildHistoryTab() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('shoppingLists')
-          .where('isCompleted', isEqualTo: true)
-          .orderBy('completedAt', descending: true)
-          .limit(50)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final docs = snapshot.data!.docs;
-
-        if (docs.isEmpty) {
-          return ModernEmptyState(
-            icon: Icons.history,
-            title: 'Sin historial',
-            message: 'Completa listas de compra para ver el historial',
-          );
-        }
-
-        // Calcular estadísticas
-        double totalSpent = 0;
-        int totalItems = 0;
-        for (final doc in docs) {
-          final data = doc.data() as Map<String, dynamic>;
-          final items = (data['items'] as List?) ?? [];
-          for (final item in items) {
-            totalSpent += (item['total'] as num?)?.toDouble() ?? 0;
-            totalItems++;
-          }
-        }
-
-        return Column(
-          children: [
-            // Estadísticas
-            Container(
-              margin: const EdgeInsets.all(AppSpacing.md),
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.orange.shade700, Colors.orange.shade500],
-                ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _StatItem(
-                    icon: Icons.receipt_long,
-                    label: 'Listas',
-                    value: docs.length.toString(),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: Colors.white30,
-                  ),
-                  _StatItem(
-                    icon: Icons.shopping_basket,
-                    label: 'Productos',
-                    value: totalItems.toString(),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: Colors.white30,
-                  ),
-                  _StatItem(
-                    icon: Icons.euro,
-                    label: 'Total Gastado',
-                    value: '€${totalSpent.toStringAsFixed(0)}',
-                  ),
-                ],
-              ),
-            ).animate().fadeIn().slideY(begin: -0.2),
-            // Lista del historial
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  final doc = docs[index];
-                  final data = doc.data() as Map<String, dynamic>;
-                  
-                  return _HistoryListTile(
-                    data: data,
-                    docId: doc.id,
-                  ).animate().fadeIn(delay: Duration(milliseconds: index * 30));
-                },
-              ),
-            ),
-          ],
-        );
-      },
+    // TODO: Implement history with CompletedShoppingList collection
+    return const ModernEmptyState(
+      icon: Icons.history,
+      message: 'Historial próximamente',
+      subtitle: 'El historial de compras estará disponible pronto',
     );
   }
 
@@ -483,7 +394,7 @@ class _ShoppingListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
-    final purchased = list.items.where((i) => i.purchased).length;
+    final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
 
     return GestureDetector(
@@ -574,8 +485,8 @@ class _ShoppingListCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ModernBadge(
-                      text: _getScopeLabel(list.scope),
-                      color: Colors.orange,
+                      label: _getScopeLabel(list.scope),
+                      color: AppColors.food,
                     ),
                     const Spacer(),
                     Text(
@@ -602,8 +513,8 @@ class _ShoppingListCard extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         ModernProgressBar(
-                          progress: progress,
-                          color: Colors.orange,
+                          value: progress,
+                          color: AppColors.food,
                         ),
                       ],
                     ),
@@ -647,7 +558,7 @@ class _ShoppingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
-    final purchased = list.items.where((i) => i.purchased).length;
+    final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
 
     return Container(
@@ -689,7 +600,7 @@ class _ShoppingListTile extends StatelessWidget {
               style: AppTypography.caption(context),
             ),
             const SizedBox(height: AppSpacing.xs),
-            ModernProgressBar(progress: progress, color: Colors.orange),
+            ModernProgressBar(value: progress, color: AppColors.food),
           ],
         ),
         trailing: PopupMenuButton<String>(

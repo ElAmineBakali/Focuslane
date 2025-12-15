@@ -22,9 +22,8 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
     return Scaffold(
       appBar: ModernGradientAppBar(
         title: 'Despensa',
-        gradient: LinearGradient(
-          colors: [Colors.brown.shade700, Colors.brown.shade500],
-        ),
+        primaryColor: const Color(0xFF8D6E63),
+        secondaryColor: const Color(0xFFA1887F),
         actions: [
           IconButton(
             icon: Icon(_showLowStockOnly ? Icons.warning_amber : Icons.inventory_2),
@@ -64,8 +63,8 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
           if (items.isEmpty) {
             return ModernEmptyState(
               icon: _showLowStockOnly ? Icons.check_circle_outline : Icons.kitchen_outlined,
-              title: _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
-              message: _showLowStockOnly
+              message: _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
+              subtitle: _showLowStockOnly
                   ? 'Todos los productos tienen stock suficiente'
                   : 'Añade productos a tu despensa',
               actionLabel: _showLowStockOnly ? null : 'Añadir Producto',
@@ -333,17 +332,17 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
           unit: result['unit'] as UnitKind,
           minQty: result['minQty'] as double?,
         );
-        await widget.svc.savePantry(updated);
+        await widget.svc.upsertPantryWithId(updated, id: id);
       } else {
         // Crear nuevo
         final newItem = PantryItem(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: '',
           name: name,
           qty: result['qty'] as double,
           unit: result['unit'] as UnitKind,
           minQty: result['minQty'] as double?,
         );
-        await widget.svc.savePantry(newItem);
+        await widget.svc.upsertPantry(newItem);
       }
 
       if (mounted) {
@@ -521,7 +520,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
             if (item.minQty != null) ...[
               const SizedBox(height: AppSpacing.sm),
               _DetailRow(
-                icon: Icons.warning_outline,
+                icon: Icons.warning_amber_outlined,
                 label: 'Stock mínimo',
                 value: '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
               ),
@@ -694,8 +693,8 @@ class _PantryCard extends StatelessWidget {
                     const Spacer(),
                     if (isLowStock)
                       ModernBadge(
-                        text: 'STOCK BAJO',
-                        color: Colors.amber,
+                        label: 'STOCK BAJO',
+                        color: AppColors.warning,
                       ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(

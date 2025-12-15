@@ -5,17 +5,17 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'food_edit_sheet_v2.dart';
 
-/// 🥗 CATÁLOGO DE ALIMENTOS - REDISEÑO COMPLETO PREMIUM
+/// 🥗 CATÁLOGO DE ALIMENTOS V2 - REDISEÑO COMPLETO PREMIUM
 /// Grid de tarjetas modernas con búsqueda, filtros y favoritos
-class FoodsListScreen extends StatefulWidget {
+class FoodsListScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodsListScreen({super.key, required this.svc});
+  const FoodsListScreenV2({super.key, required this.svc});
 
   @override
-  State<FoodsListScreen> createState() => _FoodsListScreenState();
+  State<FoodsListScreenV2> createState() => _FoodsListScreenV2State();
 }
 
-class _FoodsListScreenState extends State<FoodsListScreen> {
+class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
   String _searchQuery = '';
   bool _suppsOnly = false;
   bool _showGridView = true;
