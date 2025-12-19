@@ -3,9 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Widget global reutilizable para selección de color
-/// Muestra colores recientes y permite seleccionar cualquier color
-class GlobalColorPickerWidget extends StatefulWidget {
+  class GlobalColorPickerWidget extends StatefulWidget {
   final Color? initialColor;
   final ValueChanged<Color> onColorSelected;
   final String label;
@@ -51,8 +49,7 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
     final prefs = await SharedPreferences.getInstance();
     final colorValue = color.value.toString();
     
-    // Remove if exists and add to front
-    _recentColors.removeWhere((c) => c.value == color.value);
+         _recentColors.removeWhere((c) => c.value == color.value);
     _recentColors.insert(0, color);
     if (_recentColors.length > 5) {
       _recentColors = _recentColors.take(5).toList();
@@ -120,8 +117,7 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
         ),
         const SizedBox(height: 12),
         
-        // Color actual seleccionado
-        InkWell(
+                 InkWell(
           onTap: _showColorPickerDialog,
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -172,8 +168,7 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
           ),
         ),
         
-        // Colores recientes
-        if (_recentColors.isNotEmpty) ...[
+                 if (_recentColors.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
             'Recientes',

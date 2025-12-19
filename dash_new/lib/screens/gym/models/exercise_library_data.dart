@@ -1,13 +1,10 @@
-// lib/screens/gym/models/exercise_library_data.dart
-
+ 
 class ExerciseLibraryItem {
   final String id;
   final String name;
   final String
-  category; // "Máquina", "Barra", "Mancuernas", "Peso libre", "Polea", "Calistenia", etc.
-  final String
-  muscleGroup; // "Pecho", "Espalda", "Hombros", "Bíceps", "Tríceps", "Piernas", "Glúteos", "Core"
-
+  category;    final String
+  muscleGroup;  
   const ExerciseLibraryItem({
     required this.id,
     required this.name,
@@ -16,10 +13,8 @@ class ExerciseLibraryItem {
   });
 }
 
-/// ✓ Lista base ampliada (70+ ejercicios habituales)
-const List<ExerciseLibraryItem> kExerciseLibrary = [
-  // Pecho
-  ExerciseLibraryItem(
+ const List<ExerciseLibraryItem> kExerciseLibrary = [
+     ExerciseLibraryItem(
     id: 'bench_bar',
     name: 'Press banca (barra)',
     category: 'Barra',
@@ -74,8 +69,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Pecho',
   ),
 
-  // Espalda
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'deadlift',
     name: 'Peso muerto',
     category: 'Barra',
@@ -130,8 +124,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Espalda',
   ),
 
-  // Hombros
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'ohp',
     name: 'Press militar (barra)',
     category: 'Barra',
@@ -174,8 +167,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Hombros',
   ),
 
-  // Bíceps
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'curl_bar',
     name: 'Curl de bíceps (barra)',
     category: 'Barra',
@@ -212,8 +204,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Bíceps',
   ),
 
-  // Tríceps
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'close_grip',
     name: 'Press cerrado',
     category: 'Barra',
@@ -250,8 +241,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Tríceps',
   ),
 
-  // Piernas / Glúteos
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'squat',
     name: 'Sentadilla (barra)',
     category: 'Barra',
@@ -330,8 +320,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Piernas',
   ),
 
-  // Core
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'crunch',
     name: 'Crunch',
     category: 'Peso libre',
@@ -362,8 +351,7 @@ const List<ExerciseLibraryItem> kExerciseLibrary = [
     muscleGroup: 'Core',
   ),
 
-  // Extras útiles
-  ExerciseLibraryItem(
+     ExerciseLibraryItem(
     id: 'farmer_walk',
     name: 'Farmer walk',
     category: 'Mancuernas',

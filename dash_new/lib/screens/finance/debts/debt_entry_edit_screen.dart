@@ -1,4 +1,3 @@
-// lib/screens/finance/debts/debt_entry_edit_screen.dart
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
 import '../services/finance_firestore_service.dart';

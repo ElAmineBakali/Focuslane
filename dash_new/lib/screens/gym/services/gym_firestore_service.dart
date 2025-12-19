@@ -24,8 +24,7 @@ class GymFirestoreService {
 
   DocumentReference<Map<String, dynamic>> get root => _root;
 
-  // ===== Routines =====
-  Stream<List<Routine>> streamRoutines() {
+     Stream<List<Routine>> streamRoutines() {
     return _root
         .collection('routines')
         .orderBy('name')
@@ -122,8 +121,7 @@ class GymFirestoreService {
     await rRef.delete();
   }
 
-  // ===== Days =====
-  Stream<List<RoutineDay>> streamDays(String routineId) {
+     Stream<List<RoutineDay>> streamDays(String routineId) {
     return _root
         .collection('routines')
         .doc(routineId)
@@ -216,8 +214,7 @@ class GymFirestoreService {
     await dRef.delete();
   }
 
-  // ===== Exercises in day =====
-  Stream<List<RoutineExercise>> streamDayExercises(
+     Stream<List<RoutineExercise>> streamDayExercises(
     String routineId,
     String dayId,
   ) {
@@ -327,8 +324,7 @@ class GymFirestoreService {
         .delete();
   }
 
-  // ===== Sessions =====
-  Future<void> saveSession(SessionDoc session) async {
+     Future<void> saveSession(SessionDoc session) async {
     final doc = _root.collection('sessions').doc();
     await doc.set(session.toMap());
 
@@ -345,8 +341,7 @@ class GymFirestoreService {
     } catch (_) {}
   }
 
-  /// Actualiza las sensaciones de una sesión existente
-  Future<void> updateSessionFeelings(
+     Future<void> updateSessionFeelings(
     String sessionId,
     int energy,
     int fatigue,
@@ -359,22 +354,17 @@ class GymFirestoreService {
     });
   }
 
-  /// Elimina una sesión del historial
-  /// IMPORTANTE: Actualiza las estadísticas y no rompe métricas
-  Future<void> deleteSession(String sessionId) async {
-    // Obtener datos de la sesión antes de eliminarla
-    final sessionDoc = await _root.collection('sessions').doc(sessionId).get();
+     Future<void> deleteSession(String sessionId) async {
+         final sessionDoc = await _root.collection('sessions').doc(sessionId).get();
     if (!sessionDoc.exists) return;
 
     final sessionData = sessionDoc.data() as Map<String, dynamic>;
     final routineId = sessionData['routineId'] as String?;
     final dayId = sessionData['dayId'] as String?;
 
-    // Eliminar la sesión
-    await _root.collection('sessions').doc(sessionId).delete();
+         await _root.collection('sessions').doc(sessionId).delete();
 
-    // Si hay rutina y día, recalcular lastDone
-    if (routineId != null && dayId != null) {
+         if (routineId != null && dayId != null) {
       try {
         final remainingSessions = await _root
             .collection('sessions')
@@ -399,8 +389,7 @@ class GymFirestoreService {
             'lastDoneLocal': lastSession.date.toIso8601String(),
           });
         } else {
-          // No quedan sesiones, limpiar lastDone
-          await _root
+                     await _root
               .collection('routines')
               .doc(routineId)
               .collection('days')
@@ -480,8 +469,7 @@ class GymFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  /// 🔎 Última sesión registrada (para recordar inactividad)
-  Future<DateTime?> lastSessionDate() async {
+     Future<DateTime?> lastSessionDate() async {
     final snap =
         await _root
             .collection('sessions')
@@ -493,8 +481,7 @@ class GymFirestoreService {
     return DateTime.tryParse(data['date']?.toString() ?? '');
   }
 
-  // ===== Body weight =====
-  Future<void> addBodyWeight(
+     Future<void> addBodyWeight(
     double kg,
     DateTime date, {
     double? trend7,
@@ -555,8 +542,7 @@ class GymFirestoreService {
     );
   }
 
-  // ===== Measurements (cm) =====
-  Future<void> addMeasurement(
+     Future<void> addMeasurement(
     String muscle,
     double cm,
     DateTime date, {
@@ -594,10 +580,8 @@ class GymFirestoreService {
     );
   }
 
-  // 📊 ===== Análisis y estadísticas avanzadas =====
-  
-  /// Obtiene el historial de e1RM de un ejercicio específico
-  Future<List<({DateTime date, double e1rm})>> getExerciseE1rmHistory(
+     
+     Future<List<({DateTime date, double e1rm})>> getExerciseE1rmHistory(
     String exerciseName, {
     int lookback = 90,
   }) async {
@@ -640,8 +624,7 @@ class GymFirestoreService {
     return results;
   }
 
-  /// Obtiene el volumen total por sesión de un ejercicio
-  Future<List<({DateTime date, double volume})>> getExerciseVolumeHistory(
+     Future<List<({DateTime date, double volume})>> getExerciseVolumeHistory(
     String exerciseName, {
     int lookback = 90,
   }) async {
@@ -681,8 +664,7 @@ class GymFirestoreService {
     return results;
   }
 
-  /// Obtiene los PRs históricos de un ejercicio
-  Future<List<({DateTime date, double weight, int reps, double e1rm})>> getExercisePRs(
+     Future<List<({DateTime date, double weight, int reps, double e1rm})>> getExercisePRs(
     String exerciseName, {
     int limit = 10,
   }) async {
@@ -716,27 +698,21 @@ class GymFirestoreService {
       }
     }
     
-    // Ordenar por e1RM y tomar los mejores
-    allRecords.sort((a, b) => b.e1rm.compareTo(a.e1rm));
+         allRecords.sort((a, b) => b.e1rm.compareTo(a.e1rm));
     return allRecords.take(limit).toList();
   }
 
-  /// 📤 Exportar datos del usuario a JSON
-  Future<Map<String, dynamic>> exportAllData() async {
-    // Sessions
-    final sessions = await _root.collection('sessions').get();
+     Future<Map<String, dynamic>> exportAllData() async {
+         final sessions = await _root.collection('sessions').get();
     final sessionsData = sessions.docs.map((d) => {'id': d.id, ...d.data()}).toList();
     
-    // Body weight
-    final bodyweight = await _root.collection('bodyweight').get();
+         final bodyweight = await _root.collection('bodyweight').get();
     final bodyweightData = bodyweight.docs.map((d) => {'id': d.id, ...d.data()}).toList();
     
-    // Measurements
-    final measurements = await _root.collection('measurements').get();
+         final measurements = await _root.collection('measurements').get();
     final measurementsData = measurements.docs.map((d) => {'id': d.id, ...d.data()}).toList();
     
-    // Routines (con días y ejercicios)
-    final routines = await _root.collection('routines').get();
+         final routines = await _root.collection('routines').get();
     final routinesData = <Map<String, dynamic>>[];
     for (final r in routines.docs) {
       final routineData = {'id': r.id, ...r.data()};
@@ -762,8 +738,7 @@ class GymFirestoreService {
     };
   }
 
-  /// 📊 Obtener estadísticas por rango de fechas
-  Future<Map<String, dynamic>> getStatsForDateRange(
+     Future<Map<String, dynamic>> getStatsForDateRange(
     DateTime start,
     DateTime end,
   ) async {
@@ -823,23 +798,20 @@ class GymFirestoreService {
     };
   }
 
-  /// 🔥 Crear rutina desde preset
-  Future<String> createRoutineFromPreset(
+     Future<String> createRoutineFromPreset(
     String name,
     String description,
     String splitType,
     List<PresetDay> presetDays,
   ) async {
-    // Primero crear la rutina
-    final routineId = await createRoutine(
+         final routineId = await createRoutine(
       name: name,
       description: description,
       splitType: splitType,
       restSecDefault: 90,
     );
     
-    // Luego crear los días y ejercicios
-    for (int dayIndex = 0; dayIndex < presetDays.length; dayIndex++) {
+         for (int dayIndex = 0; dayIndex < presetDays.length; dayIndex++) {
       final pd = presetDays[dayIndex];
       final dayId = await addDay(
         routineId,
@@ -848,8 +820,7 @@ class GymFirestoreService {
         icon: pd.icon,
       );
       
-      // Añadir ejercicios al día
-      for (int exIndex = 0; exIndex < pd.exercises.length; exIndex++) {
+             for (int exIndex = 0; exIndex < pd.exercises.length; exIndex++) {
         final pe = pd.exercises[exIndex];
         final routineEx = RoutineExercise(
           id: '',

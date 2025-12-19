@@ -13,9 +13,9 @@ class FinanceSettingsScreen extends StatefulWidget {
 class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
   final _currency = TextEditingController(text: 'EUR');
   int _monthStartDay =
-      1; // Fijado a 1 por tu requisito, igualmente editable si quisieras cambiarlo
-  double _budgetsAlertPct = 80; // alerta de presupuestos (%)
-  int _fixedRemindDays = 3; // recordar X días antes
+      1;
+  double _budgetsAlertPct = 80; 
+  int _fixedRemindDays = 3; 
   bool _pinLock = false;
 
   bool _loading = true;
@@ -59,7 +59,7 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
       'settings': {
         'currency':
             _currency.text.trim().isEmpty ? 'EUR' : _currency.text.trim(),
-        'monthStartDay': _monthStartDay, // queda 1 como acordamos
+        'monthStartDay': _monthStartDay, 
         'pinLock': _pinLock,
         'notifications': {
           'budgetsThresholdPct': _budgetsAlertPct,
@@ -111,7 +111,6 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
                               DropdownButton<int>(
                                 value: _monthStartDay,
                                 onChanged: (v) {
-                                  // Si prefieres dejarlo fijo a 1, comenta el setState:
                                   setState(() => _monthStartDay = v ?? 1);
                                 },
                                 items:

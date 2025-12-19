@@ -4,9 +4,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-/// 🎨 FORMULARIO MODERNO PREMIUM PARA ALIMENTOS
-/// Diseño completo estilo TaskForm con validación y UX mejorada
-class FoodEditSheet extends StatefulWidget {
+ class FoodEditSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   final Food? initial;
   
@@ -75,7 +73,6 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
               Container(
                 margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 width: 40,
@@ -85,8 +82,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
               ),
-              
-              // Header
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: Row(
@@ -117,10 +113,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                   ],
                 ),
               ).animate().fadeIn().slideX(begin: -0.2, duration: 300.ms),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
-              // Tabs
+
               TabBar(
                 controller: _tabController,
                 labelColor: colorScheme.primary,
@@ -131,8 +126,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                   Tab(icon: Icon(Icons.analytics), text: 'Nutrición'),
                 ],
               ),
-              
-              // Content
+
               SizedBox(
                 height: 500,
                 child: TabBarView(
@@ -143,8 +137,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                   ],
                 ),
               ),
-              
-              // Actions
+
               Container(
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
@@ -290,8 +283,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           
           const SizedBox(height: AppSpacing.xl),
           
-          // Calorías destacadas
-          Container(
+                     Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               gradient: AppColors.foodGradient,
@@ -324,7 +316,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           ),
           
           const SizedBox(height: AppSpacing.xl),
-          
+
           Text('Macronutrientes (gramos)', style: AppTypography.label(context)),
           const SizedBox(height: AppSpacing.md),
           

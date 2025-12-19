@@ -5,9 +5,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'recipe_edit_screen_v2.dart';
 
-/// 📖 CATÁLOGO DE RECETAS - REDISEÑO COMPLETO PREMIUM
-/// Grid de tarjetas modernas con búsqueda, auto-cálculo de macros y favoritos
-class RecipesListScreenV2 extends StatefulWidget {
+ class RecipesListScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const RecipesListScreenV2({super.key, required this.svc});
 
@@ -163,8 +161,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
   }
 }
 
-/// Tarjeta moderna de receta para grid
-class _RecipeGridCard extends StatelessWidget {
+ class _RecipeGridCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
   
@@ -188,8 +185,7 @@ class _RecipeGridCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Container(
+                         Container(
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -223,8 +219,6 @@ class _RecipeGridCard extends StatelessWidget {
                 ],
               ),
             ),
-            
-            // Contenido
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -276,8 +270,7 @@ class _RecipeGridCard extends StatelessWidget {
   }
 }
 
-/// Tarjeta moderna de receta para lista
-class _RecipeListCard extends StatelessWidget {
+ class _RecipeListCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
   
@@ -303,7 +296,6 @@ class _RecipeListCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              // Icono
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
@@ -320,10 +312,9 @@ class _RecipeListCard extends StatelessWidget {
                   size: 32,
                 ),
               ),
-              
+
               const SizedBox(width: AppSpacing.lg),
-              
-              // Información
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

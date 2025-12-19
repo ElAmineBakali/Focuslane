@@ -7,8 +7,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'shopping_list_detail_screen_v2.dart';
 
-/// 🛍️ LISTAS DE COMPRA V2 - Diseño moderno con historial y estadísticas
-class ShoppingListsScreenV2 extends StatefulWidget {
+ class ShoppingListsScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const ShoppingListsScreenV2({super.key, required this.svc});
 
@@ -193,7 +192,6 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
     );
   }
 
-  // Acciones
   Future<void> _createNewList() async {
     final nameController = TextEditingController();
     ShoppingScope scope = ShoppingScope.custom;
@@ -222,7 +220,6 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -234,17 +231,14 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              // Título
               Text('Nueva Lista de Compra', style: AppTypography.heading3(context)),
               const SizedBox(height: AppSpacing.md),
-              // Nombre
               ModernTextField(
                 controller: nameController,
                 label: 'Nombre de la lista',
                 hint: 'Ej: Compra semanal, Supermercado...',
               ),
               const SizedBox(height: AppSpacing.md),
-              // Scope
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
@@ -285,7 +279,6 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              // Predeterminada
               CheckboxListTile(
                 value: makeDefault,
                 onChanged: (v) => setModalState(() => makeDefault = v ?? false),
@@ -294,7 +287,6 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                 activeColor: Colors.orange,
               ),
               const SizedBox(height: AppSpacing.md),
-              // Botones
               Row(
                 children: [
                   Expanded(
@@ -364,8 +356,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
 
   Future<void> _restoreList(ShoppingList list) async {
     try {
-      // Restaurar la lista quitando el completedAt
-      await widget.svc.updateShoppingList(
+             await widget.svc.updateShoppingList(
         list.id,
         {'completedAt': null},
       );
@@ -449,7 +440,6 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
   }
 }
 
-// Widgets auxiliares
 class _ShoppingListCard extends StatelessWidget {
   final ShoppingList list;
   final VoidCallback onTap;
@@ -486,7 +476,6 @@ class _ShoppingListCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header con gradiente
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
@@ -549,7 +538,6 @@ class _ShoppingListCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Body
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -575,7 +563,7 @@ class _ShoppingListCard extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: AppSpacing.sm),
-                    // Barra de progreso
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -721,8 +709,7 @@ class _ShoppingListTile extends StatelessWidget {
   }
 }
 
-/// Widget para mostrar listas completadas en el historial
-class _HistoryListCard extends StatelessWidget {
+ class _HistoryListCard extends StatelessWidget {
   final ShoppingList list;
   final VoidCallback onTap;
   final VoidCallback onRestore;

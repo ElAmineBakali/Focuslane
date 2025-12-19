@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 String yyyymm(DateTime d) =>
     "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
 
-// ------------ TRANSACCIONES ------------
 enum TxType { income, expense, transfer }
 
 class FinanceTransaction {
@@ -101,7 +100,6 @@ class FinanceTransaction {
   }
 }
 
-// ------------ PRESUPUESTOS ------------
 class Budget {
   final String id;
   final String name;
@@ -146,7 +144,6 @@ class Budget {
   }
 }
 
-// ------------ SUSCRIPCIONES ------------
 class Subscription {
   final String id;
   final String name;
@@ -158,7 +155,7 @@ class Subscription {
   final bool isFixed;
   final int remindDaysBefore;
   final bool autoMarkPaid;
-  final int? order; // posición para reordenar en checklist
+  final int? order; 
 
   Subscription({
     required this.id,
@@ -207,14 +204,13 @@ class Subscription {
   }
 }
 
-// ------------ PERSONAS / DEUDAS ------------
 class Person {
   final String id;
   final String name;
   final String defaultCurrency;
   final String? contact;
   final String? notes;
-  final double balance; // >0 me deben, <0 debo
+  final double balance; 
 
   Person({
     required this.id,
@@ -250,7 +246,7 @@ class Person {
 
 class DebtEntry {
   final String id;
-  final double amount; // + me deben, - le debo
+  final double amount; 
   final DateTime date;
   final String concept;
   final String? relatedTxId;
@@ -284,13 +280,12 @@ class DebtEntry {
   }
 }
 
-// ------------ VARIABLE EXPENSES ------------
 class VariableExpenseItem {
   final String id;
   final String name;
   final String category;
-  final String periodKey; // yyyy-mm
-  final String status; // planned|done|skipped
+  final String periodKey; 
+  final String status; 
   final double? amount;
   final String? linkedTxId;
 
@@ -327,7 +322,6 @@ class VariableExpenseItem {
   }
 }
 
-// ------------ DEPÓSITOS ------------
 class Deposit {
   final String id;
   final String name;
@@ -382,12 +376,12 @@ class AssetItem {
   final String id;
   final String name;
   final AssetKind kind;
-  final double? estValue; // valor estimado
-  final String? currency; // p.ej. EUR
-  final String? address; // dirección libre
-  final String? notes; // notas
-  final DateTime? acquiredAt; // fecha adquisición
-  final String? colorHex; // UI opcional
+  final double? estValue; 
+  final String? currency; 
+  final String? address; 
+  final String? notes; 
+  final DateTime? acquiredAt; 
+  final String? colorHex; 
 
   AssetItem({
     required this.id,

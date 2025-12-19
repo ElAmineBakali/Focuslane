@@ -31,8 +31,7 @@ class Course {
   final bool isArchived;
   final DateTime? createdAt;
 
-  /// ✅ NUEVO: porcentaje de asistencia requerido (0–100). Ej: 50 = 50%
-  final double? attendanceRequired;
+     final double? attendanceRequired;
 
   const Course({
     required this.id,
@@ -53,14 +52,12 @@ class Course {
       try {
         if (v == null) return null;
         if (v is DateTime) return v;
-        // Firestore Timestamp
-        try {
+                 try {
           if (v.toString().contains('Timestamp')) {
             return v.toDate();
           }
         } catch (_) {
-          // Not a Timestamp, continue
-        }
+                   }
         return DateTime.tryParse(v.toString());
       } catch (_) {
         return null;
@@ -76,8 +73,7 @@ class Course {
       goalHours: (m['goalHours'] as num?)?.toDouble(),
       isArchived: m['isArchived'] == true,
       createdAt: parseCreatedAt(m['createdAt']),
-      attendanceRequired: (m['attendanceRequired'] as num?)?.toDouble(), // ✅
-    );
+      attendanceRequired: (m['attendanceRequired'] as num?)?.toDouble(),      );
   }
 
   Map<String, dynamic> toMap() => {
@@ -87,8 +83,7 @@ class Course {
     if (credits != null) 'credits': credits,
     if (goalHours != null) 'goalHours': goalHours,
     if (attendanceRequired != null)
-      'attendanceRequired': attendanceRequired, // ✅
-    'isArchived': isArchived,
+      'attendanceRequired': attendanceRequired,      'isArchived': isArchived,
   };
 }
 
@@ -103,9 +98,7 @@ class StudyTask {
   final String? notes;
   final DateTime? createdAt;
   
-  /// ✅ NUEVO: ID de la tarea sincronizada en el módulo general Tasks
-  /// Si es null, esta tarea no está sincronizada
-  final String? syncedTaskId;
+     final String? syncedTaskId;
 
   const StudyTask({
     required this.id,
@@ -170,9 +163,7 @@ class TimerPreset {
   final String name;
   final StudyMethod method;
   final Map<String, dynamic>
-  params; // e.g. {work:25, short:5, long:15, cycles:4}
-  final String? courseId; // null => global
-
+  params;    final String? courseId;  
   const TimerPreset({
     required this.id,
     required this.name,
@@ -207,10 +198,7 @@ class StudySession {
   final String courseId;
   final String? taskId;
   final StudyMethod method;
-  final int minutes; // total
-  final int? laps; // para simple
-  final int? cycles; // para pomodoro/custom
-  final Map<String, dynamic> configSnapshot;
+  final int minutes;    final int? laps;    final int? cycles;    final Map<String, dynamic> configSnapshot;
   final String? notes;
   final DateTime date;
 
@@ -271,12 +259,10 @@ class StudySession {
   };
 }
 
-/// Nuevo: Bloques de clase del horario académico semanal
-class StudyClassBlock {
+ class StudyClassBlock {
   final String id;
   final String courseId;
-  final List<int> daysOfWeek; // 1=lun .. 7=dom
-  final TimeOfDay start;
+  final List<int> daysOfWeek;    final TimeOfDay start;
   final TimeOfDay end;
   final String? room;
 
@@ -317,13 +303,10 @@ class StudyClassBlock {
   };
 }
 
-/// Nuevo: Gestión de calificaciones por tarea/examen
-class GradeEntry {
+ class GradeEntry {
   final String id;
-  final String taskId; // referencia a StudyTask
-  final String courseId;
-  final double grade; // 0..10 o 0..100 según uso
-  final DateTime date;
+  final String taskId;    final String courseId;
+  final double grade;    final DateTime date;
   final String? notes;
 
   const GradeEntry({

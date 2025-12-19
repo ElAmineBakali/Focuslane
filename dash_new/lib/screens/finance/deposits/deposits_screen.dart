@@ -1,4 +1,3 @@
-// lib/screens/finance/deposits/deposits_screen.dart
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/deposits/deposit_edit_screen.dart';
 import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';

@@ -4,9 +4,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-/// 🎨 FORMULARIO MODERNO PREMIUM PARA RECETAS
-/// Con auto-cálculo de macros desde ingredientes
-class RecipeEditScreenV2 extends StatefulWidget {
+ class RecipeEditScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   final Recipe? initial;
   
@@ -43,7 +41,6 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
       _descController.text = r.description ?? '';
       _servingsController.text = r.servings.toString();
       _ingredients = List.from(r.ingredients);
-      // steps es String, no List
       if (r.steps.isNotEmpty) _steps = [r.steps];
       _tags = List.from(r.tags);
       
@@ -82,7 +79,6 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
         key: _formKey,
         child: Column(
           children: [
-            // Tabs
             TabBar(
               controller: _tabController,
               labelColor: Colors.purple,
@@ -96,8 +92,6 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
                 Tab(icon: Icon(Icons.analytics), text: 'Nutrición'),
               ],
             ),
-            
-            // Content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -109,8 +103,6 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
                 ],
               ),
             ),
-            
-            // Actions
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
@@ -432,14 +424,12 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
   }
   
   Future<void> _addIngredient() async {
-    // TODO: Implementar diálogo para seleccionar alimento y cantidad
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Funcionalidad de añadir ingrediente próximamente')),
     );
   }
-  
+
   Future<void> _editIngredient(int index) async {
-    // TODO: Implementar diálogo de edición
   }
   
   Future<void> _addStep() async {
@@ -507,9 +497,8 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
     if (_ingredients.isEmpty) return;
     
     setState(() => _isCalculating = true);
-    
+
     try {
-      // TODO: Implementar cálculo real desde los ingredientes
       await Future.delayed(const Duration(seconds: 1));
       
       setState(() {
@@ -524,11 +513,11 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
       });
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Macros calculados automáticamente')),
+        const SnackBar(content: Text('Macros calculated successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Error al calcular: $e')),
+        SnackBar(content: Text('Error calculating macros: $e')),
       );
     } finally {
       setState(() => _isCalculating = false);
@@ -547,7 +536,7 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
         description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
         servings: int.tryParse(_servingsController.text) ?? 1,
         ingredients: _ingredients,
-        steps: _steps.join('\n'), // Convertir List<String> a String
+        steps: _steps.join('\n'),
         tags: _tags,
         kcal: _calculatedMacros?['kcal'],
         protein: _calculatedMacros?['protein'],
@@ -568,15 +557,15 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.initial == null 
-                ? '✅ Receta creada correctamente'
-                : '✅ Receta actualizada correctamente'),
+                ? 'Recipe created successfully'
+                : 'Recipe updated successfully'),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Error: $e')),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     } finally {

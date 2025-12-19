@@ -1,14 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-/// Representa un recordatorio individual para un hábito
-class HabitReminder {
-  final String id; // ID único del recordatorio
-  final TimeOfDay time; // Hora del recordatorio
-  final List<int>
-  daysOfWeek; // Días activos (1=lun, 7=dom), vacío = todos los días
-  final bool enabled; // Si está activo o no
-
+ class HabitReminder {
+  final String id;    final TimeOfDay time;    final List<int>
+  daysOfWeek;    final bool enabled;  
   HabitReminder({
     required this.id,
     required this.time,
@@ -68,18 +63,9 @@ class Habit {
   int order;
   bool daily;
   DateTime lastUpdated;
-  String colorHex; // '0xFFxxxxxx'
-
-  // 🆕 Nuevos campos para personalización y motivación
-  String? emoji; // Emoji opcional para el hábito
-  String? iconCode; // Código del icono (ej. 'book', 'fitness', etc.)
-  List<String> tags; // Etiquetas/categorías (máx 3)
-  List<HabitReminder> reminders; // Múltiples recordatorios
-  int currentStreak; // Racha actual de días consecutivos
-  int bestStreak; // Mejor racha histórica
-
-  // campos no usados pero presentes en tu clase original
-  var values;
+  String colorHex;  
+     String? emoji;    String? iconCode;    List<String> tags;    List<HabitReminder> reminders;    int currentStreak;    int bestStreak;  
+     var values;
   var textColor;
 
   Habit({
@@ -111,8 +97,7 @@ class Habit {
 
   Map<String, dynamic> toMap() {
     return {
-      // 'id' NO se guarda dentro del doc
-      'name': name,
+             'name': name,
       'description': description,
       'frequency': frequency,
       'reminderTime': reminderTime,
@@ -126,8 +111,7 @@ class Habit {
       'daily': daily,
       'lastUpdated': Timestamp.fromDate(lastUpdated),
       'colorHex': colorHex,
-      // Nuevos campos
-      'emoji': emoji,
+             'emoji': emoji,
       'iconCode': iconCode,
       'tags': tags,
       'reminders': reminders.map((r) => r.toMap()).toList(),
@@ -174,8 +158,7 @@ class Habit {
       daily: map['daily'] ?? true,
       lastUpdated: toDate(map['lastUpdated']),
       colorHex: map['colorHex'] ?? '0xFF000000',
-      // Nuevos campos
-      emoji: map['emoji'],
+             emoji: map['emoji'],
       iconCode: map['iconCode'],
       tags: List<String>.from(map['tags'] ?? []),
       reminders: parseReminders(map['reminders']),

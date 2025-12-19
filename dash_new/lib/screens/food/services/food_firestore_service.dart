@@ -12,11 +12,9 @@ class FoodFirestoreService {
       .collection('food')
       .doc('root');
 
-  // ====== GLOBAL TARGETS (nuevos) ============================================
   DocumentReference<Map<String, dynamic>> get _targetsRef =>
       _root.collection('config').doc('targets');
 
-  /// Stream de objetivos globales. Keys: kcal, protein, carbs, fat, fiber, water (double).
   Stream<Map<String, double?>> streamGlobalTargets() {
     return _targetsRef.snapshots().map((d) {
       final m = Map<String, dynamic>.from(d.data() ?? const {});
@@ -32,7 +30,6 @@ class FoodFirestoreService {
     });
   }
 
-  /// Guardar objetivos globales (solo se escriben los no nulos)
   Future<void> setGlobalTargets({
     double? kcal,
     double? protein,
@@ -51,26 +48,20 @@ class FoodFirestoreService {
     if (patch.isEmpty) return;
     await _targetsRef.set(patch, SetOptions(merge: true));
   }
-  // ===========================================================================
 
-  // ---------- Foods ----------
   Stream<List<Food>> streamFoods({
     String? query,
     bool supplementsOnly = false,
   }) {
-    // Para evitar problemas con índices de Firestore cuando se combina where + orderBy,
-    // aplicamos el filtro de suplementos en memoria después de obtener todos los alimentos
     Query<Map<String, dynamic>> q = _root.collection('foods').orderBy('name');
     
     return q.snapshots().map((s) {
       var list = s.docs.map((d) => Food.fromMap(d.id, d.data())).toList();
-      
-      // Filtrar por suplementos si es necesario
+
       if (supplementsOnly) {
         list = list.where((f) => f.isSupplement).toList();
       }
-      
-      // Filtrar por búsqueda si es necesario
+
       if (query != null && query.trim().isNotEmpty) {
         final ql = query.trim().toLowerCase();
         list = list
@@ -81,7 +72,7 @@ class FoodFirestoreService {
             )
             .toList();
       }
-      
+
       return list;
     });
   }
@@ -100,7 +91,6 @@ class FoodFirestoreService {
     await _root.collection('foods').doc(id).delete();
   }
 
-  // ---------- Recipes ----------
   Stream<List<Recipe>> streamRecipes() {
     return _root
         .collection('recipes')
@@ -123,7 +113,6 @@ class FoodFirestoreService {
     await _root.collection('recipes').doc(id).delete();
   }
 
-  // ---------- Favorites ----------
   Stream<List<Favorite>> streamFavorites() {
     return _root
         .collection('favorites')
@@ -144,11 +133,9 @@ class FoodFirestoreService {
     await _root.collection('favorites').doc(id).delete();
   }
 
-  // Aliases para compatibilidad
   Future<String> addFavorite(Favorite f) => saveFavorite(f);
   Future<void> removeFavorite(String id) => deleteFavorite(id);
 
-  // ---------- Diary ----------
   DocumentReference<Map<String, dynamic>> _dayRef(String dayId) =>
       _root.collection('intake').doc(dayId);
 
@@ -275,8 +262,7 @@ class FoodFirestoreService {
     await _recalcTotals(dayId, entries);
   }
 
-  // (dejo tus objetivos por día tal cual por si quieres usarlos puntualmente)
-  Future<void> setTargets(
+     Future<void> setTargets(
     String dayId, {
     double? kcal,
     double? protein,
@@ -306,17 +292,15 @@ class FoodFirestoreService {
     });
   }
 
-  // Alias para facade
+
   Stream<DailyIntakeDoc> streamDailyIntake(String dayId) => streamDay(dayId);
   Future<void> addIntakeEntry(String dayId, IntakeEntry entry) => addEntry(dayId, entry);
   Future<void> removeIntakeEntry(String dayId, String entryId) async {
-    // entryId es el index convertido a string
     final index = int.tryParse(entryId);
     if (index != null) await deleteEntry(dayId, index);
   }
   Future<void> addWater(String dayId, int ml) => incrementWater(dayId, ml);
 
-  // Stream de últimos N días
   Stream<List<DailyIntakeDoc>> streamLastNDays(int n) {
     final today = DateTime.now();
     final dayIds = List.generate(n, (i) {
@@ -351,7 +335,6 @@ class FoodFirestoreService {
     });
   }
 
-  // ---------- Planner ----------
   DocumentReference<Map<String, dynamic>> _plannerRef(String weekId) =>
       _root.collection('planner').doc(weekId);
 
@@ -402,9 +385,8 @@ class FoodFirestoreService {
     await _plannerRef(w.id).set(w.toMap(), SetOptions(merge: true));
   }
 
-  // Métodos para múltiples planners (TODO: implementar modelo MealPlanner)
   Stream<List<dynamic>> streamPlanners() {
-    return Stream.value([]); // Placeholder
+    return Stream.value([]);
   }
 
   Future<String> createPlanner(String name) async {
@@ -461,7 +443,6 @@ class FoodFirestoreService {
     await ref.update({'days': days});
   }
 
-  // ---------- ShoppingLists ----------
   Stream<List<ShoppingList>> streamShoppingLists() {
     return _root
         .collection('shoppingLists')
@@ -514,8 +495,7 @@ class FoodFirestoreService {
     await _root.collection('shoppingLists').doc(id).delete();
   }
 
-  // Versión para facade con 3 parámetros
-  Future<void> upsertShoppingItem(String listId, String itemId, ShoppingListItem item) async {
+     Future<void> upsertShoppingItem(String listId, String itemId, ShoppingListItem item) async {
     await upsertShoppingItemInternal(listId, itemId: itemId, item: item);
   }
 
@@ -547,7 +527,6 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // Versión para facade con String itemId
   Future<void> removeShoppingItem(String listId, String itemId) async {
     final index = int.tryParse(itemId) ?? -1;
     await removeShoppingItemByIndex(listId, index);
@@ -568,7 +547,6 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // Versión para facade con String itemId
   Future<void> toggleChecked(String listId, String itemId, bool checked) async {
     final index = int.tryParse(itemId) ?? -1;
     await toggleCheckedByIndex(listId, index, checked);
@@ -589,7 +567,6 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // ---------- Pantry ----------
   Stream<List<PantryItem>> streamPantry() {
     return _root
         .collection('pantry')
@@ -600,7 +577,6 @@ class FoodFirestoreService {
         );
   }
 
-  // Versión para facade sin id opcional
   Future<void> upsertPantry(PantryItem item) async {
     await upsertPantryWithId(item, id: item.id.isEmpty ? null : item.id);
   }
@@ -627,7 +603,6 @@ class FoodFirestoreService {
     });
   }
 
-  // ---------- Planner → Shopping generator ----------
   Future<void> generateShoppingFromWeek(
     String weekId, {
     ShoppingScope? scopeOverride,
@@ -735,7 +710,6 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // ---------- Reminders config ----------
   DocumentReference<Map<String, dynamic>> get _remindersRef =>
       _root.collection('config').doc('reminders');
 
@@ -748,7 +722,7 @@ class FoodFirestoreService {
     await _remindersRef.set(data, SetOptions(merge: true));
   }
 
-  /// Marca “me he despertado” (para histórico simple y deduplicar si quieres).
+
   Future<void> markAwake(DateTime when, {required String dayId}) async {
     await _remindersRef.set({
       'lastAwakeAt': Timestamp.fromDate(when),

@@ -1,4 +1,3 @@
-// lib/screens/finance/assets/asset_edit_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/finance_models.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/finance_firestore_service.dart';
@@ -20,13 +19,11 @@ class _AssetEditSheetState extends State<AssetEditSheet> {
   final _address = TextEditingController();
   final _notes = TextEditingController();
 
-  /// almacenamos el string ARGB como en otros módulos (p.ej. '0xFF2962FF')
   final _colorHex = TextEditingController();
 
   AssetKind _kind = AssetKind.other;
   DateTime? _acquiredAt;
 
-  /// misma paleta que usamos en Study
   static const _swatches = <int>[
     0xFF2962FF,
     0xFF00BFA5,

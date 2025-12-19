@@ -24,7 +24,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
   final _year = TextEditingController();
   final _pages = TextEditingController();
   final _cover = TextEditingController();
-  final _pdfUrl = TextEditingController(); // ✅
+  final _pdfUrl = TextEditingController(); 
   ItemStatus _status = ItemStatus.pending;
   double? _rating;
 
@@ -55,7 +55,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: true, // solicitamos bytes para web / path null
+        withData: true, 
       );
       if (result == null || result.files.isEmpty) return;
       final user = FirebaseAuth.instance.currentUser;

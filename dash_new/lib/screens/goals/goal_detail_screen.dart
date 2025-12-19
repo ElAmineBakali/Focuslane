@@ -245,8 +245,7 @@ class _SectionList extends StatelessWidget {
                       goalId,
                       sg.id,
                       1,
-                    ); // +1 unidad rápida
-                  } else if (v == 'minus') {
+                    );                    } else if (v == 'minus') {
                     await svc.bumpSubGoalProgress(goalId, sg.id, -1);
                   }
                 },

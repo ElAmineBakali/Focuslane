@@ -13,21 +13,13 @@ class NoteAttachment {
   );
 }
 
-/// Modelo de nota con contenido rico (texto Quill, imágenes, portada)
-class Note {
+ class Note {
   final String id;
   final String title;
-  // Compatibilidad: si existe `delta` se usa editor rico; si no, `content` plano.
-  final String content; // texto plano heredado
-  final List<FormatSpan> spans; // legado para marcas simples
-  final List<dynamic>? delta; // Quill Delta (lista de ops)
-  final List<String> tags;
+     final String content;    final List<FormatSpan> spans;    final List<dynamic>? delta;    final List<String> tags;
   final bool isPinned;
   final String? colorHex;
-  final String? coverUrl; // portada (imagen/dibujo)
-  final String? style; // estilo visual de tarjeta
-  final List<NoteAttachment> attachments; // imágenes/archivos
-  final DateTime createdAt;
+  final String? coverUrl;    final String? style;    final List<NoteAttachment> attachments;    final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? date;
   final List<String> linkedTaskIds;
@@ -160,10 +152,8 @@ class Note {
   }
 }
 
-/// Segmento de texto con formato
-class FormatSpan {
-  final int start; // offset en content
-  final int length;
+ class FormatSpan {
+  final int start;    final int length;
   final bool bold;
   final bool italic;
   final bool underline;

@@ -16,8 +16,7 @@ class HabitFirestoreService {
         .asyncExpand((uid) => uid == null ? const Stream.empty() : build(uid));
   }
 
-  /// Activos por defecto (orden manual)
-  static Stream<List<Habit>> getHabits({bool activeOnly = true}) {
+     static Stream<List<Habit>> getHabits({bool activeOnly = true}) {
     return _withUserStream((uid) {
       Query q = _col(uid).orderBy('order');
       if (activeOnly) q = q.where('isActive', isEqualTo: true);
@@ -28,8 +27,7 @@ class HabitFirestoreService {
     });
   }
 
-  /// Solo archivados
-  static Stream<List<Habit>> getArchivedHabits() {
+     static Stream<List<Habit>> getArchivedHabits() {
     return _withUserStream((uid) {
       return _col(uid)
           .where('isActive', isEqualTo: false)
@@ -44,14 +42,11 @@ class HabitFirestoreService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    // calcula orden actual
-    final snap = await _col(uid).get();
-    final docRef = _col(uid).doc(); // id auto
-    final toSave =
+         final snap = await _col(uid).get();
+    final docRef = _col(uid).doc();      final toSave =
         habit
             .copyWith(id: docRef.id, order: snap.docs.length)
-            .toMap(); // sin 'id' dentro
-    await docRef.set(toSave);
+            .toMap();      await docRef.set(toSave);
   }
 
   static Future<void> updateHabit(Habit habit) async {
@@ -60,8 +55,7 @@ class HabitFirestoreService {
     await _col(uid).doc(habit.id).update(habit.toMap());
   }
 
-  /// Campos sueltos (para editar sin tocar todo)
-  static Future<void> updateHabitFields(
+     static Future<void> updateHabitFields(
     String id,
     Map<String, dynamic> fields,
   ) async {
@@ -76,8 +70,7 @@ class HabitFirestoreService {
     await _col(uid).doc(id).delete();
   }
 
-  /// Orden manual
-  Future<void> updateHabitOrder(List<Habit> habits) async {
+     Future<void> updateHabitOrder(List<Habit> habits) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     final batch = _db.batch();
@@ -87,8 +80,7 @@ class HabitFirestoreService {
     await batch.commit();
   }
 
-  /// Archivar / Desarchivar
-  Future<void> archiveHabit(String id) async {
+     Future<void> archiveHabit(String id) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     await _col(uid).doc(id).update({'isActive': false});
@@ -100,18 +92,15 @@ class HabitFirestoreService {
     await _col(uid).doc(id).update({'isActive': true});
   }
 
-  /// Guardar marca del día (✔️/❌/"-"/número) + lastUpdated
-  Future<void> updateHabitHistory(
+     Future<void> updateHabitHistory(
     String id,
     DateTime date,
     dynamic value,
   ) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final key = date.toIso8601String().split('T')[0]; // yyyy-MM-dd
-
-    // merge parcial en el mapa 'history'
-    await _col(uid).doc(id).set({
+    final key = date.toIso8601String().split('T')[0];  
+         await _col(uid).doc(id).set({
       'history': {key: value},
       'lastUpdated': Timestamp.now(),
     }, SetOptions(merge: true));

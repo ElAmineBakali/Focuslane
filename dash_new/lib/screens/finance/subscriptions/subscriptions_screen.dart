@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'subscription_edit_screen.dart'; // import relativo al editor
+import 'subscription_edit_screen.dart'; 
 import '../services/finance_firestore_service.dart';
 import '../models/finance_models.dart';
 
 class SubscriptionsScreen extends StatelessWidget {
   const SubscriptionsScreen({super.key});
-  static const route = '/finance/subscriptions'; // LISTA
-
+  static const route = '/finance/subscriptions'; 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

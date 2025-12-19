@@ -16,8 +16,7 @@ class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  // removed unused helper
-
+   
   @override
   Widget build(BuildContext context) {
     final svc = widget.svc;
@@ -148,8 +147,7 @@ class _DayEventsList extends StatelessWidget {
     );
   }
 
-  int _weekday(DateTime d) => d.weekday; // 1..7
-}
+  int _weekday(DateTime d) => d.weekday;  }
 
 class _SectionHeader extends StatelessWidget {
   final String title;

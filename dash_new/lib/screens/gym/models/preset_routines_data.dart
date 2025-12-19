@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'gym_models.dart';
 
-/// 🏋️ Rutinas predefinidas famosas - Listo para copiar y personalizar
-final List<PresetRoutine> presetRoutines = [
-  // 1️⃣ Arnold Classic Split
-  PresetRoutine(
+ final List<PresetRoutine> presetRoutines = [
+     PresetRoutine(
     id: 'arnold_classic',
     name: 'Arnold Classic Split',
     description: 'Rutina legendaria de Arnold Schwarzenegger. 6 días/semana enfocada en volumen alto e hipertrofia. Ideal para avanzados.',
@@ -171,8 +169,7 @@ final List<PresetRoutine> presetRoutines = [
     ],
   ),
 
-  // 2️⃣ PPL para Novatos
-  PresetRoutine(
+     PresetRoutine(
     id: 'ppl_beginner',
     name: 'PPL Novato',
     description: 'Push Pull Legs clásico. 6 días/semana con volumen moderado. Perfecto para principiantes que buscan estructura.',
@@ -309,8 +306,7 @@ final List<PresetRoutine> presetRoutines = [
     ],
   ),
 
-  // 3️⃣ Full Body 3x/semana
-  PresetRoutine(
+     PresetRoutine(
     id: 'full_body_3x',
     name: 'Full Body 3x Semana',
     description: 'Rutina de cuerpo completo 3 días/semana. Ideal para principiantes o personas con poco tiempo.',
@@ -444,8 +440,7 @@ final List<PresetRoutine> presetRoutines = [
     ],
   ),
 
-  // 4️⃣ Hipertrofia Avanzada
-  PresetRoutine(
+     PresetRoutine(
     id: 'hypertrophy_advanced',
     name: 'Hipertrofia Avanzada',
     description: 'Rutina de 5 días enfocada en máximo crecimiento muscular. Volumen alto, intensidad controlada.',
@@ -669,8 +664,7 @@ final List<PresetRoutine> presetRoutines = [
     ],
   ),
 
-  // 5️⃣ Calistenia Full Body
-  PresetRoutine(
+     PresetRoutine(
     id: 'calisthenics_full',
     name: 'Calistenia Full Body',
     description: 'Entrenamiento con peso corporal. Sin pesas, enfocado en control, fuerza relativa y habilidad.',
@@ -764,8 +758,7 @@ final List<PresetRoutine> presetRoutines = [
     ],
   ),
 
-  // 6️⃣ Fuerza 5x5
-  PresetRoutine(
+     PresetRoutine(
     id: 'strength_5x5',
     name: 'Fuerza 5x5',
     description: 'Programa de fuerza pura. 5 series de 5 reps en grandes levantamientos. Ganar fuerza máxima.',

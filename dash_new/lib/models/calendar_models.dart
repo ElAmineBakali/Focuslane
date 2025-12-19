@@ -14,9 +14,7 @@ class CalendarEvent {
   final bool allDay;
   final String? notes;
 
-  /// opcional: solo se usa para eventos que provienen de Tasks
-  /// (para pintar tachado/atenuado si está completada)
-  final bool? completed;
+        final bool? completed;
 
   CalendarEvent({
     required this.id,
@@ -27,8 +25,7 @@ class CalendarEvent {
     this.end,
     this.allDay = false,
     this.notes,
-    this.completed, // ← nuevo (nullable)
-  });
+    this.completed,    });
 
   Map<String, dynamic> toMap() => {
     'title': title,
@@ -56,8 +53,7 @@ class CalendarEvent {
       end: (m['end'] as Timestamp?)?.toDate(),
       allDay: (m['allDay'] ?? false) as bool,
       notes: m['notes'] as String?,
-      completed: m['completed'] as bool?, // puede ser null
-    );
+      completed: m['completed'] as bool?,      );
   }
 
   static T _enumParse<T>(List<T> values, Object? raw, T fallback) {
@@ -69,16 +65,11 @@ class CalendarEvent {
   }
 }
 
-/// --- Timetable (semanal) ---
-class Timetable {
+ class Timetable {
   final String id;
   final String name;
   final bool isDefault;
-  final List<String> days; // ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
-  final String startHour; // "07:00"
-  final String endHour; // "22:00"
-  final int slotMinutes; // 30,45,60...
-  final String? colorHex;
+  final List<String> days;    final String startHour;    final String endHour;    final int slotMinutes;    final String? colorHex;
 
   Timetable({
     required this.id,
@@ -120,10 +111,7 @@ class Timetable {
 
 class TimetableSlot {
   final String id;
-  final String day; // "Mon"... "Sun"
-  final String start; // "HH:mm"
-  final String end; // "HH:mm"
-  final String title;
+  final String day;    final String start;    final String end;    final String title;
   final CalendarType type;
   final String? note;
   final String? colorHex;

@@ -4,8 +4,7 @@ import '../models/finance_models.dart';
 
 class SubscriptionEditScreen extends StatefulWidget {
   const SubscriptionEditScreen({super.key});
-  static const route = '/finance/subscriptions/edit'; // EDITOR (RUTA DIFERENTE)
-
+  static const route = '/finance/subscriptions/edit'; 
   @override
   State<SubscriptionEditScreen> createState() => _SubscriptionEditScreenState();
 }

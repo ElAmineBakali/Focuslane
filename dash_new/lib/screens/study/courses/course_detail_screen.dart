@@ -5,8 +5,7 @@ import '../tasks/study_tasks_screen.dart';
 import '../timer/study_timer_screen.dart';
 import '../analytics/study_analytics_screen.dart';
 import 'course_edit_sheet.dart';
-import '../attendance/attendance_screen.dart'; // ✅ NUEVO
-
+import '../attendance/attendance_screen.dart';  
 class CourseDetailScreen extends StatelessWidget {
   final StudyFirestoreService svc;
   final Course course;
@@ -88,8 +87,7 @@ class CourseDetailScreen extends StatelessWidget {
               },
             ),
           ),
-          // ✅ NUEVO: Asistencia
-          Card(
+                     Card(
             child: ListTile(
               leading: Icon(Icons.event_available, color: accent),
               title: const Text('Asistencia'),

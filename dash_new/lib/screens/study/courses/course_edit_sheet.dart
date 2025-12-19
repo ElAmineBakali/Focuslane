@@ -5,8 +5,7 @@ import '../models/study_models.dart';
 import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
 import 'package:mi_dashboard_personal/widgets/external_link_picker_widget.dart';
 
-/// Formulario de creación/edición de curso con diseño TaskFormTheme
-class CourseEditSheet extends StatefulWidget {
+ class CourseEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course? initial;
   
@@ -147,8 +146,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
-                  Row(
+                                     Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -192,8 +190,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Campo: Nombre
-                  _TaskFormTextField(
+                                     _TaskFormTextField(
                     controller: _nameController,
                     label: 'Nombre del curso',
                     icon: Icons.book_rounded,
@@ -206,16 +203,14 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo: Profesor
-                  _TaskFormTextField(
+                                     _TaskFormTextField(
                     controller: _teacherController,
                     label: 'Profesor',
                     icon: Icons.person_rounded,
                   ),
                   const SizedBox(height: 16),
 
-                  // Campos en fila: Créditos y Horas meta
-                  Row(
+                                     Row(
                     children: [
                       Expanded(
                         child: _TaskFormTextField(
@@ -238,8 +233,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo: Asistencia requerida
-                  _TaskFormTextField(
+                                     _TaskFormTextField(
                     controller: _attendancePctController,
                     label: 'Asistencia requerida (%)',
                     icon: Icons.how_to_reg_rounded,
@@ -256,8 +250,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Selector de color
-                  GlobalColorPickerWidget(
+                                     GlobalColorPickerWidget(
                     initialColor: _selectedColor,
                     onColorSelected: (color) {
                       setState(() => _selectedColor = color);
@@ -266,8 +259,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Selector de enlaces externos
-                  ExternalLinkPickerWidget(
+                                     ExternalLinkPickerWidget(
                     initialLink: _externalLink,
                     onLinkSelected: (link) {
                       setState(() => _externalLink = link);
@@ -276,8 +268,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Botón de guardar
-                  SizedBox(
+                                     SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: FilledButton(
@@ -317,8 +308,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
   }
 }
 
-/// TextField con estilo TaskFormTheme consistente
-class _TaskFormTextField extends StatelessWidget {
+ class _TaskFormTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final IconData icon;

@@ -36,14 +36,12 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     
-    // Cargar configuración global
-    final notifyClasses = prefs.getBool(_kNotifyClasses) ?? true;
+         final notifyClasses = prefs.getBool(_kNotifyClasses) ?? true;
     final notifyTasks = prefs.getBool(_kNotifyTasks) ?? true;
     final classesAdvance = prefs.getInt(_kClassesAdvanceMinutes) ?? 15;
     final tasksAdvance = prefs.getInt(_kTasksAdvanceHours) ?? 24;
     
-    // Cargar configuración por curso
-    final courses = await widget.svc.streamCourses().first;
+         final courses = await widget.svc.streamCourses().first;
     final courseNotifs = <String, bool>{};
     for (final course in courses) {
       courseNotifs[course.id] = prefs.getBool('study_notify_course_${course.id}') ?? true;
@@ -66,8 +64,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
     await prefs.setInt(_kClassesAdvanceMinutes, _classesAdvanceMinutes);
     await prefs.setInt(_kTasksAdvanceHours, _tasksAdvanceHours);
     
-    // Guardar configuración por curso
-    for (final entry in _courseNotifications.entries) {
+         for (final entry in _courseNotifications.entries) {
       await prefs.setBool('study_notify_course_${entry.key}', entry.value);
     }
   }
@@ -98,8 +95,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Handle bar
-                  Container(
+                                     Container(
                     margin: const EdgeInsets.only(top: 12, bottom: 8),
                     width: 40,
                     height: 4,
@@ -109,8 +105,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                     ),
                   ),
                   
-                  // Header
-                  Padding(
+                                     Padding(
                     padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                     child: Row(
                       children: [
@@ -163,15 +158,13 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                   
                   const SizedBox(height: 24),
                   
-                  // Contenido scrollable
-                  Flexible(
+                                     Flexible(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // SECCIÓN 1: Notificaciones globales
-                          _SectionTitle(
+                                                     _SectionTitle(
                             icon: Icons.toggle_on_rounded,
                             title: 'Configuración General',
                             subtitle: 'Activa o desactiva tipos de notificaciones',
@@ -222,8 +215,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                           
                           const SizedBox(height: 32),
                           
-                          // SECCIÓN 2: Notificaciones por curso
-                          _SectionTitle(
+                                                     _SectionTitle(
                             icon: Icons.book_rounded,
                             title: 'Notificaciones por Curso',
                             subtitle: 'Personaliza qué cursos te notifican',
@@ -271,8 +263,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                           
                           const SizedBox(height: 32),
                           
-                          // Botones de acción
-                          Row(
+                                                     Row(
                             children: [
                               Expanded(
                                 child: OutlinedButton.icon(
@@ -345,8 +336,7 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
   }
 }
 
-// Widget para títulos de sección
-class _SectionTitle extends StatelessWidget {
+ class _SectionTitle extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -392,8 +382,7 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-// Widget para cada opción de notificación
-class _NotificationTile extends StatelessWidget {
+ class _NotificationTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -456,8 +445,7 @@ class _NotificationTile extends StatelessWidget {
   }
 }
 
-// Widget para seleccionar tiempo de anticipación
-class _TimeSelector extends StatelessWidget {
+ class _TimeSelector extends StatelessWidget {
   final String label;
   final int value;
   final List<int> options;
@@ -544,8 +532,7 @@ class _TimeSelector extends StatelessWidget {
   }
 }
 
-// Widget para cada curso
-class _CourseTile extends StatelessWidget {
+ class _CourseTile extends StatelessWidget {
   final Course course;
   final bool value;
   final ValueChanged<bool> onChanged;

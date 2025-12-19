@@ -5,9 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
 
-/// 📈 Pantalla de progreso individual por ejercicio
-/// Muestra evolución de e1RM, volumen, PRs históricos y comparación
-class ExerciseProgressScreen extends StatefulWidget {
+  class ExerciseProgressScreen extends StatefulWidget {
   final GymFirestoreService svc;
   final String exerciseName;
   final String? exerciseId;
@@ -70,8 +68,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // App Bar con efecto glassmorphism
-          SliverAppBar.large(
+                     SliverAppBar.large(
             expandedHeight: 160,
             pinned: true,
             stretch: true,
@@ -114,8 +111,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             ),
           ),
 
-          // Contenido según tab seleccionado
-          SliverFillRemaining(
+                     SliverFillRemaining(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : TabBarView(
@@ -150,8 +146,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // KPIs
-          _buildKpiRow([
+                     _buildKpiRow([
             ('Actual', '${latestE1rm.toStringAsFixed(1)} kg', Icons.fitness_center, Colors.blue),
             ('Máximo', '${maxE1rm.toStringAsFixed(1)} kg', Icons.trending_up, Colors.green),
             ('Mejora', '${improvement >= 0 ? '+' : ''}${improvement.toStringAsFixed(1)}%', 
@@ -160,8 +155,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           ]),
           const SizedBox(height: 24),
           
-          // Gráfico de e1RM
-          Text(
+                     Text(
             'Evolución e1RM',
             style: GoogleFonts.poppins(
               fontSize: 18,
@@ -176,8 +170,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           
           const SizedBox(height: 24),
           
-          // Promedio móvil
-          _buildStatCard(
+                     _buildStatCard(
             'Promedio General',
             '${avgE1rm.toStringAsFixed(1)} kg',
             Icons.analytics_outlined,
@@ -202,16 +195,14 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // KPIs
-          _buildKpiRow([
+                     _buildKpiRow([
             ('Total', '${(totalVolume / 1000).toStringAsFixed(1)} ton', Icons.scale, Colors.orange),
             ('Promedio', '${avgVolume.toStringAsFixed(0)} kg', Icons.analytics, Colors.blue),
             ('Máximo', '${maxVolume.toStringAsFixed(0)} kg', Icons.trending_up, Colors.green),
           ]),
           const SizedBox(height: 24),
           
-          // Gráfico de volumen
-          Text(
+                     Text(
             'Volumen por Sesión',
             style: GoogleFonts.poppins(
               fontSize: 18,
@@ -391,8 +382,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
         ),
         child: Row(
           children: [
-            // Medalla/Ranking
-            Container(
+                         Container(
               width: 56,
               height: 56,
               decoration: BoxDecoration(
@@ -416,8 +406,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             ),
             const SizedBox(width: 16),
             
-            // Info del PR
-            Expanded(
+                         Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

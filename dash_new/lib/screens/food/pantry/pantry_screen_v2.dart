@@ -4,8 +4,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-/// 🍳 DESPENSA V2 - Diseño moderno con alertas de stock bajo y gestión inteligente
-class PantryScreenV2 extends StatefulWidget {
+ class PantryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const PantryScreenV2({super.key, required this.svc});
 
@@ -73,7 +72,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
 
           return Column(
             children: [
-              // Alerta de stock bajo
               if (lowStockCount > 0 && !_showLowStockOnly)
                 Container(
                   margin: const EdgeInsets.all(AppSpacing.md),
@@ -130,7 +128,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                     ],
                   ),
                 ).animate().fadeIn().slideY(begin: -0.2),
-              // Lista de productos
               Expanded(
                 child: _isGridView
                     ? _buildGridView(items)
@@ -195,7 +192,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
     );
   }
 
-  // Acciones
   Future<void> _editItem({PantryItem? initial, String? id}) async {
     final nameController = TextEditingController(text: initial?.name ?? '');
     final qtyController = TextEditingController(text: (initial?.qty ?? 1).toString());
@@ -229,7 +225,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -327,7 +322,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       if (name.isEmpty) return;
 
       if (id != null) {
-        // Editar
         final updated = PantryItem(
           id: id,
           name: name,
@@ -337,7 +331,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
         );
         await widget.svc.upsertPantryWithId(updated, id: id);
       } else {
-        // Crear nuevo
         final newItem = PantryItem(
           id: '',
           name: name,
@@ -463,8 +456,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Handle
-            Center(
+                         Center(
               child: Container(
                 width: 40,
                 height: 4,
@@ -475,7 +467,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            // Header
             Row(
               children: [
                 Container(
@@ -514,7 +505,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            // Detalles
             _DetailRow(
               icon: Icons.inventory_2,
               label: 'Stock actual',
@@ -529,7 +519,6 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               ),
             ],
             const SizedBox(height: AppSpacing.lg),
-            // Acciones
             Row(
               children: [
                 Expanded(
@@ -574,8 +563,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
   }
 }
 
-// Widgets auxiliares
-class _PantryCard extends StatelessWidget {
+ class _PantryCard extends StatelessWidget {
   final PantryItem item;
   final bool isLowStock;
   final VoidCallback onTap;
@@ -615,7 +603,6 @@ class _PantryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
@@ -679,7 +666,7 @@ class _PantryCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Body
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),

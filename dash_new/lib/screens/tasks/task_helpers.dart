@@ -1,6 +1,4 @@
-// task_helpers.dart
-// Helpers para agrupación, ordenación y formateo de tareas
-
+  
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'task_model.dart';
@@ -63,29 +61,23 @@ class TaskGrouper {
   static List<Task> sortTasks(List<Task> tasks) {
     final sorted = List<Task>.from(tasks);
     sorted.sort((a, b) {
-      // 0. Fijadas primero
-      if (a.isPinned != b.isPinned) {
+             if (a.isPinned != b.isPinned) {
         return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
       }
 
-      // 1. Fecha de vencimiento (ascendente: más cercana primero)
-      if (a.dueDate == null && b.dueDate == null) {
-        // 2. Prioridad (descendente: alta primero)
-        final priorityComp = b.priority.index.compareTo(a.priority.index);
+             if (a.dueDate == null && b.dueDate == null) {
+                 final priorityComp = b.priority.index.compareTo(a.priority.index);
         if (priorityComp != 0) return priorityComp;
-        // 3. Orden manual como tiebreaker
-        return (a.order ?? 0).compareTo(b.order ?? 0);
+                 return (a.order ?? 0).compareTo(b.order ?? 0);
       }
       if (a.dueDate == null) return 1;
       if (b.dueDate == null) return -1;
 
       final dateComp = a.dueDate!.compareTo(b.dueDate!);
       if (dateComp != 0) return dateComp;
-      // 2. Prioridad si misma fecha
-      final priorityComp = b.priority.index.compareTo(a.priority.index);
+             final priorityComp = b.priority.index.compareTo(a.priority.index);
       if (priorityComp != 0) return priorityComp;
-      // 3. Orden manual como último criterio
-      return (a.order ?? 0).compareTo(b.order ?? 0);
+             return (a.order ?? 0).compareTo(b.order ?? 0);
     });
     return sorted;
   }

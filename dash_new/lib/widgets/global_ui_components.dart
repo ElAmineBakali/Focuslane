@@ -2,16 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-/// 🎨 SISTEMA DE DISEÑO GLOBAL - FOCUSLANE
-/// Sistema unificado de componentes visuales basado en el módulo GYM
-/// Usado en todos los módulos para mantener consistencia visual
-
-// ════════════════════════════════════════════════════════════════════════════
-// COLORES Y GRADIENTES
-// ════════════════════════════════════════════════════════════════════════════
-
 class FocusColors {
-  // Colores principales por módulo
   static const Color gym = Color(0xFF2196F3);
   static const Color food = Color(0xFFFF9800);
   static const Color study = Color(0xFF9C27B0);
@@ -19,13 +10,10 @@ class FocusColors {
   static const Color goals = Color(0xFFE91E63);
   static const Color calendar = Color(0xFF00BCD4);
   
-  // Estados
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFF9800);
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
-  
-  // Neutros
   static Color grey50 = Colors.grey[50]!;
   static Color grey100 = Colors.grey[100]!;
   static Color grey200 = Colors.grey[200]!;
@@ -50,10 +38,6 @@ class FocusColors {
     );
   }
 }
-
-// ════════════════════════════════════════════════════════════════════════════
-// TIPOGRAFÍA
-// ════════════════════════════════════════════════════════════════════════════
 
 class FocusTypography {
   static TextStyle heading1(BuildContext context) => GoogleFonts.poppins(
@@ -109,10 +93,6 @@ class FocusTypography {
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// ESPACIADO Y DIMENSIONES
-// ════════════════════════════════════════════════════════════════════════════
-
 class FocusSpacing {
   static const double xs = 4.0;
   static const double sm = 8.0;
@@ -132,11 +112,6 @@ class FocusSpacing {
   static const double iconSizeLarge = 40.0;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// COMPONENTES REUTILIZABLES
-// ════════════════════════════════════════════════════════════════════════════
-
-/// Card con gradiente y borde de color
 class FocusKpiCard extends StatelessWidget {
   final String label;
   final String value;
@@ -184,7 +159,6 @@ class FocusKpiCard extends StatelessWidget {
   }
 }
 
-/// Card de estadística con ícono y valores
 class FocusStatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -240,7 +214,6 @@ class FocusStatCard extends StatelessWidget {
   }
 }
 
-/// Card de acción rápida con gradiente
 class FocusActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -296,7 +269,6 @@ class FocusActionCard extends StatelessWidget {
   }
 }
 
-/// Chip de información con ícono
 class FocusInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -343,7 +315,6 @@ class FocusInfoChip extends StatelessWidget {
   }
 }
 
-/// Badge decorativo (ej: "PR", "NUEVO")
 class FocusBadge extends StatelessWidget {
   final String text;
   final Color color;
@@ -388,7 +359,6 @@ class FocusBadge extends StatelessWidget {
   }
 }
 
-/// Barra de progreso con label y valor
 class FocusProgressBar extends StatelessWidget {
   final String label;
   final double value;
@@ -446,7 +416,6 @@ class FocusProgressBar extends StatelessWidget {
   }
 }
 
-/// SliverAppBar moderno con gradiente
 class FocusGradientAppBar extends StatelessWidget {
   final String title;
   final IconData? icon;
@@ -498,7 +467,6 @@ class FocusGradientAppBar extends StatelessWidget {
   }
 }
 
-/// Card de lista con ícono y chevron
 class FocusListCard extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -574,7 +542,6 @@ class FocusListCard extends StatelessWidget {
   }
 }
 
-/// Empty state con ilustración
 class FocusEmptyState extends StatelessWidget {
   final IconData icon;
   final String message;
@@ -627,7 +594,6 @@ class FocusEmptyState extends StatelessWidget {
   }
 }
 
-/// Card de métrica con medidor circular
 class FocusMeterCard extends StatelessWidget {
   final String label;
   final double value;
@@ -692,7 +658,6 @@ class FocusMeterCard extends StatelessWidget {
   }
 }
 
-/// Sección con título
 class FocusSection extends StatelessWidget {
   final String title;
   final Widget? action;
@@ -724,18 +689,13 @@ class FocusSection extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// UTILIDADES
-// ════════════════════════════════════════════════════════════════════════════
-
-/// Helper para padding responsive según dispositivo
+double screenPad(BuildContext context) {
 double screenPad(BuildContext context) {
   final width = MediaQuery.of(context).size.width;
   if (width > 600) return 80.0;
   return 0.0;
 }
 
-/// Animación estándar para navegación
 PageRouteBuilder<T> focusPageRoute<T>({
   required Widget page,
   bool useHero = false,

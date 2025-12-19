@@ -24,7 +24,6 @@ class CultureHomeScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
         child: Column(
           children: [
-            // ── Botón "azul" dentro del grid/lista ───────────────────────
             _addTile(context),
 
             const SizedBox(height: 12),
@@ -76,13 +75,11 @@ class CultureHomeScreen extends StatelessWidget {
     );
   }
 
-  // ───────────────── Helpers UI ─────────────────
 
-  // Card “azul” de añadir (sustituye al FAB)
   Widget _addTile(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Card(
-      color: cs.primary, // azul del tema
+      color: cs.primary,
       elevation: 1,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

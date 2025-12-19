@@ -43,7 +43,7 @@ import 'screens/habits/habit_model.dart';
 import 'screens/gym/gym_home_screen.dart';
 import 'screens/gym/services/gym_firestore_service.dart';
 import 'screens/gym/routines/routines_list_screen.dart';
-import 'screens/gym/analytics/gym_analytics_screen.dart';
+import 'screens/gym/analytics/gym_analytics_screen_v2.dart';
 import 'screens/gym/goals/gym_goals_screen.dart';
 import 'screens/gym/body/bodyweight_screen.dart';
 import 'screens/gym/body/measurements_screen.dart';
@@ -67,7 +67,6 @@ import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
 
-//
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
@@ -334,7 +333,7 @@ class _MyAppState extends State<MyApp> {
 
             '/gym': (_) => GymHomeScreen(svc: _gymService),
             '/gym/routines': (_) => RoutinesListScreen(svc: _gymService),
-            '/gym/analytics': (_) => GymAnalyticsScreen(svc: _gymService),
+            '/gym/analytics': (_) => GymAnalyticsScreenV2(svc: _gymService),
             '/gym/goals': (_) => GymGoalsScreen(svc: _gymService),
             '/gym/body/weight': (_) => BodyweightScreen(svc: _gymService),
             '/gym/body/measurements':

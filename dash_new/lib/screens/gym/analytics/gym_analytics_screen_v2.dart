@@ -8,8 +8,7 @@ import '../session/session_history_screen.dart';
 import 'exercise_progress_screen.dart';
 import 'package:intl/intl.dart';
 
-/// 📊 GymAnalyticsScreen rediseñado - Análisis profesional y comprehensivo
-class GymAnalyticsScreenV2 extends StatefulWidget {
+ class GymAnalyticsScreenV2 extends StatefulWidget {
   final GymFirestoreService svc;
 
   const GymAnalyticsScreenV2({super.key, required this.svc});
@@ -21,8 +20,7 @@ class GymAnalyticsScreenV2 extends StatefulWidget {
 class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedPeriod = '7'; // '7', '30', '90'
-
+  String _selectedPeriod = '7';  
   @override
   void initState() {
     super.initState();
@@ -48,8 +46,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // AppBar moderno con gradiente
-          SliverAppBar(
+                     SliverAppBar(
             expandedHeight: 160,
             pinned: true,
             backgroundColor: colorScheme.primaryContainer,
@@ -82,8 +79,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               ),
             ),
             actions: [
-              // Botón de historial
-              IconButton(
+                             IconButton(
                 icon: const Icon(Icons.history_rounded),
                 tooltip: 'Ver historial completo',
                 onPressed: () {
@@ -95,8 +91,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   );
                 },
               ),
-              // Filtros de periodo
-              PopupMenuButton<String>(
+                             PopupMenuButton<String>(
                 initialValue: _selectedPeriod,
                 icon: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -128,8 +123,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
 
-          // Contenido según tab
-          SliverFillRemaining(
+                     SliverFillRemaining(
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -158,10 +152,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // 1. TAB: RESUMEN GENERAL
-  // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildOverviewTab() {
+           Widget _buildOverviewTab() {
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.svc.getStatsForDateRange(_startDate, DateTime.now()),
       builder: (context, snap) {
@@ -179,8 +170,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // KPIs principales
-              _buildSectionTitle('Métricas Principales'),
+                             _buildSectionTitle('Métricas Principales'),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -228,8 +218,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-              // Gráfico de volumen semanal
-              _buildSectionTitle('Volumen Semanal'),
+                             _buildSectionTitle('Volumen Semanal'),
               const SizedBox(height: 24),
               SizedBox(
                 height: 300,
@@ -238,8 +227,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-              // Distribución por grupos musculares
-              _buildSectionTitle('Grupos Musculares'),
+                             _buildSectionTitle('Grupos Musculares'),
               const SizedBox(height: 24),
               SizedBox(
                 height: 300,
@@ -252,10 +240,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // 2. TAB: ENTRENAMIENTO
-  // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildTrainingTab() {
+           Widget _buildTrainingTab() {
     return StreamBuilder<List<SessionDoc>>(
       stream: widget.svc.streamSessions(limit: 90),
       builder: (context, snap) {
@@ -266,14 +251,12 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           return _buildEmptyState('No hay sesiones en este periodo');
         }
 
-        // Calcular frecuencia por rutina
-        final routineFreq = <String, int>{};
+                 final routineFreq = <String, int>{};
         for (final s in sessions) {
           routineFreq[s.routineName] = (routineFreq[s.routineName] ?? 0) + 1;
         }
 
-        // Top ejercicios por volumen
-        final exerciseVolume = <String, double>{};
+                 final exerciseVolume = <String, double>{};
         for (final s in sessions) {
           for (final ex in s.exercises) {
             exerciseVolume[ex.name] = (exerciseVolume[ex.name] ?? 0) + ex.volumeKg;
@@ -308,10 +291,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // 3. TAB: PROGRESO FÍSICO
-  // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildPhysicalTab() {
+           Widget _buildPhysicalTab() {
     return StreamBuilder<List<BodyWeightEntry>>(
       stream: widget.svc.streamBodyWeight(limit: 180),
       builder: (context, snap) {
@@ -323,8 +303,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // KPIs de peso
-              if (weights.isNotEmpty) ...[
+                             if (weights.isNotEmpty) ...[
                 Row(
                   children: [
                     Expanded(
@@ -363,8 +342,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-              // Medidas corporales
-              _buildSectionTitle('Medidas Corporales'),
+                             _buildSectionTitle('Medidas Corporales'),
               const SizedBox(height: 12),
               StreamBuilder<List<MeasurementEntry>>(
                 stream: widget.svc.streamMeasurements(limit: 90),
@@ -377,8 +355,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                     return _buildEmptyState('No hay medidas registradas');
                   }
 
-                  // Agrupar por músculo
-                  final byMuscle = <String, List<MeasurementEntry>>{};
+                                     final byMuscle = <String, List<MeasurementEntry>>{};
                   for (final m in measurements) {
                     byMuscle.putIfAbsent(m.muscle, () => []).add(m);
                   }
@@ -401,8 +378,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 16),
 
-              // Botones de acción
-              Row(
+                             Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
@@ -428,10 +404,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // 4. TAB: SENSACIONES
-  // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildFeelingsTab() {
+           Widget _buildFeelingsTab() {
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.svc.getStatsForDateRange(_startDate, DateTime.now()),
       builder: (context, snap) {
@@ -474,10 +447,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // WIDGETS COMPARTIDOS
-  // ═══════════════════════════════════════════════════════════════════════
-
+         
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -779,10 +749,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // GRÁFICOS
-  // ═══════════════════════════════════════════════════════════════════════
-
+         
   Widget _buildVolumeWeeklyChart() {
     return StreamBuilder<List<SessionDoc>>(
       stream: widget.svc.streamSessions(limit: 90),
@@ -792,8 +759,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
         if (sessions.isEmpty) return const SizedBox();
 
-        // Agrupar por semana
-        final weeklyVolume = <int, double>{};
+                 final weeklyVolume = <int, double>{};
         for (final s in sessions) {
           final weekNum = _getWeekNumber(s.date);
           weeklyVolume[weekNum] = (weeklyVolume[weekNum] ?? 0) + s.volumeKg;
@@ -926,13 +892,10 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
         if (sessions.isEmpty) return const SizedBox();
 
-        // Calcular volumen por grupo muscular
-        final muscleVolume = <String, double>{};
+                 final muscleVolume = <String, double>{};
         for (final s in sessions) {
           for (final ex in s.exercises) {
-            // Asumiendo que los ejercicios tienen muscleGroup en metadata
-            // Por simplicidad, usar el nombre del ejercicio
-            final group = _inferMuscleGroup(ex.name);
+                                      final group = _inferMuscleGroup(ex.name);
             muscleVolume[group] = (muscleVolume[group] ?? 0) + ex.volumeKg;
           }
         }
@@ -941,13 +904,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           ..sort((a, b) => b.value.compareTo(a.value));
 
         final colors = [
-          const Color(0xFF6366F1), // Indigo
-          const Color(0xFFEC4899), // Pink
-          const Color(0xFF10B981), // Green
-          const Color(0xFFF59E0B), // Amber
-          const Color(0xFF8B5CF6), // Purple
-          const Color(0xFF14B8A6), // Teal
-        ];
+          const Color(0xFF6366F1),            const Color(0xFFEC4899),            const Color(0xFF10B981),            const Color(0xFFF59E0B),            const Color(0xFF8B5CF6),            const Color(0xFF14B8A6),          ];
 
         int touchedIndex = -1;
 
@@ -1185,10 +1142,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // UTILIDADES
-  // ═══════════════════════════════════════════════════════════════════════
-
+         
   int _getWeekNumber(DateTime date) {
     final firstDayOfYear = DateTime(date.year, 1, 1);
     final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
@@ -1215,8 +1169,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     }
   }
 
-  // Quick actions
-  Future<void> _quickAddWeight(BuildContext context) async {
+     Future<void> _quickAddWeight(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     final ctrl = TextEditingController();
     final colorScheme = Theme.of(context).colorScheme;
@@ -1234,8 +1187,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con icono
-                Row(
+                                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -1275,8 +1227,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 24),
 
-                // Campo de entrada
-                TextFormField(
+                                 TextFormField(
                   controller: ctrl,
                   autofocus: true,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -1334,8 +1285,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 8),
 
-                // Información adicional
-                Container(
+                                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
@@ -1363,8 +1313,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 24),
 
-                // Botones
-                Row(
+                                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
@@ -1427,8 +1376,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
         );
-        setState(() {}); // Refrescar
-      }
+        setState(() {});        }
     }
   }
 
@@ -1452,8 +1400,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con icono
-                Row(
+                                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -1493,8 +1440,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 24),
 
-                // Campo de músculo
-                TextFormField(
+                                 TextFormField(
                   controller: muscleCtrl,
                   autofocus: true,
                   textCapitalization: TextCapitalization.words,
@@ -1538,8 +1484,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 16),
 
-                // Campo de valor
-                TextFormField(
+                                 TextFormField(
                   controller: valCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   style: GoogleFonts.poppins(
@@ -1596,8 +1541,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 8),
 
-                // Chips sugerencias
-                Wrap(
+                                 Wrap(
                   spacing: 8,
                   children: [
                     'Biceps',
@@ -1621,8 +1565,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 ),
                 const SizedBox(height: 24),
 
-                // Botones
-                Row(
+                                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
@@ -1686,8 +1629,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
         );
-        setState(() {}); // Refrescar
-      }
+        setState(() {});        }
     }
   }
 }

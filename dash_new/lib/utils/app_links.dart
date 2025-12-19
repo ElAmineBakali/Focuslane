@@ -10,7 +10,7 @@ class AppLinks {
         openStore: true,
         appStoreLink: 'market://details?id=$package',
       );
-      return result == true; // cast seguro
+      return result == true;
     } catch (_) {
       return false;
     }

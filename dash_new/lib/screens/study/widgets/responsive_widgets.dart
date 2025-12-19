@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Extensión para obtener fácilmente el safe area bottom padding
-extension SafeAreaExt on BuildContext {
+ extension SafeAreaExt on BuildContext {
   double get safeAreaBottomPadding =>
       MediaQuery.of(this).viewPadding.bottom > 0
           ? MediaQuery.of(this).viewPadding.bottom
@@ -26,8 +25,7 @@ extension SafeAreaExt on BuildContext {
   bool get isDesktop => screenWidth >= 1200;
 }
 
-/// Widget que aplica padding responsivo automático
-class ResponsivePadding extends StatelessWidget {
+ class ResponsivePadding extends StatelessWidget {
   final Widget child;
   final double horizontal;
   final double vertical;
@@ -56,8 +54,7 @@ class ResponsivePadding extends StatelessWidget {
   }
 }
 
-/// ListView con padding responsivo automático
-class ResponsiveListView extends StatelessWidget {
+ class ResponsiveListView extends StatelessWidget {
   final ScrollPhysics? physics;
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
@@ -114,8 +111,7 @@ class ResponsiveListView extends StatelessWidget {
   }
 }
 
-/// CustomScrollView con padding responsivo en slivers
-class ResponsiveCustomScrollView extends StatelessWidget {
+ class ResponsiveCustomScrollView extends StatelessWidget {
   final List<Widget> slivers;
   final ScrollPhysics? physics;
   final ScrollController? controller;
@@ -136,8 +132,7 @@ class ResponsiveCustomScrollView extends StatelessWidget {
       controller: controller,
       slivers: [
         ...slivers,
-        // Bottom padding safety area
-        SliverToBoxAdapter(
+                 SliverToBoxAdapter(
           child: SizedBox(height: bottomPadding),
         ),
       ],
@@ -145,8 +140,7 @@ class ResponsiveCustomScrollView extends StatelessWidget {
   }
 }
 
-/// Card responsivo con mejor spacing
-class ResponsiveCard extends StatelessWidget {
+ class ResponsiveCard extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;
   final EdgeInsets? padding;

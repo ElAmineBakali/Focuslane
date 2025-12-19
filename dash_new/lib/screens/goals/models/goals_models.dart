@@ -9,14 +9,9 @@ class Goal {
   final GoalStatus status;
   final DateTime? targetDate;
 
-  /// progreso numérico (opcional): p.ej. minutos/h, %, unidades…
-  final double? progress; // actual
-  final double? progressTarget; // objetivo
-  final String? unit; // ej. "h", "%", "km"
-  final List<String> tags;
+     final double? progress;    final double? progressTarget;    final String? unit;    final List<String> tags;
   final String? colorHex;
-  final int? order; // para persistir orden manual
-
+  final int? order;  
   Goal({
     required this.id,
     required this.title,
@@ -66,19 +61,15 @@ class Goal {
   }
 }
 
-/// ===== Sub-objetivo =====
-/// Se guarda en: users/{uid}/goals/{goalId}/subgoals/{subId}
-class SubGoal {
+  class SubGoal {
   final String id;
   final String title;
   final String? description;
-  final GoalStatus status; // reutilizamos enum
-  final DateTime? dueDate;
+  final GoalStatus status;    final DateTime? dueDate;
   final double? progress;
   final double? progressTarget;
   final String? unit;
-  final String? section; // para agrupar en la vista
-  final int order;
+  final String? section;    final int order;
 
   const SubGoal({
     required this.id,

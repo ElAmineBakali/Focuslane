@@ -1,5 +1,4 @@
-// task_model.dart
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum TaskPriority {
@@ -41,27 +40,20 @@ class Task {
   final String description;
   final TaskPriority priority;
   final String? category;
-  final DateTime? dueDate; // Fecha y hora límite combinadas
-  final TimeOfDay?
-  reminderTime; // Hora específica del recordatorio diario (si se quiere repetir)
-  final bool completed;
+  final DateTime? dueDate;    final TimeOfDay?
+  reminderTime;    final bool completed;
   final int? order;
-  final List<String> tags; // Etiquetas para organización
-
-  // Recordatorio puntual (fecha/hora exacta para notificación única)
-  final DateTime? remindAt;
-  // Nuevos campos
-  final bool isPinned;
+  final List<String> tags;  
+     final DateTime? remindAt;
+     final bool isPinned;
   final RepeatRule repeatRule;
   final List<Subtask> subtasks;
   final bool isCalendarVisible;
   final String? linkedNoteId;
   
-  /// ✅ NUEVO: Si la categoría es "Study", este campo guarda el courseId asociado
-  final String? linkedStudyCourseId;
+     final String? linkedStudyCourseId;
   
-  /// ✅ NUEVO: Si esta tarea está sincronizada desde Study, guarda el StudyTask id
-  final String? syncedStudyTaskId;
+     final String? syncedStudyTaskId;
 
   Task({
     required this.id,
@@ -152,8 +144,7 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
-    // reminderTime flexible (map)
-    TimeOfDay? parsedReminderTime;
+         TimeOfDay? parsedReminderTime;
     final rtRaw = map['reminderTime'];
     if (rtRaw != null && rtRaw is Map) {
       final timeMap = Map<String, dynamic>.from(rtRaw);
@@ -164,8 +155,7 @@ class Task {
       }
     }
 
-    // dueDate flexible (Timestamp/int/string)
-    DateTime? parsedDueDate;
+         DateTime? parsedDueDate;
     final dd = map['dueDate'];
     if (dd is Timestamp) {
       parsedDueDate = dd.toDate();
@@ -175,8 +165,7 @@ class Task {
       parsedDueDate = DateTime.tryParse(dd);
     }
 
-    // remindAt flexible
-    DateTime? parsedRemindAt;
+         DateTime? parsedRemindAt;
     final ra = map['remindAt'];
     if (ra is Timestamp) {
       parsedRemindAt = ra.toDate();
@@ -186,15 +175,13 @@ class Task {
       parsedRemindAt = DateTime.tryParse(ra);
     }
 
-    // tags
-    List<String> parsedTags = [];
+         List<String> parsedTags = [];
     final tagsRaw = map['tags'];
     if (tagsRaw is List) {
       parsedTags = tagsRaw.map((e) => e.toString()).toList();
     }
 
-    // subtasks
-    final subsRaw = map['subtasks'];
+         final subsRaw = map['subtasks'];
     List<Subtask> parsedSubs = [];
     if (subsRaw is List) {
       parsedSubs =
@@ -237,8 +224,7 @@ class Task {
   }
 }
 
-/// Reglas de repetición para tareas
-enum RepeatRule { none, daily, weekly, monthly }
+ enum RepeatRule { none, daily, weekly, monthly }
 
 extension RepeatRuleX on RepeatRule {
   static RepeatRule parse(dynamic raw) {

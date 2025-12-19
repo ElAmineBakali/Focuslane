@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// 🎨 GLOBAL UI THEME SYSTEM
-/// Sistema de diseño unificado para toda la aplicación Focuslane
-/// Extraído del módulo GYM y expandido para uso global
-
-// ==================== COLORES ====================
-
 class AppColors {
-  // Módulos principales
   static const Color food = Color(0xFFFF6B35);
   static const Color gym = Color(0xFF6C63FF);
   static const Color study = Color(0xFF4CAF50);
@@ -17,13 +10,10 @@ class AppColors {
   static const Color habits = Color(0xFFFF9800);
   static const Color goals = Color(0xFFE91E63);
   
-  // Estados
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFFB020);
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
-  
-  // Grises
   static const Color grey50 = Color(0xFFFAFAFA);
   static const Color grey100 = Color(0xFFF5F5F5);
   static const Color grey200 = Color(0xFFEEEEEE);
@@ -35,17 +25,13 @@ class AppColors {
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
   
-  // Colores de texto
   static const Color textPrimary = grey900;
   static const Color textSecondary = grey600;
   static const Color borderLight = grey300;
   
-  // Dark Mode
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color darkCard = Color(0xFF2C2C2C);
-  
-  // Gradientes
   static LinearGradient foodGradient = LinearGradient(
     colors: [food, warning],
     begin: Alignment.topLeft,
@@ -82,8 +68,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 }
-
-// ==================== TIPOGRAFÍA ====================
 
 class AppTypography {
   static TextStyle heading1(BuildContext context, {Color? color}) {
@@ -176,8 +160,7 @@ class AppTypography {
   }
 }
 
-// ==================== ESPACIADO ====================
-
+ 
 class AppSpacing {
   static const double xs = 4;
   static const double sm = 8;
@@ -187,7 +170,6 @@ class AppSpacing {
   static const double xxl = 32;
   static const double xxxl = 48;
   
-  // Border Radius
   static const double radiusXs = 4;
   static const double radiusSm = 8;
   static const double radiusMd = 12;
@@ -195,17 +177,12 @@ class AppSpacing {
   static const double radiusXl = 20;
   static const double radiusXxl = 24;
   static const double radiusFull = 9999;
-  
-  // Elevaciones
   static const double elevationSm = 2;
   static const double elevationMd = 4;
   static const double elevationLg = 8;
   static const double elevationXl = 12;
 }
 
-// ==================== WIDGETS BASE ====================
-
-/// AppBar con gradiente moderno
 class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? icon;
@@ -267,7 +244,6 @@ class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidge
   }
 }
 
-/// Card de acción moderna con gradiente
 class ModernActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -323,7 +299,6 @@ class ModernActionCard extends StatelessWidget {
   }
 }
 
-/// Card estadística moderna
 class ModernStatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -384,7 +359,6 @@ class ModernStatCard extends StatelessWidget {
   }
 }
 
-/// Estado vacío moderno
 class ModernEmptyState extends StatelessWidget {
   final IconData icon;
   final String message;
@@ -459,7 +433,6 @@ class ModernEmptyState extends StatelessWidget {
   }
 }
 
-/// Botón primario moderno
 class ModernPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -529,7 +502,6 @@ class ModernPrimaryButton extends StatelessWidget {
   }
 }
 
-/// Campo de texto moderno
 class ModernTextField extends StatelessWidget {
   final String label;
   final String? hint;
@@ -596,7 +568,6 @@ class ModernTextField extends StatelessWidget {
   }
 }
 
-/// Badge moderno
 class ModernBadge extends StatelessWidget {
   final String label;
   final Color color;
@@ -631,7 +602,6 @@ class ModernBadge extends StatelessWidget {
   }
 }
 
-/// Chip moderno
 class ModernChip extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -698,7 +668,6 @@ class ModernChip extends StatelessWidget {
   }
 }
 
-/// Card de lista moderna
 class ModernListCard extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -761,7 +730,6 @@ class ModernListCard extends StatelessWidget {
   }
 }
 
-/// Progress bar moderno
 class ModernProgressBar extends StatelessWidget {
   final double value;
   final Color color;

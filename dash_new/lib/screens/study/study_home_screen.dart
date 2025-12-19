@@ -12,15 +12,7 @@ import 'services/study_notifications.dart';
 import 'models/study_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Pantalla raíz centralizada del módulo Study.
-/// Proporciona acceso estructurado a todas las funcionalidades:
-/// - Cursos
-/// - Tareas
-/// - Temporizador
-/// - Estadísticas
-/// - Asistencia
-/// - Horario académico
-class StudyHomeScreen extends StatefulWidget {
+        class StudyHomeScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   const StudyHomeScreen({super.key, required this.svc});
 
@@ -121,8 +113,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
   }
 }
 
-/// Widget para mostrar resumen de asistencia de todos los cursos
-class _AttendanceOverviewScreen extends StatelessWidget {
+ class _AttendanceOverviewScreen extends StatelessWidget {
   final StudyFirestoreService svc;
   const _AttendanceOverviewScreen({required this.svc});
 
@@ -161,8 +152,7 @@ class _AttendanceOverviewScreen extends StatelessWidget {
   }
 }
 
-/// Tarjeta de asistencia para un curso
-class _AttendanceCard extends StatelessWidget {
+ class _AttendanceCard extends StatelessWidget {
   final StudyFirestoreService svc;
   final Course course;
   const _AttendanceCard({required this.svc, required this.course});

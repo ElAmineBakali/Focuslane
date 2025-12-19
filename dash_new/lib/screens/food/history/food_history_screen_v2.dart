@@ -6,9 +6,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
-/// 📊 FOOD HISTORY SCREEN V2
-/// Historial con gráficas de tendencias y compras completadas
-class FoodHistoryScreenV2 extends StatefulWidget {
+ class FoodHistoryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHistoryScreenV2({super.key, required this.svc});
 
@@ -19,8 +17,7 @@ class FoodHistoryScreenV2 extends StatefulWidget {
 class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _daysRange = 7; // 7, 30, 90
-
+  int _daysRange = 7;  
   @override
   void initState() {
     super.initState();
@@ -37,7 +34,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📊 Historial'),
+        title: const Text('Historial'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -62,7 +59,6 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de rango
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -74,22 +70,18 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
           const SizedBox(height: FocusSpacing.xl),
 
-          // Gráfica de calorías
           _buildCaloriesChart(),
 
           const SizedBox(height: FocusSpacing.xl),
 
-          // Gráfica de proteínas
           _buildProteinChart(),
 
           const SizedBox(height: FocusSpacing.xl),
 
-          // Gráfica de agua
           _buildWaterChart(),
 
           const SizedBox(height: FocusSpacing.xl),
 
-          // Resumen estadístico
           _buildSummaryStats(),
         ],
       ),
@@ -381,8 +373,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             getTitlesWidget: (value, meta) {
               final index = value.toInt();
               if (index < 0 || index >= days.length) return const SizedBox();
-              
-              // Mostrar solo algunos labels para no saturar
+
               if (_daysRange == 7 || index % 5 == 0) {
                 final day = DateTime.parse(days[index].id);
                 return Text(
@@ -511,7 +502,6 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
       if (doc != null) {
         result.add(doc);
       } else {
-        // Día sin datos
         result.add(DailyIntakeDoc(
           id: dayId,
           entries: const [],
@@ -532,7 +522,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
   Widget _buildShoppingHistoryTab() {
     return StreamBuilder<List<CompletedShoppingList>>(
-      stream: Stream.value([]), // TODO: Implementar historial de compras completadas
+      stream: Stream.value([]),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -547,7 +537,6 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
           );
         }
 
-        // Agrupar por mes
         final grouped = <String, List<CompletedShoppingList>>{};
         for (final c in completed) {
           final month = c.completedAt.toIso8601String().substring(0, 7);

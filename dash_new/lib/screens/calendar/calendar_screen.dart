@@ -31,10 +31,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   StreamSubscription<List<CalendarEvent>>? _monthSub;
   StreamSubscription<PlannerPrefs>? _prefsSub;
 
-  // Alturas fijas para evitar overflow y dar cabida a la “lista de 2 eventos”
-  static const double _monthRowHeight = 40; // altura de cada fila del mes
-  static const double _eventsHeaderH = 44; // cabecera “Eventos de hoy”
-  static const double _eventsBodyH = 150; // ~2 ListTile con subtítulo
+  static const double _monthRowHeight = 40;
+  static const double _eventsHeaderH = 44;
+  static const double _eventsBodyH = 150;
   static const double _eventsCardH = _eventsHeaderH + _eventsBodyH;
 
   @override
@@ -79,12 +78,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return List<CalendarEvent>.of(_eventsByDay[k] ?? const <CalendarEvent>[]);
   }
 
-  // _openFiltersSheet() was unused; inline chips are shown in month view
+
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Mensual, Semanal, Diario
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Calendario'),
@@ -121,13 +120,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // ------- MES -------
   Widget _buildMonth() {
     final s = Theme.of(context).colorScheme;
     final eventsToday = _eventsFor(_selected)
       ..sort((a, b) => a.start.compareTo(b.start));
 
-    // YMD de hoy para comparar días (00:00)
     final now = DateTime.now();
     final todayYMD = DateTime(now.year, now.month, now.day);
 
@@ -154,7 +151,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _focused = f;
               _watchMonth(f);
             },
-            // ↓↓↓ claves para no desbordar
             rowHeight: _monthRowHeight,
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
@@ -166,17 +162,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: Colors.grey,
                 shape: BoxShape.circle,
               ),
-              // Estas decoraciones no se usan cuando hay *builders* personalizados,
-              // pero las dejamos por compatibilidad.
               todayDecoration:
-                  const BoxDecoration(), // hueco -> lo pinta todayBuilder
+                  const BoxDecoration(),
               selectedDecoration: BoxDecoration(
                 color: s.primary,
                 shape: BoxShape.circle,
               ),
             ),
             calendarBuilders: CalendarBuilders(
-              // HOY: circunferencia hueca y clara (sin relleno)
               todayBuilder: (ctx, day, _) {
                 final cs = Theme.of(ctx).colorScheme;
                 return _DayNumberRing(
@@ -185,7 +178,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   textColor: cs.onSurface,
                 );
               },
-              // SELECCIONADO: círculo sólido (como ya estaba)
               selectedBuilder: (ctx, day, _) {
                 final cs = Theme.of(ctx).colorScheme;
                 return _DayNumberCell(
@@ -194,7 +186,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   fg: cs.onPrimary,
                 );
               },
-              // CÉLULAS DEL MES ACTUAL: si es anterior a hoy -> gris visible
               defaultBuilder: (ctx, day, _) {
                 final ymd = DateTime(day.year, day.month, day.day);
                 final isPast = ymd.isBefore(todayYMD);
@@ -208,8 +199,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   fg: cs.onSurface.withOpacity(.75),
                 );
               },
-              // CÉLULAS FUERA DE MES (p. ej. 29 y 30 del mes anterior):
-              // también grises si son anteriores a hoy.
+
               outsideBuilder: (ctx, day, _) {
                 final ymd = DateTime(day.year, day.month, day.day);
                 final cs = Theme.of(ctx).colorScheme;
@@ -221,7 +211,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     fg: cs.onSurface.withOpacity(.75),
                   );
                 } else {
-                  // futuro fuera de mes: normal pero con leve atenuación
                   return Center(
                     child: Text(
                       '${day.day}',
@@ -262,7 +251,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
         const SizedBox(height: 8),
 
-        // ---- Contenedor fijo con cabecera + lista scrollable ----
         SizedBox(
           height: _eventsCardH,
           child: Card(
@@ -283,7 +271,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ),
                 const Divider(height: 1),
-                // cuerpo con scroll propio, altura fija (~2 ListTile)
                 SizedBox(
                   height: _eventsBodyH,
                   child: _DayEventList(
@@ -302,13 +289,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // ------- SEMANA -------
-  // _buildWeek() was unused; keeping month view only
-
-  // ------- DÍA ------
-  // _buildDay() was unused; keeping month view only
-
-  // ------- filtros -------
   Widget _buildFilterChips() {
     final p = _prefs;
     if (p == null) return const SizedBox.shrink();
@@ -371,7 +351,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // ------- editor (bottom sheet tipo tareas) -------
   Future<void> _editEvent(
     BuildContext context,
     CalendarEvent? e, {
@@ -634,7 +613,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // _fmt unused
   String _humanDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   String _humanDateTime(DateTime d, bool allDay) {
@@ -645,7 +623,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-/// Celda de número de día (rellena)
 class _DayNumberCell extends StatelessWidget {
   final int day;
   final Color? bg;
@@ -667,7 +644,6 @@ class _DayNumberCell extends StatelessWidget {
   }
 }
 
-/// Celda de número de día con **anillo** (hoy)
 class _DayNumberRing extends StatelessWidget {
   final int day;
   final Color border;
@@ -695,7 +671,6 @@ class _DayNumberRing extends StatelessWidget {
   }
 }
 
-// ---- lista de eventos del día (tap = editar) ----
 class _DayEventList extends StatelessWidget {
   final List<CalendarEvent> events;
   final ValueChanged<CalendarEvent> onEdit;
@@ -745,7 +720,6 @@ class _DayEventList extends StatelessWidget {
                 ? 'Todo el día'
                 : '${e.start.hour.toString().padLeft(2, '0')}:${e.start.minute.toString().padLeft(2, '0')}';
 
-        // ✅ Ahora solo se tacha/atenúa si es tarea y viene marcada como completada
         final isCompleted =
             (e.type == CalendarType.task) && (e.completed == true);
 
@@ -780,6 +754,3 @@ class _DayEventList extends StatelessWidget {
     return list;
   }
 }
-
-// ---- cuadrícula semanal (clic para editar evento) ----
-// _WeekGrid unused

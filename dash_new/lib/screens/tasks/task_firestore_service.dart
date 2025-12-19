@@ -1,5 +1,4 @@
-// task_firestore_service.dart
-import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'task_model.dart';
 
@@ -29,8 +28,7 @@ class TaskFirestoreService {
     });
   }
 
-  // 👇 devolvemos el id creado (necesario para notificación)
-  static Future<String?> addTask(Task task) async {
+     static Future<String?> addTask(Task task) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return null;
     final map = task.toMap()..remove('id');

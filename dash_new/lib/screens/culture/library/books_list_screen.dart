@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/culture_firestore_service.dart';
 import '../../../models/culture_models.dart';
-// (no se usa, pero mantiene consistencia)
 
 class BooksListScreen extends StatefulWidget {
   const BooksListScreen({super.key});
@@ -50,7 +49,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
             separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (_, i) {
               final b = data[i];
-              // Keep for future progress bar if needed; compute inline when used to avoid unused
               return ListTile(
                 leading: const Icon(Icons.menu_book_outlined),
                 title: Text(b.title),

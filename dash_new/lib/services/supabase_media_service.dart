@@ -7,9 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as img;
 import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
 
-/// Servicio de almacenamiento usando Supabase Storage (gratuito)
-/// Reemplaza Firebase Storage manteniendo la misma API
-class SupabaseMediaService {
+  class SupabaseMediaService {
   static final _storage = Supabase.instance.client.storage;
   static const String _bucketName = 'notes-media';
 
@@ -34,8 +32,7 @@ class SupabaseMediaService {
     }
   }
 
-  /// Pick de archivo e inmediatamente subirlo a Supabase
-  Future<String?> pickAndUpload(context, {String pathPrefix = 'notes'}) async {
+     Future<String?> pickAndUpload(context, {String pathPrefix = 'notes'}) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
@@ -69,8 +66,7 @@ class SupabaseMediaService {
     }
   }
 
-  /// Sube bytes directamente a Supabase
-  Future<String> uploadBytes(
+     Future<String> uploadBytes(
     Uint8List data, {
     required String fileName,
     String pathPrefix = 'notes',

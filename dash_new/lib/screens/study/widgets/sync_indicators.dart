@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Widgets y utilidades para sincronización entre Study y Tasks
-class SyncIndicators {
-  /// Badge que muestra que la tarea está sincronizada
-  static Widget syncBadge(BuildContext context) {
+ class SyncIndicators {
+     static Widget syncBadge(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -31,8 +29,7 @@ class SyncIndicators {
     );
   }
 
-  /// Ícono pequeño que indica sincronización
-  static Widget syncIcon(BuildContext context, {double size = 16}) {
+     static Widget syncIcon(BuildContext context, {double size = 16}) {
     return Icon(
       Icons.sync_rounded,
       size: size,
@@ -40,8 +37,7 @@ class SyncIndicators {
     );
   }
 
-  /// Indicador de que la tarea no está sincronizada (sin sincronizar)
-  static Widget unsyncBadge(BuildContext context) {
+     static Widget unsyncBadge(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -68,8 +64,7 @@ class SyncIndicators {
     );
   }
 
-  /// Animación de sincronización (spinner)
-  static Widget syncingSpinner(BuildContext context, {double size = 14}) {
+     static Widget syncingSpinner(BuildContext context, {double size = 14}) {
     return SizedBox(
       width: size,
       height: size,

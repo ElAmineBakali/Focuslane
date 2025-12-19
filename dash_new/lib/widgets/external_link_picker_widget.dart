@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Widget global para selección de enlaces externos
-/// Muestra apps comunes con iconos grandes y visuales
-class ExternalLinkPickerWidget extends StatelessWidget {
+  class ExternalLinkPickerWidget extends StatelessWidget {
   final String? initialLink;
   final ValueChanged<String?> onLinkSelected;
   final String label;
@@ -19,50 +17,42 @@ class ExternalLinkPickerWidget extends StatelessWidget {
   static final List<ExternalApp> _apps = [
     ExternalApp(
       name: 'Canvas',
-      url: 'https://canvas.instructure.com',
-      icon: Icons.school_rounded,
+      url: 'https:       icon: Icons.school_rounded,
       color: const Color(0xFFE13827),
     ),
     ExternalApp(
       name: 'ChatGPT',
-      url: 'https://chat.openai.com',
-      icon: Icons.chat_bubble_rounded,
+      url: 'https:       icon: Icons.chat_bubble_rounded,
       color: const Color(0xFF10A37F),
     ),
     ExternalApp(
       name: 'Google Translate',
-      url: 'https://translate.google.com',
-      icon: Icons.translate_rounded,
+      url: 'https:       icon: Icons.translate_rounded,
       color: const Color(0xFF4285F4),
     ),
     ExternalApp(
       name: 'Google Drive',
-      url: 'https://drive.google.com',
-      icon: Icons.folder_rounded,
+      url: 'https:       icon: Icons.folder_rounded,
       color: const Color(0xFF34A853),
     ),
     ExternalApp(
       name: 'GitHub',
-      url: 'https://github.com',
-      icon: Icons.code_rounded,
+      url: 'https:       icon: Icons.code_rounded,
       color: const Color(0xFF181717),
     ),
     ExternalApp(
       name: 'Notion',
-      url: 'https://notion.so',
-      icon: Icons.description_rounded,
+      url: 'https:       icon: Icons.description_rounded,
       color: const Color(0xFF000000),
     ),
     ExternalApp(
       name: 'Google Docs',
-      url: 'https://docs.google.com',
-      icon: Icons.article_rounded,
+      url: 'https:       icon: Icons.article_rounded,
       color: const Color(0xFF4285F4),
     ),
     ExternalApp(
       name: 'YouTube',
-      url: 'https://youtube.com',
-      icon: Icons.play_circle_filled_rounded,
+      url: 'https:       icon: Icons.play_circle_filled_rounded,
       color: const Color(0xFFFF0000),
     ),
   ];
@@ -156,8 +146,7 @@ class ExternalLinkPickerWidget extends StatelessWidget {
         TextField(
           decoration: InputDecoration(
             labelText: 'O pega un enlace personalizado',
-            hintText: 'https://...',
-            prefixIcon: const Icon(Icons.link_rounded),
+            hintText: 'https:             prefixIcon: const Icon(Icons.link_rounded),
             suffixIcon: initialLink != null && initialLink!.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.open_in_new_rounded),

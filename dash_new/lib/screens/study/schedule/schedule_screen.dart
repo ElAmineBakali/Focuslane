@@ -39,8 +39,7 @@ class ScheduleScreen extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               final blocks = snap.data!;
               
-              // Vista móvil: día por día con PageView
-              if (isMobile) {
+                             if (isMobile) {
                 return _MobileDayByDaySchedule(
                   blocks: blocks,
                   courseById: byId,
@@ -48,8 +47,7 @@ class ScheduleScreen extends StatelessWidget {
                 );
               }
               
-              // Vista web/tablet: semanal completa
-              return _WeeklyScheduleView(
+                             return _WeeklyScheduleView(
                 blocks: blocks,
                 courseById: byId,
                 svc: svc,
@@ -62,8 +60,7 @@ class ScheduleScreen extends StatelessWidget {
   }
 }
 
-/// Vista semanal completa para web/tablet
-class _WeeklyScheduleView extends StatelessWidget {
+ class _WeeklyScheduleView extends StatelessWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final StudyFirestoreService svc;
@@ -125,8 +122,7 @@ class _WeeklyScheduleView extends StatelessWidget {
                                   ),
                                 ),
                                 ...List.generate(7, (dowIdx) {
-                                  final dow = dowIdx + 1; // 1..7
-                                  final here =
+                                  final dow = dowIdx + 1;                                    final here =
                                       blocks
                                           .where(
                                             (b) =>
@@ -211,8 +207,7 @@ class _WeeklyScheduleView extends StatelessWidget {
                                                   await svc.deleteScheduleBlock(
                                                     b.id,
                                                   );
-                                                  // Reprogramar recordatorios de clases del día
-                                                  await StudyNotifications(
+                                                                                                     await StudyNotifications(
                                                     svc,
                                                   ).scheduleTodayClasses();
                                                   if (context.mounted) {
@@ -281,8 +276,7 @@ class _WeeklyScheduleView extends StatelessWidget {
   }
 }
 
-/// Vista móvil día por día con PageView
-class _MobileDayByDaySchedule extends StatefulWidget {
+ class _MobileDayByDaySchedule extends StatefulWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final StudyFirestoreService svc;
@@ -304,8 +298,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
   @override
   void initState() {
     super.initState();
-    _currentDay = DateTime.now().weekday; // 1=Lun, 7=Dom
-  }
+    _currentDay = DateTime.now().weekday;    }
 
   @override
   void dispose() {
@@ -321,8 +314,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
     
     return Column(
       children: [
-        // Header con gradient
-        Container(
+                 Container(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -368,8 +360,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Indicador de días con letras
-              Row(
+                             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(7, (index) {
                   final dayIndex = index + 1;
@@ -417,8 +408,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
           ),
         ),
         
-        // PageView con scroll horizontal
-        Expanded(
+                 Expanded(
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -428,10 +418,8 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
             },
             itemCount: 7,
             itemBuilder: (context, pageIndex) {
-              final dayOfWeek = pageIndex + 1; // 1=Lun, 7=Dom
-              
-              // Filtrar bloques para este día
-              final dayBlocks = widget.blocks
+              final dayOfWeek = pageIndex + 1;                
+                             final dayBlocks = widget.blocks
                   .where((b) => b.daysOfWeek.contains(dayOfWeek))
                   .toList()
                 ..sort((a, b) {
@@ -587,8 +575,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle bar
-              Center(
+                             Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   width: 40,
@@ -600,8 +587,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                 ),
               ),
               
-              // Title with icon
-              Row(
+                             Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -635,8 +621,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               
               const SizedBox(height: 32),
               
-              // Course selector with visual chips
-              Text(
+                             Text(
                 'Curso',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -720,8 +705,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               
               const SizedBox(height: 28),
               
-              // Days selector
-              Text(
+                             Text(
                 'Días de la semana',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -786,8 +770,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               
               const SizedBox(height: 28),
               
-              // Time pickers
-              Row(
+                             Row(
                 children: [
                   Expanded(
                     child: _TimePickerButton(
@@ -823,8 +806,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               
               const SizedBox(height: 28),
               
-              // Room field
-              Text(
+                             Text(
                 'Aula (opcional)',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -853,11 +835,9 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               
               const SizedBox(height: 32),
               
-              // Action buttons
-              Row(
+                             Row(
                 children: [
-                  // Botón eliminar (solo si estamos editando)
-                  if (widget.initial != null)
+                                     if (widget.initial != null)
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
@@ -961,8 +941,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     flex: 2,
                     child: FilledButton(
                       onPressed: () async {
-                    // Validaciones básicas
-                    if ((_courseId == null || _courseId!.trim().isEmpty) ||
+                                         if ((_courseId == null || _courseId!.trim().isEmpty) ||
                         _days.isEmpty) {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1029,8 +1008,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                           newMap,
                         );
                       }
-                      // Reprogramar recordatorios de clases del día
-                      await StudyNotifications(
+                                             await StudyNotifications(
                         widget.svc,
                       ).scheduleTodayClasses();
                       if (mounted) Navigator.pop(context);
@@ -1085,8 +1063,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
   }
 }
 
-/// Helper widget for time picker buttons
-class _TimePickerButton extends StatelessWidget {
+ class _TimePickerButton extends StatelessWidget {
   final String label;
   final TimeOfDay time;
   final IconData icon;

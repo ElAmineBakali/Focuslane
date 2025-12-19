@@ -21,8 +21,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
   String? _courseId;
   TaskStatus? _status;
   bool _onlyHigh = false;
-  String _groupBy = 'date'; // 'date' | 'course'
-
+  String _groupBy = 'date';  
   @override
   void initState() {
     super.initState();
@@ -92,8 +91,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     if (!snap.hasData)
                       return const Center(child: CircularProgressIndicator());
                     
-                    // Crear mapa de courseId -> courseName
-                    final courseMap = <String, String>{};
+                                         final courseMap = <String, String>{};
                     if (coursesSnap.hasData) {
                       for (final course in coursesSnap.data!) {
                         courseMap[course.id] = course.name;
@@ -155,8 +153,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
                   );
 
-                    // Grouping
-                    final Map<String, List<StudyTask>> groups = {};
+                                         final Map<String, List<StudyTask>> groups = {};
                     if (_groupBy == 'course') {
                       for (final t in tasks) {
                         groups.putIfAbsent(t.courseId, () => []).add(t);
@@ -689,8 +686,7 @@ class _FiltersBar extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Filtro de cursos con chips
-              Row(
+                             Row(
                 children: [
                   Icon(
                     Icons.book_rounded,
@@ -713,8 +709,7 @@ class _FiltersBar extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  // Chip "Todos"
-                  FilterChip(
+                                     FilterChip(
                     label: const Text('Todos los cursos'),
                     selected: selectedCourseId == null,
                     onSelected: (selected) {
@@ -724,8 +719,7 @@ class _FiltersBar extends StatelessWidget {
                         ? const Icon(Icons.check_circle, size: 18)
                         : null,
                   ),
-                  // Chips por curso
-                  ...courses.map((course) {
+                                     ...courses.map((course) {
                     final isSelected = selectedCourseId == course.id;
                     return FilterChip(
                       label: Text(course.name),
@@ -750,8 +744,7 @@ class _FiltersBar extends StatelessWidget {
               
               const SizedBox(height: 20),
               
-              // Filtro de estado con segmented button
-              Row(
+                             Row(
                 children: [
                   Icon(
                     Icons.task_alt_rounded,
@@ -821,8 +814,7 @@ class _FiltersBar extends StatelessWidget {
               
               const SizedBox(height: 16),
               
-              // Filtro de alta prioridad
-              FilterChip(
+                             FilterChip(
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

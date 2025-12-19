@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/study_models.dart';
 
-/// Servicio para sincronizar tareas entre Study y Tasks general.
-class StudyTasksSyncService {
+ class StudyTasksSyncService {
   final String _fallbackUserId;
   StudyTasksSyncService([this._fallbackUserId = '']);
 
@@ -21,8 +20,7 @@ class StudyTasksSyncService {
   DocumentReference<Map<String, dynamic>> get _tasksRoot =>
       _db.collection('users').doc(_uid).collection('tasks').doc('root');
 
-  /// Sincroniza un cambio de status de StudyTask a Task
-  Future<void> syncTaskStatusToTasks(
+     Future<void> syncTaskStatusToTasks(
     String? syncedTaskId,
     TaskStatus newStatus,
   ) async {
@@ -32,12 +30,10 @@ class StudyTasksSyncService {
         'completed': newStatus == TaskStatus.done,
       });
     } catch (_) {
-      // Silent fail
-    }
+           }
   }
 
-  /// Sincroniza un cambio de status de Task a StudyTask
-  Future<void> syncTaskStatusToStudy(
+     Future<void> syncTaskStatusToStudy(
     String? syncedStudyTaskId,
     bool completed,
   ) async {
@@ -47,12 +43,10 @@ class StudyTasksSyncService {
         'status': completed ? TaskStatus.done.name : TaskStatus.todo.name,
       });
     } catch (_) {
-      // Silent fail
-    }
+           }
   }
 
-  /// Sincroniza cambios en datos de StudyTask al Task
-  Future<void> syncStudyTaskDataToTasks(
+     Future<void> syncStudyTaskDataToTasks(
     String? syncedTaskId,
     String? title,
     String? notes,
@@ -74,12 +68,10 @@ class StudyTasksSyncService {
         );
       }
     } catch (_) {
-      // Silent fail
-    }
+           }
   }
 
-  /// Sincroniza cambios en Task general al StudyTask
-  Future<void> syncTaskDataToStudy(
+     Future<void> syncTaskDataToStudy(
     String? syncedStudyTaskId,
     String? title,
     String? description,
@@ -102,12 +94,10 @@ class StudyTasksSyncService {
         );
       }
     } catch (_) {
-      // Silent fail
-    }
+           }
   }
 
-  // ===== Conversiones de prioridades =====
-
+   
   String _studyPriorityToTaskPriorityLabel(Priority priority) {
     switch (priority) {
       case Priority.high:

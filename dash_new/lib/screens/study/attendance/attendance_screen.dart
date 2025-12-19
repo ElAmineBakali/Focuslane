@@ -33,18 +33,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         builder: (context, snap) {
           final map = snap.data ?? const <String, String>{};
 
-          // Stats
-          final attended = map.values.where((v) => v == 'A').length;
+                     final attended = map.values.where((v) => v == 'A').length;
           final absent = map.values.where((v) => v == 'X').length;
           final noClass = map.values.where((v) => v == '-').length;
-          final totalCount = attended + absent; // '-' no cuenta
-
-          // 🔧 Aseguramos double en ambos branches
-          final double pct =
+          final totalCount = attended + absent;  
+                     final double pct =
               totalCount == 0 ? 0.0 : (attended * 100.0 / totalCount);
 
-          // 🔧 También aseguramos double aquí
-          final double target = c.attendanceRequired ?? 0.0;
+                     final double target = c.attendanceRequired ?? 0.0;
           final bool meets = pct >= target;
 
           return ListView(
@@ -54,9 +50,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 attended: attended,
                 absent: absent,
                 noClass: noClass,
-                percent: pct, // ahora es double
-                target: target, // double
-                meets: meets,
+                percent: pct,                  target: target,                  meets: meets,
               ),
               const SizedBox(height: 8),
 
@@ -96,8 +90,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     calendarBuilders: CalendarBuilders(
                       defaultBuilder: (context, day, _) {
                         final k = _key(day);
-                        final st = map[k]; // 'A', 'X', '-'  o null
-                        Color bg;
+                        final st = map[k];                          Color bg;
                         Widget child;
 
                         if (st == 'A') {
@@ -256,9 +249,7 @@ class _StatsHeader extends StatelessWidget {
   final int attended;
   final int absent;
   final int noClass;
-  final double percent; // 0..100
-  final double target; // 0..100
-  final bool meets;
+  final double percent;    final double target;    final bool meets;
   const _StatsHeader({
     required this.attended,
     required this.absent,
@@ -271,8 +262,7 @@ class _StatsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double p = percent.isNaN ? 0.0 : percent;
-    // 🔧 clamp devuelve num; lo llevamos a double para el LinearProgressIndicator
-    final double progress = (p.clamp(0.0, 100.0)) / 100.0;
+         final double progress = (p.clamp(0.0, 100.0)) / 100.0;
     final color = meets ? Colors.green : Theme.of(context).colorScheme.error;
 
     return Card(

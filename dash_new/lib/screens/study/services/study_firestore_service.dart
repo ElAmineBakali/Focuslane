@@ -2,10 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/study_models.dart';
 
-/// Servicio de estudio.
-/// CAMBIO CLAVE: el uid se toma SIEMPRE del usuario autenticado.
-/// Si no hay usuario (no debería), usa el fallback (vacío por defecto) o 'local'.
-class StudyFirestoreService {
+  class StudyFirestoreService {
   final String _fallbackUserId;
   StudyFirestoreService([this._fallbackUserId = '']);
 
@@ -22,8 +19,7 @@ class StudyFirestoreService {
       .collection('study')
       .doc('root');
 
-  // ===== Courses =====
-  Stream<List<Course>> streamCourses({bool includeArchived = false}) {
+     Stream<List<Course>> streamCourses({bool includeArchived = false}) {
     Query q = _root.collection('courses');
     if (!includeArchived) q = q.where('isArchived', isEqualTo: false);
     return q
@@ -54,8 +50,7 @@ class StudyFirestoreService {
     await _root.collection('courses').doc(id).delete();
   }
 
-  // ===== Tasks =====
-  Stream<List<StudyTask>> streamTasks({
+     Stream<List<StudyTask>> streamTasks({
     String? courseId,
     TaskStatus? status,
     bool highPriorityOnly = false,
@@ -64,8 +59,7 @@ class StudyFirestoreService {
   }) {
     Query q = _root.collection('tasks');
     
-    // Aplicar filtros where
-    if (courseId != null) {
+         if (courseId != null) {
       q = q.where('courseId', isEqualTo: courseId);
     }
     if (status != null) {
@@ -86,8 +80,7 @@ class StudyFirestoreService {
           .map((d) => StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>))
           .toList();
       
-      // Ordenar siempre en memoria para evitar problemas con índices
-      list.sort((a, b) {
+             list.sort((a, b) {
         final ad = a.due?.millisecondsSinceEpoch ?? DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
         final bd = b.due?.millisecondsSinceEpoch ?? DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
         return ad.compareTo(bd);
@@ -111,8 +104,7 @@ class StudyFirestoreService {
     await _root.collection('tasks').doc(id).delete();
   }
 
-  // ===== Presets =====
-  Stream<List<TimerPreset>> streamPresets({String? courseId}) {
+     Stream<List<TimerPreset>> streamPresets({String? courseId}) {
     Query q = _root.collection('presets');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q
@@ -141,8 +133,7 @@ class StudyFirestoreService {
     await _root.collection('presets').doc(id).delete();
   }
 
-  // ===== Sessions =====
-  Stream<List<StudySession>> streamSessions({
+     Stream<List<StudySession>> streamSessions({
     String? courseId,
     int limit = 100,
   }) {
@@ -169,8 +160,7 @@ class StudyFirestoreService {
     await doc.set(s.toMap());
   }
 
-  // ===== Schedule (horario académico) =====
-  Stream<List<StudyClassBlock>> streamSchedule({String? courseId}) {
+     Stream<List<StudyClassBlock>> streamSchedule({String? courseId}) {
     Query q = _root.collection('schedule');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
@@ -200,8 +190,7 @@ class StudyFirestoreService {
     await _root.collection('schedule').doc(id).delete();
   }
 
-  // ===== Grades (calificaciones) =====
-  Stream<List<GradeEntry>> streamGrades({String? courseId}) {
+     Stream<List<GradeEntry>> streamGrades({String? courseId}) {
     Query q = _root.collection('grades');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q
@@ -234,9 +223,7 @@ class StudyFirestoreService {
     await _root.collection('grades').doc(id).delete();
   }
 
-  // ===== Attendance (asistencia por curso) =====
-  /// Devuelve un mapa yyyy-MM-dd -> 'A' (asistió), 'X' (faltó), '-' (sin clase)
-  Stream<Map<String, String>> streamAttendanceMap(String courseId) {
+        Stream<Map<String, String>> streamAttendanceMap(String courseId) {
     return _root
         .collection('attendance')
         .doc(courseId)
@@ -247,8 +234,7 @@ class StudyFirestoreService {
   Future<void> setAttendance({
     required String courseId,
     required DateTime day,
-    required String status, // 'A' | 'X' | '-'
-  }) async {
+    required String status,    }) async {
     final key =
         '${day.year.toString().padLeft(4, '0')}-'
         '${day.month.toString().padLeft(2, '0')}-'

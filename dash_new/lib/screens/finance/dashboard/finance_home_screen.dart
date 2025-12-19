@@ -88,7 +88,6 @@ class _FinanceHomeScreenState extends State<FinanceHomeScreen> {
             ),
             const SizedBox(height: 16),
 
-            // ---- Navegación principal ----
             Card(
               child: ListTile(
                 leading: const Icon(Icons.list),
@@ -139,7 +138,6 @@ class _FinanceHomeScreenState extends State<FinanceHomeScreen> {
               ),
             ),
 
-            // ---- NUEVO: Patrimonio (activos con ubicación) ----
             Card(
               child: ListTile(
                 leading: const Icon(Icons.maps_home_work_outlined),
@@ -149,14 +147,7 @@ class _FinanceHomeScreenState extends State<FinanceHomeScreen> {
               ),
             ),
 
-            /* Card(
-              child: ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Ajustes de finanzas'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.pushNamed(context, '/finance/settings'),
-              ),
-            ), */
+
           ],
         ),
       ),

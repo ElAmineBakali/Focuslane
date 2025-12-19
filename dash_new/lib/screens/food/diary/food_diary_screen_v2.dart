@@ -5,9 +5,7 @@ import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'package:intl/intl.dart';
 
-/// 📝 DIARIO DE ALIMENTACIÓN V2 - REDISEÑO COMPLETO PREMIUM
-/// Vista diaria con diseño moderno, formularios hermosos y microanimaciones
-class FoodDiaryScreenV2 extends StatefulWidget {
+ class FoodDiaryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodDiaryScreenV2({super.key, required this.svc});
 
@@ -20,12 +18,12 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
   
   final Map<String, String> _mealTitles = {
-    'breakfast': '🌅 Desayuno',
-    'snack1': '🍎 Media Mañana',
-    'lunch': '🍽️ Almuerzo',
-    'snack2': '🥤 Merienda',
-    'dinner': '🌙 Cena',
-    'other': '➕ Otros',
+    'breakfast': 'Desayuno',
+    'snack1': 'Media Mañana',
+    'lunch': 'Almuerzo',
+    'snack2': 'Merienda',
+    'dinner': 'Cena',
+    'other': 'Otros',
   };
 
   @override
@@ -64,18 +62,15 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
               
               final d = snap.data!;
               
-              // Merge: si en el día falta algo -> toma global
-              Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
+                             Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
               for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
                 mergedTargets[k] ??= globalTargets[k];
                     }
-              // Agua: si no hay objetivo por día, usa global (o 2000 por defecto al renderizar)
-              mergedTargets['water'] ??= globalTargets['water'];
+                             mergedTargets['water'] ??= globalTargets['water'];
               
               return CustomScrollView(
                 slivers: [
-                  // Selector de día moderno
-                  SliverToBoxAdapter(
+                                     SliverToBoxAdapter(
                     child: _ModernDaySelector(
                       date: _date,
                       onPrev: () => setState(() => _date = _date.subtract(const Duration(days: 1))),
@@ -84,7 +79,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     ).animate().slideY(begin: -0.2, duration: 300.ms),
                   ),
                   
-                  // Resumen de macros actual
                   SliverToBoxAdapter(
                     child: _MacrosSummary(
                       day: d,
@@ -92,7 +86,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, duration: 300.ms),
                   ),
                   
-                  // Barra de agua
                   SliverToBoxAdapter(
                     child: _ModernWaterCard(
                       water: d.waterMl,
@@ -101,7 +94,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, duration: 300.ms),
                   ),
                   
-                  // Entradas por comida
                   if (d.entries.isEmpty)
                     SliverFillRemaining(
                       child: ModernEmptyState(
@@ -126,8 +118,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   }
   
   List<Widget> _buildMealSections(List<IntakeEntry> entries, String dayId) {
-    // Agrupamos entradas por comida (o usamos un campo meal si existe)
-    // Por ahora mostramos todas en "Entradas del día"
     return [
       SliverPadding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -180,8 +170,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   }
 }
 
-/// Selector de día moderno con chips
-class _ModernDaySelector extends StatelessWidget {
+ class _ModernDaySelector extends StatelessWidget {
   final DateTime date;
   final VoidCallback onPrev;
   final VoidCallback onNext;
@@ -268,8 +257,7 @@ class _ModernDaySelector extends StatelessWidget {
   }
 }
 
-/// Resumen de macros con tarjetas modernas
-class _MacrosSummary extends StatelessWidget {
+ class _MacrosSummary extends StatelessWidget {
   final DailyIntakeDoc day;
   final Map<String, double?> mergedTargets;
   
@@ -294,7 +282,6 @@ class _MacrosSummary extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           
-          // Card principal de calorías
           Card(
             elevation: AppSpacing.elevationMd,
             shape: RoundedRectangleBorder(
@@ -355,7 +342,6 @@ class _MacrosSummary extends StatelessWidget {
           
           const SizedBox(height: AppSpacing.md),
           
-          // Grid de macros
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -409,8 +395,7 @@ class _MacrosSummary extends StatelessWidget {
   }
 }
 
-/// Tarjeta individual de macro
-class _MacroCard extends StatelessWidget {
+ class _MacroCard extends StatelessWidget {
   final String label;
   final double value;
   final double? target;
@@ -488,8 +473,7 @@ class _MacroCard extends StatelessWidget {
   }
 }
 
-/// Tarjeta moderna de agua con acciones rápidas
-class _ModernWaterCard extends StatelessWidget {
+ class _ModernWaterCard extends StatelessWidget {
   final int water;
   final int waterTarget;
   final Function(int) onAdd;
@@ -639,8 +623,7 @@ class _ModernWaterCard extends StatelessWidget {
   }
 }
 
-/// Tarjeta de entrada individual
-class _EntryCard extends StatelessWidget {
+ class _EntryCard extends StatelessWidget {
   final IntakeEntry entry;
   final VoidCallback onDuplicate;
   final VoidCallback onDelete;
@@ -666,7 +649,7 @@ class _EntryCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        onTap: () {}, // TODO: Editar entrada
+        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
@@ -776,8 +759,7 @@ class _MacroChip extends StatelessWidget {
   }
 }
 
-/// Sheet moderno para añadir entradas con tabs hermosas
-class _ModernAddEntrySheet extends StatefulWidget {
+ class _ModernAddEntrySheet extends StatefulWidget {
   final FoodFirestoreService svc;
   final String dayId;
   
@@ -821,8 +803,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle
-            Container(
+                         Container(
               margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               width: 40,
               height: 4,
@@ -832,8 +813,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
               ),
             ),
             
-            // Título
-            Padding(
+                         Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Row(
                 children: [
@@ -855,8 +835,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
             
             const SizedBox(height: AppSpacing.md),
             
-            // Tabs
-            TabBar(
+                         TabBar(
               controller: _tabController,
               labelColor: colorScheme.primary,
               unselectedLabelColor: isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
@@ -1222,8 +1201,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
   }
 }
 
-/// Sheet moderna para configurar objetivos nutricionales
-class _ModernGoalsSheet extends StatefulWidget {
+ class _ModernGoalsSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   
   const _ModernGoalsSheet({required this.svc});
@@ -1261,8 +1239,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
-              Center(
+                             Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
                   width: 40,
@@ -1382,18 +1359,14 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Objetivos guardados correctamente')),
+        const SnackBar(content: Text('Objetivos guardados correctamente')),
       );
     }
   }
 }
 
-// ============================================================================
-// WIDGETS DE LISTADOS (FAVORITOS, ALIMENTOS, RECETAS)
-// ============================================================================
-
-/// Lista moderna de favoritos
-class _FavList extends StatelessWidget {
+   
+ class _FavList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Favorite> onPick;
@@ -1447,8 +1420,7 @@ class _FavList extends StatelessWidget {
   }
 }
 
-/// Lista moderna de alimentos
-class _FoodList extends StatelessWidget {
+ class _FoodList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Food> onPick;
@@ -1500,8 +1472,7 @@ class _FoodList extends StatelessWidget {
   }
 }
 
-/// Lista moderna de recetas
-class _RecipeList extends StatelessWidget {
+ class _RecipeList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Recipe> onPick;

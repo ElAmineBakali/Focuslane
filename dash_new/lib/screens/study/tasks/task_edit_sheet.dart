@@ -3,8 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 
-/// Formulario de creación/edición de tareas con diseño TaskFormTheme
-class TaskEditSheet extends StatefulWidget {
+ class TaskEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final StudyTask? initial;
   final String? initialCourseId;
@@ -135,8 +134,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header
-                      Row(
+                                             Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(12),
@@ -182,8 +180,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Selector de curso (visual chips)
-                      Text(
+                                             Text(
                         'Curso',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -258,8 +255,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                         ),
                       const SizedBox(height: 20),
 
-                      // Campo: Título
-                      _TaskFormTextField(
+                                             _TaskFormTextField(
                         controller: _titleController,
                         label: 'Título',
                         icon: Icons.title_rounded,
@@ -272,8 +268,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Selector de tipo (visual chips)
-                      Text(
+                                             Text(
                         'Tipo',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -307,8 +302,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Selector de prioridad (visual chips)
-                      Text(
+                                             Text(
                         'Prioridad',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -352,8 +346,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Selector de estado (visual chips)
-                      Text(
+                                             Text(
                         'Estado',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -397,8 +390,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Selector de fecha
-                      Text(
+                                             Text(
                         'Fecha límite',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -462,8 +454,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Campo: Notas
-                      _TaskFormTextField(
+                                             _TaskFormTextField(
                         controller: _notesController,
                         label: 'Notas (opcional)',
                         icon: Icons.notes_rounded,
@@ -471,8 +462,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       ),
                       const SizedBox(height: 32),
 
-                      // Botón de guardar
-                      SizedBox(
+                                             SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: FilledButton(
@@ -513,8 +503,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
   }
 }
 
-/// TextField con estilo TaskFormTheme consistente
-class _TaskFormTextField extends StatelessWidget {
+ class _TaskFormTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final IconData icon;
@@ -578,8 +567,7 @@ class _TaskFormTextField extends StatelessWidget {
   }
 }
 
-/// Chip visual para opciones (tipo, prioridad, estado)
-class _OptionChip extends StatelessWidget {
+ class _OptionChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;

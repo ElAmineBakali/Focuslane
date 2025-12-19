@@ -18,7 +18,6 @@ class _FixedExpensesChecklistScreenState
   @override
   void initState() {
     super.initState();
-    // Backfill una vez para suscripciones antiguas sin 'order'
     FinanceFirestoreService.I.backfillSubscriptionsOrder();
   }
 
@@ -109,7 +108,6 @@ class _FixedExpensesChecklistScreenState
               final moved = mutable.removeAt(oldIndex);
               mutable.insert(newIndex, moved);
 
-              // Asignar nuevos índices y persistir con batch
               final reordered = [
                 for (var i = 0; i < mutable.length; i++)
                   Subscription(
@@ -164,7 +162,6 @@ class _FixedExpensesChecklistScreenState
     return [result];
   }
 
-  // -------- Formulario simple (crear/editar) ----------
   void _openSubForm(
     BuildContext context,
     FinanceFirestoreService svc, {
@@ -322,7 +319,7 @@ class _SubscriptionRow extends StatefulWidget {
 }
 
 class _SubscriptionRowState extends State<_SubscriptionRow> {
-  bool? _optimisticPaid; // null => usar stream
+  bool? _optimisticPaid; 
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +361,7 @@ class _SubscriptionRowState extends State<_SubscriptionRow> {
                   } catch (e) {
                     setState(
                       () => _optimisticPaid = null,
-                    ); // revertir al stream
+                    ); 
                     if (context.mounted) {
                       ScaffoldMessenger.of(
                         context,

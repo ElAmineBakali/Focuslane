@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart'; // 🔔
-
+import 'package:mi_dashboard_personal/services/notification_service.dart';  
 class RestTimer extends StatefulWidget {
-  final int initialSeconds; // p.ej. 90
-  final VoidCallback? onFinished;
+  final int initialSeconds;    final VoidCallback? onFinished;
 
   const RestTimer({super.key, this.initialSeconds = 90, this.onFinished});
 
@@ -16,8 +14,7 @@ class _RestTimerState extends State<RestTimer> {
   late int _remaining;
   Timer? _t;
   bool _running = false;
-  int? _notifId; // id de la noti programada para este timer
-
+  int? _notifId;  
   @override
   void initState() {
     super.initState();
@@ -28,8 +25,7 @@ class _RestTimerState extends State<RestTimer> {
     _t?.cancel();
     setState(() => _running = true);
 
-    // 🔔 programa noti exacta para cuando termine el descanso
-    _notifId = DateTime.now().millisecondsSinceEpoch ^ hashCode;
+         _notifId = DateTime.now().millisecondsSinceEpoch ^ hashCode;
     await NotificationService.I.scheduleOnce(
       id: _notifId!,
       title: 'Descanso terminado',
@@ -45,8 +41,7 @@ class _RestTimerState extends State<RestTimer> {
           _remaining = 0;
           _running = false;
         });
-        _notifId = null; // dejamos que la noti suene
-        widget.onFinished?.call();
+        _notifId = null;          widget.onFinished?.call();
       } else {
         setState(() => _remaining--);
       }
@@ -78,8 +73,7 @@ class _RestTimerState extends State<RestTimer> {
   void dispose() {
     _t?.cancel();
     if (_notifId != null) {
-      NotificationService.I.cancel(_notifId!); // best-effort
-      _notifId = null;
+      NotificationService.I.cancel(_notifId!);        _notifId = null;
     }
     super.dispose();
   }

@@ -95,8 +95,7 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
           );
-        final map = <String, Set<DateTime>>{}; // courseId -> unique days
-        for (final s in snap.data!) {
+        final map = <String, Set<DateTime>>{};          for (final s in snap.data!) {
           final d = DateTime(s.date.year, s.date.month, s.date.day);
           map.putIfAbsent(s.courseId, () => <DateTime>{}).add(d);
         }
@@ -195,8 +194,7 @@ class _MinutesBarCard extends StatelessWidget {
           );
         final list = snap.data!;
         final now = DateTime.now();
-        final map = <int, int>{}; // dayOffset -> minutes
-        for (int i = 0; i < days; i++) {
+        final map = <int, int>{};          for (int i = 0; i < days; i++) {
           map[i] = 0;
         }
         for (final s in list) {

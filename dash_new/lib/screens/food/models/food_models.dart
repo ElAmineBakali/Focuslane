@@ -25,13 +25,10 @@ Color? _hex(String? hex) {
   }
 }
 
-/// ---------- Food ----------
-class Food {
+ class Food {
   final String id;
   final String name;
-  final UnitKind perUnit; // g | ml | unit (referencia)
-  final double unitSize; // p.ej. 100 si "por 100g", 1 si "por 1 unidad"
-  final double kcal;
+  final UnitKind perUnit;    final double unitSize;    final double kcal;
   final double protein;
   final double carbs;
   final double fat;
@@ -107,8 +104,7 @@ class Food {
     if (colorHex != null) 'colorHex': colorHex,
   };
 
-  /// macros para una cantidad concreta (qty, en la MISMA unidad base que perUnit)
-  Map<String, double> macrosFor(double qty) {
+     Map<String, double> macrosFor(double qty) {
     final ratio = unitSize == 0 ? 0 : qty / unitSize;
     return {
       'kcal': kcal * ratio,
@@ -121,9 +117,8 @@ class Food {
   }
 }
 
-/// ---------- Recipes ----------
-class RecipeIngredient {
-  final String? foodId; // null => texto libre
+ class RecipeIngredient {
+  final String? foodId;
   final String? freeName;
   final double qty;
   final UnitKind unit;
@@ -171,7 +166,6 @@ class Recipe {
   final int servings;
   final List<RecipeIngredient> ingredients;
   final String steps;
-  // cache opcional
   final double? kcal;
   final double? protein;
   final double? carbs;
@@ -236,11 +230,10 @@ class Recipe {
   };
 }
 
-/// ---------- Favorites ----------
-class Favorite {
+ class Favorite {
   final String id;
   final FavoriteType type;
-  final String refId; // foodId o recipeId
+  final String refId;
   final double defaultQty;
   final UnitKind defaultUnit;
   final String? alias;
@@ -287,10 +280,9 @@ class Favorite {
   };
 }
 
-/// ---------- Diario (intake del día) ----------
-class IntakeEntry {
+ class IntakeEntry {
   final String id;
-  final FavoriteType type; // food | recipe
+  final FavoriteType type;
   final String refId;
   final double qty;
   final UnitKind unit;
@@ -348,12 +340,11 @@ class IntakeEntry {
 }
 
 class DailyIntakeDoc {
-  final String id; // YYYY-MM-DD
+  final String id;
   final List<IntakeEntry> entries;
   final int waterMl;
-  final Map<String, double> totals; // kcal, protein, carbs, fat, fiber, sodium
-  final Map<String, double?>
-  targets; // kcal/protein/carbs/fat/fiber; waterTargetMl en otro int
+  final Map<String, double> totals;
+  final Map<String, double?> targets;
 
   const DailyIntakeDoc({
     required this.id,
@@ -401,8 +392,7 @@ class DailyIntakeDoc {
   };
 }
 
-/// ---------- Planner ----------
-class PlannerDayEntry {
+ class PlannerDayEntry {
   final MealSlot slot;
   final FavoriteType type;
   final String refId;
@@ -451,9 +441,9 @@ class PlannerDayEntry {
 }
 
 class WeekPlanner {
-  final String id; // week-YYYY-Www
+  final String id;
   final ShoppingScope scope;
-  final Map<String, List<PlannerDayEntry>> days; // Mon..Sun
+  final Map<String, List<PlannerDayEntry>> days;
 
   const WeekPlanner({
     required this.id,
@@ -496,11 +486,10 @@ class WeekPlanner {
   };
 }
 
-/// ---------- Shopping ----------
-class ShoppingListItem {
+ class ShoppingListItem {
   final String id;
   final String? foodId;
-  final String name; // si no hay foodId
+  final String name;
   final double qty;
   final UnitKind unit;
   final bool checked;
@@ -569,7 +558,7 @@ class ShoppingList {
   final List<ShoppingListItem> items;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final DateTime? completedAt; // Para historial
+  final DateTime? completedAt;
 
   const ShoppingList({
     required this.id,
@@ -637,8 +626,7 @@ class ShoppingList {
     if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
     if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
   };
-  
-  /// Crea una copia con algunos campos actualizados
+
   ShoppingList copyWith({
     String? name,
     List<ShoppingListItem>? items,
@@ -657,8 +645,7 @@ class ShoppingList {
   }
 }
 
-/// ---------- Pantry ----------
-class PantryItem {
+ class PantryItem {
   final String id;
   final String? foodId;
   final String name;
@@ -706,10 +693,8 @@ class PantryItem {
   };
 }
 
-/// ========== NUEVAS CLASES V2 ==========
-
-/// PlannedMeal para múltiples planificadores
-class PlannedMeal {
+ 
+ class PlannedMeal {
   final String recipeId;
   final String? note;
 
@@ -728,8 +713,7 @@ class PlannedMeal {
       };
 }
 
-/// DayMenu para cada día del planificador
-class DayMenu {
+ class DayMenu {
   final List<PlannedMeal> breakfast;
   final List<PlannedMeal> lunch;
   final List<PlannedMeal> dinner;
@@ -779,8 +763,7 @@ class DayMenu {
   }
 }
 
-/// CompletedShoppingList para historial
-class CompletedShoppingList {
+ class CompletedShoppingList {
   final String id;
   final String? plannerId;
   final List<ShoppingListItem> items;
@@ -830,8 +813,7 @@ class CompletedShoppingList {
       };
 }
 
-/// ========== EXTENSIONES copyWith ==========
-
+ 
 extension FavoriteX on Favorite {
   Favorite copyWith({
     String? alias,
@@ -846,23 +828,17 @@ extension FavoriteX on Favorite {
     );
   }
 
-  // Campo adicional para compatibilidad con nuevos servicios
   String get entityId => refId;
 }
 
 extension WeekPlannerX on WeekPlanner {
-  // Adaptar a la nueva estructura con name y customMultiplier
   String get name => id.startsWith('planner_') 
       ? id.substring(8) 
       : id;
-  
-  double? get customMultiplier => null; // Extendido después
 
-  // dayMap adapter: convierte days (Map<String, List<PlannerDayEntry>>) 
-  // a dayMap (Map<int, DayMenu>)
+  double? get customMultiplier => null;
+
   Map<int, DayMenu> get dayMap {
-    // Esta es una conversión simplificada
-    // Necesitarías una implementación más completa según tu estructura
     return {};
   }
 

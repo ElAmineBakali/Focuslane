@@ -5,8 +5,7 @@ class Routine {
   final String name;
   final String? description;
   final bool isDefault;
-  final String splitType; // 'PPL' | 'UL' | 'FB' | 'Custom'
-  final int restSecDefault;
+  final String splitType;    final int restSecDefault;
   final String? colorHex;
 
   const Routine({
@@ -101,17 +100,12 @@ class RoutineExercise {
   final int targetReps;
   final int? restSec;
   final int order;
-  final String? tempo; // ej. "3-1-1"
-  final double? targetRPE;
+  final String? tempo;    final double? targetRPE;
   final double? targetPercent1RM;
   final String? notes;
   
-  // 🔥 Nuevos campos para progresiones automáticas
-  final bool autoProgressionEnabled;
-  final String? progressionType; // 'weight' | 'reps' | 'rpe'
-  final double? progressionIncrement; // ej: 2.5 kg por semana
-  final int? progressionWeeks; // cada cuántas semanas aplicar
-
+     final bool autoProgressionEnabled;
+  final String? progressionType;    final double? progressionIncrement;    final int? progressionWeeks;  
   const RoutineExercise({
     required this.id,
     required this.exerciseId,
@@ -247,14 +241,10 @@ class SessionDoc {
   final String? notes;
   final int? durationMin;
   final double volumeKg;
-  final List<String> prList; // nombres de ejercicios con PR
-  final List<PerformedExercise> exercises;
+  final List<String> prList;    final List<PerformedExercise> exercises;
   
-  // 🧠 Sensaciones post-entreno
-  final int? feelingEnergy; // 1-5
-  final int? feelingFatigue; // 1-5
-  final int? feelingMotivation; // 1-5
-
+     final int? feelingEnergy;
+  final int? feelingFatigue;    final int? feelingMotivation;  
   const SessionDoc({
     required this.id,
     required this.routineId,
@@ -341,8 +331,7 @@ class MeasurementEntry {
   final DateTime date;
   final String muscle;
   final double valueCm;
-  final String? site; // 'left' | 'right' | 'avg'
-
+  final String? site;  
   const MeasurementEntry({
     required this.id,
     required this.date,
@@ -374,14 +363,11 @@ class GymGoals {
   }
 }
 
-// 🏋️ Rutinas predefinidas famosas
-class PresetRoutine {
+ class PresetRoutine {
   final String id;
   final String name;
   final String description;
-  final String goal; // 'strength' | 'mass' | 'endurance' | 'general'
-  final String level; // 'beginner' | 'intermediate' | 'advanced'
-  final String? imageAsset;
+  final String goal;    final String level;    final String? imageAsset;
   final IconData icon;
   final List<PresetDay> days;
 

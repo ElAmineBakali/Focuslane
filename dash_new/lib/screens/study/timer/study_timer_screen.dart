@@ -225,8 +225,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         t.cancel();
         if (_phase == 'work') {
           _accumulatedMinutes += (seconds / 60).round();
-          // Show confetti on work completion
-          _confettiController.play();
+                     _confettiController.play();
         }
         if (_method == StudyMethod.flowtime && _phase == 'work') {
           final ratio = (_cfg['ratio'] ?? 0.2).toDouble();
@@ -370,8 +369,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       ),
       body: Stack(
         children: [
-          // Background gradient
-          Container(
+                     Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -384,8 +382,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               ),
             ),
           ),
-          // Confetti overlay
-          Align(
+                     Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
               confettiController: _confettiController,
@@ -395,8 +392,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               gravity: 0.3,
             ),
           ),
-          // Main content
-          SafeArea(
+                     SafeArea(
             child: Column(
               children: [
                 _HeaderSelectors(
@@ -412,8 +408,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        // Circular timer
-                        CircularTimerWidget(
+                                                 CircularTimerWidget(
                           timeLeft: _timeLeft,
                           totalTime: _totalTime,
                           phase: phaseLabel,
@@ -424,15 +419,13 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                             .fadeIn(duration: 600.ms)
                             .scale(begin: const Offset(0.8, 0.8)),
                         const SizedBox(height: 32),
-                        // Stats row
-                        if (_method != StudyMethod.simple)
+                                                 if (_method != StudyMethod.simple)
                           _buildStatsRow(context).animate().fadeIn(
                                 delay: 200.ms,
                                 duration: 400.ms,
                               ),
                         const SizedBox(height: 32),
-                        // Control buttons
-                        _buildControlButtons(context).animate().fadeIn(
+                                                 _buildControlButtons(context).animate().fadeIn(
                               delay: 400.ms,
                               duration: 400.ms,
                             ),
@@ -649,11 +642,9 @@ class _HeaderSelectors extends StatelessWidget {
       builder: (context, csnap) {
         final courses = csnap.data ?? const [];
         
-        // FIX: Validar que el courseId existe en la lista actual
-        final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
+                 final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
         if (validCourseId != courseId && validCourseId == null && courseId != null) {
-          // Resetear el courseId si ya no existe
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+                     WidgetsBinding.instance.addPostFrameCallback((_) {
             onCourseChanged(null);
           });
         }

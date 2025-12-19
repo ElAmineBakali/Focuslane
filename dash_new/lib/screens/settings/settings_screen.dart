@@ -27,7 +27,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // ignore: unused_field
   final bool _syncing = false;
   bool _signingOut = false;
   DateTime? _lastSync;
@@ -172,29 +171,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          /* Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Fondo', style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _bgChip('Sin fondo', BackgroundStyle.none, widget.currentBackground, widget.onChangeBackground),
-                      _bgChip('Sunrise', BackgroundStyle.gradientSunrise, widget.currentBackground, widget.onChangeBackground),
-                      _bgChip('Ocean', BackgroundStyle.gradientOcean, widget.currentBackground, widget.onChangeBackground),
-                      _bgChip('Forest', BackgroundStyle.gradientForest, widget.currentBackground, widget.onChangeBackground),
-                      _bgChip('Orchid', BackgroundStyle.gradientOrchid, widget.currentBackground, widget.onChangeBackground),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ), */
           const SizedBox(height: 12),
           Text(
             'Consejo: asegúrate de que los botones y textos tengan buen contraste en ambos modos.',
@@ -206,7 +182,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // ignore: unused_element
   Widget _bgChip(
     String label,
     BackgroundStyle val,

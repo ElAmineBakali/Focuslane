@@ -13,7 +13,7 @@ class TimetablesListScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Horarios (semanales)')),
       body: StreamBuilder<List<Timetable>>(
         stream: svc.watchTimetables(),
-        initialData: const <Timetable>[], // ← clave
+        initialData: const <Timetable>[], 
         builder: (context, s) {
           final data = s.data ?? const <Timetable>[];
           if (data.isEmpty) {

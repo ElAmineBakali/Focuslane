@@ -42,8 +42,7 @@ class GoalsFirestoreService {
     await batch.commit();
   }
 
-  /// Backfill: asigna 'order' secuencial sólo a metas sin el campo.
-  Future<void> backfillGoalsOrder() async {
+     Future<void> backfillGoalsOrder() async {
     final snap = await _coll().get();
     final batch = _db.batch();
     int idx = 0;
@@ -52,18 +51,14 @@ class GoalsFirestoreService {
       if (!data.containsKey('order')) {
         batch.update(d.reference, {'order': idx});
       }
-      idx++; // conserva el orden actual de consulta
-    }
+      idx++;      }
     await batch.commit();
   }
 
-  // ===== Subgoals =====
-  CollectionReference<Map<String, dynamic>> _subCol(String goalId) =>
+     CollectionReference<Map<String, dynamic>> _subCol(String goalId) =>
       _coll().doc(goalId).collection('subgoals');
 
-  /// Ordenamos sólo por `order` (para evitar índices compuestos);
-  /// si necesitas por fecha también, ordénalo en memoria en la UI.
-  Stream<List<SubGoal>> watchSubGoals(String goalId) => _subCol(goalId)
+        Stream<List<SubGoal>> watchSubGoals(String goalId) => _subCol(goalId)
       .orderBy('order', descending: false)
       .snapshots()
       .map((s) => s.docs.map(SubGoal.fromSnap).toList());

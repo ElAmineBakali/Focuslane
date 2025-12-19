@@ -3,8 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/study_models.dart';
 
-/// Widget para mostrar un bloque de clase con diseño moderno
-class ModernClassBlock extends StatelessWidget {
+ class ModernClassBlock extends StatelessWidget {
   final StudyClassBlock block;
   final Course? course;
   final VoidCallback? onTap;
@@ -49,16 +48,14 @@ class ModernClassBlock extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Decorative pattern
-            Positioned.fill(
+                         Positioned.fill(
               child: CustomPaint(
                 painter: _DotPatternPainter(
                   color: Colors.white.withOpacity(0.1),
                 ),
               ),
             ),
-            // Content
-            Padding(
+                         Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,8 +177,7 @@ class ModernClassBlock extends StatelessWidget {
   }
 }
 
-/// Painter para crear un patrón de puntos decorativo
-class _DotPatternPainter extends CustomPainter {
+ class _DotPatternPainter extends CustomPainter {
   final Color color;
 
   _DotPatternPainter({required this.color});
@@ -206,8 +202,7 @@ class _DotPatternPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Empty state widget para cuando no hay clases
-class EmptyScheduleState extends StatelessWidget {
+ class EmptyScheduleState extends StatelessWidget {
   final VoidCallback onAddClass;
 
   const EmptyScheduleState({super.key, required this.onAddClass});

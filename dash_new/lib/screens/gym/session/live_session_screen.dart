@@ -25,15 +25,12 @@ class LiveSessionScreen extends StatefulWidget {
 }
 
 class _LiveSessionScreenState extends State<LiveSessionScreen> {
-  final Map<String, List<SessionSet>> _performed = {}; // exName -> sets
-  final Map<String, int> _restLeft = {}; // exName -> seconds
-  final Map<String, Timer?> _timers = {};
+  final Map<String, List<SessionSet>> _performed = {};    final Map<String, int> _restLeft = {};    final Map<String, Timer?> _timers = {};
   final _notesCtrl = TextEditingController();
   late final DateTime _startAt;
 
-  // ---- IDs fijos para notificaciones programadas ----
-  static const int _inactivityId = 22001; // aviso X días sin entrenar
-  static const int _inactivityDays = 3; // puedes cambiarlo rápido aquí
+     static const int _inactivityId = 22001;
+  static const int _inactivityDays = 3;
 
   int _restNotifId(String exName) =>
       ('gym_rest_${widget.routine.id}_${widget.day.id}_$exName').hashCode;
@@ -54,14 +51,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   void _startRest(String exName, int seconds) async {
-    // cancela notificación previa de ese ejercicio si la hubiera
-    await NotificationService.I.cancel(_restNotifId(exName));
+         await NotificationService.I.cancel(_restNotifId(exName));
 
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = seconds);
 
-    // 🔔 programa fin de descanso (exacto)
-    final when = DateTime.now().add(Duration(seconds: seconds));
+         final when = DateTime.now().add(Duration(seconds: seconds));
     await NotificationService.I.scheduleOnce(
       id: _restNotifId(exName),
       title: 'Descanso terminado',
@@ -75,8 +70,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
       if (left <= 0) {
         t.cancel();
         setState(() => _restLeft[exName] = 0);
-        // No cancelamos la notificación: debe sonar aunque cierres la app.
-      } else {
+               } else {
         setState(() => _restLeft[exName] = left);
       }
     });
@@ -85,8 +79,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   void _stopRest(String exName) async {
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = 0);
-    // 🔔 si paras el descanso, cancelamos la noti
-    await NotificationService.I.cancel(_restNotifId(exName));
+         await NotificationService.I.cancel(_restNotifId(exName));
   }
 
   Future<void> _addSetDialog(String exName) async {
@@ -289,8 +282,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     await widget.svc.saveSession(doc);
     await widget.svc.markDayCompleted(widget.routine.id, widget.day.id);
 
-    // 🔔 Reprograma aviso de inactividad usando el servicio centralizado
-    await GymNotificationService.I.scheduleInactivityReminder();
+         await GymNotificationService.I.scheduleInactivityReminder();
 
     if (!mounted) return;
     Navigator.pushReplacement(
@@ -322,8 +314,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Nombre del día a la izquierda
-                  Flexible(
+                                     Flexible(
                     child: Text(
                       widget.day.name,
                       style: GoogleFonts.poppins(
@@ -340,8 +331,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Badge "Sesión en vivo" a la derecha
-                  Container(
+                                     Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 5,

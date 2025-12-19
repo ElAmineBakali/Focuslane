@@ -344,8 +344,7 @@ class RoutinesListScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- NUEVA RUTINA: SHEET BONITO (sin hex) ----------------
-
+   
   Future<void> _newRoutineSheet(BuildContext context) async {
     final res = await showModalBottomSheet<_RoutineFormResult>(
       context: context,
@@ -361,7 +360,7 @@ class RoutinesListScreen extends StatelessWidget {
       description: res.description,
       splitType: res.splitType,
       restSecDefault: res.restSecDefault,
-      colorHex: res.colorHex, // seguimos guardando hex por compatibilidad
+      colorHex: res.colorHex,
       isDefault: res.isDefault,
     );
 
@@ -375,8 +374,7 @@ class RoutinesListScreen extends StatelessWidget {
       isDefault: res.isDefault,
     );
 
-    // ignore: use_build_context_synchronously
-    Navigator.push(
+         Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => RoutineDetailScreen(svc: svc, routine: created),
@@ -384,8 +382,7 @@ class RoutinesListScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- EDITAR RUTINA: SHEET BONITO (sin hex) ----------------
-
+   
   Future<void> _editRoutineSheet(BuildContext context, Routine r) async {
     final res = await showModalBottomSheet<_RoutineFormResult>(
       context: context,
@@ -402,8 +399,7 @@ class RoutinesListScreen extends StatelessWidget {
               colorHex: r.colorHex ?? _rgbToHex(r.color.value),
               isDefault: r.isDefault,
             ),
-            showDefaultToggle:
-                false, // al editar no cambiamos aquí predeterminada
+            showDefaultToggle: false,
           ),
     );
 
@@ -419,14 +415,12 @@ class RoutinesListScreen extends StatelessWidget {
   }
 }
 
-// ===================== SHEET Y MODELO DE FORMULARIO =====================
-
+ 
 class _RoutineFormResult {
   final String name;
   final String? description;
-  final String splitType; // PPL / UL / FB / Custom
-  final int restSecDefault;
-  final String colorHex; // #RRGGBB (sin alpha) – seguimos guardando así
+  final String splitType;    final int restSecDefault;
+  final String colorHex;
   final bool isDefault;
 
   _RoutineFormResult({
@@ -462,10 +456,8 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   String _split = 'Custom';
   bool _isDefault = false;
 
-  // Paleta (elige las que te molen; sin pedir HEX)
-  static const _palette = <Color>[
-    Color(0xFF6750A4), // primary md3-ish
-    Color(0xFF1E88E5),
+     static const _palette = <Color>[
+    Color(0xFF6750A4),      Color(0xFF1E88E5),
     Color(0xFFD81B60),
     Color(0xFFF57C00),
     Color(0xFF2E7D32),
@@ -487,8 +479,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
     _restCtrl.text = '${i?.restSecDefault ?? 90}';
     _isDefault = i?.isDefault ?? false;
 
-    // Si hay colorHex inicial, úsalo; si no, primero de la paleta
-    if (i?.colorHex != null) {
+         if (i?.colorHex != null) {
       _selected = _hexToColor(i!.colorHex);
     } else {
       _selected = _palette.first;
@@ -747,8 +738,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   void _submit() {
     if (_formKey.currentState?.validate() != true) return;
 
-    // Guardamos como #RRGGBB (sin alpha) para ser 100% compatibles con tu modelo/servicio
-    final rgb = _selected.value & 0x00FFFFFF;
+         final rgb = _selected.value & 0x00FFFFFF;
     final hex = '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 
     Navigator.pop(
@@ -766,13 +756,10 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   }
 }
 
-// ===================== helpers de color =====================
-
+ 
 Color _hexToColor(String hex) {
   var h = hex.replaceAll('#', '').toUpperCase();
-  if (h.length == 6) h = 'FF$h'; // añade alpha si no viene
-  // computed where needed; avoid unused local
-  return Color(int.parse(h, radix: 16));
+  if (h.length == 6) h = 'FF$h';       return Color(int.parse(h, radix: 16));
 }
 
 String _rgbToHex(int argb) {

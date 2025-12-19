@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/study_models.dart';
 
-/// Grid interactivo del horario académico con zoom y scroll
-class InteractiveScheduleGrid extends StatefulWidget {
+ class InteractiveScheduleGrid extends StatefulWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final ValueChanged<StudyClassBlock>? onBlockTap;
@@ -47,8 +46,7 @@ class _InteractiveScheduleGridState extends State<InteractiveScheduleGrid> {
 
     return Column(
       children: [
-        // Zoom controls
-        Padding(
+                 Padding(
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
@@ -77,8 +75,7 @@ class _InteractiveScheduleGridState extends State<InteractiveScheduleGrid> {
           ),
         ),
 
-        // Scrollable grid
-        Expanded(
+                 Expanded(
           child: InteractiveViewer(
             transformationController: _transformationController,
             minScale: 0.5,
@@ -103,8 +100,7 @@ class _InteractiveScheduleGridState extends State<InteractiveScheduleGrid> {
   }
 }
 
-/// Tabla del horario
-class _ScheduleTable extends StatelessWidget {
+ class _ScheduleTable extends StatelessWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final List<String> days;
@@ -132,8 +128,7 @@ class _ScheduleTable extends StatelessWidget {
         for (int i = 1; i <= 7; i++) i: const FixedColumnWidth(100),
       },
       children: [
-        // Header con días de la semana
-        TableRow(
+                 TableRow(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
@@ -155,8 +150,7 @@ class _ScheduleTable extends StatelessWidget {
           ],
         ),
 
-        // Filas de horas
-        ...hours.asMap().entries.map((entry) {
+                 ...hours.asMap().entries.map((entry) {
           final hour = entry.value;
           final hourInt = int.parse(hour.split(':')[0]);
           return TableRow(
@@ -173,8 +167,7 @@ class _ScheduleTable extends StatelessWidget {
               ...List.generate(
                 7,
                 (dowIdx) {
-                  final dow = dowIdx + 1; // 1..7
-                  final blocksHere = blocks
+                  final dow = dowIdx + 1;                    final blocksHere = blocks
                       .where(
                         (b) =>
                             b.daysOfWeek.contains(dow) &&

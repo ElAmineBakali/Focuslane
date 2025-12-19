@@ -13,9 +13,7 @@ import '../shopping/shopping_lists_screen_v2.dart';
 import '../pantry/pantry_screen_v2.dart';
 import '../history/food_history_screen_v2.dart';
 
-/// 🏠 FOOD HOME SCREEN V2 - Rediseñado
-/// Dashboard principal del módulo de alimentación con diseño moderno
-class FoodHomeScreenV2 extends StatefulWidget {
+   class FoodHomeScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHomeScreenV2({super.key, required this.svc});
 
@@ -35,7 +33,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // AppBar moderno con gradiente
           SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
@@ -76,7 +73,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
               ),
             ),
             actions: [
-              // Historial
               IconButton(
                 icon: const Icon(Icons.history),
                 tooltip: 'Historial',
@@ -89,7 +85,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                   );
                 },
               ),
-              // Configuración de recordatorios
               IconButton(
                 icon: const Icon(Icons.notifications_active_outlined),
                 tooltip: 'Recordatorios',
@@ -98,14 +93,12 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ],
           ),
 
-          // Contenido
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(FocusSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Alerta de stock bajo
                   StreamBuilder<int>(
                     stream: widget.svc.streamPantry().map((items) => items.where((i) => (i.qty ?? 0) < (i.minQty ?? 0)).length),
                     builder: (context, snap) {
@@ -163,7 +156,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Resumen del día
                   StreamBuilder<DailyIntakeDoc>(
                     stream: widget.svc.streamDay(todayId),
                     builder: (context, daySnap) {
@@ -213,7 +205,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
                   const SizedBox(height: FocusSpacing.xl),
 
-                  // Sugerencias inteligentes
                   StreamBuilder<List<String>>(
                     stream: Stream.value([]),
                     builder: (context, snap) {
@@ -224,7 +215,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '💡 Sugerencias',
+                            'Sugerencias',
                             style: FocusTypography.heading3(context),
                           ),
                           const SizedBox(height: FocusSpacing.md),
@@ -264,7 +255,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Favoritos
                   StreamBuilder<List<Favorite>>(
                     stream: widget.svc.streamFavorites(),
                     builder: (context, snap) {
@@ -278,12 +268,11 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '⭐ Favoritos',
+                                'Favoritos',
                                 style: FocusTypography.heading3(context),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  // TODO: Implementar FavoritesScreen
                                   /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -314,7 +303,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Grid de acciones rápidas
                   Text(
                     'Acciones Rápidas',
                     style: FocusTypography.heading3(context),
@@ -467,7 +455,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
             const SizedBox(height: FocusSpacing.lg),
 
-            // Macros principales
             _buildMiniMacro(
               context,
               'Calorías',
@@ -505,7 +492,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             const Divider(),
             const SizedBox(height: FocusSpacing.md),
 
-            // Agua
             Row(
               children: [
                 Icon(Icons.water_drop, color: Colors.blue, size: 20),
@@ -619,10 +605,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         child: InkWell(
           onTap: () async {
-            // Añadir al diario desde favorito
-            final todayId = _dayId(DateTime.now());
-            // Lógica de añadir (implementar según sea food o recipe)
-          },
+                         final todayId = _dayId(DateTime.now());
+                       },
           borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
           child: Padding(
             padding: const EdgeInsets.all(FocusSpacing.md),
@@ -661,8 +645,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   }
 }
 
-/// Sheet de configuración de recordatorios
-class _RemindersSheet extends StatefulWidget {
+ class _RemindersSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
 
@@ -680,18 +663,14 @@ class _RemindersSheetState extends State<_RemindersSheet> {
   TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
   TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
   
-  // Intervalos de agua más granulares (en minutos)
-  int _waterIntervalMinutes = 120; // Por defecto 2 horas
+  int _waterIntervalMinutes = 120;
   TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
   
-  // Intervalo de objetivos
-  TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
+     TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _weekendsOnly = false;
   
-  // Días de la semana para cada tipo de recordatorio
-  List<bool> _mealDays = List.filled(7, true); // Lun-Dom
-  List<bool> _waterDays = List.filled(7, true);
+     List<bool> _mealDays = List.filled(7, true);    List<bool> _waterDays = List.filled(7, true);
   List<bool> _goalDays = List.filled(7, true);
 
   @override
@@ -711,7 +690,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -724,7 +702,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                 ),
               ),
               
-              // Header
               Row(
                 children: [
                   Container(
@@ -755,7 +732,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Recordatorios de comidas
               _buildReminderSection(
                 icon: Icons.restaurant_menu,
                 title: 'Comidas del día',
@@ -788,7 +764,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Recordatorios de agua
               _buildReminderSection(
                 icon: Icons.water_drop,
                 title: 'Hidratación',
@@ -829,7 +804,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Recordatorios de suplementos
               _buildReminderSection(
                 icon: Icons.medication,
                 title: 'Suplementos',
@@ -851,7 +825,6 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Recordatorios de objetivos
               _buildReminderSection(
                 icon: Icons.flag,
                 title: 'Objetivos diarios',
@@ -878,13 +851,11 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Botón de guardar
               ModernPrimaryButton(
                 label: 'Guardar Preferencias',
                 icon: Icons.save,
                 fullWidth: true,
                 onPressed: () {
-                  // TODO: Guardar en Firestore/SharedPreferences
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

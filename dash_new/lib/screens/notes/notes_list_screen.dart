@@ -13,8 +13,7 @@ class NotesListScreen extends StatefulWidget {
 class _NotesListScreenState extends State<NotesListScreen> {
   bool _grid = false;
   final Set<String> _tagFilter = {};
-  String _sort = 'updated'; // created|updated|title
-
+  String _sort = 'updated';  
   List<Note> _applyFilters(List<Note> notes) {
     var list = notes.toList();
     if (_tagFilter.isNotEmpty) {

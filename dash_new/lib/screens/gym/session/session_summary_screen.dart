@@ -18,8 +18,7 @@ class SessionSummaryScreen extends StatefulWidget {
 }
 
 class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
-  // Valores de sensaciones (por defecto si ya existen)
-  late int _energyValue;
+     late int _energyValue;
   late int _fatigueValue;
   late int _motivationValue;
   bool _feelingsSaved = false;
@@ -205,8 +204,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
           ),
           const SizedBox(height: 24),
 
-          // 🧠 Sección de sensaciones post-entrenamiento
-          if (!_feelingsSaved) ...[
+                     if (!_feelingsSaved) ...[
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -257,8 +255,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Energía
-                    _buildFeelingSlider(
+                                         _buildFeelingSlider(
                       'Energía',
                       _energyValue,
                       Icons.bolt_rounded,
@@ -267,8 +264,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Fatiga física
-                    _buildFeelingSlider(
+                                         _buildFeelingSlider(
                       'Fatiga física',
                       _fatigueValue,
                       Icons.fitness_center_rounded,
@@ -277,8 +273,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Motivación
-                    _buildFeelingSlider(
+                                         _buildFeelingSlider(
                       'Motivación',
                       _motivationValue,
                       Icons.favorite_rounded,
@@ -308,8 +303,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
             ),
             const SizedBox(height: 16),
           ] else ...[
-            // Mostrar sensaciones ya guardadas
-            Card(
+                         Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

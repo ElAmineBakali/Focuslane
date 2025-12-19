@@ -7,8 +7,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-/// 📅 PLANIFICADOR V2 - Diseño moderno con gestión de múltiples planners
-class FoodPlannerScreenV2 extends StatefulWidget {
+ class FoodPlannerScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodPlannerScreenV2({super.key, required this.svc});
 
@@ -20,9 +19,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   String _currentPlannerId = 'menu';
   ShoppingScope _scope = ShoppingScope.weekly;
   bool _showPlannersList = false;
-  String _selectedMobileDay = 'lunes'; // Para vista móvil
+  String _selectedMobileDay = 'lunes';
   
-  // Configuración de slots
   List<Map<String, dynamic>> _enabledSlots = [];
   bool _slotsLoaded = false;
 
@@ -43,7 +41,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         _slotsLoaded = true;
       });
     } else {
-      // Configuración por defecto
       setState(() {
         _enabledSlots = [
           {'slot': 'breakfast', 'name': 'Desayuno', 'icon': Icons.wb_sunny.codePoint, 'enabled': true},
@@ -98,7 +95,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         title: 'Planificador de Comidas',
         useThemeColors: true,
         actions: [
-          // Selector de planner actual
           TextButton.icon(
             onPressed: () => setState(() => _showPlannersList = !_showPlannersList),
             icon: const Icon(Icons.restaurant_menu, color: Colors.white, size: 18),
@@ -107,7 +103,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               style: AppTypography.button(context).copyWith(color: Colors.white),
             ),
           ),
-          // Selector de scope
           PopupMenuButton<ShoppingScope>(
             icon: const Icon(Icons.calendar_today, color: Colors.white),
             tooltip: 'Alcance del planner',
@@ -167,13 +162,11 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               ),
             ],
           ),
-          // Configurar slots de comidas
           IconButton(
             icon: const Icon(Icons.edit_calendar, color: Colors.white),
             tooltip: 'Configurar comidas',
             onPressed: _configureMealSlots,
           ),
-          // Generar lista de compras
           IconButton(
             icon: const Icon(Icons.shopping_cart_checkout, color: Colors.white),
             tooltip: 'Generar lista de compras',
@@ -186,11 +179,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
           final isMobile = constraints.maxWidth < 800;
           return Column(
             children: [
-              // Lista de planners (desplegable)
               if (_showPlannersList) _buildPlannersList(),
-              // Selector de día para móvil
               if (isMobile) _buildMobileDaySelector(),
-              // Tabla del planner actual o vista móvil
               Expanded(
                 child: isMobile 
                     ? _buildMobileDayView(_selectedMobileDay)
@@ -365,7 +355,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Instrucciones
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -388,7 +377,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                               ],
                             ),
                             const SizedBox(height: AppSpacing.md),
-                            // Tabla moderna
                             Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
@@ -412,7 +400,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                                 ),
                                 children: [
-                                  // Header row
                                   TableRow(
                                     decoration: BoxDecoration(
                                       gradient: AppColors.foodGradient,
@@ -426,7 +413,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                       ...days.map((d) => _buildHeaderCell(d)),
                                     ],
                                   ),
-                                  // Meal slot rows
                                   ...slots.asMap().entries.map((entry) {
                                     final slotIndex = entry.key;
                                     final slot = entry.value;
@@ -568,7 +554,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     ).animate().fadeIn(delay: Duration(milliseconds: delay));
   }
 
-  // Métodos auxiliares
   String _getPlannerName() {
     if (_currentPlannerId == 'menu') return 'Principal';
     return _currentPlannerId.length > 12 
@@ -637,7 +622,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     }
   }
 
-  // Acciones
   Future<void> _generateShoppingList() async {
     try {
       await widget.svc.generateShoppingFromWeek(
@@ -680,8 +664,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
       backgroundColor: Colors.transparent,
       builder: (_) => _MealSlotsConfigSheet(
         onConfigSaved: () {
-          // Recargar configuración cuando se guarde
-          _loadSlotsConfig();
+                     _loadSlotsConfig();
         },
       ),
     );
@@ -766,8 +749,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
           ),
           child: Column(
             children: [
-              // Handle
-              Container(
+                             Container(
                 margin: const EdgeInsets.only(top: AppSpacing.sm),
                 width: 40,
                 height: 4,
@@ -776,8 +758,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Header
-              Padding(
+                             Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Row(
                   children: [
@@ -795,8 +776,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                 ),
               ),
               const Divider(height: 1),
-              // Lista de alimentos
-              Expanded(
+                             Expanded(
                 child: ListView.builder(
                   controller: scrollController,
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -893,8 +873,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     }
   }
 
-  // === VISTA MÓVIL ===
-  
+     
   Widget _buildMobileDaySelector() {
     final days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
     final colorScheme = Theme.of(context).colorScheme;
@@ -981,7 +960,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header del slot
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
@@ -1009,8 +987,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                           ],
                         ),
                       ),
-                      // Contenido del slot
-                      if (entries.isEmpty)
+                                             if (entries.isEmpty)
                         Padding(
                           padding: const EdgeInsets.all(AppSpacing.lg),
                           child: Center(
@@ -1077,8 +1054,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   }
 }
 
-/// Widget para configurar los slots de comidas personalizables
-class _MealSlotsConfigSheet extends StatefulWidget {
+ class _MealSlotsConfigSheet extends StatefulWidget {
   final VoidCallback onConfigSaved;
   const _MealSlotsConfigSheet({required this.onConfigSaved});
 
@@ -1107,7 +1083,6 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
         _isLoading = false;
       });
     } else {
-      // Configuración por defecto
       setState(() {
         _slots = [
           {'slot': 'breakfast', 'name': 'Desayuno', 'icon': Icons.wb_sunny.codePoint, 'enabled': true},
@@ -1162,7 +1137,6 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle
             Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.md),
               width: 40,
@@ -1173,7 +1147,6 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
               ),
             ),
 
-            // Header
             Row(
               children: [
                 Container(
@@ -1213,7 +1186,6 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
 
             const SizedBox(height: AppSpacing.xl),
 
-            // Lista de slots configurables
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -1260,7 +1232,6 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
 
             const SizedBox(height: AppSpacing.lg),
 
-            // Botones
             Row(
               children: [
                 Expanded(
@@ -1289,12 +1260,10 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                     icon: Icons.check,
                     fullWidth: true,
                     onPressed: () async {
-                      // Guardar configuración en SharedPreferences
                       final prefs = await SharedPreferences.getInstance();
                       final slotsJson = jsonEncode(_slots);
                       await prefs.setString('meal_slots_config', slotsJson);
                       
-                      // Notificar al padre para recargar
                       widget.onConfigSaved();
                       
                       if (mounted) {

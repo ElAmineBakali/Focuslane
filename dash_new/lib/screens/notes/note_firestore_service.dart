@@ -32,22 +32,17 @@ class NoteFirestoreService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return null;
     final data = note.toMap();
-    // Asegurar timestamps y consistencia
-    if (!data.containsKey('createdAt'))
+         if (!data.containsKey('createdAt'))
       data['createdAt'] = Timestamp.fromDate(DateTime.now());
     if (!data.containsKey('updatedAt'))
       data['updatedAt'] = Timestamp.fromDate(DateTime.now());
     final ref = await _col(uid).add(data);
-    // Añadir campo id explícito para futuras migraciones (opcional)
-    try {
+         try {
       await ref.update({'id': ref.id});
     } catch (e) {
-      // ignore: avoid_print
-      print('[NoteFirestoreService] Error updating id field: $e');
+             print('[NoteFirestoreService] Error updating id field: $e');
     }
-    // Debug log
-    // ignore: avoid_print
-    print('[NoteFirestoreService] add -> id=${ref.id} title=${note.title}');
+              print('[NoteFirestoreService] add -> id=${ref.id} title=${note.title}');
     return ref.id;
   }
 
@@ -57,8 +52,7 @@ class NoteFirestoreService {
     final data = note.toMap();
     data['updatedAt'] = Timestamp.fromDate(DateTime.now());
     await _col(uid).doc(note.id).update(data);
-    // ignore: avoid_print
-    print('[NoteFirestoreService] update -> id=${note.id} title=${note.title}');
+         print('[NoteFirestoreService] update -> id=${note.id} title=${note.title}');
   }
 
   static Future<void> delete(String id) async {

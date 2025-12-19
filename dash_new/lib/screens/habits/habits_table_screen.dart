@@ -32,8 +32,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   static const EdgeInsets _cellMargin = EdgeInsets.all(4);
   static double get _rowHeight => _cellHeight + _cellMargin.vertical;
 
-  // margen inferior extra para navbar móvil
-  static const double _bottomSafeGap = 100;
+     static const double _bottomSafeGap = 100;
 
   List<Habit>? _orderedHabits;
 
@@ -155,12 +154,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         await _habitService.updateHabitHistory(habit.id, date, result);
         habit.history[key] = result;
 
-        // Actualizar racha si se marca como completado
-        if (result == '✔️' && _isToday(date)) {
+                 if (result == '✔️' && _isToday(date)) {
           await _updateStreak(habit, true);
 
-          // Verificar día perfecto y mostrar confeti
-          if (mounted) {
+                     if (mounted) {
             final allHabits = _orderedHabits ?? [];
             final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
             final allCompleted = allHabits.every(
@@ -214,12 +211,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         await _habitService.updateHabitHistory(habit.id, date, result);
         habit.history[key] = result;
 
-        // Para hábitos cuantitativos, verificar si cumple el objetivo
-        if (result != '-' && _isToday(date)) {
+                 if (result != '-' && _isToday(date)) {
           final value = int.tryParse(result) ?? 0;
           final goalMet =
-              value > 0; // Cualquier valor > 0 cuenta como completado
-          await _updateStreak(habit, goalMet);
+              value > 0;            await _updateStreak(habit, goalMet);
 
           if (goalMet && mounted) {
             final allHabits = _orderedHabits ?? [];
@@ -401,8 +396,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   initialTime: const TimeOfDay(hour: 21, minute: 0),
                 );
                 if (picked != null) {
-                  // ⚠️ Para que funcione al 100% necesito ver NotificationService.dart
-                  await NotificationService.I.scheduleHabitDailyReminder(
+                                     await NotificationService.I.scheduleHabitDailyReminder(
                     picked,
                   );
                   if (mounted) {
@@ -481,8 +475,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
 
             return Row(
               children: [
-                // Columna nombres (izquierda)
-                SizedBox(
+                                 SizedBox(
                   width: _nameColWidth,
                   child: Column(
                     children: [
@@ -553,8 +546,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   ),
                 ),
 
-                // Grid
-                Expanded(
+                                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, cons) {
                       final bodyHeight = cons.maxHeight - _rowHeight - 2;
@@ -663,8 +655,7 @@ class _NameRow extends StatelessWidget {
                   final state =
                       context
                           .findAncestorStateOfType<_HabitsTableScreenState>();
-                  // ignore: invalid_use_of_protected_member
-                  state?.setState(() {
+                                     state?.setState(() {
                     state._editMode = true;
                     state._selectedHabit = habit;
                   });
@@ -674,8 +665,7 @@ class _NameRow extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8, right: 4),
                 child: Row(
                   children: [
-                    // Emoji/Icono
-                    if (habit.emoji != null)
+                                         if (habit.emoji != null)
                       Text(habit.emoji!, style: const TextStyle(fontSize: 20))
                     else if (habit.iconCode != null)
                       Icon(
@@ -691,8 +681,7 @@ class _NameRow extends StatelessWidget {
                       ),
                     const SizedBox(width: 6),
 
-                    // Nombre
-                    Expanded(
+                                         Expanded(
                       child: Text(
                         habit.name,
                         maxLines: 3,

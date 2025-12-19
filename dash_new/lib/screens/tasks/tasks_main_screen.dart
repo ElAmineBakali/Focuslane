@@ -8,34 +8,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class TasksMainScreen extends StatefulWidget {
   const TasksMainScreen({super.key, this.startWithChecklist = true});
-  final bool startWithChecklist; // 👈 por defecto abre Checklist
-
+  final bool startWithChecklist;  
   @override
   State<TasksMainScreen> createState() => _TasksMainScreenState();
 }
 
 class _TasksMainScreenState extends State<TasksMainScreen> {
-  // ------- estado submódulos -------
-  int _tab = 1; // 0 = Tareas, 1 = Checklist (default)
+  int _tab = 1;
   @override
   void initState() {
     super.initState();
     _tab = widget.startWithChecklist ? 1 : 0;
   }
 
-  // ------- estado TAREAS (mejorado con filtros funcionales) -------
   bool showCompleted = false;
-  // Default debe coincidir con un valor presente en el Dropdown
   String sortBy = 'manual';
 
-  // Estado de expansión para cada grupo
   final Map<TaskGroup, bool> _expandedGroups = {
     TaskGroup.overdue: true,
     TaskGroup.today: true,
     TaskGroup.tomorrow: true,
     TaskGroup.thisWeek: true,
-    TaskGroup.later: false, // colapsado por defecto
-    TaskGroup.noDate: false, // colapsado por defecto
+    TaskGroup.later: false,
+    TaskGroup.noDate: false,
   };
 
   @override
@@ -70,14 +65,12 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                   ),
                 ]
                 : [
-                  // ✅ Marcar todo
-                  IconButton(
+                                     IconButton(
                     tooltip: 'Marcar todo',
                     icon: const Icon(Icons.done_all),
                     onPressed: () => _Checklist.checkAll(context),
                   ),
-                  // ⛔ Desmarcar todo
-                  IconButton(
+                                     IconButton(
                     tooltip: 'Desmarcar todo',
                     icon: const Icon(Icons.close_fullscreen),
                     onPressed: () => _Checklist.uncheckAll(context),
@@ -85,10 +78,8 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 ],
       ),
 
-      // ---------- BODY ----------
       body: _tab == 0 ? _buildTasksBody(theme) : const _ChecklistToday(),
 
-      // FAB específico de cada tab (solo para Tareas)
       floatingActionButton:
           _tab == 0
               ? FloatingActionButton(
@@ -103,7 +94,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
     );
   }
 
-  // ================== TAREAS (rediseñado con tema dinámico y filtrado funcional) ==================
   Widget _buildTasksBody(ThemeData theme) {
     return StreamBuilder<List<Task>>(
       stream: TaskFirestoreService.getTasks(),
@@ -120,27 +110,21 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
 
         List<Task> allTasks = snapshot.data!;
 
-        // Filtrar por completadas (FILTRADO FUNCIONAL RESTAURADO)
         List<Task> tasks =
             allTasks
                 .where((task) => showCompleted ? true : !task.completed)
                 .toList();
 
-        // Ordenar por prioridad + fecha
         tasks = TaskGrouper.sortTasks(tasks);
 
-        // Agrupar por fecha de vencimiento
         final groups = TaskGrouper.groupTasks(tasks);
-
-        // Colores dinámicos del theme
         final cs = theme.colorScheme;
         final isDark = theme.brightness == Brightness.dark;
 
         return ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            // Vencidas
-            if (groups[TaskGroup.overdue]!.isNotEmpty)
+                         if (groups[TaskGroup.overdue]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -148,8 +132,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 groups[TaskGroup.overdue]!,
                 isDark ? cs.errorContainer : cs.error.withOpacity(0.1),
               ),
-            // Hoy
-            if (groups[TaskGroup.today]!.isNotEmpty)
+                         if (groups[TaskGroup.today]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -159,8 +142,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.primaryContainer.withOpacity(0.3)
                     : cs.primary.withOpacity(0.08),
               ),
-            // Mañana
-            if (groups[TaskGroup.tomorrow]!.isNotEmpty)
+                         if (groups[TaskGroup.tomorrow]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -170,8 +152,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.secondaryContainer.withOpacity(0.3)
                     : cs.secondary.withOpacity(0.08),
               ),
-            // Esta semana
-            if (groups[TaskGroup.thisWeek]!.isNotEmpty)
+                         if (groups[TaskGroup.thisWeek]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -181,8 +162,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.tertiaryContainer.withOpacity(0.3)
                     : cs.tertiary.withOpacity(0.08),
               ),
-            // Más adelante
-            if (groups[TaskGroup.later]!.isNotEmpty)
+                         if (groups[TaskGroup.later]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -190,8 +170,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 groups[TaskGroup.later]!,
                 isDark ? cs.surfaceContainerHighest : cs.surfaceContainerHigh,
               ),
-            // Sin fecha
-            if (groups[TaskGroup.noDate]!.isNotEmpty)
+                         if (groups[TaskGroup.noDate]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -200,8 +179,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 isDark ? cs.surfaceContainerHigh : cs.surfaceContainer,
               ),
 
-            // Mensaje si no hay tareas
-            if (tasks.isEmpty)
+                         if (tasks.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
                 child: Center(
@@ -309,8 +287,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         task.dueDate!.isBefore(DateTime.now()) &&
         !task.completed;
 
-    // Colores adaptativos al tema
-    final cardColor =
+         final cardColor =
         isOverdue
             ? (isDark
                 ? cs.errorContainer.withOpacity(0.3)
@@ -332,8 +309,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Indicador de prioridad
-            Container(
+                         Container(
               width: 4,
               height: 48,
               decoration: BoxDecoration(
@@ -350,15 +326,13 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 final updated = task.copyWith(completed: val ?? false);
                 await TaskFirestoreService.updateTask(updated);
 
-                // Si se marca como completada, cancelar recordatorio
-                if (updated.completed) {
+                                 if (updated.completed) {
                   try {
                     await ReminderService.I.cancelTaskReminder(task.id);
                   } catch (e) {
                     debugPrint('Error canceling task reminder: $e');
                   }
-                  // Lógica de repetición: crear próxima instancia si aplica
-                  if (task.repeatRule != RepeatRule.none) {
+                                     if (task.repeatRule != RepeatRule.none) {
                     final nextDue = _nextDueDate(task.dueDate, task.repeatRule);
                     final nextRemind = _nextDateFrom(
                       task.remindAt,
@@ -386,8 +360,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     }
                   }
                 } else {
-                  // Si se desmarca, reprogramar si tiene recordatorio
-                  try {
+                                     try {
                     await ReminderService.I.scheduleTaskReminder(
                       updated,
                       previous: previous,
@@ -525,8 +498,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
           visualDensity: VisualDensity.compact,
           icon: Icon(Icons.delete_outline, color: cs.onSurfaceVariant),
           onPressed: () async {
-            // Cancelar recordatorio antes de eliminar
-            try {
+                         try {
               await ReminderService.I.cancelTaskReminder(task.id);
             } catch (e) {
               debugPrint('Error canceling task reminder on delete: $e');
@@ -663,8 +635,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   }
 }
 
-// ================== UI: Botón de pestaña en AppBar ==================
-class _TabTextButton extends StatelessWidget {
+ class _TabTextButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -749,10 +720,8 @@ class _SubtaskRow extends StatelessWidget {
   }
 }
 
-// ================== CHECKLIST (persistente, sin resets ni archivo) ==================
-class _Checklist {
-  // Colección única y persistente
-  static CollectionReference<Map<String, dynamic>> _col() {
+ class _Checklist {
+     static CollectionReference<Map<String, dynamic>> _col() {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     return FirebaseFirestore.instance
         .collection('users')
@@ -763,8 +732,7 @@ class _Checklist {
   }
 
   static Stream<List<_ChecklistItem>> watchToday() {
-    // mantenemos el nombre para no tocar el resto del código
-    return _col()
+         return _col()
         .orderBy('order')
         .snapshots()
         .map(
@@ -783,8 +751,7 @@ class _Checklist {
       'text': text,
       'done': false,
       'order': next,
-      // 'color' opcional
-    });
+           });
   }
 
   static Future<void> toggle(_ChecklistItem it) async {
@@ -793,8 +760,7 @@ class _Checklist {
 
   static Future<void> remove(_ChecklistItem it) async {
     await _col().doc(it.id).delete();
-    // recompactar orden
-    final items = await _col().orderBy('order').get();
+         final items = await _col().orderBy('order').get();
     int i = 0;
     for (final d in items.docs) {
       await d.reference.update({'order': i++});
@@ -814,13 +780,11 @@ class _Checklist {
     }
   }
 
-  // Color: guardar como hex (ej. #FF8A80) o null para “blanco”
-  static Future<void> setColor(_ChecklistItem it, String? hex) async {
+     static Future<void> setColor(_ChecklistItem it, String? hex) async {
     await _col().doc(it.id).update({'color': hex});
   }
 
-  // ---------- Marcar/Desmarcar TODO ----------
-  static const int _kBatchLimit = 450;
+     static const int _kBatchLimit = 450;
 
   static Future<void> checkAll(BuildContext context) async {
     await _setAll(done: true);
@@ -952,8 +916,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                   final color = _colorFromHex(it.colorHex);
                   final tileBg = color?.withOpacity(
                     0.12,
-                  ); // fondo suave cuando hay color
-
+                  );  
                   return Card(
                     key: ValueKey(it.id),
                     color: tileBg ?? Theme.of(context).cardColor,
@@ -1019,21 +982,8 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
   }
 }
 
-/// =============== Colores (12 pastillas) ===============
-const List<Color> _kPalette = [
-  Color(0xFFFF8A80), // rojo suave
-  Color(0xFFFFC400), // ámbar
-  Color(0xFFFFF176), // amarillo suave
-  Color(0xFFA5D6A7), // verde suave
-  Color(0xFF66BB6A), // verde
-  Color(0xFF80DEEA), // cian claro
-  Color(0xFF81D4FA), // azul claro
-  Color(0xFF64B5F6), // azul
-  Color(0xFFCE93D8), // lila suave
-  Color(0xFFF48FB1), // rosa
-  Color(0xFFBCAAA4), // marrón claro
-  Color(0xFFCFD8DC), // gris azulado
-];
+ const List<Color> _kPalette = [
+  Color(0xFFFF8A80),    Color(0xFFFFC400),    Color(0xFFFFF176),    Color(0xFFA5D6A7),    Color(0xFF66BB6A),    Color(0xFF80DEEA),    Color(0xFF81D4FA),    Color(0xFF64B5F6),    Color(0xFFCE93D8),    Color(0xFFF48FB1),    Color(0xFFBCAAA4),    Color(0xFFCFD8DC),  ];
 
 String? _hexFromColor(Color? c) =>
     c == null
@@ -1047,8 +997,7 @@ Color? _colorFromHex(String? hex) {
   return Color(v);
 }
 
-/// Píldora pequeña que muestra el color actual (o borde si no hay color)
-class _ColorPill extends StatelessWidget {
+ class _ColorPill extends StatelessWidget {
   final Color? color;
   const _ColorPill({this.color});
 
@@ -1060,8 +1009,7 @@ class _ColorPill extends StatelessWidget {
       height: 18,
       decoration: BoxDecoration(
         color: color ?? Colors.transparent,
-        borderRadius: BorderRadius.circular(4), // cuadrado suave
-        border: Border.all(
+        borderRadius: BorderRadius.circular(4),          border: Border.all(
           color: color == null ? cs.outlineVariant : color!.withOpacity(.9),
           width: 1,
         ),
@@ -1070,8 +1018,7 @@ class _ColorPill extends StatelessWidget {
   }
 }
 
-/// Botón de paleta que abre un menú pequeño con 12 pastillas + opción “sin color”
-class _ColorMenuButton extends StatelessWidget {
+ class _ColorMenuButton extends StatelessWidget {
   final Color? current;
   final ValueChanged<Color?> onPick;
   final VoidCallback onClear;

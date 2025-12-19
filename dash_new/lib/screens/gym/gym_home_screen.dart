@@ -12,8 +12,7 @@ import 'widgets/export_data_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:intl/intl.dart';
 
-/// 🏋️ GymHomeScreen rediseñado - Estética profesional estilo Strong/Hevy
-class GymHomeScreen extends StatefulWidget {
+ class GymHomeScreen extends StatefulWidget {
   final GymFirestoreService svc;
   const GymHomeScreen({super.key, required this.svc});
 
@@ -122,8 +121,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // AppBar moderno con gradiente
-          SliverAppBar.large(
+                     SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
             stretch: true,
@@ -171,15 +169,13 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             ],
           ),
 
-          // Contenido principal
-          SliverToBoxAdapter(
+                     SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Rutina predeterminada (si existe)
-                  StreamBuilder<Routine?>(
+                                     StreamBuilder<Routine?>(
                     stream: widget.svc.streamDefaultRoutine(),
                     builder: (context, snap) {
                       if (snap.connectionState == ConnectionState.waiting) {
@@ -199,13 +195,11 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                   
                   if (true) const SizedBox(height: 20),
                   
-                  // Quick Stats
-                  _buildQuickStats(),
+                                     _buildQuickStats(),
                   
                   const SizedBox(height: 24),
                   
-                  // Sección de acciones rápidas
-                  Text(
+                                     Text(
                     'Acciones Rápidas',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
@@ -219,8 +213,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                   
                   const SizedBox(height: 24),
                   
-                  // Acceso a funciones principales
-                  Text(
+                                     Text(
                     'Gestión y Análisis',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
@@ -278,8 +271,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                // Icono
-                Container(
+                                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: colorScheme.primary.withOpacity(0.2),
@@ -294,8 +286,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                 
                 const SizedBox(width: 16),
                 
-                // Info
-                Expanded(
+                                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -550,8 +541,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
         
         return Column(
           children: [
-            // Última sesión (si existe)
-            if (sessions.isNotEmpty) ...[
+                         if (sessions.isNotEmpty) ...[
               _buildLastSessionCard(sessions.first)
                   .animate(delay: 500.ms)
                   .fadeIn(duration: 600.ms)
@@ -559,8 +549,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
               const SizedBox(height: 12),
             ],
             
-            // Historial completo
-            _buildFeatureCard(
+                         _buildFeatureCard(
               'Historial Completo',
               'Ver todas tus sesiones de entrenamiento',
               Icons.history,
@@ -739,8 +728,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
   }
 }
 
-/// 🔔 Widget de configuración de notificaciones
-class _NotificationSettingsSheet extends StatefulWidget {
+ class _NotificationSettingsSheet extends StatefulWidget {
   final VoidCallback onSave;
   const _NotificationSettingsSheet({required this.onSave});
 
@@ -771,8 +759,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
-            Container(
+                         Container(
               margin: const EdgeInsets.only(top: 12, bottom: 8),
               width: 40,
               height: 4,
@@ -782,8 +769,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
               ),
             ),
 
-            // Título
-            Padding(
+                         Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
@@ -826,14 +812,12 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
 
             Divider(height: 1, color: Colors.grey[300]),
 
-            // Opciones
-            Flexible(
+                         Flexible(
               child: ListView(
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(20),
                 children: [
-                  // Recordatorio de peso
-                  _buildSection(
+                                     _buildSection(
                     icon: Icons.monitor_weight_outlined,
                     title: 'Control de Peso Semanal',
                     subtitle: 'Recordatorio para registrar tu peso',
@@ -889,8 +873,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
 
                   const SizedBox(height: 16),
 
-                  // Recordatorio de medidas
-                  _buildSection(
+                                     _buildSection(
                     icon: Icons.straighten,
                     title: 'Medidas Físicas Semanales',
                     subtitle: 'Recordatorio para medidas corporales',
@@ -928,8 +911,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
 
                   const SizedBox(height: 16),
 
-                  // Recordatorio de inactividad
-                  _buildSection(
+                                     _buildSection(
                     icon: Icons.notifications_active,
                     title: 'Alerta de Inactividad',
                     subtitle: 'Aviso cuando llevas días sin entrenar',
@@ -975,8 +957,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
               ),
             ),
 
-            // Botones
-            Padding(
+                         Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [

@@ -1,4 +1,3 @@
-// lib/services/finance_firestore_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/finance_models.dart';
@@ -7,10 +6,8 @@ class FinanceFirestoreService {
   FinanceFirestoreService._();
   static final FinanceFirestoreService I = FinanceFirestoreService._();
   final _db = FirebaseFirestore.instance;
-  // 🔁 Cambio mínimo: exigir usuario autenticado (eliminar fallback 'local')
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
 
-  /// ---------- Paths ----------
   CollectionReference get _txCol => _db
       .collection('users')
       .doc(_uid)
@@ -52,7 +49,6 @@ class FinanceFirestoreService {
   DocumentReference get _metaDoc =>
       _db.collection('users').doc(_uid).collection('finance').doc('meta');
 
-  /// ---------- Transactions ----------
   Stream<List<FinanceTransaction>> watchTransactions({
     DateTime? from,
     DateTime? to,
@@ -83,7 +79,6 @@ class FinanceFirestoreService {
     await _txCol.doc(id).delete();
   }
 
-  /// ---------- Budgets ----------
   Stream<List<Budget>> watchBudgets() => _budgetsCol
       .orderBy('name')
       .snapshots()
@@ -93,7 +88,7 @@ class FinanceFirestoreService {
     final m = b.toMap();
     final bool isActive = (m['active'] ?? m['_active'] ?? true) as bool;
     m['active'] = isActive;
-    m['_active'] = isActive; // compatibilidad hacia atrás
+    m['_active'] = isActive; 
     await _budgetsCol.add(m);
   }
 
@@ -107,7 +102,6 @@ class FinanceFirestoreService {
 
   Future<void> deleteBudget(String id) async => _budgetsCol.doc(id).delete();
 
-  /// ---------- Subscriptions (Fijos) ----------
   Stream<List<Subscription>> watchSubscriptions() => _subsCol
       .orderBy('order', descending: false)
       .snapshots()
@@ -132,7 +126,6 @@ class FinanceFirestoreService {
     await batch.commit();
   }
 
-  /// Backfill: asigna 'order' secuencial solo a los que no lo tengan.
   Future<void> backfillSubscriptionsOrder() async {
     final snap = await _subsCol.get();
     final batch = _db.batch();
@@ -142,14 +135,13 @@ class FinanceFirestoreService {
       if (!data.containsKey('order')) {
         batch.update(d.reference, {'order': idx});
       }
-      idx++; // mantiene orden actual del snapshot (por nombre)
+      idx++; 
     }
     await batch.commit();
   }
 
   Future<void> deleteSubscription(String id) async => _subsCol.doc(id).delete();
 
-  /// ---------- People / Debts ----------
   Stream<List<Person>> watchPeople() => _peopleCol
       .orderBy('name')
       .snapshots()
@@ -157,10 +149,9 @@ class FinanceFirestoreService {
 
   Future<void> addPerson(Person p) async => _peopleCol.add(p.toMap());
 
-  // 🔧 CAMBIO: no sobrescribir 'balance' cuando se edita la persona.
   Future<void> updatePerson(Person p) async {
     final m = p.toMap();
-    m.remove('balance'); // <- lo gestiona el ledger/recalc
+    m.remove('balance');
     await _peopleCol.doc(p.id).update(m);
   }
 
@@ -201,7 +192,6 @@ class FinanceFirestoreService {
     final batch = _db.batch();
     batch.update(personRef, {'balance': sum, 'updatedAt': Timestamp.now()});
 
-    // recalcular meta global
     final peopleSnap = await _peopleCol.get();
     double toReceive = 0, toPay = 0;
     for (final p in peopleSnap.docs) {
@@ -210,7 +200,7 @@ class FinanceFirestoreService {
       if (bal > 0) {
         toReceive += bal;
       } else {
-        toPay += bal; // bal es negativo
+        toPay += bal; 
       }
     }
 
@@ -228,7 +218,6 @@ class FinanceFirestoreService {
   Stream<Map<String, dynamic>?> watchDebtsSummary() =>
       _metaDoc.snapshots().map((d) => d.data() as Map<String, dynamic>?);
 
-  /// ---------- Variable Expenses ----------
   Stream<List<VariableExpenseItem>> watchVariableExpenses(String periodKey) =>
       _varExpCol
           .doc(periodKey)
@@ -251,7 +240,6 @@ class FinanceFirestoreService {
   Future<void> deleteVariableExpense(String periodKey, String id) async =>
       _varExpCol.doc(periodKey).collection('items').doc(id).delete();
 
-  /// ---------- Deposits ----------
   Stream<List<Deposit>> watchDeposits() => _depositsCol
       .orderBy('name')
       .snapshots()
@@ -290,7 +278,6 @@ class FinanceFirestoreService {
     await ref.update({'amount': cur + amount});
   }
 
-  /// ---------- Simple KPIs para dashboard (puntual) ----------
   Future<Map<String, double>> monthTotals({required DateTime month}) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
@@ -311,7 +298,6 @@ class FinanceFirestoreService {
     return {'income': inc, 'expense': exp, 'saving': inc - exp};
   }
 
-  /// ---------- KPIs en vivo para dashboard (reactivo) ----------
   Stream<Map<String, double>> watchMonthTotals({required DateTime month}) {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59);
@@ -338,7 +324,6 @@ class FinanceFirestoreService {
   String periodKey(DateTime d) =>
       "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}";
 
-  // === Historial mensual dentro de cada suscripción ===
   DocumentReference _subHistoryDoc(String subId, String pk) {
     return _subsCol.doc(subId).collection('history').doc(pk);
   }
@@ -388,8 +373,7 @@ class FinanceFirestoreService {
     await _subHistoryDoc(s.id, pk).delete();
   }
 
-  // Totales por categorías (privado, por si lo re-usas)
-  // ignore: unused_element
+ 
   Future<Map<String, double>> _monthExpensesTotals({
     required DateTime month,
   }) async {
@@ -413,7 +397,6 @@ class FinanceFirestoreService {
     return byCat;
   }
 
-  /// ---------- Presupuestos: progreso ----------
   Future<List<Map<String, dynamic>>> budgetsProgress({
     required DateTime month,
   }) async {
@@ -488,7 +471,6 @@ class FinanceAssetsFirestoreService {
 
   final root = FirebaseFirestore.instance.collection('finance');
 
-  // Usa un doc global “assets”, subcolección “items” por usuario (si ya tienes userId, añade el scope).
   CollectionReference<Map<String, dynamic>> _items() =>
       FirebaseFirestore.instance.collection('finance_assets');
 

@@ -16,7 +16,7 @@ import 'debts/people_debts_screen.dart';
 import 'debts/person_edit_screen.dart';
 import 'debts/debt_entry_edit_screen.dart';
 
-import 'checklists/fixed_expenses_checklist_screen.dart'; // <- nombre correcto (sin 's' extra)
+import 'checklists/fixed_expenses_checklist_screen.dart'; 
 import 'checklists/variable_expenses_screen.dart';
 
 import 'deposits/deposits_screen.dart';
@@ -42,8 +42,7 @@ Map<String, WidgetBuilder> financeRoutes = {
   PersonEditScreen.route: (_) => const PersonEditScreen(),
   DebtEntryEditScreen.route: (_) => const DebtEntryEditScreen(),
 
-  // NOMBRES EXACTOS (coinciden con las clases reales)
-  FixedExpensesChecklistScreen.route:
+    FixedExpensesChecklistScreen.route:
       (_) => const FixedExpensesChecklistScreen(),
   VariableExpensesScreen.route: (_) => const VariableExpensesScreen(),
 

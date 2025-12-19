@@ -16,8 +16,7 @@ class PresetsSheet extends StatefulWidget {
 class _PresetsSheetState extends State<PresetsSheet> {
   final _name = TextEditingController(text: 'Pomodoro 25/5');
   StudyMethod _method = StudyMethod.pomodoro;
-  // params por defecto
-  final Map<String, dynamic> _params = {
+     final Map<String, dynamic> _params = {
     'work': 25,
     'short': 5,
     'long': 15,
@@ -34,8 +33,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
       case StudyMethod.flowtime:
         _params
           ..clear()
-          ..addAll({'ratio': 0.2}); // descanso = ratio * trabajo
-        break;
+          ..addAll({'ratio': 0.2});          break;
       case StudyMethod.timeboxing:
         _params
           ..clear()
@@ -54,8 +52,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
       case StudyMethod.simple:
         _params
           ..clear()
-          ..addAll({'target': 60}); // minutos
-        break;
+          ..addAll({'target': 60});          break;
     }
   }
 
@@ -74,8 +71,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
           ),
           child: Column(
             children: [
-              // Handle bar
-              Container(
+                             Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 40,
                 height: 4,
@@ -85,8 +81,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                 ),
               ),
               
-              // Header
-              Padding(
+                             Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                 child: Row(
                   children: [
@@ -126,8 +121,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                   controller: controller,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
-                    // ========== SECCIÓN 1: PRESETS GUARDADOS ==========
-                    Padding(
+                                         Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 12),
                       child: Row(
                         children: [
@@ -222,8 +216,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                                     padding: const EdgeInsets.all(16),
                                     child: Row(
                                       children: [
-                                        // Method icon
-                                        Container(
+                                                                                 Container(
                                           width: 48,
                                           height: 48,
                                           decoration: BoxDecoration(
@@ -239,8 +232,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                                         
                                         const SizedBox(width: 16),
                                         
-                                        // Preset info
-                                        Expanded(
+                                                                                 Expanded(
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
@@ -263,8 +255,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                                           ),
                                         ),
                                         
-                                        // Delete button
-                                        IconButton(
+                                                                                 IconButton(
                                           icon: Icon(
                                             Icons.delete_outline_rounded,
                                             color: Colors.red.shade400,
@@ -284,8 +275,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
 
                     const SizedBox(height: 32),
 
-                    // ========== SECCIÓN 2: CREAR NUEVO PRESET ==========
-                    Padding(
+                                         Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Row(
                         children: [
@@ -326,8 +316,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Name field
-                          Text(
+                                                     Text(
                             'Nombre',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
@@ -356,8 +345,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                           
                           const SizedBox(height: 20),
                           
-                          // Method selector
-                          Text(
+                                                     Text(
                             'Método de estudio',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
@@ -427,13 +415,11 @@ class _PresetsSheetState extends State<PresetsSheet> {
                           
                           const SizedBox(height: 20),
                           
-                          // Parameters editor
-                          _ParamsEditor(method: _method, params: _params),
+                                                     _ParamsEditor(method: _method, params: _params),
                           
                           const SizedBox(height: 24),
                           
-                          // Save button
-                          SizedBox(
+                                                     SizedBox(
                             width: double.infinity,
                             child: FilledButton.icon(
                               onPressed: () async {

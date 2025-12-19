@@ -4,8 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
 
-/// 📤 Pantalla de exportación de datos del gym
-class ExportDataScreen extends StatefulWidget {
+ class ExportDataScreen extends StatefulWidget {
   final GymFirestoreService svc;
 
   const ExportDataScreen({super.key, required this.svc});
@@ -44,8 +43,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
   void _copyToClipboard() {
     if (_exportedData != null) {
-      // En una app real, usar Clipboard.setData
-      ScaffoldMessenger.of(context).showSnackBar(
+             ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
@@ -66,8 +64,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
   void _saveToFile() {
     if (_exportedData != null) {
-      // En una app real, usar file_picker y guardar archivo
-      final fileName = 'focuslane_gym_export_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
+             final fileName = 'focuslane_gym_export_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -123,8 +120,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header con icono
-            Container(
+                         Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -169,8 +165,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
             const SizedBox(height: 24),
 
-            // Info sobre lo que se exporta
-            Text(
+                         Text(
               '¿Qué se exportará?',
               style: GoogleFonts.poppins(
                 fontSize: 16,
@@ -185,8 +180,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
             
             const SizedBox(height: 32),
 
-            // Botón de exportar
-            if (!_isExporting && _exportedData == null)
+                         if (!_isExporting && _exportedData == null)
               FilledButton.icon(
                 onPressed: _exportData,
                 icon: const Icon(Icons.download),
@@ -205,8 +199,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ),
               ),
 
-            // Loading
-            if (_isExporting)
+                         if (_isExporting)
               Column(
                 children: [
                   const CircularProgressIndicator(),
@@ -220,8 +213,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ],
               ),
 
-            // Error
-            if (_errorMessage != null)
+                         if (_errorMessage != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -246,8 +238,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ),
               ),
 
-            // Success + acciones
-            if (_exportedData != null) ...[
+                         if (_exportedData != null) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -288,8 +279,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
               
               const SizedBox(height: 16),
               
-              // Botones de acción
-              Row(
+                             Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
@@ -323,8 +313,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
               
               const SizedBox(height: 20),
               
-              // Preview del JSON
-              Text(
+                             Text(
                 'Vista previa',
                 style: GoogleFonts.poppins(
                   fontSize: 14,

@@ -5,9 +5,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'food_edit_sheet_v2.dart';
 
-/// 🥗 CATÁLOGO DE ALIMENTOS V2 - REDISEÑO COMPLETO PREMIUM
-/// Grid de tarjetas modernas con búsqueda, filtros y favoritos
-class FoodsListScreenV2 extends StatefulWidget {
+ class FoodsListScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodsListScreenV2({super.key, required this.svc});
 
@@ -43,7 +41,6 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       ),
       body: Column(
         children: [
-          // Barra de búsqueda y filtros
           Container(
             color: AppColors.grey100,
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -89,7 +86,6 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
             ),
           ).animate().slideY(begin: -0.2, duration: 300.ms),
           
-          // Lista/Grid de alimentos
           Expanded(
             child: StreamBuilder<List<Food>>(
               stream: widget.svc.streamFoods(
@@ -195,8 +191,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
     ).toList();
     
     if (existing.isNotEmpty) {
-      // Remover de favoritos
-      for (final fav in existing) {
+             for (final fav in existing) {
         await widget.svc.removeFavorite(fav.id);
       }
       if (mounted) {
@@ -206,7 +201,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
               children: [
                 const Icon(Icons.star_border, color: Colors.white),
                 const SizedBox(width: 8),
-                Text('✓ ${food.name} eliminado de favoritos'),
+                Text('${food.name} eliminado de favoritos'),
               ],
             ),
             backgroundColor: AppColors.grey700,
@@ -218,8 +213,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
         );
       }
     } else {
-      // Añadir a favoritos
-      await widget.svc.addFavorite(
+             await widget.svc.addFavorite(
         Favorite(
           id: '',
           type: FavoriteType.food,
@@ -236,7 +230,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
               children: [
                 const Icon(Icons.star, color: Colors.amber),
                 const SizedBox(width: 8),
-                Text('✓ ${food.name} añadido a favoritos'),
+                Text('${food.name} añadido a favoritos'),
               ],
             ),
             backgroundColor: AppColors.grey700,
@@ -251,8 +245,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
   }
 }
 
-/// Tarjeta moderna de alimento para grid
-class _FoodGridCard extends StatefulWidget {
+ class _FoodGridCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
@@ -297,8 +290,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono y favorito
-            Container(
+                         Container(
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -332,7 +324,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
               ),
             ),
             
-            // Contenido
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -386,8 +378,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
   }
 }
 
-/// Tarjeta moderna de alimento para lista
-class _FoodListCard extends StatefulWidget {
+ class _FoodListCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
@@ -433,7 +424,6 @@ class _FoodListCardState extends State<_FoodListCard> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              // Icono
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
@@ -449,7 +439,6 @@ class _FoodListCardState extends State<_FoodListCard> {
               
               const SizedBox(width: AppSpacing.lg),
               
-              // Información
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

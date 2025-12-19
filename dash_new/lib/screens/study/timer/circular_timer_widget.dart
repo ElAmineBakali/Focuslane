@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-/// Widget visual impactante para mostrar el temporizador circular
-class CircularTimerWidget extends StatefulWidget {
+ class CircularTimerWidget extends StatefulWidget {
   final int timeLeft;
   final int totalTime;
   final String phase;
@@ -87,8 +86,7 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Background circle
-                Container(
+                                 Container(
                   width: 280,
                   height: 280,
                   decoration: BoxDecoration(
@@ -99,8 +97,7 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                         .withOpacity(0.3),
                   ),
                 ),
-                // Progress circle
-                CustomPaint(
+                                 CustomPaint(
                   size: const Size(280, 280),
                   painter: _CircularProgressPainter(
                     progress: progress,
@@ -110,8 +107,7 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                         .surfaceContainerHighest,
                   ),
                 ),
-                // Inner content
-                Column(
+                                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
@@ -170,8 +166,7 @@ class _CircularProgressPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width / 2) - 10;
 
-    // Background arc
-    final backgroundPaint = Paint()
+         final backgroundPaint = Paint()
       ..color = backgroundColor.withOpacity(0.3)
       ..strokeWidth = 12
       ..style = PaintingStyle.stroke
@@ -179,8 +174,7 @@ class _CircularProgressPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, backgroundPaint);
 
-    // Progress arc
-    final progressPaint = Paint()
+         final progressPaint = Paint()
       ..shader = LinearGradient(
         colors: [
           color,
@@ -200,8 +194,7 @@ class _CircularProgressPainter extends CustomPainter {
       progressPaint,
     );
 
-    // Glow effect at progress end
-    if (progress > 0 && progress < 1) {
+         if (progress > 0 && progress < 1) {
       final glowPaint = Paint()
         ..color = color.withOpacity(0.6)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);

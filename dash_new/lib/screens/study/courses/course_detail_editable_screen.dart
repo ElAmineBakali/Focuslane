@@ -6,9 +6,7 @@ import '../services/study_firestore_service.dart';
 import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
 import '../timer/study_timer_screen.dart';
 
-/// Pantalla de detalle editable del curso
-/// Se abre al pulsar un curso desde CoursesListScreen
-class CourseDetailEditableScreen extends StatefulWidget {
+  class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course course;
 
@@ -51,8 +49,7 @@ class _CourseDetailEditableScreenState
       text: widget.course.attendanceRequired?.toStringAsFixed(0) ?? '',
     );
     _selectedColor = widget.course.color ?? Colors.blue;
-    // Asumiendo que Course tiene un campo externalLink (si no, agregarlo al modelo)
-  }
+       }
 
   @override
   void dispose() {
@@ -140,8 +137,7 @@ class _CourseDetailEditableScreenState
     );
 
     if (confirm == true && mounted) {
-      // Implementar lógica de archivo (agregar campo isArchived al modelo)
-      Navigator.pop(context);
+             Navigator.pop(context);
     }
   }
 
@@ -196,8 +192,7 @@ class _CourseDetailEditableScreenState
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // AppBar con degradado
-          SliverAppBar.large(
+                     SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -271,8 +266,7 @@ class _CourseDetailEditableScreenState
             ],
           ),
 
-          // Contenido
-          SliverToBoxAdapter(
+                     SliverToBoxAdapter(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -280,8 +274,7 @@ class _CourseDetailEditableScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Formulario de edición
-                    if (_isEditing) ...[
+                                         if (_isEditing) ...[
                       Text(
                         'Información del curso',
                         style: GoogleFonts.plusJakartaSans(
@@ -345,8 +338,7 @@ class _CourseDetailEditableScreenState
                       ),
                       const SizedBox(height: 32),
                       
-                      // Botón de guardar
-                      SizedBox(
+                                             SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: FilledButton(
@@ -376,8 +368,7 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                     ] else ...[
-                      // Vista de solo lectura con estadísticas
-                      _StatCard(
+                                             _StatCard(
                         icon: Icons.school_rounded,
                         label: 'Profesor',
                         value: widget.course.teacher ?? 'No asignado',
@@ -426,8 +417,7 @@ class _CourseDetailEditableScreenState
   }
 }
 
-// Widget para campos de formulario con estilo TaskFormTheme
-class _TaskFormTextField extends StatelessWidget {
+ class _TaskFormTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final IconData icon;
@@ -474,8 +464,7 @@ class _TaskFormTextField extends StatelessWidget {
   }
 }
 
-// Widget para tarjetas de estadísticas
-class _StatCard extends StatelessWidget {
+ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;

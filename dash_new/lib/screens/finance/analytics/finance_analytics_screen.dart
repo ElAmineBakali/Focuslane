@@ -44,7 +44,6 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          // ===== KPIs (centrados) =====
           FutureBuilder<Map<String, double>>(
             future: svc.monthTotals(month: _start),
             builder: (context, snap) {
@@ -72,7 +71,6 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
           ),
           const SizedBox(height: 8),
 
-          // ===== Gasto por categoría =====
           StreamBuilder<List<FinanceTransaction>>(
             stream: FinanceFirestoreService.I.watchTransactions(
               from: _start,
@@ -149,77 +147,11 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
               );
             },
           ),
-
-          //const SizedBox(height: 24),
-          //_sectionTitle('Presupuestos: consumido vs límite',
-          //subtitle: '${_start.year}-${_start.month.toString().padLeft(2, '0')}'),
-          //const SizedBox(height: 8),
-
-          // ===== Progreso de presupuestos =====
-          /* FutureBuilder<List<Map<String, dynamic>>>(
-            future: FinanceFirestoreService.I.budgetsProgress(month: _start),
-            builder: (context, s) {
-              if (s.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              final data = s.data ?? const [];
-              if (data.isEmpty) {
-                return _card(child: const ListTile(title: Text('No hay presupuestos activos')));
-              }
-              return _card(
-                child: Column(
-                  children: data.map((row) {
-                    // soporta tanto el mapa plano (nuevo) como el antiguo con Budget
-                    final name = (row['name'] ??
-                        (row['budget'] is Budget ? (row['budget'] as Budget).name : '—')) as String;
-                    final category = (row['category'] ??
-                        (row['budget'] is Budget ? (row['budget'] as Budget).category : null)) as String?;
-                    final spent = (row['spent'] as num).toDouble();
-                    final limit = (row['limit'] as num).toDouble();
-                    final remaining = (row['remaining'] as num).toDouble();
-                    final pct = (row['pct'] as num).toDouble().clamp(0.0, 1.0);
-
-                    final detail = category == null || category.isEmpty ? 'Global' : 'Categoría: $category';
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(name, style: Theme.of(context).textTheme.titleMedium),
-                          const SizedBox(height: 2),
-                          Text(detail, style: Theme.of(context).textTheme.bodySmall),
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: LinearProgressIndicator(value: pct, minHeight: 10),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('${spent.toStringAsFixed(2)} / ${limit.toStringAsFixed(2)}'),
-                              Text('Resta ${remaining.toStringAsFixed(2)}'),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  ).toList(),
-                ),
-              );
-            },
-          ), */
         ],
       ),
     );
   }
 
-  // ---------- helpers de UI ----------
   Widget _kpiCard(String title, double value, IconData icon) {
     return SizedBox(
       width: 220,
@@ -259,7 +191,6 @@ class _FinanceAnalyticsScreenState extends State<FinanceAnalyticsScreen> {
     );
   }
 
-  // Barra apilada 100%
   Widget _stackedBar(List<_CategoryPart> parts) {
     final totalPct = parts.fold<double>(0, (p, e) => p + e.pct);
     if (totalPct <= 0) {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 
-/// Gestor de múltiples recordatorios para un hábito
-class ReminderManager extends StatefulWidget {
+ class ReminderManager extends StatefulWidget {
   final List<HabitReminder> reminders;
   final Function(List<HabitReminder>) onRemindersChanged;
 
@@ -93,8 +92,7 @@ class _ReminderManagerState extends State<ReminderManager> {
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
         child: Column(
           children: [
-            // Header
-            Container(
+                         Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
@@ -132,8 +130,7 @@ class _ReminderManagerState extends State<ReminderManager> {
               ),
             ),
 
-            // Lista de recordatorios
-            Expanded(
+                         Expanded(
               child:
                   _reminders.isEmpty
                       ? Center(
@@ -254,8 +251,7 @@ class _ReminderManagerState extends State<ReminderManager> {
                       ),
             ),
 
-            // Footer
-            Container(
+                         Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,

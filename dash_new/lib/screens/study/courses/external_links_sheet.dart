@@ -3,8 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mi_dashboard_personal/utils/app_links.dart';
 
-/// Modern bottom sheet for external study links
-class ExternalLinksSheet extends StatelessWidget {
+ class ExternalLinksSheet extends StatelessWidget {
   const ExternalLinksSheet({super.key});
 
   @override
@@ -20,8 +19,7 @@ class ExternalLinksSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
-          Container(
+                     Container(
             margin: const EdgeInsets.only(top: 12, bottom: 8),
             width: 40,
             height: 4,
@@ -31,8 +29,7 @@ class ExternalLinksSheet extends StatelessWidget {
             ),
           ),
           
-          // Title
-          Padding(
+                     Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
             child: Row(
               children: [
@@ -78,8 +75,7 @@ class ExternalLinksSheet extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Links grid
-          Padding(
+                     Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
@@ -249,8 +245,7 @@ class _ExternalLinkTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Icon with gradient background
-              Container(
+                             Container(
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
@@ -273,8 +268,7 @@ class _ExternalLinkTile extends StatelessWidget {
               
               const SizedBox(width: 16),
               
-              // Text content
-              Expanded(
+                             Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -299,8 +293,7 @@ class _ExternalLinkTile extends StatelessWidget {
                 ),
               ),
               
-              // Arrow icon
-              Icon(
+                             Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
                 color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),

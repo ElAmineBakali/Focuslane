@@ -13,8 +13,7 @@ class Prenda {
   final List<String> ocasiones;
   final String? marca;
   final double? precio;
-  final Map<String, String> imagenes; // {thumb, medium, full}
-  final int vecesUsada;
+  final Map<String, String> imagenes;    final int vecesUsada;
   final DateTime? ultimaVezUsada;
   final bool archivada;
   final bool favorita;

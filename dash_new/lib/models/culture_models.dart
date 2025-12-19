@@ -6,8 +6,7 @@ double _asDouble(dynamic v) => (v is num) ? v.toDouble() : 0.0;
 int _asInt(dynamic v) => (v is num) ? v.toInt() : 0;
 DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
 
-/// ---------- Libros ----------
-class Book {
+ class Book {
   final String id;
   final String title;
   final String? author;
@@ -17,12 +16,10 @@ class Book {
   final int currentPage;
   final String? shortSummary;
   final String? deepSummary;
-  final double? rating; // 0..10
-  final ItemStatus status;
+  final double? rating;    final ItemStatus status;
   final List<String> tags;
   final String? coverUrl;
-  final String? pdfUrl; // ✅ NUEVO
-  final DateTime? startedAt;
+  final String? pdfUrl;    final DateTime? startedAt;
   final DateTime? finishedAt;
 
   Book({
@@ -39,8 +36,7 @@ class Book {
     this.status = ItemStatus.pending,
     this.tags = const [],
     this.coverUrl,
-    this.pdfUrl, // ✅ NUEVO
-    this.startedAt,
+    this.pdfUrl,      this.startedAt,
     this.finishedAt,
   });
 
@@ -57,8 +53,7 @@ class Book {
     'status': status.name,
     'tags': tags,
     'coverUrl': coverUrl,
-    'pdfUrl': pdfUrl, // ✅ NUEVO
-    'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
+    'pdfUrl': pdfUrl,      'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
     'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
   };
 
@@ -81,8 +76,7 @@ class Book {
       ),
       tags: (d['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       coverUrl: d['coverUrl'] as String?,
-      pdfUrl: d['pdfUrl'] as String?, // ✅ NUEVO
-      startedAt: (d['startedAt'] as Timestamp?)?.toDate(),
+      pdfUrl: d['pdfUrl'] as String?,        startedAt: (d['startedAt'] as Timestamp?)?.toDate(),
       finishedAt: (d['finishedAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -91,8 +85,7 @@ class Book {
 class BookSession {
   final String id;
   final DateTime date;
-  final int pages; // páginas leídas
-  final int minutes;
+  final int pages;    final int minutes;
   final String? notes;
 
   BookSession({
@@ -143,8 +136,7 @@ class BookQuote {
   }
 }
 
-/// ---------- Series / Anime ----------
-class Series {
+ class Series {
   final String id;
   final String title;
   final String? platform;
@@ -247,8 +239,7 @@ class Episode {
   }
 }
 
-/// ---------- Películas ----------
-class Movie {
+ class Movie {
   final String id;
   final String title;
   final int? year;
@@ -309,8 +300,7 @@ class Movie {
   }
 }
 
-/// ---------- Música (Álbum) ----------
-class Album {
+ class Album {
   final String id;
   final String title;
   final String artist;
@@ -373,20 +363,14 @@ class Album {
   }
 }
 
-/// ---------- Juegos ----------
-class Game {
+ class Game {
   final String id;
   final String title;
-  final String platform; // PC/PS/Switch...
-  final ItemStatus status; // backlog, en curso, terminado, 100%, abandonado
-  final double? rating;
-  final double hours; // acumuladas
-  final int progressPct; // 0..100 autopercibido
-  final List<String> tags;
+  final String platform;    final ItemStatus status;    final double? rating;
+  final double hours;    final int progressPct;    final List<String> tags;
   final String? coverUrl;
   final String? notes;
-  final int? difficulty; // 1..5
-
+  final int? difficulty;  
   Game({
     required this.id,
     required this.title,
@@ -439,8 +423,7 @@ class GameSession {
   final String id;
   final DateTime date;
   final int minutes;
-  final int? progressAfter; // %
-  final String? notes;
+  final int? progressAfter;    final String? notes;
 
   GameSession({
     required this.id,
@@ -469,10 +452,8 @@ class GameSession {
   }
 }
 
-/// ---------- Colecciones mixtas ----------
-class CultureCollectionItemRef {
-  final String type; // 'book'|'series'|'movie'|'album'|'game'
-  final String id;
+ class CultureCollectionItemRef {
+  final String type;    final String id;
   final int order;
   CultureCollectionItemRef({
     required this.type,

@@ -4,8 +4,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-/// 🛒 DETALLE LISTA DE COMPRA V2 - Diseño moderno con marcado de productos
-class ShoppingListDetailScreenV2 extends StatefulWidget {
+ class ShoppingListDetailScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   final String listId;
 
@@ -118,7 +117,6 @@ class _ShoppingListDetailScreenV2State
           ),
           body: Column(
             children: [
-              // Resumen
               Builder(
                 builder: (context) {
                   final colorScheme = Theme.of(context).colorScheme;
@@ -206,7 +204,6 @@ class _ShoppingListDetailScreenV2State
                   );
                 }
               ).animate().fadeIn().slideY(begin: -0.2),
-              // Lista de productos
               Expanded(
                 child: visibleItems.isEmpty
                     ? ModernEmptyState(
@@ -252,7 +249,6 @@ class _ShoppingListDetailScreenV2State
     );
   }
 
-  // Diálogos y acciones
   Future<void> _addItemDialog(ShoppingList list) async {
     final nameController = TextEditingController();
     final qtyController = TextEditingController(text: '1');
@@ -284,7 +280,6 @@ class _ShoppingListDetailScreenV2State
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -590,8 +585,7 @@ class _ShoppingListDetailScreenV2State
     );
 
     if (confirmed == true && mounted) {
-      // Eliminar en reversa para no afectar índices
-      for (int i = list.items.length - 1; i >= 0; i--) {
+             for (int i = list.items.length - 1; i >= 0; i--) {
         if (list.items[i].checked) {
           await widget.svc.removeShoppingItem(list.id, i.toString());
         }
@@ -619,8 +613,7 @@ class _ShoppingListDetailScreenV2State
       return;
     }
 
-    // Enviar cada producto comprado a la despensa
-    for (final item in purchased) {
+         for (final item in purchased) {
       final pantryItem = PantryItem(
         id: '',
         foodId: item.foodId,
@@ -668,15 +661,13 @@ class _ShoppingListDetailScreenV2State
 
     if (confirmed == true && mounted) {
       try {
-        // Marcar lista como completada
-        await widget.svc.updateShoppingList(
+                 await widget.svc.updateShoppingList(
           list.id,
           {'completedAt': DateTime.now().toIso8601String()},
         );
         
         if (mounted) {
-          Navigator.pop(context); // Volver atrás
-          ScaffoldMessenger.of(context).showSnackBar(
+          Navigator.pop(context);            ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
                 children: [
@@ -718,8 +709,7 @@ class _ShoppingListDetailScreenV2State
   }
 }
 
-// Widgets auxiliares
-class _SummaryItem extends StatelessWidget {
+ class _SummaryItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;

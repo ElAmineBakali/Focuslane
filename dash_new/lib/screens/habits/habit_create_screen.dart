@@ -10,8 +10,7 @@ import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.da
 import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
 
 class HabitCreateScreen extends StatefulWidget {
-  final Habit? habit; // null => crear, !null => editar
-  const HabitCreateScreen({super.key, this.habit});
+  final Habit? habit;    const HabitCreateScreen({super.key, this.habit});
 
   @override
   State<HabitCreateScreen> createState() => _HabitCreateScreenState();
@@ -28,8 +27,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   String _unit = '';
   Color _selectedColor = Colors.blue;
 
-  // Nuevos campos
-  String? _emoji;
+     String? _emoji;
   String? _iconCode;
   List<String> _tags = [];
   List<HabitReminder> _reminders = [];
@@ -223,8 +221,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono/Emoji selector
-                Card(
+                                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -306,8 +303,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                // Nombre
-                TextFormField(
+                                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Nombre del hábito',
@@ -321,8 +317,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 12),
 
-                // Descripción
-                TextFormField(
+                                 TextFormField(
                   controller: _descriptionController,
                   decoration: const InputDecoration(labelText: 'Descripción'),
                   maxLines: 2,
@@ -330,8 +325,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 12),
 
-                // Frecuencia
-                DropdownButtonFormField<String>(
+                                 DropdownButtonFormField<String>(
                   initialValue: _frequency,
                   decoration: const InputDecoration(labelText: 'Frecuencia'),
                   items: const [
@@ -344,8 +338,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                // Etiquetas
-                Card(
+                                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -417,8 +410,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                // Recordatorios
-                Card(
+                                 Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -472,8 +464,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                // Cuantitativo
-                SwitchListTile(
+                                 SwitchListTile(
                   title: const Text('¿Es cuantitativo?'),
                   subtitle: Text(
                     'Permite registrar números (ej: páginas leídas, km corridos)',
@@ -503,8 +494,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 20),
 
-                // Color
-                Row(
+                                 Row(
                   children: [
                     const Text(
                       'Color del hábito:',
@@ -528,8 +518,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 24),
 
-                // Botón guardar
-                Center(
+                                 Center(
                   child: FilledButton.icon(
                     onPressed: _submit,
                     icon: Icon(

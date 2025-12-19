@@ -5,8 +5,7 @@ import '../services/gym_firestore_service.dart';
 import '../models/preset_routines_data.dart';
 import '../models/gym_models.dart';
 
-/// 🏋️ Pantalla de rutinas predefinidas famosas
-class PresetRoutinesScreen extends StatefulWidget {
+ class PresetRoutinesScreen extends StatefulWidget {
   final GymFirestoreService svc;
 
   const PresetRoutinesScreen({super.key, required this.svc});
@@ -35,8 +34,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // App Bar con gradiente
-          SliverAppBar.large(
+                     SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
             stretch: true,
@@ -70,8 +68,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             ),
           ),
 
-          // Filtros
-          SliverToBoxAdapter(
+                     SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -105,8 +102,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             ),
           ),
 
-          // Lista de rutinas
-          SliverPadding(
+                     SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -216,8 +212,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
               children: [
                 Row(
                   children: [
-                    // Icono
-                    Container(
+                                         Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: goalColor.withOpacity(0.2),
@@ -227,8 +222,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                     ),
                     const SizedBox(width: 16),
                     
-                    // Nombre y badges
-                    Expanded(
+                                         Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -257,8 +251,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 
                 const SizedBox(height: 12),
                 
-                // Descripción
-                Text(
+                                 Text(
                   routine.description,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
@@ -271,8 +264,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 
                 const SizedBox(height: 12),
                 
-                // Info días
-                Row(
+                                 Row(
                   children: [
                     Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 6),
@@ -338,8 +330,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             ),
             child: Column(
               children: [
-                // Handle
-                Container(
+                                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
                   width: 40,
                   height: 4,
@@ -349,14 +340,12 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                   ),
                 ),
                 
-                // Contenido
-                Expanded(
+                                 Expanded(
                   child: ListView(
                     controller: scrollController,
                     padding: const EdgeInsets.all(20),
                     children: [
-                      // Header
-                      Row(
+                                             Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(16),
@@ -404,8 +393,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                       
                       const SizedBox(height: 20),
                       
-                      // Descripción
-                      Text(
+                                             Text(
                         routine.description,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
@@ -416,8 +404,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                       
                       const SizedBox(height: 24),
                       
-                      // Días
-                      Text(
+                                             Text(
                         'Estructura (${routine.days.length} días)',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
@@ -441,8 +428,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
         },
       ),
     ).then((_) {
-      // Preguntar si quiere aplicar la rutina
-      _askToApplyRoutine(routine);
+             _askToApplyRoutine(routine);
     });
   }
 
@@ -508,10 +494,8 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
   }
 
   Future<void> _applyRoutine(PresetRoutine routine) async {
-    Navigator.pop(context); // Cerrar diálogo
-    
-    // Mostrar loading
-    showDialog(
+    Navigator.pop(context);      
+         showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
@@ -526,9 +510,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       );
       
       if (mounted) {
-        Navigator.pop(context); // Cerrar loading
-        Navigator.pop(context); // Volver a la pantalla anterior
-        
+        Navigator.pop(context);          Navigator.pop(context);          
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -548,8 +530,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       }
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context); // Cerrar loading
-        
+        Navigator.pop(context);          
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -631,10 +612,8 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
   String _mapGoalToSplitType(String goal) {
     switch (goal) {
       case 'strength':
-        return 'UL'; // Upper/Lower
-      case 'mass':
-        return 'PPL'; // Push/Pull/Legs
-      default:
+        return 'UL';        case 'mass':
+        return 'PPL';        default:
         return 'Custom';
     }
   }

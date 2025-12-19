@@ -61,13 +61,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       final res = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: true, // ✅ usamos bytes; sin dart:io
+        withData: true, 
       );
       if (res == null || res.files.isEmpty) return;
 
       final file = res.files.first;
       final Uint8List? bytes = file.bytes;
-      // Limit PDF size to 5MB
+    
       const maxPdfBytes = 5 * 1024 * 1024;
       if (bytes == null) {
         AppToast.error(context, 'No se pudo leer el archivo');
@@ -158,7 +158,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       status: b.status,
       tags: b.tags,
       coverUrl: b.coverUrl,
-      pdfUrl: pdfUrl ?? b.pdfUrl, // ✅ conservar/actualizar
+      pdfUrl: pdfUrl ?? b.pdfUrl,
       startedAt: b.startedAt,
       finishedAt: b.finishedAt,
     );

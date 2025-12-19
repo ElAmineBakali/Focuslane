@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 
-/// Selector de plantillas predefinidas
-class TemplateSelector extends StatelessWidget {
+ class TemplateSelector extends StatelessWidget {
   final Function(HabitTemplate) onSelect;
 
   const TemplateSelector({super.key, required this.onSelect});
@@ -18,8 +17,7 @@ class TemplateSelector extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
         child: Column(
           children: [
-            // Header
-            Container(
+                         Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
@@ -57,8 +55,7 @@ class TemplateSelector extends StatelessWidget {
               ),
             ),
 
-            // Lista de plantillas
-            Expanded(
+                         Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: HabitTemplates.templates.length,
@@ -83,8 +80,7 @@ class TemplateSelector extends StatelessWidget {
                         padding: EdgeInsets.all(isMobile ? 14 : 16),
                         child: Row(
                           children: [
-                            // Icono/Emoji
-                            Container(
+                                                         Container(
                               width: isMobile ? 50 : 56,
                               height: isMobile ? 50 : 56,
                               decoration: BoxDecoration(
@@ -114,8 +110,7 @@ class TemplateSelector extends StatelessWidget {
 
                             const SizedBox(width: 16),
 
-                            // Información
-                            Expanded(
+                                                         Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -176,8 +171,7 @@ class TemplateSelector extends StatelessWidget {
                               ),
                             ),
 
-                            // Indicador
-                            Icon(
+                                                         Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: isMobile ? 16 : 18,
                               color: cs.onSurfaceVariant,

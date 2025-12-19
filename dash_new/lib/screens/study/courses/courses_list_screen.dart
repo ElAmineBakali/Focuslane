@@ -191,8 +191,7 @@ class CoursesListScreen extends StatelessWidget {
   }
 }
 
-/// Tarjeta mejorada de curso con indicador de progreso
-class _CourseCard extends StatelessWidget {
+ class _CourseCard extends StatelessWidget {
   final StudyFirestoreService svc;
   final Course course;
   final VoidCallback onTap;
@@ -205,8 +204,7 @@ class _CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Stream de sesiones de estudio para este curso
-    final color = course.color ?? Theme.of(context).colorScheme.primary;
+         final color = course.color ?? Theme.of(context).colorScheme.primary;
 
     return StreamBuilder<List<StudySession>>(
       stream: svc.streamSessions(courseId: course.id, limit: 100),
@@ -229,12 +227,10 @@ class _CourseCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header con nombre y botón de acciones
-                  Row(
+                                     Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Indicador de color
-                      Container(
+                                             Container(
                         width: 6,
                         height: 56,
                         decoration: BoxDecoration(
@@ -268,8 +264,7 @@ class _CourseCard extends StatelessWidget {
                     ],
                   ),
 
-                  // Información de créditos y progreso
-                  if (course.credits != null || course.goalHours != null) ...[
+                                     if (course.credits != null || course.goalHours != null) ...[
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 16,
@@ -289,8 +284,7 @@ class _CourseCard extends StatelessWidget {
                     ),
                   ],
 
-                  // Barra de progreso si hay objetivo de horas
-                  if (course.goalHours != null && goalMinutes > 0) ...[
+                                     if (course.goalHours != null && goalMinutes > 0) ...[
                     const SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),
@@ -336,8 +330,7 @@ class _CourseCard extends StatelessWidget {
   }
 }
 
-/// Chip pequeño de información
-class _InfoChip extends StatelessWidget {
+ class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
 
@@ -406,5 +399,4 @@ class _ArchivedCoursesScreen extends StatelessWidget {
   }
 }
 
-/// Pantalla de ajustes de Study (inline para evitar dependencia)
-
+ 
