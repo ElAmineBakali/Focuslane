@@ -26,8 +26,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
       appBar: ModernGradientAppBar(
         title: 'Catálogo de Recetas',
         icon: Icons.menu_book,
-        primaryColor: Colors.purple,
-        secondaryColor: Colors.purpleAccent,
+        useThemeColors: true,
         actions: [
           IconButton(
             icon: Icon(_showGridView ? Icons.view_list : Icons.grid_view),

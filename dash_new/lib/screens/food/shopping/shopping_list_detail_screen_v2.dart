@@ -62,8 +62,7 @@ class _ShoppingListDetailScreenV2State
         return Scaffold(
           appBar: ModernGradientAppBar(
             title: list.name,
-            primaryColor: AppColors.food,
-            secondaryColor: AppColors.warning,
+            useThemeColors: true,
             actions: [
               IconButton(
                 icon: Icon(_hideCompleted ? Icons.visibility : Icons.visibility_off),
@@ -79,8 +78,20 @@ class _ShoppingListDetailScreenV2State
                 onSelected: (value) {
                   if (value == 'clear') _clearPurchased(list);
                   if (value == 'pantry') _sendToPantry(list);
+                  if (value == 'complete') _completeList(list);
                 },
                 itemBuilder: (context) => [
+                  if (progress >= 1.0 && list.completedAt == null)
+                    const PopupMenuItem(
+                      value: 'complete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.archive, size: 20, color: Colors.green),
+                          SizedBox(width: AppSpacing.sm),
+                          Text('Archivar al historial', style: TextStyle(color: Colors.green)),
+                        ],
+                      ),
+                    ),
                   const PopupMenuItem(
                     value: 'clear',
                     child: Row(
@@ -108,87 +119,92 @@ class _ShoppingListDetailScreenV2State
           body: Column(
             children: [
               // Resumen
-              Container(
-                margin: const EdgeInsets.all(AppSpacing.md),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.food, AppColors.warning],
-                  ),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.food.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _SummaryItem(
-                          icon: Icons.shopping_basket,
-                          label: 'Productos',
-                          value: '${list.items.length}',
-                        ),
-                        Container(width: 1, height: 40, color: Colors.white30),
-                        _SummaryItem(
-                          icon: Icons.check_circle,
-                          label: 'Comprados',
-                          value: '$purchasedCount',
-                        ),
-                        Container(width: 1, height: 40, color: Colors.white30),
-                        _SummaryItem(
-                          icon: Icons.euro,
-                          label: 'Total',
-                          value: '€${total.toStringAsFixed(2)}',
+              Builder(
+                builder: (context) {
+                  final colorScheme = Theme.of(context).colorScheme;
+                  return Container(
+                    margin: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+                      ),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
-                              'Progreso',
-                              style: AppTypography.label(context).copyWith(
-                                color: Colors.white,
-                              ),
+                            _SummaryItem(
+                              icon: Icons.shopping_basket,
+                              label: 'Productos',
+                              value: '${list.items.length}',
                             ),
-                            Text(
-                              '${(progress * 100).toStringAsFixed(0)}%',
-                              style: AppTypography.label(context).copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Container(width: 1, height: 40, color: Colors.white30),
+                            _SummaryItem(
+                              icon: Icons.check_circle,
+                              label: 'Comprados',
+                              value: '$purchasedCount',
+                            ),
+                            Container(width: 1, height: 40, color: Colors.white30),
+                            _SummaryItem(
+                              icon: Icons.euro,
+                              label: 'Total',
+                              value: '€${total.toStringAsFixed(2)}',
                             ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        ModernProgressBar(
-                          value: progress,
-                          color: Colors.white,
-                          backgroundColor: Colors.white30,
+                        const SizedBox(height: AppSpacing.md),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Progreso',
+                                  style: AppTypography.label(context).copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  '${(progress * 100).toStringAsFixed(0)}%',
+                                  style: AppTypography.label(context).copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            ModernProgressBar(
+                              value: progress,
+                              color: Colors.white,
+                              backgroundColor: Colors.white30,
+                            ),
+                          ],
                         ),
+                        if (totalPurchased > 0) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
+                            style: AppTypography.caption(context).copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                    if (totalPurchased > 0) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
-                        style: AppTypography.caption(context).copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                  );
+                }
               ).animate().fadeIn().slideY(begin: -0.2),
               // Lista de productos
               Expanded(
@@ -229,7 +245,6 @@ class _ShoppingListDetailScreenV2State
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _addItemDialog(list),
-            backgroundColor: AppColors.food,
             child: const Icon(Icons.add),
           ),
         );
@@ -249,10 +264,13 @@ class _ShoppingListDetailScreenV2State
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
+        builder: (context, setModalState) {
+          final colorScheme = Theme.of(context).colorScheme;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+          decoration: BoxDecoration(
+            color: isDark ? colorScheme.surface : Colors.white,
+            borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXl),
             ),
           ),
@@ -272,7 +290,7 @@ class _ShoppingListDetailScreenV2State
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.borderLight,
+                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -344,7 +362,6 @@ class _ShoppingListDetailScreenV2State
                         'unit': unit,
                         'price': double.tryParse(priceController.text),
                       }),
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.food),
                       child: const Text('Añadir'),
                     ),
                   ),
@@ -352,7 +369,8 @@ class _ShoppingListDetailScreenV2State
               ),
             ],
           ),
-        ),
+          );
+        },
       ),
     );
 
@@ -391,10 +409,13 @@ class _ShoppingListDetailScreenV2State
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
+        builder: (context, setModalState) {
+          final colorScheme = Theme.of(context).colorScheme;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+          decoration: BoxDecoration(
+            color: isDark ? colorScheme.surface : Colors.white,
+            borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXl),
             ),
           ),
@@ -491,7 +512,8 @@ class _ShoppingListDetailScreenV2State
               ),
             ],
           ),
-        ),
+          );
+        },
       ),
     );
 
@@ -517,9 +539,11 @@ class _ShoppingListDetailScreenV2State
   }
 
   Future<void> _deleteItem(ShoppingList list, int index) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surface,
         title: const Text('Eliminar producto'),
         content: Text('¿Seguro que quieres eliminar "${list.items[index].name}"?'),
         actions: [
@@ -545,9 +569,11 @@ class _ShoppingListDetailScreenV2State
     final purchased = list.items.where((i) => i.checked).toList();
     if (purchased.isEmpty) return;
 
+    final colorScheme = Theme.of(context).colorScheme;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surface,
         title: const Text('Limpiar comprados'),
         content: Text('¿Eliminar ${purchased.length} productos ya comprados?'),
         actions: [
@@ -613,6 +639,70 @@ class _ShoppingListDetailScreenV2State
           behavior: SnackBarBehavior.floating,
         ),
       );
+    }
+  }
+
+  Future<void> _completeList(ShoppingList list) async {
+    final colorScheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surface,
+        title: const Text('Archivar lista'),
+        content: const Text(
+          '¿Marcar esta lista como completada y enviarla al historial?\n\nPodrás restaurarla más tarde si lo necesitas.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.green),
+            child: const Text('Archivar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        // Marcar lista como completada
+        await widget.svc.updateShoppingList(
+          list.id,
+          {'completedAt': DateTime.now().toIso8601String()},
+        );
+        
+        if (mounted) {
+          Navigator.pop(context); // Volver atrás
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.archive, color: Colors.white),
+                  const SizedBox(width: AppSpacing.sm),
+                  const Text('Lista archivada correctamente'),
+                ],
+              ),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al archivar: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

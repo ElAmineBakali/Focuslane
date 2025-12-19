@@ -569,6 +569,7 @@ class ShoppingList {
   final List<ShoppingListItem> items;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final DateTime? completedAt; // Para historial
 
   const ShoppingList({
     required this.id,
@@ -578,6 +579,7 @@ class ShoppingList {
     required this.items,
     required this.createdAt,
     this.updatedAt,
+    this.completedAt,
   });
 
   factory ShoppingList.fromMap(String id, Map<String, dynamic> m) {
@@ -622,6 +624,7 @@ class ShoppingList {
               .toList(),
       createdAt: parse(m['createdAt']),
       updatedAt: m['updatedAt'] != null ? parse(m['updatedAt']) : null,
+      completedAt: m['completedAt'] != null ? parse(m['completedAt']) : null,
     );
   }
 
@@ -632,7 +635,26 @@ class ShoppingList {
     'items': items.map((e) => e.toMap()).toList(),
     'createdAt': createdAt.toIso8601String(),
     if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
+    if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
   };
+  
+  /// Crea una copia con algunos campos actualizados
+  ShoppingList copyWith({
+    String? name,
+    List<ShoppingListItem>? items,
+    DateTime? completedAt,
+  }) {
+    return ShoppingList(
+      id: id,
+      name: name ?? this.name,
+      scope: scope,
+      isDefault: isDefault,
+      items: items ?? this.items,
+      createdAt: createdAt,
+      updatedAt: DateTime.now(),
+      completedAt: completedAt ?? this.completedAt,
+    );
+  }
 }
 
 /// ---------- Pantry ----------

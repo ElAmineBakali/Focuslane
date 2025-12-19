@@ -58,19 +58,31 @@ class FoodFirestoreService {
     String? query,
     bool supplementsOnly = false,
   }) {
+    // Para evitar problemas con índices de Firestore cuando se combina where + orderBy,
+    // aplicamos el filtro de suplementos en memoria después de obtener todos los alimentos
     Query<Map<String, dynamic>> q = _root.collection('foods').orderBy('name');
-    if (supplementsOnly) q = q.where('isSupplement', isEqualTo: true);
+    
     return q.snapshots().map((s) {
-      final list = s.docs.map((d) => Food.fromMap(d.id, d.data())).toList();
-      if (query == null || query.trim().isEmpty) return list;
-      final ql = query.trim().toLowerCase();
-      return list
-          .where(
-            (f) =>
-                f.name.toLowerCase().contains(ql) ||
-                (f.brand ?? '').toLowerCase().contains(ql),
-          )
-          .toList();
+      var list = s.docs.map((d) => Food.fromMap(d.id, d.data())).toList();
+      
+      // Filtrar por suplementos si es necesario
+      if (supplementsOnly) {
+        list = list.where((f) => f.isSupplement).toList();
+      }
+      
+      // Filtrar por búsqueda si es necesario
+      if (query != null && query.trim().isNotEmpty) {
+        final ql = query.trim().toLowerCase();
+        list = list
+            .where(
+              (f) =>
+                  f.name.toLowerCase().contains(ql) ||
+                  (f.brand ?? '').toLowerCase().contains(ql),
+            )
+            .toList();
+      }
+      
+      return list;
     });
   }
 

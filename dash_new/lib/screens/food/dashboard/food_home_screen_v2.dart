@@ -36,11 +36,45 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
       body: CustomScrollView(
         slivers: [
           // AppBar moderno con gradiente
-          FocusGradientAppBar(
-            title: 'Alimentación',
-            icon: Icons.restaurant,
-            primaryColor: FocusColors.food,
-            secondaryColor: FocusColors.warning,
+          SliverAppBar.large(
+            expandedHeight: 200,
+            pinned: true,
+            stretch: true,
+            backgroundColor: colorScheme.primaryContainer,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                'Alimentación',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withOpacity(0.8),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -20,
+                      top: 40,
+                      child: Icon(
+                        Icons.restaurant,
+                        size: 120,
+                        color: Colors.white.withOpacity(0.1),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             actions: [
               // Historial
               IconButton(
@@ -297,7 +331,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                       FocusActionCard(
                         title: 'Diario',
                         icon: Icons.today,
-                        color: FocusColors.food,
+                        color: colorScheme.primary,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -401,6 +435,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     DailyIntakeDoc day,
     Map<String, double?> globalTargets,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     final mergedTargets = Map<String, double?>.from(day.targets);
     for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
       mergedTargets[k] ??= globalTargets[k];
@@ -438,7 +473,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
               'Calorías',
               t['kcal'] ?? 0,
               mergedTargets['kcal'],
-              FocusColors.food,
+              colorScheme.primary,
               'kcal',
             ),
             _buildMiniMacro(
@@ -575,11 +610,12 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   }
 
   Widget _buildFavoriteChip(BuildContext context, Favorite fav) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 120,
       margin: const EdgeInsets.only(right: FocusSpacing.md),
       child: Material(
-        color: FocusColors.food.withOpacity(0.1),
+        color: colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         child: InkWell(
           onTap: () async {
@@ -597,7 +633,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                   fav.type == FavoriteType.food
                       ? Icons.restaurant
                       : Icons.menu_book,
-                  color: FocusColors.food,
+                  color: colorScheme.primary,
                   size: 28,
                 ),
                 const SizedBox(height: FocusSpacing.sm),
@@ -626,82 +662,439 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 }
 
 /// Sheet de configuración de recordatorios
-class _RemindersSheet extends StatelessWidget {
+class _RemindersSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
 
   @override
+  State<_RemindersSheet> createState() => _RemindersSheetState();
+}
+
+class _RemindersSheetState extends State<_RemindersSheet> {
+  bool _mealReminders = false;
+  bool _waterReminders = false;
+  bool _supplementReminders = false;
+  bool _goalReminders = false;
+  
+  TimeOfDay _breakfastTime = const TimeOfDay(hour: 8, minute: 0);
+  TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
+  TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
+  
+  // Intervalos de agua más granulares (en minutos)
+  int _waterIntervalMinutes = 120; // Por defecto 2 horas
+  TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
+  TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
+  
+  // Intervalo de objetivos
+  TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
+  bool _weekendsOnly = false;
+  
+  // Días de la semana para cada tipo de recordatorio
+  List<bool> _mealDays = List.filled(7, true); // Lun-Dom
+  List<bool> _waterDays = List.filled(7, true);
+  List<bool> _goalDays = List.filled(7, true);
+
+  @override
   Widget build(BuildContext context) {
-    final todayId = DateTime.now().toIso8601String().substring(0, 10);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(FocusSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '🔔 Recordatorios',
-              style: FocusTypography.heading2(context),
-            ),
-            const SizedBox(height: FocusSpacing.lg),
-
-            // TODO: Implementar reminders
-            Column(
-              children: [
-                SwitchListTile(
-                  value: false,
-                  onChanged: (v) async {
-                    // TODO: Implementar reminders
-                    /* if (v) {
-                      await svc.reminders.activateAwakeReminders(todayId);
-                    } else {
-                      await svc.reminders.deactivateAwakeReminders();
-                    } */
-                  },
-                  title: Text(
-                    'Despierto HOY',
-                    style: FocusTypography.heading4(context),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
-                  subtitle: const Text(
-                    '5 notificaciones para comidas del día',
-                  ),
-                  secondary: const Icon(Icons.wb_sunny),
                 ),
-                  const Divider(),
-                  SwitchListTile(
-                    value: false,
-                    onChanged: (v) async {
-                      // TODO: Implementar reminders
-                      /* if (v) {
-                        await svc.reminders.activateWaterReminders();
-                      } else {
-                        await svc.reminders.deactivateWaterReminders();
-                      } */
-                    },
-                    title: Text(
-                      'Agua cada 2h',
-                      style: FocusTypography.heading4(context),
+              ),
+              
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
-                    subtitle: const Text(
-                      'Recordatorios recurrentes de hidratación',
+                    child: Icon(
+                      Icons.notifications_active,
+                      color: colorScheme.primary,
+                      size: 28,
                     ),
-                    secondary: const Icon(Icons.water_drop),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Text(
+                      'Recordatorios',
+                      style: AppTypography.heading2(context),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
 
-            const SizedBox(height: FocusSpacing.lg),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cerrar'),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Recordatorios de comidas
+              _buildReminderSection(
+                icon: Icons.restaurant_menu,
+                title: 'Comidas del día',
+                subtitle: 'Notificaciones para desayuno, comida y cena',
+                value: _mealReminders,
+                onChanged: (v) => setState(() => _mealReminders = v),
+                expanded: _mealReminders,
+                children: [
+                  _buildTimeSelector(
+                    'Desayuno',
+                    Icons.wb_sunny,
+                    _breakfastTime,
+                    (time) => setState(() => _breakfastTime = time),
+                  ),
+                  _buildTimeSelector(
+                    'Comida',
+                    Icons.restaurant,
+                    _lunchTime,
+                    (time) => setState(() => _lunchTime = time),
+                  ),
+                  _buildTimeSelector(
+                    'Cena',
+                    Icons.dinner_dining,
+                    _dinnerTime,
+                    (time) => setState(() => _dinnerTime = time),
+                  ),
+                  _buildDaysSelector('Días activos', _mealDays),
+                ],
               ),
-            ),
-          ],
+
+              const SizedBox(height: AppSpacing.md),
+
+              // Recordatorios de agua
+              _buildReminderSection(
+                icon: Icons.water_drop,
+                title: 'Hidratación',
+                subtitle: 'Recordatorios recurrentes de agua',
+                value: _waterReminders,
+                onChanged: (v) => setState(() => _waterReminders = v),
+                expanded: _waterReminders,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.schedule, color: colorScheme.primary),
+                    title: const Text('Intervalo'),
+                    trailing: DropdownButton<int>(
+                      value: _waterIntervalMinutes,
+                      items: const [
+                        DropdownMenuItem(value: 15, child: Text('15 min')),
+                        DropdownMenuItem(value: 30, child: Text('30 min')),
+                        DropdownMenuItem(value: 45, child: Text('45 min')),
+                        DropdownMenuItem(value: 60, child: Text('1 hora')),
+                        DropdownMenuItem(value: 90, child: Text('1.5 horas')),
+                        DropdownMenuItem(value: 120, child: Text('2 horas')),
+                        DropdownMenuItem(value: 180, child: Text('3 horas')),
+                        DropdownMenuItem(value: 240, child: Text('4 horas')),
+                      ],
+                      onChanged: (v) => setState(() => _waterIntervalMinutes = v!),
+                    ),
+                  ),
+                  _buildTimeRangeSelector(
+                    'Horario activo',
+                    Icons.access_time,
+                    _waterStartTime,
+                    _waterEndTime,
+                    (start) => setState(() => _waterStartTime = start),
+                    (end) => setState(() => _waterEndTime = end),
+                  ),
+                  _buildDaysSelector('Días activos', _waterDays),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+
+              // Recordatorios de suplementos
+              _buildReminderSection(
+                icon: Icons.medication,
+                title: 'Suplementos',
+                subtitle: 'Recuerda tomar tus suplementos',
+                value: _supplementReminders,
+                onChanged: (v) => setState(() => _supplementReminders = v),
+                expanded: _supplementReminders,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      'Configura horarios personalizados para cada suplemento en su ficha individual',
+                      style: AppTypography.caption(context),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+
+              // Recordatorios de objetivos
+              _buildReminderSection(
+                icon: Icons.flag,
+                title: 'Objetivos diarios',
+                subtitle: 'Revisa tu progreso de calorías y macros',
+                value: _goalReminders,
+                onChanged: (v) => setState(() => _goalReminders = v),
+                expanded: _goalReminders,
+                children: [
+                  _buildTimeSelector(
+                    'Hora del recordatorio',
+                    Icons.schedule,
+                    _goalReminderTime,
+                    (time) => setState(() => _goalReminderTime = time),
+                  ),
+                  SwitchListTile(
+                    value: _weekendsOnly,
+                    onChanged: (v) => setState(() => _weekendsOnly = v),
+                    title: const Text('Solo en fin de semana'),
+                    secondary: const Icon(Icons.weekend),
+                  ),
+                  if (!_weekendsOnly) _buildDaysSelector('Días activos', _goalDays),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Botón de guardar
+              ModernPrimaryButton(
+                label: 'Guardar Preferencias',
+                icon: Icons.save,
+                fullWidth: true,
+                onPressed: () {
+                  // TODO: Guardar en Firestore/SharedPreferences
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white),
+                          const SizedBox(width: AppSpacing.sm),
+                          const Text('Preferencias guardadas'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green.shade600,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      ),
+                      margin: const EdgeInsets.all(AppSpacing.md),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildReminderSection({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    required bool expanded,
+    List<Widget> children = const [],
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Card(
+      elevation: 2,
+      child: Column(
+        children: [
+          SwitchListTile(
+            value: value,
+            onChanged: onChanged,
+            title: Text(title, style: AppTypography.heading4(context)),
+            subtitle: Text(subtitle),
+            secondary: Icon(icon, color: colorScheme.primary),
+          ),
+          if (expanded && children.isNotEmpty)
+            Container(
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(AppSpacing.radiusMd),
+                  bottomRight: Radius.circular(AppSpacing.radiusMd),
+                ),
+              ),
+              child: Column(children: children),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeSelector(
+    String label,
+    IconData icon,
+    TimeOfDay time,
+    ValueChanged<TimeOfDay> onChanged,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return ListTile(
+      leading: Icon(icon, color: colorScheme.primary),
+      title: Text(label),
+      trailing: TextButton(
+        onPressed: () async {
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: time,
+          );
+          if (picked != null) onChanged(picked);
+        },
+        child: Text(
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+          style: AppTypography.heading4(context).copyWith(
+            color: colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeRangeSelector(
+    String label,
+    IconData icon,
+    TimeOfDay startTime,
+    TimeOfDay endTime,
+    ValueChanged<TimeOfDay> onStartChanged,
+    ValueChanged<TimeOfDay> onEndChanged,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: colorScheme.primary, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Text(label, style: AppTypography.caption(context)),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: startTime,
+                    );
+                    if (picked != null) onStartChanged(picked);
+                  },
+                  icon: const Icon(Icons.alarm_on, size: 16),
+                  label: Text(
+                    '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                child: Icon(Icons.arrow_forward, size: 16),
+              ),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: endTime,
+                    );
+                    if (picked != null) onEndChanged(picked);
+                  },
+                  icon: const Icon(Icons.alarm_off, size: 16),
+                  label: Text(
+                    '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDaysSelector(String label, List<bool> days) {
+    final colorScheme = Theme.of(context).colorScheme;
+    const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTypography.caption(context),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(7, (index) {
+              return GestureDetector(
+                onTap: () => setState(() => days[index] = !days[index]),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: days[index] 
+                      ? colorScheme.primary 
+                      : colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    border: Border.all(
+                      color: days[index] 
+                        ? colorScheme.primary 
+                        : colorScheme.outline,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      dayLabels[index],
+                      style: AppTypography.body(context).copyWith(
+                        color: days[index] 
+                          ? Colors.white 
+                          : colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }

@@ -98,11 +98,12 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
   Widget _buildRangeChip(int days, String label) {
     final isSelected = _daysRange == days;
+    final colorScheme = Theme.of(context).colorScheme;
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (v) => setState(() => _daysRange = days),
-      selectedColor: FocusColors.food,
+      selectedColor: colorScheme.primary,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : FocusColors.grey700,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

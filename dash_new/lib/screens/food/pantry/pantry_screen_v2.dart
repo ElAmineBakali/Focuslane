@@ -22,8 +22,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
     return Scaffold(
       appBar: ModernGradientAppBar(
         title: 'Despensa',
-        primaryColor: const Color(0xFF8D6E63),
-        secondaryColor: const Color(0xFFA1887F),
+        useThemeColors: true,
         actions: [
           IconButton(
             icon: Icon(_showLowStockOnly ? Icons.warning_amber : Icons.inventory_2),
@@ -210,14 +209,17 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusXl),
+        builder: (context, setModalState) {
+          final colorScheme = Theme.of(context).colorScheme;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            decoration: BoxDecoration(
+              color: isDark ? colorScheme.surface : Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.radiusXl),
+              ),
             ),
-          ),
-          padding: EdgeInsets.only(
+            padding: EdgeInsets.only(
             left: AppSpacing.md,
             right: AppSpacing.md,
             top: AppSpacing.md,
@@ -233,7 +235,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.borderLight,
+                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -315,7 +317,8 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               ),
             ],
           ),
-        ),
+          );
+        },
       ),
     );
 

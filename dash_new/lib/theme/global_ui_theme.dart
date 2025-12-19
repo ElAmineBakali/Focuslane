@@ -209,19 +209,21 @@ class AppSpacing {
 class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? icon;
-  final Color primaryColor;
-  final Color secondaryColor;
+  final Color? primaryColor;
+  final Color? secondaryColor;
   final List<Widget>? actions;
   final bool centerTitle;
+  final bool useThemeColors;
   
   const ModernGradientAppBar({
     super.key,
     required this.title,
     this.icon,
-    required this.primaryColor,
-    required this.secondaryColor,
+    this.primaryColor,
+    this.secondaryColor,
     this.actions,
     this.centerTitle = false,
+    this.useThemeColors = true,
   });
   
   @override
@@ -229,10 +231,14 @@ class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidge
   
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final primary = useThemeColors ? colorScheme.primaryContainer : (primaryColor ?? colorScheme.primaryContainer);
+    final secondary = useThemeColors ? colorScheme.secondaryContainer : (secondaryColor ?? colorScheme.secondaryContainer);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor, secondaryColor],
+          colors: [primary, secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

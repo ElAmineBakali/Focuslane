@@ -68,8 +68,7 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2> with SingleTick
       appBar: ModernGradientAppBar(
         title: isEdit ? 'Editar Receta' : 'Nueva Receta',
         icon: Icons.menu_book,
-        primaryColor: Colors.purple,
-        secondaryColor: Colors.purpleAccent,
+        useThemeColors: true,
         actions: [
           if (_ingredients.isNotEmpty)
             IconButton(

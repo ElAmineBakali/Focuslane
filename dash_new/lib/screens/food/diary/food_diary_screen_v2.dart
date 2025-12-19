@@ -36,8 +36,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       appBar: ModernGradientAppBar(
         title: 'Diario de Alimentación',
         icon: Icons.restaurant_menu,
-        primaryColor: AppColors.food,
-        secondaryColor: AppColors.warning,
+        useThemeColors: true,
         actions: [
           IconButton(
             tooltip: 'Objetivos Nutricionales',
@@ -48,7 +47,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEntrySheet(context, dayId),
-        backgroundColor: AppColors.food,
         icon: const Icon(Icons.add),
         label: const Text('Añadir'),
       ).animate().scale(delay: 300.ms, duration: 200.ms),
@@ -200,13 +198,17 @@ class _ModernDaySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final isToday = _isToday(date);
     final dateStr = DateFormat('EEEE, d MMMM', 'es').format(date);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
     
     return Container(
       margin: const EdgeInsets.all(AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: isDark ? colorScheme.surface : AppColors.grey100,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: isDark ? Border.all(color: colorScheme.outline.withOpacity(0.2)) : null,
       ),
       child: Column(
         children: [
@@ -216,7 +218,7 @@ class _ModernDaySelector extends StatelessWidget {
                 onPressed: onPrev,
                 icon: const Icon(Icons.chevron_left),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
                 ),
               ),
               Expanded(
@@ -231,7 +233,7 @@ class _ModernDaySelector extends StatelessWidget {
                       if (isToday)
                         ModernBadge(
                           label: 'HOY',
-                          color: AppColors.food,
+                          color: colorScheme.primary,
                         ),
                     ],
                   ),
@@ -241,7 +243,7 @@ class _ModernDaySelector extends StatelessWidget {
                 onPressed: onNext,
                 icon: const Icon(Icons.chevron_right),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
                 ),
               ),
             ],
@@ -252,7 +254,7 @@ class _ModernDaySelector extends StatelessWidget {
               label: 'Ir a hoy',
               icon: Icons.today,
               onPressed: onToday,
-              color: AppColors.food,
+              color: colorScheme.primary,
             ),
           ],
         ],
@@ -803,10 +805,14 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
   
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -821,7 +827,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.grey300,
+                color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
@@ -831,7 +837,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Row(
                 children: [
-                  Icon(Icons.add_circle, color: AppColors.food, size: 28),
+                  Icon(Icons.add_circle, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
@@ -852,9 +858,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
             // Tabs
             TabBar(
               controller: _tabController,
-              labelColor: AppColors.food,
-              unselectedLabelColor: AppColors.grey600,
-              indicatorColor: AppColors.food,
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+              indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
                 Tab(icon: Icon(Icons.star), text: 'Favoritos'),
@@ -932,7 +938,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
             label: 'Añadir Quick Entry',
             icon: Icons.check,
             fullWidth: true,
-            color: AppColors.food,
+            color: Theme.of(context).colorScheme.primary,
             onPressed: _addQuickEntry,
           ),
         ],
@@ -1236,10 +1242,14 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
   
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -1258,7 +1268,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.grey300,
+                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                 ),
@@ -1266,7 +1276,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
               
               Row(
                 children: [
-                  Icon(Icons.flag, color: AppColors.food, size: 28),
+                  Icon(Icons.flag, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
@@ -1349,7 +1359,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 label: 'Guardar Objetivos',
                 icon: Icons.check,
                 fullWidth: true,
-                color: AppColors.food,
+                color: colorScheme.primary,
                 onPressed: _saveGoals,
               ),
             ],

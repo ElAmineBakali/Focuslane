@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -41,8 +42,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           children: [
             ModernGradientAppBar(
               title: 'Listas de Compra',
-              primaryColor: AppColors.food,
-              secondaryColor: AppColors.warning,
+              useThemeColors: true,
               actions: [
                 IconButton(
                   icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
@@ -57,7 +57,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
               ],
             ),
             Container(
-              color: AppColors.food,
+              color: Theme.of(context).colorScheme.primaryContainer,
               child: TabBar(
                 controller: _tabController,
                 indicatorColor: Colors.white,
@@ -155,11 +155,41 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
   }
 
   Widget _buildHistoryTab() {
-    // TODO: Implement history with CompletedShoppingList collection
-    return const ModernEmptyState(
-      icon: Icons.history,
-      message: 'Historial próximamente',
-      subtitle: 'El historial de compras estará disponible pronto',
+    return StreamBuilder<List<ShoppingList>>(
+      stream: widget.svc.streamShoppingLists(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final lists = snapshot.data!;
+        final completedLists = lists
+            .where((list) => list.completedAt != null)
+            .toList()
+          ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
+
+        if (completedLists.isEmpty) {
+          return const ModernEmptyState(
+            icon: Icons.history,
+            message: 'Sin historial',
+            subtitle: 'Las listas completadas aparecerán aquí',
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          itemCount: completedLists.length,
+          itemBuilder: (context, index) {
+            final list = completedLists[index];
+            return _HistoryListCard(
+              list: list,
+              onTap: () => _openListDetail(list),
+              onRestore: () => _restoreList(list),
+              onDelete: () => _deleteList(list),
+            ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).slideX(begin: -0.2);
+          },
+        );
+      },
     );
   }
 
@@ -174,12 +204,15 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
-          ),
-          padding: EdgeInsets.only(
+        builder: (context, setModalState) {
+          final colorScheme = Theme.of(context).colorScheme;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            decoration: BoxDecoration(
+              color: isDark ? colorScheme.surface : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+            ),
+            padding: EdgeInsets.only(
             left: AppSpacing.md,
             right: AppSpacing.md,
             top: AppSpacing.md,
@@ -195,7 +228,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.borderLight,
+                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -215,7 +248,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color: isDark ? colorScheme.outline : AppColors.borderLight),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Column(
@@ -288,7 +321,8 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
               ),
             ],
           ),
-        ),
+          );
+        },
       ),
     );
 
@@ -326,6 +360,44 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
         ),
       ),
     );
+  }
+
+  Future<void> _restoreList(ShoppingList list) async {
+    try {
+      // Restaurar la lista quitando el completedAt
+      await widget.svc.updateShoppingList(
+        list.id,
+        {'completedAt': null},
+      );
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.restore, color: Colors.white),
+                const SizedBox(width: AppSpacing.sm),
+                Text('Lista "${list.name}" restaurada'),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al restaurar: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _deleteList(ShoppingList list) async {
@@ -600,7 +672,7 @@ class _ShoppingListTile extends StatelessWidget {
               style: AppTypography.caption(context),
             ),
             const SizedBox(height: AppSpacing.xs),
-            ModernProgressBar(value: progress, color: AppColors.food),
+            ModernProgressBar(value: progress, color: Theme.of(context).colorScheme.primary),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -646,6 +718,91 @@ class _ShoppingListTile extends StatelessWidget {
       case ShoppingScope.custom:
         return 'Custom';
     }
+  }
+}
+
+/// Widget para mostrar listas completadas en el historial
+class _HistoryListCard extends StatelessWidget {
+  final ShoppingList list;
+  final VoidCallback onTap;
+  final VoidCallback onRestore;
+  final VoidCallback onDelete;
+  
+  const _HistoryListCard({
+    required this.list,
+    required this.onTap,
+    required this.onRestore,
+    required this.onDelete,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
+    final completedDate = list.completedAt != null 
+        ? DateFormat('dd/MM/yyyy').format(list.completedAt!)
+        : 'Fecha desconocida';
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: ListTile(
+        onTap: onTap,
+        leading: Container(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          ),
+          child: const Icon(Icons.check_circle, color: Colors.green),
+        ),
+        title: Text(list.name, style: AppTypography.body(context)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Completada el $completedDate',
+              style: AppTypography.caption(context).copyWith(
+                color: Colors.green,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${list.items.length} productos${total > 0 ? ' • €${total.toStringAsFixed(2)}' : ''}',
+              style: AppTypography.caption(context),
+            ),
+          ],
+        ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'restore') onRestore();
+            if (value == 'delete') onDelete();
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'restore',
+              child: Row(
+                children: [
+                  Icon(Icons.restore, size: 20, color: Colors.blue),
+                  SizedBox(width: AppSpacing.sm),
+                  Text('Restaurar', style: TextStyle(color: Colors.blue)),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, size: 20, color: Colors.red),
+                  SizedBox(width: AppSpacing.sm),
+                  Text('Eliminar', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

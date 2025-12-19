@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -18,14 +20,83 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   String _currentPlannerId = 'menu';
   ShoppingScope _scope = ShoppingScope.weekly;
   bool _showPlannersList = false;
+  String _selectedMobileDay = 'lunes'; // Para vista móvil
+  
+  // Configuración de slots
+  List<Map<String, dynamic>> _enabledSlots = [];
+  bool _slotsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSlotsConfig();
+  }
+
+  Future<void> _loadSlotsConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    final slotsJson = prefs.getString('meal_slots_config');
+    
+    if (slotsJson != null) {
+      final List<dynamic> decoded = jsonDecode(slotsJson);
+      setState(() {
+        _enabledSlots = decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+        _slotsLoaded = true;
+      });
+    } else {
+      // Configuración por defecto
+      setState(() {
+        _enabledSlots = [
+          {'slot': 'breakfast', 'name': 'Desayuno', 'icon': Icons.wb_sunny.codePoint, 'enabled': true},
+          {'slot': 'snack', 'name': 'Media Mañana', 'icon': Icons.cookie.codePoint, 'enabled': true},
+          {'slot': 'lunch', 'name': 'Almuerzo', 'icon': Icons.restaurant.codePoint, 'enabled': true},
+          {'slot': 'merienda', 'name': 'Merienda', 'icon': Icons.icecream.codePoint, 'enabled': true},
+          {'slot': 'dinner', 'name': 'Cena', 'icon': Icons.dinner_dining.codePoint, 'enabled': true},
+        ];
+        _slotsLoaded = true;
+      });
+    }
+  }
+
+  List<MealSlot> _getActiveSlots() {
+    final slotMap = {
+      'breakfast': MealSlot.breakfast,
+      'snack': MealSlot.snack,
+      'lunch': MealSlot.lunch,
+      'merienda': MealSlot.merienda,
+      'dinner': MealSlot.dinner,
+    };
+    
+    return _enabledSlots
+        .where((s) => s['enabled'] == true)
+        .map((s) => slotMap[s['slot']])
+        .whereType<MealSlot>()
+        .toList();
+  }
+
+  String _getConfiguredSlotName(MealSlot slot) {
+    final slotKey = slot.toString().split('.').last;
+    final config = _enabledSlots.firstWhere(
+      (s) => s['slot'] == slotKey,
+      orElse: () => {'name': _getSlotName(slot)},
+    );
+    return config['name'] ?? _getSlotName(slot);
+  }
+
+  IconData _getConfiguredSlotIcon(MealSlot slot) {
+    final slotKey = slot.toString().split('.').last;
+    final config = _enabledSlots.firstWhere(
+      (s) => s['slot'] == slotKey,
+      orElse: () => {'icon': _getSlotIcon(slot).codePoint},
+    );
+    return IconData(config['icon'] ?? _getSlotIcon(slot).codePoint, fontFamily: 'MaterialIcons');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ModernGradientAppBar(
         title: 'Planificador de Comidas',
-        primaryColor: AppColors.food,
-        secondaryColor: AppColors.warning,
+        useThemeColors: true,
         actions: [
           // Selector de planner actual
           TextButton.icon(
@@ -96,6 +167,12 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               ),
             ],
           ),
+          // Configurar slots de comidas
+          IconButton(
+            icon: const Icon(Icons.edit_calendar, color: Colors.white),
+            tooltip: 'Configurar comidas',
+            onPressed: _configureMealSlots,
+          ),
           // Generar lista de compras
           IconButton(
             icon: const Icon(Icons.shopping_cart_checkout, color: Colors.white),
@@ -104,29 +181,42 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Lista de planners (desplegable)
-          if (_showPlannersList) _buildPlannersList(),
-          // Tabla del planner actual
-          Expanded(
-            child: _buildWeekPlannerTable(),
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 800;
+          return Column(
+            children: [
+              // Lista de planners (desplegable)
+              if (_showPlannersList) _buildPlannersList(),
+              // Selector de día para móvil
+              if (isMobile) _buildMobileDaySelector(),
+              // Tabla del planner actual o vista móvil
+              Expanded(
+                child: isMobile 
+                    ? _buildMobileDayView(_selectedMobileDay)
+                    : _buildWeekPlannerTable(),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createNewPlanner,
         icon: const Icon(Icons.add),
         label: const Text('Nuevo Planner'),
-        backgroundColor: AppColors.food,
       ),
     );
   }
 
   Widget _buildPlannersList() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        gradient: AppColors.foodGradient,
+        gradient: LinearGradient(
+          colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -172,7 +262,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                       color: isSelected ? Colors.white : Colors.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       border: Border.all(
-                        color: isSelected ? AppColors.food : Colors.transparent,
+                        color: isSelected ? colorScheme.primary : Colors.transparent,
                         width: 2,
                       ),
                       boxShadow: [
@@ -192,7 +282,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                           children: [
                             Icon(
                               Icons.restaurant_menu,
-                              color: isSelected ? AppColors.food : AppColors.textSecondary,
+                              color: isSelected ? colorScheme.primary : AppColors.textSecondary,
                               size: 20,
                             ),
                             const SizedBox(width: AppSpacing.xs),
@@ -200,7 +290,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                               child: Text(
                                 planner.id,
                                 style: AppTypography.label(context).copyWith(
-                                  color: isSelected ? AppColors.food : AppColors.textSecondary,
+                                  color: isSelected ? colorScheme.primary : AppColors.textSecondary,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -244,7 +334,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         final planner = snap.data!;
         final days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
         final dayKeys = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        final slots = MealSlot.values;
+        final slots = _slotsLoaded ? _getActiveSlots() : MealSlot.values;
 
         return StreamBuilder<List<Food>>(
           stream: widget.svc.streamFoods(),
@@ -293,7 +383,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                 ),
                                 ModernBadge(
                                   label: _getScopeLabel(_scope),
-                                  color: AppColors.food,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ],
                             ),
@@ -301,7 +391,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             // Tabla moderna
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                                 boxShadow: [
                                   BoxShadow(
@@ -348,7 +438,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                             : Colors.white,
                                       ),
                                       children: [
-                                        _buildSlotHeaderCell(_getSlotName(slot)),
+                                        _buildSlotHeaderCell(_getConfiguredSlotName(slot), _getConfiguredSlotIcon(slot)),
                                         ...dayKeys.asMap().entries.map((dayEntry) {
                                           final dayIndex = dayEntry.key;
                                           final dayKey = dayEntry.value;
@@ -399,13 +489,14 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     );
   }
 
-  Widget _buildSlotHeaderCell(String text) {
+  Widget _buildSlotHeaderCell(String text, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
-          Icon(_getSlotIcon(text), size: 18, color: AppColors.food),
+          Icon(icon, size: 18, color: colorScheme.primary),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
@@ -513,7 +604,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     }
   }
 
-  IconData _getSlotIcon(String slotName) {
+  IconData _getSlotIconFromString(String slotName) {
     switch (slotName) {
       case 'Desayuno':
         return Icons.wb_sunny_outlined;
@@ -582,6 +673,20 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     }
   }
 
+  Future<void> _configureMealSlots() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _MealSlotsConfigSheet(
+        onConfigSaved: () {
+          // Recargar configuración cuando se guarde
+          _loadSlotsConfig();
+        },
+      ),
+    );
+  }
+
   Future<void> _createNewPlanner() async {
     final controller = TextEditingController();
     
@@ -643,6 +748,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   ) async {
     final foods = foodsMap.values.toList();
     
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -652,9 +760,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+          decoration: BoxDecoration(
+            color: isDark ? colorScheme.surface : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
           ),
           child: Column(
             children: [
@@ -664,7 +772,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.borderLight,
+                  color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -783,5 +891,439 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         ),
       );
     }
+  }
+
+  // === VISTA MÓVIL ===
+  
+  Widget _buildMobileDaySelector() {
+    final days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+        itemCount: days.length,
+        itemBuilder: (context, index) {
+          final day = days[index];
+          final isSelected = day == _selectedMobileDay;
+          
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: ChoiceChip(
+              label: Text(
+                day[0].toUpperCase() + day.substring(1, 3),
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : colorScheme.onSurface,
+                ),
+              ),
+              selected: isSelected,
+              selectedColor: colorScheme.primary,
+              backgroundColor: colorScheme.surface,
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() => _selectedMobileDay = day);
+                }
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMobileDayView(String dayKey) {
+    return StreamBuilder<WeekPlanner?>(
+      stream: widget.svc.streamWeek(_currentPlannerId),
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        final planner = snap.data ?? WeekPlanner(id: _currentPlannerId, scope: _scope, days: const {});
+        final slots = _slotsLoaded ? _getActiveSlots() : MealSlot.values;
+
+        return StreamBuilder<List<Food>>(
+          stream: widget.svc.streamFoods(),
+          builder: (context, foodsSnap) {
+            if (!foodsSnap.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final foods = foodsSnap.data!;
+            final foodsMap = {for (final f in foods) f.id: f};
+            final colorScheme = Theme.of(context).colorScheme;
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              itemCount: slots.length,
+              itemBuilder: (context, index) {
+                final slot = slots[index];
+                final entries = (planner.days[dayKey] ?? const [])
+                    .where((e) => e.slot == slot)
+                    .toList();
+                
+                return Card(
+                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                  elevation: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header del slot
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(AppSpacing.radiusMd),
+                            topRight: Radius.circular(AppSpacing.radiusMd),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(_getConfiguredSlotIcon(slot), color: colorScheme.primary),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              _getConfiguredSlotName(slot),
+                              style: AppTypography.heading4(context).copyWith(
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: Icon(Icons.add_circle, color: colorScheme.primary),
+                              onPressed: () => _openFoodSelector(planner, dayKey, slot, foodsMap),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Contenido del slot
+                      if (entries.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Center(
+                            child: Text(
+                              'Toca + para añadir alimento',
+                              style: AppTypography.caption(context),
+                            ),
+                          ),
+                        )
+                      else
+                        ...entries.asMap().entries.map((mapEntry) {
+                          final entryIndex = mapEntry.key;
+                          final entry = mapEntry.value;
+                          final food = foodsMap[entry.refId];
+                          
+                          if (food == null) {
+                            return ListTile(
+                              title: Text('Alimento no encontrado'),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => _deleteEntry(planner, dayKey, slot, entryIndex),
+                              ),
+                            );
+                          }
+                          
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: colorScheme.primaryContainer,
+                              child: Icon(
+                                food.isSupplement ? Icons.medication : Icons.restaurant,
+                                color: colorScheme.primary,
+                                size: 20,
+                              ),
+                            ),
+                            title: Text(food.name),
+                            subtitle: Text(
+                              '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal • ${entry.servings}x porción',
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteEntry(planner, dayKey, slot, entryIndex),
+                            ),
+                          );
+                        }),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: (index * 100).ms);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  IconData _getSlotIcon(MealSlot slot) {
+    switch (slot) {
+      case MealSlot.breakfast: return Icons.wb_sunny;
+      case MealSlot.snack: return Icons.cookie;
+      case MealSlot.lunch: return Icons.restaurant;
+      case MealSlot.merienda: return Icons.icecream;
+      case MealSlot.dinner: return Icons.dinner_dining;
+    }
+  }
+}
+
+/// Widget para configurar los slots de comidas personalizables
+class _MealSlotsConfigSheet extends StatefulWidget {
+  final VoidCallback onConfigSaved;
+  const _MealSlotsConfigSheet({required this.onConfigSaved});
+
+  @override
+  State<_MealSlotsConfigSheet> createState() => _MealSlotsConfigSheetState();
+}
+
+class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
+  List<Map<String, dynamic>> _slots = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConfig();
+  }
+
+  Future<void> _loadConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    final slotsJson = prefs.getString('meal_slots_config');
+    
+    if (slotsJson != null) {
+      final List<dynamic> decoded = jsonDecode(slotsJson);
+      setState(() {
+        _slots = decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+        _isLoading = false;
+      });
+    } else {
+      // Configuración por defecto
+      setState(() {
+        _slots = [
+          {'slot': 'breakfast', 'name': 'Desayuno', 'icon': Icons.wb_sunny.codePoint, 'enabled': true},
+          {'slot': 'snack', 'name': 'Media Mañana', 'icon': Icons.cookie.codePoint, 'enabled': true},
+          {'slot': 'lunch', 'name': 'Almuerzo', 'icon': Icons.restaurant.codePoint, 'enabled': true},
+          {'slot': 'merienda', 'name': 'Merienda', 'icon': Icons.icecream.codePoint, 'enabled': true},
+          {'slot': 'dinner', 'name': 'Cena', 'icon': Icons.dinner_dining.codePoint, 'enabled': true},
+        ];
+        _isLoading = false;
+      });
+    }
+  }
+
+  final List<IconData> _availableIcons = [
+    Icons.wb_sunny,
+    Icons.cookie,
+    Icons.restaurant,
+    Icons.lunch_dining,
+    Icons.dinner_dining,
+    Icons.local_cafe,
+    Icons.bakery_dining,
+    Icons.fastfood,
+    Icons.ramen_dining,
+    Icons.icecream,
+    Icons.apple,
+    Icons.egg,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (_isLoading) {
+      return Container(
+        height: 400,
+        decoration: BoxDecoration(
+          color: isDark ? colorScheme.surface : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              ),
+            ),
+
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  ),
+                  child: Icon(
+                    Icons.edit_calendar,
+                    color: colorScheme.primary,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Configurar Comidas',
+                        style: AppTypography.heading2(context),
+                      ),
+                      Text(
+                        'Personaliza las comidas del día',
+                        style: AppTypography.caption(context),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // Lista de slots configurables
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _slots.length,
+                itemBuilder: (context, index) {
+                  final slot = _slots[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: ListTile(
+                      leading: Switch(
+                        value: slot['enabled'],
+                        onChanged: (v) => setState(() => slot['enabled'] = v),
+                        activeColor: colorScheme.primary,
+                      ),
+                      title: TextFormField(
+                        initialValue: slot['name'],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Nombre de la comida',
+                          enabled: slot['enabled'],
+                        ),
+                        style: AppTypography.body(context),
+                        onChanged: (v) => slot['name'] = v,
+                      ),
+                      trailing: PopupMenuButton<int>(
+                        icon: Icon(
+                          IconData(slot['icon'], fontFamily: 'MaterialIcons'),
+                          color: slot['enabled'] ? colorScheme.primary : Colors.grey,
+                        ),
+                        enabled: slot['enabled'],
+                        onSelected: (iconCode) => setState(() => slot['icon'] = iconCode),
+                        itemBuilder: (context) => _availableIcons.map((icon) {
+                          return PopupMenuItem(
+                            value: icon.codePoint,
+                            child: Icon(icon),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // Botones
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _slots.clear();
+                        _slots.addAll([
+                          {'slot': 'breakfast', 'name': 'Desayuno', 'icon': Icons.wb_sunny.codePoint, 'enabled': true},
+                          {'slot': 'snack', 'name': 'Media Mañana', 'icon': Icons.cookie.codePoint, 'enabled': true},
+                          {'slot': 'lunch', 'name': 'Almuerzo', 'icon': Icons.restaurant.codePoint, 'enabled': true},
+                          {'slot': 'merienda', 'name': 'Merienda', 'icon': Icons.icecream.codePoint, 'enabled': true},
+                          {'slot': 'dinner', 'name': 'Cena', 'icon': Icons.dinner_dining.codePoint, 'enabled': true},
+                        ]);
+                      });
+                    },
+                    icon: const Icon(Icons.restore),
+                    label: const Text('Restablecer'),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  flex: 2,
+                  child: ModernPrimaryButton(
+                    label: 'Guardar',
+                    icon: Icons.check,
+                    fullWidth: true,
+                    onPressed: () async {
+                      // Guardar configuración en SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      final slotsJson = jsonEncode(_slots);
+                      await prefs.setString('meal_slots_config', slotsJson);
+                      
+                      // Notificar al padre para recargar
+                      widget.onConfigSaved();
+                      
+                      if (mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle, color: Colors.white),
+                                const SizedBox(width: AppSpacing.sm),
+                                const Text('Configuración guardada correctamente'),
+                              ],
+                            ),
+                            backgroundColor: Colors.green.shade600,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

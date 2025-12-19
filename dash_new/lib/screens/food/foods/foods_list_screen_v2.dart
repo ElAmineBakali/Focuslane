@@ -27,8 +27,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       appBar: ModernGradientAppBar(
         title: 'Catálogo de Alimentos',
         icon: Icons.restaurant,
-        primaryColor: Colors.blue,
-        secondaryColor: Colors.lightBlueAccent,
+        useThemeColors: true,
         actions: [
           IconButton(
             icon: Icon(_showGridView ? Icons.view_list : Icons.grid_view),
@@ -190,15 +189,70 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
   }
   
   Future<void> _toggleFavorite(Food food) async {
-    // TODO: Implementar toggle de favorito
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Favorito: ${food.name}')),
-    );
+    final favs = await widget.svc.streamFavorites().first;
+    final existing = favs.where((f) => 
+      f.type == FavoriteType.food && f.refId == food.id
+    ).toList();
+    
+    if (existing.isNotEmpty) {
+      // Remover de favoritos
+      for (final fav in existing) {
+        await widget.svc.removeFavorite(fav.id);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.star_border, color: Colors.white),
+                const SizedBox(width: 8),
+                Text('✓ ${food.name} eliminado de favoritos'),
+              ],
+            ),
+            backgroundColor: AppColors.grey700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+          ),
+        );
+      }
+    } else {
+      // Añadir a favoritos
+      await widget.svc.addFavorite(
+        Favorite(
+          id: '',
+          type: FavoriteType.food,
+          refId: food.id,
+          alias: food.name,
+          defaultQty: food.unitSize,
+          defaultUnit: food.perUnit,
+        ),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.star, color: Colors.amber),
+                const SizedBox(width: 8),
+                Text('✓ ${food.name} añadido a favoritos'),
+              ],
+            ),
+            backgroundColor: AppColors.grey700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+          ),
+        );
+      }
+    }
   }
 }
 
 /// Tarjeta moderna de alimento para grid
-class _FoodGridCard extends StatelessWidget {
+class _FoodGridCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
@@ -210,16 +264,35 @@ class _FoodGridCard extends StatelessWidget {
   });
   
   @override
+  State<_FoodGridCard> createState() => _FoodGridCardState();
+}
+
+class _FoodGridCardState extends State<_FoodGridCard> {
+  
+  @override
   Widget build(BuildContext context) {
-    final color = food.color ?? AppColors.food;
+    final color = widget.food.color ?? AppColors.food;
     
+    return StreamBuilder<List<Favorite>>(
+      stream: context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
+      builder: (context, favSnap) {
+        final isFavorite = favSnap.data?.any((f) => 
+          f.type == FavoriteType.food && f.refId == widget.food.id
+        ) ?? false;
+        
+        return _buildCard(context, color, isFavorite);
+      },
+    );
+  }
+  
+  Widget _buildCard(BuildContext context, Color color, bool isFavorite) {
     return Card(
       elevation: AppSpacing.elevationMd,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +314,7 @@ class _FoodGridCard extends StatelessWidget {
                 children: [
                   Center(
                     child: Icon(
-                      food.isSupplement ? Icons.medication : Icons.restaurant,
+                      widget.food.isSupplement ? Icons.medication : Icons.restaurant,
                       size: 48,
                       color: Colors.white,
                     ),
@@ -250,9 +323,9 @@ class _FoodGridCard extends StatelessWidget {
                     top: AppSpacing.sm,
                     right: AppSpacing.sm,
                     child: IconButton(
-                      icon: const Icon(Icons.star_border),
-                      color: Colors.white,
-                      onPressed: onToggleFavorite,
+                      icon: Icon(isFavorite ? Icons.star : Icons.star_border),
+                      color: isFavorite ? Colors.amber : Colors.white,
+                      onPressed: widget.onToggleFavorite,
                     ),
                   ),
                 ],
@@ -267,15 +340,15 @@ class _FoodGridCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      food.name,
+                      widget.food.name,
                       style: AppTypography.heading4(context),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (food.brand != null) ...[
+                    if (widget.food.brand != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        food.brand!,
+                        widget.food.brand!,
                         style: AppTypography.caption(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -287,17 +360,17 @@ class _FoodGridCard extends StatelessWidget {
                         Icon(Icons.local_fire_department, size: 16, color: color),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.kcal.toStringAsFixed(0)} kcal',
+                          '${widget.food.kcal.toStringAsFixed(0)} kcal',
                           style: AppTypography.caption(context, color: color),
                         ),
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'por ${food.unitSize.toStringAsFixed(0)}${food.perUnit.name}',
+                      'por ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}',
                       style: AppTypography.caption(context),
                     ),
-                    if (food.isSupplement)
+                    if (widget.food.isSupplement)
                       ModernBadge(
                         label: 'SUPLEMENTO',
                         color: AppColors.gym,
@@ -314,7 +387,7 @@ class _FoodGridCard extends StatelessWidget {
 }
 
 /// Tarjeta moderna de alimento para lista
-class _FoodListCard extends StatelessWidget {
+class _FoodListCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
@@ -326,9 +399,27 @@ class _FoodListCard extends StatelessWidget {
   });
   
   @override
+  State<_FoodListCard> createState() => _FoodListCardState();
+}
+
+class _FoodListCardState extends State<_FoodListCard> {
+  @override
   Widget build(BuildContext context) {
-    final color = food.color ?? AppColors.food;
+    final color = widget.food.color ?? AppColors.food;
     
+    return StreamBuilder<List<Favorite>>(
+      stream: context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
+      builder: (context, favSnap) {
+        final isFavorite = favSnap.data?.any((f) => 
+          f.type == FavoriteType.food && f.refId == widget.food.id
+        ) ?? false;
+        
+        return _buildCard(context, color, isFavorite);
+      },
+    );
+  }
+  
+  Widget _buildCard(BuildContext context, Color color, bool isFavorite) {
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -336,7 +427,7 @@ class _FoodListCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -350,7 +441,7 @@ class _FoodListCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Icon(
-                  food.isSupplement ? Icons.medication : Icons.restaurant,
+                  widget.food.isSupplement ? Icons.medication : Icons.restaurant,
                   color: color,
                   size: 32,
                 ),
@@ -367,20 +458,20 @@ class _FoodListCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            food.name,
+                            widget.food.name,
                             style: AppTypography.heading4(context),
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.star_border),
-                          color: color,
-                          onPressed: onToggleFavorite,
+                          icon: Icon(isFavorite ? Icons.star : Icons.star_border),
+                          color: isFavorite ? Colors.amber : color,
+                          onPressed: widget.onToggleFavorite,
                         ),
                       ],
                     ),
-                    if (food.brand != null) ...[
+                    if (widget.food.brand != null) ...[
                       Text(
-                        food.brand!,
+                        widget.food.brand!,
                         style: AppTypography.caption(context),
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -390,11 +481,11 @@ class _FoodListCard extends StatelessWidget {
                         Icon(Icons.local_fire_department, size: 16, color: color),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.kcal.toStringAsFixed(0)} kcal',
+                          '${widget.food.kcal.toStringAsFixed(0)} kcal',
                           style: AppTypography.body(context, color: color),
                         ),
                         Text(
-                          ' por ${food.unitSize.toStringAsFixed(0)}${food.perUnit.name}',
+                          ' por ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}',
                           style: AppTypography.caption(context),
                         ),
                       ],
@@ -403,11 +494,11 @@ class _FoodListCard extends StatelessWidget {
                     Wrap(
                       spacing: AppSpacing.sm,
                       children: [
-                        if (food.isSupplement)
+                        if (widget.food.isSupplement)
                           ModernBadge(label: 'SUPLEMENTO', color: AppColors.gym),
-                        _MacroBadge(label: 'P', value: food.protein, color: AppColors.error),
-                        _MacroBadge(label: 'C', value: food.carbs, color: AppColors.warning),
-                        _MacroBadge(label: 'G', value: food.fat, color: AppColors.info),
+                        _MacroBadge(label: 'P', value: widget.food.protein, color: AppColors.error),
+                        _MacroBadge(label: 'C', value: widget.food.carbs, color: AppColors.warning),
+                        _MacroBadge(label: 'G', value: widget.food.fat, color: AppColors.info),
                       ],
                     ),
                   ],

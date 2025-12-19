@@ -58,11 +58,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.initial != null;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -79,7 +81,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.grey300,
+                  color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
               ),
@@ -92,12 +94,12 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.food.withOpacity(0.2),
+                        color: colorScheme.primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
                       child: Icon(
                         _isSupplement ? Icons.medication : Icons.restaurant,
-                        color: AppColors.food,
+                        color: colorScheme.primary,
                         size: 28,
                       ),
                     ),
@@ -121,9 +123,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               // Tabs
               TabBar(
                 controller: _tabController,
-                labelColor: AppColors.food,
-                unselectedLabelColor: AppColors.grey600,
-                indicatorColor: AppColors.food,
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+                indicatorColor: colorScheme.primary,
                 tabs: const [
                   Tab(icon: Icon(Icons.info), text: 'Información'),
                   Tab(icon: Icon(Icons.analytics), text: 'Nutrición'),
@@ -136,7 +138,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildInfoTab(),
+                    _buildInfoTab(colorScheme, isDark),
                     _buildNutritionTab(),
                   ],
                 ),
@@ -146,9 +148,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  color: AppColors.grey100,
+                  color: isDark ? colorScheme.surfaceContainerHighest : AppColors.grey100,
                   border: Border(
-                    top: BorderSide(color: AppColors.grey300),
+                    top: BorderSide(color: isDark ? colorScheme.outline : AppColors.grey300),
                   ),
                 ),
                 child: Row(
@@ -169,7 +171,6 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                         label: isEdit ? 'Guardar Cambios' : 'Crear Alimento',
                         icon: Icons.check,
                         fullWidth: true,
-                        color: AppColors.food,
                         isLoading: _isSaving,
                         onPressed: _saveFood,
                       ),
@@ -184,7 +185,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
     );
   }
   
-  Widget _buildInfoTab() {
+  Widget _buildInfoTab(ColorScheme colorScheme, bool isDark) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
@@ -229,9 +230,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.grey100,
+                    color: isDark ? colorScheme.surfaceContainerHighest : AppColors.grey100,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    border: Border.all(color: AppColors.grey300),
+                    border: Border.all(color: isDark ? colorScheme.outline : AppColors.grey300),
                   ),
                   child: DropdownButton<UnitKind>(
                     value: _perUnit,
@@ -418,16 +419,48 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.initial == null 
-                ? '✅ Alimento creado correctamente'
-                : '✅ Alimento actualizado correctamente'),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    widget.initial == null 
+                        ? 'Alimento creado correctamente'
+                        : 'Alimento actualizado correctamente',
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            margin: const EdgeInsets.all(AppSpacing.md),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Error: $e')),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    'Error al guardar: $e',
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            margin: const EdgeInsets.all(AppSpacing.md),
+          ),
         );
       }
     } finally {
