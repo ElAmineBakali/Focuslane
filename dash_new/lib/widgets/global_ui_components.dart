@@ -269,6 +269,125 @@ class FocusActionCard extends StatelessWidget {
   }
 }
 
+class FocusActionItem {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final Duration? animationDelay;
+
+  const FocusActionItem({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    this.animationDelay,
+  });
+}
+
+class FocusActionsGrid extends StatelessWidget {
+  final List<FocusActionItem> items;
+  final int crossAxisCount;
+  final double mainAxisSpacing;
+  final double crossAxisSpacing;
+  final double childAspectRatio;
+
+  const FocusActionsGrid({
+    super.key,
+    required this.items,
+    this.crossAxisCount = 2,
+    this.mainAxisSpacing = FocusSpacing.md,
+    this.crossAxisSpacing = FocusSpacing.md,
+    this.childAspectRatio = 1.3,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: crossAxisCount,
+      mainAxisSpacing: mainAxisSpacing,
+      crossAxisSpacing: crossAxisSpacing,
+      childAspectRatio: childAspectRatio,
+      children: [
+        for (final item in items)
+          FocusActionCard(
+            title: item.title,
+            icon: item.icon,
+            color: item.color,
+            onTap: item.onTap,
+            animationDelay: item.animationDelay,
+          ),
+      ],
+    );
+  }
+}
+
+class FocusFeatureCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const FocusFeatureCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: FocusSpacing.cardElevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+        child: Padding(
+          padding: const EdgeInsets.all(FocusSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(FocusSpacing.md),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
+                ),
+                child: Icon(icon, color: color, size: FocusSpacing.iconSizeMedium + 4),
+              ),
+              const SizedBox(width: FocusSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: FocusTypography.heading4(context),
+                    ),
+                    const SizedBox(height: FocusSpacing.xs),
+                    Text(
+                      subtitle,
+                      style: FocusTypography.caption(context),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: FocusColors.grey600),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class FocusInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -689,7 +808,6 @@ class FocusSection extends StatelessWidget {
   }
 }
 
-double screenPad(BuildContext context) {
 double screenPad(BuildContext context) {
   final width = MediaQuery.of(context).size.width;
   if (width > 600) return 80.0;

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/global_ui_components.dart';
 import '../../../theme/global_ui_theme.dart';
+import '../../../widgets/module_shell.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import '../diary/food_diary_screen_v2.dart';
@@ -30,75 +31,31 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(
-            expandedHeight: 200,
-            pinned: true,
-            stretch: true,
-            backgroundColor: colorScheme.primaryContainer,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Alimentación',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                ),
+    return FocusModuleShell(
+      title: 'Alimentación',
+      titleIcon: Icons.restaurant,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.history),
+          tooltip: 'Historial',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FoodHistoryScreenV2(svc: widget.svc),
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primaryContainer,
-                      colorScheme.secondaryContainer.withOpacity(0.8),
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: -20,
-                      top: 40,
-                      child: Icon(
-                        Icons.restaurant,
-                        size: 120,
-                        color: Colors.white.withOpacity(0.1),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.history),
-                tooltip: 'Historial',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FoodHistoryScreenV2(svc: widget.svc),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.notifications_active_outlined),
-                tooltip: 'Recordatorios',
-                onPressed: () => _showRemindersSheet(context),
-              ),
-            ],
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(FocusSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            );
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.notifications_active_outlined),
+          tooltip: 'Recordatorios',
+          onPressed: () => _showRemindersSheet(context),
+        ),
+      ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
                   StreamBuilder<int>(
                     stream: widget.svc.streamPantry().map((items) => items.where((i) => (i.qty ?? 0) < (i.minQty ?? 0)).length),
                     builder: (context, snap) {
@@ -148,11 +105,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                         PantryScreenV2(svc: widget.svc),
                                   ),
                                 );
-                              },
-                            ),
-                          ],
-                        ),
-                      ).animate().fadeIn().slideY(begin: -0.2, end: 0);
                     },
                   ),
 
@@ -308,15 +260,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     style: FocusTypography.heading3(context),
                   ),
                   const SizedBox(height: FocusSpacing.md),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: FocusSpacing.md,
-                    crossAxisSpacing: FocusSpacing.md,
-                    childAspectRatio: 1.3,
-                    children: [
-                      FocusActionCard(
+                  FocusActionsGrid(
+                    items: [
+                      FocusActionItem(
                         title: 'Diario',
                         icon: Icons.today,
                         color: colorScheme.primary,
@@ -324,14 +270,13 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodDiaryScreenV2(svc: widget.svc),
+                              builder: (_) => FoodDiaryScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 100.ms,
                       ),
-                      FocusActionCard(
+                      FocusActionItem(
                         title: 'Alimentos',
                         icon: Icons.restaurant,
                         color: Colors.blue,
@@ -339,14 +284,13 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodsListScreenV2(svc: widget.svc),
+                              builder: (_) => FoodsListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 200.ms,
                       ),
-                      FocusActionCard(
+                      FocusActionItem(
                         title: 'Recetas',
                         icon: Icons.menu_book,
                         color: Colors.purple,
@@ -354,14 +298,13 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  RecipesListScreenV2(svc: widget.svc),
+                              builder: (_) => RecipesListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 300.ms,
                       ),
-                      FocusActionCard(
+                      FocusActionItem(
                         title: 'Planificador',
                         icon: Icons.calendar_view_week,
                         color: Colors.green,
@@ -369,14 +312,13 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodPlannerScreenV2(svc: widget.svc),
+                              builder: (_) => FoodPlannerScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 400.ms,
                       ),
-                      FocusActionCard(
+                      FocusActionItem(
                         title: 'Compras',
                         icon: Icons.shopping_cart,
                         color: Colors.orange,
@@ -384,24 +326,23 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  ShoppingListsScreenV2(svc: widget.svc),
+                              builder: (_) => ShoppingListsScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 500.ms,
                       ),
-                      FocusActionCard(
+                      FocusActionItem(
                         title: 'Despensa',
                         icon: Icons.kitchen,
                         color: Colors.brown,
                         onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PantryScreenV2(svc: widget.svc),
-                              ),
-                            );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PantryScreenV2(svc: widget.svc),
+                            ),
+                          );
                         },
                         animationDelay: 600.ms,
                       ),
