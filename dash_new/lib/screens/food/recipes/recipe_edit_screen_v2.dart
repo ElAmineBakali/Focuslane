@@ -642,7 +642,7 @@ class _StepCard extends StatelessWidget {
           child: Center(
             child: Text(
               '$stepNumber',
-              style: AppTypography.heading4(context, color: Colors.white),
+              style: AppTypography.heading4(context, color: Theme.of(context).colorScheme.onPrimary),
             ),
           ),
         ),
@@ -696,11 +696,11 @@ class _NutritionSummaryCard extends StatelessWidget {
             children: [
               Text(
                 'Por ración',
-                style: AppTypography.heading3(context, color: Colors.white),
+                style: AppTypography.heading3(context, color: Theme.of(context).colorScheme.onPrimary),
               ),
               ModernBadge(
                 label: '1/$servings',
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 textColor: Colors.purple,
               ),
             ],
@@ -708,11 +708,11 @@ class _NutritionSummaryCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           Row(
             children: [
-              Icon(Icons.local_fire_department, color: Colors.white, size: 32),
+              Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.onPrimary, size: 32),
               const SizedBox(width: AppSpacing.md),
               Text(
                 '${perServing['kcal']!.toStringAsFixed(0)} kcal',
-                style: AppTypography.heading1(context, color: Colors.white),
+                style: AppTypography.heading1(context, color: Theme.of(context).colorScheme.onPrimary),
               ),
             ],
           ),
@@ -760,16 +760,16 @@ class _MacroDisplay extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTypography.heading2(context, color: Colors.white),
+          style: AppTypography.heading2(context, color: Theme.of(context).colorScheme.onPrimary),
         ),
         Text(
           unit,
-          style: AppTypography.caption(context, color: Colors.white70),
+          style: AppTypography.caption(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTypography.caption(context, color: Colors.white70),
+          style: AppTypography.caption(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
         ),
       ],
     );

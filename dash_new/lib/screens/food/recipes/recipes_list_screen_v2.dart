@@ -203,7 +203,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                     child: Icon(
                       Icons.menu_book,
                       size: 48,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   if (hasNutrition)
@@ -213,7 +213,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                       child: ModernBadge(
                         label: 'AUTO',
                         color: AppColors.success,
-                        textColor: Colors.white,
+                        textColor: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                 ],
@@ -308,7 +308,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                 ),
                 child: Icon(
                   Icons.menu_book,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   size: 32,
                 ),
               ),

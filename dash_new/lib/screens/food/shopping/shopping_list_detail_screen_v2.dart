@@ -146,13 +146,13 @@ class _ShoppingListDetailScreenV2State
                               label: 'Productos',
                               value: '${list.items.length}',
                             ),
-                            Container(width: 1, height: 40, color: Colors.white30),
+                            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3)),
                             _SummaryItem(
                               icon: Icons.check_circle,
                               label: 'Comprados',
                               value: '$purchasedCount',
                             ),
-                            Container(width: 1, height: 40, color: Colors.white30),
+                            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3)),
                             _SummaryItem(
                               icon: Icons.euro,
                               label: 'Total',
@@ -170,13 +170,13 @@ class _ShoppingListDetailScreenV2State
                                 Text(
                                   'Progreso',
                                   style: AppTypography.label(context).copyWith(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                   ),
                                 ),
                                 Text(
                                   '${(progress * 100).toStringAsFixed(0)}%',
                                   style: AppTypography.label(context).copyWith(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -185,8 +185,8 @@ class _ShoppingListDetailScreenV2State
                             const SizedBox(height: AppSpacing.xs),
                             ModernProgressBar(
                               value: progress,
-                              color: Colors.white,
-                              backgroundColor: Colors.white30,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
                             ),
                           ],
                         ),
@@ -195,7 +195,7 @@ class _ShoppingListDetailScreenV2State
                           Text(
                             'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
                             style: AppTypography.caption(context).copyWith(
-                              color: Colors.white70,
+                              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -671,7 +671,7 @@ class _ShoppingListDetailScreenV2State
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.archive, color: Colors.white),
+                  Icon(Icons.archive, color: Theme.of(context).colorScheme.onPrimary),
                   const SizedBox(width: AppSpacing.sm),
                   const Text('Lista archivada correctamente'),
                 ],
@@ -724,19 +724,19 @@ class _ShoppingListDetailScreenV2State
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 24),
+        Icon(icon, color: Theme.of(context).colorScheme.onPrimary, size: 24),
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: AppTypography.heading3(context).copyWith(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
           style: AppTypography.caption(context).copyWith(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
           ),
         ),
       ],
@@ -762,7 +762,7 @@ class _ShoppingItemCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
           color: item.checked

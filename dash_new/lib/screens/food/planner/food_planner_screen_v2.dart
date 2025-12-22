@@ -97,14 +97,14 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         actions: [
           TextButton.icon(
             onPressed: () => setState(() => _showPlannersList = !_showPlannersList),
-            icon: const Icon(Icons.restaurant_menu, color: Colors.white, size: 18),
+            icon: Icon(Icons.restaurant_menu, color: Theme.of(context).colorScheme.onPrimary, size: 18),
             label: Text(
               _getPlannerName(),
-              style: AppTypography.button(context).copyWith(color: Colors.white),
+              style: AppTypography.button(context).copyWith(color: Theme.of(context).colorScheme.onPrimary),
             ),
           ),
           PopupMenuButton<ShoppingScope>(
-            icon: const Icon(Icons.calendar_today, color: Colors.white),
+            icon: Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.onPrimary),
             tooltip: 'Alcance del planner',
             onSelected: (scope) => setState(() => _scope = scope),
             itemBuilder: (context) => [
@@ -163,12 +163,12 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.edit_calendar, color: Colors.white),
+            icon: Icon(Icons.edit_calendar, color: Theme.of(context).colorScheme.onPrimary),
             tooltip: 'Configurar comidas',
             onPressed: _configureMealSlots,
           ),
           IconButton(
-            icon: const Icon(Icons.shopping_cart_checkout, color: Colors.white),
+            icon: Icon(Icons.shopping_cart_checkout, color: Theme.of(context).colorScheme.onPrimary),
             tooltip: 'Generar lista de compras',
             onPressed: _generateShoppingList,
           ),
@@ -222,12 +222,15 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const SizedBox(
+            return SizedBox(
               height: 120,
-              child: Center(child: CircularProgressIndicator(color: Colors.white)),
+              child: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
             );
           }
 
+          final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
+          final isDark = theme.brightness == Brightness.dark;
           final planners = snapshot.data!.docs;
           
           return SizedBox(
@@ -249,7 +252,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     width: 160,
                     margin: const EdgeInsets.only(right: AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.white : Colors.white.withOpacity(0.9),
+                      color: isSelected
+                          ? (isDark ? colorScheme.surface : Colors.white)
+                          : (isDark ? colorScheme.surface.withOpacity(0.9) : Colors.white.withOpacity(0.9)),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       border: Border.all(
                         color: isSelected ? colorScheme.primary : Colors.transparent,
@@ -419,9 +424,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                     
                                     return TableRow(
                                       decoration: BoxDecoration(
-                                        color: slotIndex.isEven
-                                            ? Colors.grey[50]
-                                            : Colors.white,
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? Theme.of(context).colorScheme.surface
+                                            : (slotIndex.isEven ? Colors.grey[50] : Colors.white),
                                       ),
                                       children: [
                                         _buildSlotHeaderCell(_getConfiguredSlotName(slot), _getConfiguredSlotIcon(slot)),
@@ -468,7 +473,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
       child: Text(
         text,
         style: AppTypography.label(context).copyWith(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -634,7 +639,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
+                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: AppSpacing.sm),
                 Text('Lista de compras generada (${_getScopeLabel(_scope)})'),
               ],
@@ -905,7 +910,7 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                 day[0].toUpperCase() + day.substring(1, 3),
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : colorScheme.onSurface,
+                  color: isSelected ? Theme.of(context).colorScheme.onPrimary : colorScheme.onSurface,
                 ),
               ),
               selected: isSelected,
@@ -1272,7 +1277,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                           SnackBar(
                             content: Row(
                               children: [
-                                const Icon(Icons.check_circle, color: Colors.white),
+                                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
                                 const SizedBox(width: AppSpacing.sm),
                                 const Text('Configuración guardada correctamente'),
                               ],

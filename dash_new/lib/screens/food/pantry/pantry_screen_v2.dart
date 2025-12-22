@@ -91,7 +91,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber, color: Colors.white, size: 32),
+                      Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.onSurface, size: 32),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
@@ -100,14 +100,14 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                             Text(
                               'Stock Bajo',
                               style: AppTypography.heading4(context).copyWith(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               '$lowStockCount productos necesitan reposición',
                               style: AppTypography.caption(context).copyWith(
-                                color: Colors.white70,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -116,12 +116,12 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                       TextButton(
                         onPressed: () => setState(() => _showLowStockOnly = true),
                         style: TextButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                         ),
                         child: Text(
                           'Ver',
                           style: AppTypography.button(context).copyWith(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -445,8 +445,8 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.radiusXl),
           ),
@@ -481,7 +481,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                   ),
                   child: Icon(
                     isLowStock ? Icons.warning_amber : Icons.kitchen,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 32,
                   ),
                 ),
@@ -586,7 +586,9 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+            color: (Theme.of(context).brightness == Brightness.dark)
+              ? Theme.of(context).colorScheme.surface
+              : Colors.white,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(
             color: isLowStock ? Colors.amber : AppColors.borderLight,
@@ -619,12 +621,12 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                 children: [
                   Icon(
                     isLowStock ? Icons.warning_amber : Icons.kitchen,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 28,
                   ),
                   const Spacer(),
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
                     onSelected: (value) {
                       if (value == 'consume') onConsume();
                       if (value == 'edit') onEdit();
@@ -745,7 +747,9 @@ class _PantryTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: (Theme.of(context).brightness == Brightness.dark)
+            ? Theme.of(context).colorScheme.surface
+            : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
           color: isLowStock ? Colors.amber : AppColors.borderLight,
@@ -773,7 +777,9 @@ class _PantryTile extends StatelessWidget {
           ),
           child: Icon(
             isLowStock ? Icons.warning_amber : Icons.kitchen,
-            color: Colors.white,
+            color: (Theme.of(context).brightness == Brightness.dark)
+              ? Theme.of(context).colorScheme.onSurface
+              : Colors.white,
           ),
         ),
         title: Text(item.name, style: AppTypography.body(context)),

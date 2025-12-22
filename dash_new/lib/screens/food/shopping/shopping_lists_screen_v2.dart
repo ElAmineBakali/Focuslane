@@ -59,9 +59,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
               color: Theme.of(context).colorScheme.primaryContainer,
               child: TabBar(
                 controller: _tabController,
-                indicatorColor: Colors.white,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
+                indicatorColor: Theme.of(context).colorScheme.onPrimary,
+                labelColor: Theme.of(context).colorScheme.onPrimary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
                 tabs: const [
                   Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
                   Tab(icon: Icon(Icons.history), text: 'Historial'),
@@ -207,7 +207,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           final isDark = Theme.of(context).brightness == Brightness.dark;
           return Container(
             decoration: BoxDecoration(
-              color: isDark ? colorScheme.surface : Colors.white,
+              color: colorScheme.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
             ),
             padding: EdgeInsets.only(
@@ -366,7 +366,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.restore, color: Colors.white),
+                Icon(Icons.restore, color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: AppSpacing.sm),
                 Text('Lista "${list.name}" restaurada'),
               ],
@@ -455,6 +455,9 @@ class _ShoppingListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
     final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
@@ -463,7 +466,7 @@ class _ShoppingListCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           boxShadow: [
             BoxShadow(
@@ -490,7 +493,7 @@ class _ShoppingListCard extends StatelessWidget {
                 children: [
                   Icon(
                     list.isDefault ? Icons.star : Icons.shopping_cart,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -498,13 +501,13 @@ class _ShoppingListCard extends StatelessWidget {
                     child: Text(
                       list.name,
                       style: AppTypography.heading4(context).copyWith(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onPrimary),
                     onSelected: (value) {
                       if (value == 'default') onToggleDefault();
                       if (value == 'delete') onDelete();
@@ -617,6 +620,9 @@ class _ShoppingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
     final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
@@ -624,7 +630,7 @@ class _ShoppingListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? colorScheme.surface : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: [
           BoxShadow(
@@ -646,7 +652,7 @@ class _ShoppingListTile extends StatelessWidget {
           ),
           child: Icon(
             list.isDefault ? Icons.star : Icons.shopping_cart,
-            color: Colors.white,
+            color: isDark ? colorScheme.onSurface : Colors.white,
           ),
         ),
         title: Text(list.name, style: AppTypography.body(context)),
@@ -804,6 +810,9 @@ class _HistoryListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final name = data['name'] as String? ?? 'Lista';
     final items = (data['items'] as List?) ?? [];
     final completedAt = data['completedAt'] as Timestamp?;
@@ -815,7 +824,7 @@ class _HistoryListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? colorScheme.surface : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: [
           BoxShadow(
@@ -872,19 +881,19 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 28),
+        Icon(icon, color: Theme.of(context).colorScheme.onPrimary, size: 28),
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: AppTypography.heading3(context).copyWith(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
           style: AppTypography.caption(context).copyWith(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
           ),
         ),
       ],

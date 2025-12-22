@@ -199,7 +199,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.star_border, color: Colors.white),
+                Icon(Icons.star_border, color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: 8),
                 Text('${food.name} eliminado de favoritos'),
               ],
@@ -308,7 +308,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                     child: Icon(
                       widget.food.isSupplement ? Icons.medication : Icons.restaurant,
                       size: 48,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   Positioned(
@@ -316,7 +316,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                     right: AppSpacing.sm,
                     child: IconButton(
                       icon: Icon(isFavorite ? Icons.star : Icons.star_border),
-                      color: isFavorite ? Colors.amber : Colors.white,
+                      color: isFavorite ? Colors.amber : Theme.of(context).colorScheme.onPrimary,
                       onPressed: widget.onToggleFavorite,
                     ),
                   ),

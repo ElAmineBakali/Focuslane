@@ -97,7 +97,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
       onSelected: (v) => setState(() => _daysRange = days),
       selectedColor: colorScheme.primary,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : FocusColors.grey700,
+        color: isSelected ? Theme.of(context).colorScheme.onPrimary : FocusColors.grey700,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
@@ -410,7 +410,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             return spots.map((spot) {
               return LineTooltipItem(
                 spot.y.toStringAsFixed(1),
-                const TextStyle(color: Colors.white),
+                TextStyle(color: Theme.of(context).colorScheme.onPrimary),
               );
             }).toList();
           },
@@ -483,7 +483,7 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
             return BarTooltipItem(
               '${rod.toY.toInt()} ml',
-              const TextStyle(color: Colors.white),
+              TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             );
           },
         ),
@@ -599,9 +599,9 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
       ),
       child: ExpansionTile(
-        leading: const CircleAvatar(
+        leading: CircleAvatar(
           backgroundColor: Colors.green,
-          child: Icon(Icons.check, color: Colors.white),
+          child: Icon(Icons.check, color: Theme.of(context).colorScheme.onPrimary),
         ),
         title: Text(
           completed.plannerId ?? 'Compra',

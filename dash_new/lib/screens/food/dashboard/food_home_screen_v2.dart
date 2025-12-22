@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/global_ui_components.dart';
 import '../../../theme/global_ui_theme.dart';
-import '../../../widgets/module_shell.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import '../diary/food_diary_screen_v2.dart';
@@ -14,7 +13,9 @@ import '../shopping/shopping_lists_screen_v2.dart';
 import '../pantry/pantry_screen_v2.dart';
 import '../history/food_history_screen_v2.dart';
 
-   class FoodHomeScreenV2 extends StatefulWidget {
+/// ­ƒÅá FOOD HOME SCREEN V2 - Redise├▒ado
+/// Dashboard principal del m├│dulo de alimentaci├│n con dise├▒o moderno
+class FoodHomeScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHomeScreenV2({super.key, required this.svc});
 
@@ -31,31 +32,80 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FocusModuleShell(
-      title: 'Alimentación',
-      titleIcon: Icons.restaurant,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.history),
-          tooltip: 'Historial',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FoodHistoryScreenV2(svc: widget.svc),
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          // AppBar moderno con gradiente
+          SliverAppBar.large(
+            expandedHeight: 200,
+            pinned: true,
+            stretch: true,
+            backgroundColor: colorScheme.primaryContainer,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                'Alimentaci├│n',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
               ),
-            );
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.notifications_active_outlined),
-          tooltip: 'Recordatorios',
-          onPressed: () => _showRemindersSheet(context),
-        ),
-      ],
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withOpacity(0.8),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -20,
+                      top: 40,
+                      child: Icon(
+                        Icons.restaurant,
+                        size: 120,
+                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.15),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              // Historial
+              IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: 'Historial',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FoodHistoryScreenV2(svc: widget.svc),
+                    ),
+                  );
+                },
+              ),
+              // Configuraci├│n de recordatorios
+              IconButton(
+                icon: const Icon(Icons.notifications_active_outlined),
+                tooltip: 'Recordatorios',
+                onPressed: () => _showRemindersSheet(context),
+              ),
+            ],
+          ),
+
+          // Contenido
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(FocusSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Alerta de stock bajo
                   StreamBuilder<int>(
                     stream: widget.svc.streamPantry().map((items) => items.where((i) => (i.qty ?? 0) < (i.minQty ?? 0)).length),
                     builder: (context, snap) {
@@ -89,7 +139,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                     style: FocusTypography.heading4(context),
                                   ),
                                   Text(
-                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposición',
+                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposici├│n',
                                     style: FocusTypography.caption(context),
                                   ),
                                 ],
@@ -105,9 +155,15 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                         PantryScreenV2(svc: widget.svc),
                                   ),
                                 );
+                              },
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideY(begin: -0.2, end: 0);
                     },
                   ),
 
+                  // Resumen del d├¡a
                   StreamBuilder<DailyIntakeDoc>(
                     stream: widget.svc.streamDay(todayId),
                     builder: (context, daySnap) {
@@ -157,6 +213,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
                   const SizedBox(height: FocusSpacing.xl),
 
+                  // Sugerencias inteligentes
                   StreamBuilder<List<String>>(
                     stream: Stream.value([]),
                     builder: (context, snap) {
@@ -167,7 +224,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Sugerencias',
+                            '­ƒÆí Sugerencias',
                             style: FocusTypography.heading3(context),
                           ),
                           const SizedBox(height: FocusSpacing.md),
@@ -207,6 +264,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
+                  // Favoritos
                   StreamBuilder<List<Favorite>>(
                     stream: widget.svc.streamFavorites(),
                     builder: (context, snap) {
@@ -220,11 +278,12 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Favoritos',
+                                'Ô¡É Favoritos',
                                 style: FocusTypography.heading3(context),
                               ),
                               TextButton(
                                 onPressed: () {
+                                  // TODO: Implementar FavoritesScreen
                                   /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -255,14 +314,21 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
+                  // Grid de acciones r├ípidas
                   Text(
-                    'Acciones Rápidas',
+                    'Acciones R├ípidas',
                     style: FocusTypography.heading3(context),
                   ),
                   const SizedBox(height: FocusSpacing.md),
-                  FocusActionsGrid(
-                    items: [
-                      FocusActionItem(
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: FocusSpacing.md,
+                    crossAxisSpacing: FocusSpacing.md,
+                    childAspectRatio: 1.3,
+                    children: [
+                      FocusActionCard(
                         title: 'Diario',
                         icon: Icons.today,
                         color: colorScheme.primary,
@@ -270,13 +336,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => FoodDiaryScreenV2(svc: widget.svc),
+                              builder: (_) =>
+                                  FoodDiaryScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 100.ms,
                       ),
-                      FocusActionItem(
+                      FocusActionCard(
                         title: 'Alimentos',
                         icon: Icons.restaurant,
                         color: Colors.blue,
@@ -284,13 +351,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => FoodsListScreenV2(svc: widget.svc),
+                              builder: (_) =>
+                                  FoodsListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 200.ms,
                       ),
-                      FocusActionItem(
+                      FocusActionCard(
                         title: 'Recetas',
                         icon: Icons.menu_book,
                         color: Colors.purple,
@@ -298,13 +366,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => RecipesListScreenV2(svc: widget.svc),
+                              builder: (_) =>
+                                  RecipesListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 300.ms,
                       ),
-                      FocusActionItem(
+                      FocusActionCard(
                         title: 'Planificador',
                         icon: Icons.calendar_view_week,
                         color: Colors.green,
@@ -312,13 +381,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => FoodPlannerScreenV2(svc: widget.svc),
+                              builder: (_) =>
+                                  FoodPlannerScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 400.ms,
                       ),
-                      FocusActionItem(
+                      FocusActionCard(
                         title: 'Compras',
                         icon: Icons.shopping_cart,
                         color: Colors.orange,
@@ -326,23 +396,24 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ShoppingListsScreenV2(svc: widget.svc),
+                              builder: (_) =>
+                                  ShoppingListsScreenV2(svc: widget.svc),
                             ),
                           );
                         },
                         animationDelay: 500.ms,
                       ),
-                      FocusActionItem(
+                      FocusActionCard(
                         title: 'Despensa',
                         icon: Icons.kitchen,
                         color: Colors.brown,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PantryScreenV2(svc: widget.svc),
-                            ),
-                          );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PantryScreenV2(svc: widget.svc),
+                              ),
+                            );
                         },
                         animationDelay: 600.ms,
                       ),
@@ -396,9 +467,10 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
             const SizedBox(height: FocusSpacing.lg),
 
+            // Macros principales
             _buildMiniMacro(
               context,
-              'Calorías',
+              'Calor├¡as',
               t['kcal'] ?? 0,
               mergedTargets['kcal'],
               colorScheme.primary,
@@ -406,7 +478,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
             _buildMiniMacro(
               context,
-              'Proteínas',
+              'Prote├¡nas',
               t['protein'] ?? 0,
               mergedTargets['protein'],
               Colors.red,
@@ -433,6 +505,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             const Divider(),
             const SizedBox(height: FocusSpacing.md),
 
+            // Agua
             Row(
               children: [
                 Icon(Icons.water_drop, color: Colors.blue, size: 20),
@@ -546,8 +619,10 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         child: InkWell(
           onTap: () async {
-                         final todayId = _dayId(DateTime.now());
-                       },
+            // A├▒adir al diario desde favorito
+            final todayId = _dayId(DateTime.now());
+            // L├│gica de a├▒adir (implementar seg├║n sea food o recipe)
+          },
           borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
           child: Padding(
             padding: const EdgeInsets.all(FocusSpacing.md),
@@ -586,7 +661,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   }
 }
 
- class _RemindersSheet extends StatefulWidget {
+/// Sheet de configuraci├│n de recordatorios
+class _RemindersSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
 
@@ -604,14 +680,18 @@ class _RemindersSheetState extends State<_RemindersSheet> {
   TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
   TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
   
-  int _waterIntervalMinutes = 120;
+  // Intervalos de agua m├ís granulares (en minutos)
+  int _waterIntervalMinutes = 120; // Por defecto 2 horas
   TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
   
-     TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
+  // Intervalo de objetivos
+  TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _weekendsOnly = false;
   
-     List<bool> _mealDays = List.filled(7, true);    List<bool> _waterDays = List.filled(7, true);
+  // D├¡as de la semana para cada tipo de recordatorio
+  List<bool> _mealDays = List.filled(7, true); // Lun-Dom
+  List<bool> _waterDays = List.filled(7, true);
   List<bool> _goalDays = List.filled(7, true);
 
   @override
@@ -631,6 +711,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Handle
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -643,6 +724,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                 ),
               ),
               
+              // Header
               Row(
                 children: [
                   Container(
@@ -673,9 +755,10 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.xl),
 
+              // Recordatorios de comidas
               _buildReminderSection(
                 icon: Icons.restaurant_menu,
-                title: 'Comidas del día',
+                title: 'Comidas del d├¡a',
                 subtitle: 'Notificaciones para desayuno, comida y cena',
                 value: _mealReminders,
                 onChanged: (v) => setState(() => _mealReminders = v),
@@ -699,15 +782,16 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     _dinnerTime,
                     (time) => setState(() => _dinnerTime = time),
                   ),
-                  _buildDaysSelector('Días activos', _mealDays),
+                  _buildDaysSelector('D├¡as activos', _mealDays),
                 ],
               ),
 
               const SizedBox(height: AppSpacing.md),
 
+              // Recordatorios de agua
               _buildReminderSection(
                 icon: Icons.water_drop,
-                title: 'Hidratación',
+                title: 'Hidrataci├│n',
                 subtitle: 'Recordatorios recurrentes de agua',
                 value: _waterReminders,
                 onChanged: (v) => setState(() => _waterReminders = v),
@@ -739,12 +823,13 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     (start) => setState(() => _waterStartTime = start),
                     (end) => setState(() => _waterEndTime = end),
                   ),
-                  _buildDaysSelector('Días activos', _waterDays),
+                  _buildDaysSelector('D├¡as activos', _waterDays),
                 ],
               ),
 
               const SizedBox(height: AppSpacing.md),
 
+              // Recordatorios de suplementos
               _buildReminderSection(
                 icon: Icons.medication,
                 title: 'Suplementos',
@@ -766,10 +851,11 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
               const SizedBox(height: AppSpacing.md),
 
+              // Recordatorios de objetivos
               _buildReminderSection(
                 icon: Icons.flag,
                 title: 'Objetivos diarios',
-                subtitle: 'Revisa tu progreso de calorías y macros',
+                subtitle: 'Revisa tu progreso de calor├¡as y macros',
                 value: _goalReminders,
                 onChanged: (v) => setState(() => _goalReminders = v),
                 expanded: _goalReminders,
@@ -786,23 +872,25 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     title: const Text('Solo en fin de semana'),
                     secondary: const Icon(Icons.weekend),
                   ),
-                  if (!_weekendsOnly) _buildDaysSelector('Días activos', _goalDays),
+                  if (!_weekendsOnly) _buildDaysSelector('D├¡as activos', _goalDays),
                 ],
               ),
 
               const SizedBox(height: AppSpacing.xl),
 
+              // Bot├│n de guardar
               ModernPrimaryButton(
                 label: 'Guardar Preferencias',
                 icon: Icons.save,
                 fullWidth: true,
                 onPressed: () {
+                  // TODO: Guardar en Firestore/SharedPreferences
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Row(
                         children: [
-                          const Icon(Icons.check_circle, color: Colors.white),
+                          Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
                           const SizedBox(width: AppSpacing.sm),
                           const Text('Preferencias guardadas'),
                         ],
@@ -995,8 +1083,8 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     child: Text(
                       dayLabels[index],
                       style: AppTypography.body(context).copyWith(
-                        color: days[index] 
-                          ? Colors.white 
+                        color: days[index]
+                          ? Theme.of(context).colorScheme.onPrimary
                           : colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),

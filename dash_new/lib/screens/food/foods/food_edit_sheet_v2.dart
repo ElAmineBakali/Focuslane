@@ -294,11 +294,11 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               children: [
                 Row(
                   children: [
-                    Icon(Icons.local_fire_department, color: Colors.white, size: 24),
+                    Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.onPrimary, size: 24),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Calorías',
-                      style: AppTypography.heading4(context, color: Colors.white),
+                      style: AppTypography.heading4(context, color: Theme.of(context).colorScheme.onPrimary),
                     ),
                   ],
                 ),
@@ -413,7 +413,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
+                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -438,7 +438,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.error, color: Colors.white),
+                Icon(Icons.error, color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(

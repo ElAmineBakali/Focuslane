@@ -38,7 +38,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
         actions: [
           IconButton(
             tooltip: 'Objetivos Nutricionales',
-            icon: const Icon(Icons.flag_outlined, color: Colors.white),
+            icon: Icon(Icons.flag_outlined, color: Theme.of(context).colorScheme.onPrimary),
             onPressed: () => _showGoalsSheet(context),
           ),
         ],
@@ -300,9 +300,9 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     children: [
                       Text(
                         'Calorías',
-                        style: AppTypography.heading3(context, color: Colors.white),
+                        style: AppTypography.heading3(context, color: Theme.of(context).colorScheme.onPrimary),
                       ),
-                      Icon(Icons.local_fire_department, color: Colors.white, size: 32),
+                      Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.onPrimary, size: 32),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -313,17 +313,17 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     children: [
                       Text(
                         (t['kcal'] ?? 0).toStringAsFixed(0),
-                        style: AppTypography.heading1(context, color: Colors.white).copyWith(fontSize: 48),
+                        style: AppTypography.heading1(context, color: Theme.of(context).colorScheme.onPrimary).copyWith(fontSize: 48),
                       ),
                       if (g['kcal'] != null) ...[
                         Text(
                           ' / ${g['kcal']!.toStringAsFixed(0)}',
-                          style: AppTypography.heading3(context, color: Colors.white70),
+                          style: AppTypography.heading3(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
                         ),
                       ],
                       Text(
                         ' kcal',
-                        style: AppTypography.body(context, color: Colors.white70),
+                        style: AppTypography.body(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
                       ),
                     ],
                   ),
@@ -331,8 +331,8 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                   if (g['kcal'] != null)
                     ModernProgressBar(
                       value: _pct(t['kcal'] ?? 0, g['kcal']),
-                      color: Colors.white,
-                      backgroundColor: Colors.white30,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
                       height: 8,
                     ),
                 ],
@@ -576,7 +576,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     onPressed: () => _showCustomWaterDialog(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.info,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: const Icon(Icons.edit),
                   ),
@@ -1226,7 +1226,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
     
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       padding: EdgeInsets.only(
