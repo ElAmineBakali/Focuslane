@@ -5,7 +5,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'recipe_edit_screen_v2.dart';
 
- class RecipesListScreenV2 extends StatefulWidget {
+class RecipesListScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const RecipesListScreenV2({super.key, required this.svc});
 
@@ -33,12 +33,11 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
           ),
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => RecipeEditScreenV2(svc: widget.svc),
-              ),
-            ),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => RecipeEditScreenV2(svc: widget.svc)),
+                ),
             tooltip: 'Añadir receta',
           ),
         ],
@@ -54,18 +53,19 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
               controller: _searchController,
               prefixIcon: Icons.search,
               onChanged: (v) => setState(() => _searchQuery = v),
-              suffixIcon: _searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                    )
-                  : null,
+              suffixIcon:
+                  _searchQuery.isNotEmpty
+                      ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                      : null,
             ),
           ).animate().slideY(begin: -0.2, duration: 300.ms),
-          
+
           Expanded(
             child: StreamBuilder<List<Recipe>>(
               stream: widget.svc.streamRecipes(),
@@ -73,37 +73,38 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                 if (!snap.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                
+
                 var list = snap.data!;
                 if (_searchQuery.isNotEmpty) {
                   final ql = _searchQuery.toLowerCase();
                   list = list.where((r) => r.name.toLowerCase().contains(ql)).toList();
                 }
-                
+
                 if (list.isEmpty) {
                   return ModernEmptyState(
                     icon: Icons.menu_book_outlined,
-                    message: _searchQuery.isNotEmpty 
-                        ? 'No se encontraron recetas'
-                        : 'No hay recetas en tu catálogo',
-                    subtitle: _searchQuery.isNotEmpty
-                        ? 'Intenta con otro término de búsqueda'
-                        : 'Crea tu primera receta para comenzar',
+                    message:
+                        _searchQuery.isNotEmpty
+                            ? 'No se encontraron recetas'
+                            : 'No hay recetas en tu catálogo',
+                    subtitle:
+                        _searchQuery.isNotEmpty
+                            ? 'Intenta con otro término de búsqueda'
+                            : 'Crea tu primera receta para comenzar',
                     actionLabel: _searchQuery.isEmpty ? 'Crear receta' : null,
-                    onAction: _searchQuery.isEmpty 
-                        ? () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => RecipeEditScreenV2(svc: widget.svc),
-                            ),
-                          )
-                        : null,
+                    onAction:
+                        _searchQuery.isEmpty
+                            ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => RecipeEditScreenV2(svc: widget.svc),
+                              ),
+                            )
+                            : null,
                   );
                 }
-                
-                return _showGridView
-                    ? _buildGridView(list)
-                    : _buildListView(list);
+
+                return _showGridView ? _buildGridView(list) : _buildListView(list);
               },
             ),
           ),
@@ -111,7 +112,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
       ),
     );
   }
-  
+
   Widget _buildGridView(List<Recipe> recipes) {
     return GridView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -126,19 +127,18 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
         final recipe = recipes[index];
         return _RecipeGridCard(
           recipe: recipe,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
-            ),
-          ),
-        ).animate()
-          .fadeIn(delay: (100 + index * 50).ms)
-          .scale(duration: 200.ms);
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
+                ),
+              ),
+        ).animate().fadeIn(delay: (100 + index * 50).ms).scale(duration: 200.ms);
       },
     );
   }
-  
+
   Widget _buildListView(List<Recipe> recipes) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -147,45 +147,39 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
         final recipe = recipes[index];
         return _RecipeListCard(
           recipe: recipe,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
-            ),
-          ),
-        ).animate()
-          .fadeIn(delay: (100 + index * 50).ms)
-          .slideX(begin: -0.2, duration: 300.ms);
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
+                ),
+              ),
+        ).animate().fadeIn(delay: (100 + index * 50).ms).slideX(begin: -0.2, duration: 300.ms);
       },
     );
   }
 }
 
- class _RecipeGridCard extends StatelessWidget {
+class _RecipeGridCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
-  
-  const _RecipeGridCard({
-    required this.recipe,
-    required this.onTap,
-  });
-  
+
+  const _RecipeGridCard({required this.recipe, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
     final hasNutrition = recipe.kcal != null;
-    
+
     return Card(
       elevation: AppSpacing.elevationMd,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-                         Container(
+            Container(
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -232,10 +226,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${recipe.servings} raciones',
-                      style: AppTypography.caption(context),
-                    ),
+                    Text('${recipe.servings} raciones', style: AppTypography.caption(context)),
                     const Spacer(),
                     if (hasNutrition) ...[
                       Row(
@@ -249,15 +240,9 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                         ],
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'totales',
-                        style: AppTypography.caption(context),
-                      ),
+                      Text('totales', style: AppTypography.caption(context)),
                     ] else ...[
-                      ModernBadge(
-                        label: 'Sin macros',
-                        color: AppColors.grey500,
-                      ),
+                      ModernBadge(label: 'Sin macros', color: AppColors.grey500),
                     ],
                   ],
                 ),
@@ -270,25 +255,20 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
   }
 }
 
- class _RecipeListCard extends StatelessWidget {
+class _RecipeListCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
-  
-  const _RecipeListCard({
-    required this.recipe,
-    required this.onTap,
-  });
-  
+
+  const _RecipeListCard({required this.recipe, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
     final hasNutrition = recipe.kcal != null;
-    
+
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -321,24 +301,12 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                   children: [
                     Row(
                       children: [
-                        Expanded(
-                          child: Text(
-                            recipe.name,
-                            style: AppTypography.heading4(context),
-                          ),
-                        ),
-                        if (hasNutrition)
-                          ModernBadge(
-                            label: 'MACROS',
-                            color: AppColors.success,
-                          ),
+                        Expanded(child: Text(recipe.name, style: AppTypography.heading4(context))),
+                        if (hasNutrition) ModernBadge(label: 'MACROS', color: AppColors.success),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${recipe.servings} raciones',
-                      style: AppTypography.body(context),
-                    ),
+                    Text('${recipe.servings} raciones', style: AppTypography.body(context)),
                     if (recipe.description != null) ...[
                       const SizedBox(height: AppSpacing.xs),
                       Text(
@@ -364,7 +332,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                   ],
                 ),
               ),
-              
+
               Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.grey400),
             ],
           ),

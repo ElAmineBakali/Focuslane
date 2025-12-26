@@ -1369,7 +1369,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             behavior: SnackBarBehavior.floating,
             content: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
+                const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
                 Text('Peso guardado ✅', style: GoogleFonts.poppins()),
               ],
@@ -1622,7 +1622,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             behavior: SnackBarBehavior.floating,
             content: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
+                const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
                 Text('Medida guardada 📏', style: GoogleFonts.poppins()),
               ],

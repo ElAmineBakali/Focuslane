@@ -14,7 +14,7 @@ class ScheduleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    
+
     return Scaffold(
       appBar: AppBar(title: const Text('Horario académico')),
       floatingActionButton: FloatingActionButton(
@@ -35,23 +35,14 @@ class ScheduleScreen extends StatelessWidget {
           return StreamBuilder<List<StudyClassBlock>>(
             stream: svc.streamSchedule(),
             builder: (context, snap) {
-              if (!snap.hasData)
-                return const Center(child: CircularProgressIndicator());
+              if (!snap.hasData) return const Center(child: CircularProgressIndicator());
               final blocks = snap.data!;
-              
-                             if (isMobile) {
-                return _MobileDayByDaySchedule(
-                  blocks: blocks,
-                  courseById: byId,
-                  svc: svc,
-                );
+
+              if (isMobile) {
+                return _MobileDayByDaySchedule(blocks: blocks, courseById: byId, svc: svc);
               }
-              
-                             return _WeeklyScheduleView(
-                blocks: blocks,
-                courseById: byId,
-                svc: svc,
-              );
+
+              return _WeeklyScheduleView(blocks: blocks, courseById: byId, svc: svc);
             },
           );
         },
@@ -60,223 +51,150 @@ class ScheduleScreen extends StatelessWidget {
   }
 }
 
- class _WeeklyScheduleView extends StatelessWidget {
+class _WeeklyScheduleView extends StatelessWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final StudyFirestoreService svc;
 
-  const _WeeklyScheduleView({
-    required this.blocks,
-    required this.courseById,
-    required this.svc,
-  });
+  const _WeeklyScheduleView({required this.blocks, required this.courseById, required this.svc});
 
   @override
   Widget build(BuildContext context) {
     final days = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    
+
     return CustomScrollView(
       slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(
-                        'Vista semanal',
-                        style: Theme.of(context).textTheme.titleLarge,
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text('Vista semanal', style: Theme.of(context).textTheme.titleLarge),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Table(
+              border: const TableBorder(horizontalInside: BorderSide(color: Colors.black12)),
+              columnWidths: const {0: FixedColumnWidth(60)},
+              children: [
+                TableRow(
+                  children: [
+                    const SizedBox(),
+                    ...days.map(
+                      (d) => Center(
+                        child: Text(d, style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Table(
-                        border: const TableBorder(
-                          horizontalInside: BorderSide(color: Colors.black12),
-                        ),
-                        columnWidths: const {0: FixedColumnWidth(60)},
-                        children: [
-                          TableRow(
-                            children: [
-                              const SizedBox(),
-                              ...days.map(
-                                (d) => Center(
-                                  child: Text(
-                                    d,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                  ],
+                ),
+                ...List.generate(12, (h) {
+                  return TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text('${8 + h}:00', style: Theme.of(context).textTheme.labelMedium),
+                      ),
+                      ...List.generate(7, (dowIdx) {
+                        final dow = dowIdx + 1;
+                        final here =
+                            blocks
+                                .where((b) => b.daysOfWeek.contains(dow) && b.start.hour == (8 + h))
+                                .toList();
+                        return Container(
+                          margin: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          ...List.generate(12, (h) {
-                            return TableRow(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Text(
-                                    '${8 + h}:00',
-                                    style:
-                                        Theme.of(context).textTheme.labelMedium,
-                                  ),
-                                ),
-                                ...List.generate(7, (dowIdx) {
-                                  final dow = dowIdx + 1;                                    final here =
-                                      blocks
-                                          .where(
-                                            (b) =>
-                                                b.daysOfWeek.contains(dow) &&
-                                                b.start.hour == (8 + h),
-                                          )
-                                          .toList();
-                                  return Container(
-                                    margin: const EdgeInsets.all(4),
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children:
-                                          here.map((b) {
-                                            final c = courseById[b.courseId];
-                                            final name =
-                                                (c?.name ?? b.courseId).trim();
-                                            final label =
-                                                '$name • ${b.start.format(context)}-${b.end.format(context)}${b.room != null ? ' • ${b.room}' : ''}';
-                                            return InkWell(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              onTap: () async {
-                                                await showModalBottomSheet(
-                                                  context: context,
-                                                  isScrollControlled: true,
-                                                  builder:
-                                                      (_) => _EditBlockSheet(
-                                                        svc: svc,
-                                                        initial: b,
-                                                      ),
-                                                );
-                                              },
-                                              onLongPress: () async {
-                                                final ok = await showDialog<
-                                                  bool
-                                                >(
-                                                  context: context,
-                                                  builder:
-                                                      (_) => AlertDialog(
-                                                        title: const Text(
-                                                          'Eliminar bloque',
-                                                        ),
-                                                        content: Text(
-                                                          '¿Eliminar "$label"?',
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed:
-                                                                () =>
-                                                                    Navigator.pop(
-                                                                      context,
-                                                                      false,
-                                                                    ),
-                                                            child: const Text(
-                                                              'Cancelar',
-                                                            ),
-                                                          ),
-                                                          FilledButton(
-                                                            onPressed:
-                                                                () =>
-                                                                    Navigator.pop(
-                                                                      context,
-                                                                      true,
-                                                                    ),
-                                                            child: const Text(
-                                                              'Eliminar',
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                );
-                                                if (ok == true) {
-                                                  await svc.deleteScheduleBlock(
-                                                    b.id,
-                                                  );
-                                                                                                     await StudyNotifications(
-                                                    svc,
-                                                  ).scheduleTodayClasses();
-                                                  if (context.mounted) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                          'Bloque eliminado',
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                              },
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    width: 4,
-                                                    height: 24,
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                          right: 8,
-                                                          top: 4,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          c?.color ??
-                                                          Theme.of(
-                                                            context,
-                                                          ).colorScheme.primary,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            2,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            vertical: 4,
-                                                            horizontal: 6,
-                                                          ),
-                                                      child: Text(label),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                                here.map((b) {
+                                  final c = courseById[b.courseId];
+                                  final name = (c?.name ?? b.courseId).trim();
+                                  final label =
+                                      '$name • ${b.start.format(context)}-${b.end.format(context)}${b.room != null ? ' • ${b.room}' : ''}';
+                                  return InkWell(
+                                    borderRadius: BorderRadius.circular(8),
+                                    onTap: () async {
+                                      await showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        builder: (_) => _EditBlockSheet(svc: svc, initial: b),
+                                      );
+                                    },
+                                    onLongPress: () async {
+                                      final ok = await showDialog<bool>(
+                                        context: context,
+                                        builder:
+                                            (_) => AlertDialog(
+                                              title: const Text('Eliminar bloque'),
+                                              content: Text('¿Eliminar "$label"?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context, false),
+                                                  child: const Text('Cancelar'),
+                                                ),
+                                                FilledButton(
+                                                  onPressed: () => Navigator.pop(context, true),
+                                                  child: const Text('Eliminar'),
+                                                ),
+                                              ],
+                                            ),
+                                      );
+                                      if (ok == true) {
+                                        await svc.deleteScheduleBlock(b.id);
+                                        await StudyNotifications(svc).scheduleTodayClasses();
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Bloque eliminado')),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 24,
+                                          margin: const EdgeInsets.only(right: 8, top: 4),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                c?.color ?? Theme.of(context).colorScheme.primary,
+                                            borderRadius: BorderRadius.circular(2),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 4,
+                                              horizontal: 6,
+                                            ),
+                                            child: Text(label),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   );
-                                }),
-                              ],
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                                }).toList(),
+                          ),
+                        );
+                      }),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
- class _MobileDayByDaySchedule extends StatefulWidget {
+class _MobileDayByDaySchedule extends StatefulWidget {
   final List<StudyClassBlock> blocks;
   final Map<String, Course> courseById;
   final StudyFirestoreService svc;
@@ -298,7 +216,8 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
   @override
   void initState() {
     super.initState();
-    _currentDay = DateTime.now().weekday;    }
+    _currentDay = DateTime.now().weekday;
+  }
 
   @override
   void dispose() {
@@ -308,20 +227,25 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
 
   @override
   Widget build(BuildContext context) {
-    final dayNames = const ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    final dayNames = const [
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+      'Domingo',
+    ];
     final dayNamesShort = const ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       children: [
-                 Container(
+        Container(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                colorScheme.primaryContainer,
-                colorScheme.surface,
-              ],
+              colors: [colorScheme.primaryContainer, colorScheme.surface],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -333,12 +257,15 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                 children: [
                   IconButton.filled(
                     icon: const Icon(Icons.chevron_left_rounded),
-                    onPressed: _currentDay > 1 ? () {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    } : null,
+                    onPressed:
+                        _currentDay > 1
+                            ? () {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                            : null,
                   ),
                   Text(
                     dayNames[_currentDay - 1],
@@ -350,17 +277,20 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                   ).animate(key: ValueKey(_currentDay)).fadeIn().slideX(),
                   IconButton.filled(
                     icon: const Icon(Icons.chevron_right_rounded),
-                    onPressed: _currentDay < 7 ? () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    } : null,
+                    onPressed:
+                        _currentDay < 7
+                            ? () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                            : null,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-                             Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(7, (index) {
                   final dayIndex = index + 1;
@@ -379,14 +309,16 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected 
-                            ? colorScheme.primary
-                            : isToday
+                        color:
+                            isSelected
+                                ? colorScheme.primary
+                                : isToday
                                 ? colorScheme.primaryContainer
                                 : Colors.transparent,
-                        border: isToday && !isSelected
-                            ? Border.all(color: colorScheme.primary, width: 2)
-                            : null,
+                        border:
+                            isToday && !isSelected
+                                ? Border.all(color: colorScheme.primary, width: 2)
+                                : null,
                       ),
                       child: Center(
                         child: Text(
@@ -394,9 +326,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isSelected 
-                                ? colorScheme.onPrimary
-                                : colorScheme.onSurface,
+                            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -407,8 +337,8 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
             ],
           ),
         ),
-        
-                 Expanded(
+
+        Expanded(
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -418,16 +348,15 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
             },
             itemCount: 7,
             itemBuilder: (context, pageIndex) {
-              final dayOfWeek = pageIndex + 1;                
-                             final dayBlocks = widget.blocks
-                  .where((b) => b.daysOfWeek.contains(dayOfWeek))
-                  .toList()
-                ..sort((a, b) {
-                  final aMinutes = a.start.hour * 60 + a.start.minute;
-                  final bMinutes = b.start.hour * 60 + b.start.minute;
-                  return aMinutes.compareTo(bMinutes);
-                });
-              
+              final dayOfWeek = pageIndex + 1;
+              final dayBlocks =
+                  widget.blocks.where((b) => b.daysOfWeek.contains(dayOfWeek)).toList()
+                    ..sort((a, b) {
+                      final aMinutes = a.start.hour * 60 + a.start.minute;
+                      final bMinutes = b.start.hour * 60 + b.start.minute;
+                      return aMinutes.compareTo(bMinutes);
+                    });
+
               if (dayBlocks.isEmpty) {
                 return EmptyScheduleState(
                   onAddClass: () async {
@@ -440,14 +369,14 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                   },
                 );
               }
-              
+
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: dayBlocks.length,
                 itemBuilder: (context, index) {
                   final block = dayBlocks[index];
                   final course = widget.courseById[block.courseId];
-                  
+
                   return ModernClassBlock(
                     block: block,
                     course: course,
@@ -456,37 +385,31 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (_) => _EditBlockSheet(
-                          svc: widget.svc,
-                          initial: block,
-                        ),
+                        builder: (_) => _EditBlockSheet(svc: widget.svc, initial: block),
                       );
                     },
                     onLongPress: () async {
                       final ok = await showDialog<bool>(
                         context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Eliminar clase'),
-                          content: Text(
-                            '¿Eliminar "${course?.name ?? block.courseId}"?',
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancelar'),
-                            ),
-                            FilledButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: colorScheme.error,
+                        builder:
+                            (_) => AlertDialog(
+                              title: const Text('Eliminar clase'),
+                              content: Text('¿Eliminar "${course?.name ?? block.courseId}"?'),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text('Eliminar'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: FilledButton.styleFrom(backgroundColor: colorScheme.error),
+                                  child: const Text('Eliminar'),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                       );
                       if (ok == true && context.mounted) {
                         await widget.svc.deleteScheduleBlock(block.id);
@@ -496,7 +419,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                             SnackBar(
                               content: const Row(
                                 children: [
-                                  Icon(Icons.check_circle, color: Colors.white),
+                                  Icon(Icons.check_circle),
                                   SizedBox(width: 12),
                                   Text('Clase eliminada'),
                                 ],
@@ -575,7 +498,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                             Center(
+              Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   width: 40,
@@ -586,8 +509,8 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   ),
                 ),
               ),
-              
-                             Row(
+
+              Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -610,18 +533,15 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   Expanded(
                     child: Text(
                       widget.initial == null ? 'Nuevo bloque' : 'Editar bloque',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: GoogleFonts.plusJakartaSans(fontSize: 24, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 32),
-              
-                             Text(
+
+              Text(
                 'Curso',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -652,60 +572,68 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   return Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: courses.map((course) {
-                      final isSelected = _courseId == course.id;
-                      return GestureDetector(
-                        onTap: () => setState(() => _courseId = course.id),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            gradient: isSelected
-                                ? LinearGradient(
-                                    colors: [
-                                      course.color?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3),
-                                      course.color?.withOpacity(0.15) ?? Colors.grey.withOpacity(0.15),
-                                    ],
-                                  )
-                                : null,
-                            color: !isSelected
-                                ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
-                                : null,
-                            borderRadius: BorderRadius.circular(12),
-                            border: isSelected
-                                ? Border.all(color: course.color ?? Colors.grey, width: 2)
-                                : null,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: course.color ?? Colors.grey,
-                                  shape: BoxShape.circle,
-                                ),
+                    children:
+                        courses.map((course) {
+                          final isSelected = _courseId == course.id;
+                          return GestureDetector(
+                            onTap: () => setState(() => _courseId = course.id),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              decoration: BoxDecoration(
+                                gradient:
+                                    isSelected
+                                        ? LinearGradient(
+                                          colors: [
+                                            course.color?.withOpacity(0.3) ??
+                                                Colors.grey.withOpacity(0.3),
+                                            course.color?.withOpacity(0.15) ??
+                                                Colors.grey.withOpacity(0.15),
+                                          ],
+                                        )
+                                        : null,
+                                color:
+                                    !isSelected
+                                        ? Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceVariant.withOpacity(0.5)
+                                        : null,
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    isSelected
+                                        ? Border.all(color: course.color ?? Colors.grey, width: 2)
+                                        : null,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                course.name,
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                  fontSize: 14,
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: course.color ?? Colors.grey,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    course.name,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                            ),
+                          );
+                        }).toList(),
                   );
                 },
               ),
-              
+
               const SizedBox(height: 28),
-              
-                             Text(
+
+              Text(
                 'Días de la semana',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -735,24 +663,24 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        gradient: sel
-                            ? LinearGradient(
-                                colors: [
-                                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                  Theme.of(context).colorScheme.secondary.withOpacity(0.3),
-                                ],
-                              )
-                            : null,
-                        color: !sel
-                            ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
-                            : null,
+                        gradient:
+                            sel
+                                ? LinearGradient(
+                                  colors: [
+                                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                    Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                                  ],
+                                )
+                                : null,
+                        color:
+                            !sel
+                                ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                : null,
                         borderRadius: BorderRadius.circular(12),
-                        border: sel
-                            ? Border.all(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2,
-                              )
-                            : null,
+                        border:
+                            sel
+                                ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+                                : null,
                       ),
                       child: Center(
                         child: Text(
@@ -767,10 +695,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   );
                 }),
               ),
-              
+
               const SizedBox(height: 28),
-              
-                             Row(
+
+              Row(
                 children: [
                   Expanded(
                     child: _TimePickerButton(
@@ -778,10 +706,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       time: _start,
                       icon: Icons.access_time_rounded,
                       onTap: () async {
-                        final t = await showTimePicker(
-                          context: context,
-                          initialTime: _start,
-                        );
+                        final t = await showTimePicker(context: context, initialTime: _start);
                         if (t != null) setState(() => _start = t);
                       },
                     ),
@@ -793,20 +718,17 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       time: _end,
                       icon: Icons.access_time_filled_rounded,
                       onTap: () async {
-                        final t = await showTimePicker(
-                          context: context,
-                          initialTime: _end,
-                        );
+                        final t = await showTimePicker(context: context, initialTime: _end);
                         if (t != null) setState(() => _end = t);
                       },
                     ),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 28),
-              
-                             Text(
+
+              Text(
                 'Aula (opcional)',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
@@ -832,42 +754,43 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                 ),
                 style: GoogleFonts.plusJakartaSans(),
               ),
-              
+
               const SizedBox(height: 32),
-              
-                             Row(
+
+              Row(
                 children: [
-                                     if (widget.initial != null)
+                  if (widget.initial != null)
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () async {
                           final confirm = await showDialog<bool>(
                             context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(
-                                'Eliminar bloque',
-                                style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-                              ),
-                              content: Text(
-                                '¿Estás seguro de que deseas eliminar este bloque del horario?',
-                                style: GoogleFonts.plusJakartaSans(),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.red.shade600,
+                            builder:
+                                (context) => AlertDialog(
+                                  title: Text(
+                                    'Eliminar bloque',
+                                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
                                   ),
-                                  child: const Text('Eliminar'),
+                                  content: Text(
+                                    '¿Estás seguro de que deseas eliminar este bloque del horario?',
+                                    style: GoogleFonts.plusJakartaSans(),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: Colors.red.shade600,
+                                      ),
+                                      child: const Text('Eliminar'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
                           );
-                          
+
                           if (confirm == true && mounted) {
                             try {
                               await widget.svc.deleteScheduleBlock(widget.initial!.id);
@@ -904,35 +827,27 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                           foregroundColor: Colors.red.shade600,
                           side: BorderSide(color: Colors.red.shade600),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         icon: const Icon(Icons.delete_outline_rounded),
                         label: Text(
                           'Eliminar',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
                   if (widget.initial != null) const SizedBox(width: 12),
-                  
+
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
                         'Cancelar',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -941,115 +856,100 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     flex: 2,
                     child: FilledButton(
                       onPressed: () async {
-                                         if ((_courseId == null || _courseId!.trim().isEmpty) ||
-                        _days.isEmpty) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Completa curso y días de la semana',
-                              style: GoogleFonts.plusJakartaSans(),
-                            ),
-                            backgroundColor: Colors.orange.shade600,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                      return;
-                    }
-                    final startMinutes = _start.hour * 60 + _start.minute;
-                    final endMinutes = _end.hour * 60 + _end.minute;
-                    if (endMinutes <= startMinutes) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'La hora de fin debe ser posterior al inicio',
-                              style: GoogleFonts.plusJakartaSans(),
-                            ),
-                            backgroundColor: Colors.orange.shade600,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                      return;
-                    }
+                        if ((_courseId == null || _courseId!.trim().isEmpty) || _days.isEmpty) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Completa curso y días de la semana',
+                                  style: GoogleFonts.plusJakartaSans(),
+                                ),
+                                backgroundColor: Colors.orange.shade600,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                          return;
+                        }
+                        final startMinutes = _start.hour * 60 + _start.minute;
+                        final endMinutes = _end.hour * 60 + _end.minute;
+                        if (endMinutes <= startMinutes) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'La hora de fin debe ser posterior al inicio',
+                                  style: GoogleFonts.plusJakartaSans(),
+                                ),
+                                backgroundColor: Colors.orange.shade600,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                          return;
+                        }
 
-                    final newMap =
-                        StudyClassBlock(
-                          id: widget.initial?.id ?? '',
-                          courseId: _courseId!.trim(),
-                          daysOfWeek: List<int>.from(_days)..sort(),
-                          start: _start,
-                          end: _end,
-                          room:
-                              _room.text.trim().isEmpty
-                                  ? null
-                                  : _room.text.trim(),
-                        ).toMap();
+                        final newMap =
+                            StudyClassBlock(
+                              id: widget.initial?.id ?? '',
+                              courseId: _courseId!.trim(),
+                              daysOfWeek: List<int>.from(_days)..sort(),
+                              start: _start,
+                              end: _end,
+                              room: _room.text.trim().isEmpty ? null : _room.text.trim(),
+                            ).toMap();
 
-                    try {
-                      if (widget.initial == null) {
-                        await widget.svc.addScheduleBlock(
-                          StudyClassBlock(
-                            id: '',
-                            courseId: newMap['courseId'] as String,
-                            daysOfWeek: List<int>.from(
-                              newMap['daysOfWeek'] as List,
-                            ),
-                            start: _start,
-                            end: _end,
-                            room: newMap['room'] as String?,
-                          ),
-                        );
-                      } else {
-                        await widget.svc.updateScheduleBlock(
-                          widget.initial!.id,
-                          newMap,
-                        );
-                      }
-                                             await StudyNotifications(
-                        widget.svc,
-                      ).scheduleTodayClasses();
-                      if (mounted) Navigator.pop(context);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Bloque guardado correctamente',
-                              style: GoogleFonts.plusJakartaSans(),
-                            ),
-                            backgroundColor: Colors.green.shade600,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Error guardando: $e',
-                              style: GoogleFonts.plusJakartaSans(),
-                            ),
-                            backgroundColor: Colors.red.shade600,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Guardar bloque',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w600,
-                    ),
+                        try {
+                          if (widget.initial == null) {
+                            await widget.svc.addScheduleBlock(
+                              StudyClassBlock(
+                                id: '',
+                                courseId: newMap['courseId'] as String,
+                                daysOfWeek: List<int>.from(newMap['daysOfWeek'] as List),
+                                start: _start,
+                                end: _end,
+                                room: newMap['room'] as String?,
+                              ),
+                            );
+                          } else {
+                            await widget.svc.updateScheduleBlock(widget.initial!.id, newMap);
+                          }
+                          await StudyNotifications(widget.svc).scheduleTodayClasses();
+                          if (mounted) Navigator.pop(context);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Bloque guardado correctamente',
+                                  style: GoogleFonts.plusJakartaSans(),
+                                ),
+                                backgroundColor: Colors.green.shade600,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Error guardando: $e',
+                                  style: GoogleFonts.plusJakartaSans(),
+                                ),
+                                backgroundColor: Colors.red.shade600,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Guardar bloque',
+                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -1063,7 +963,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
   }
 }
 
- class _TimePickerButton extends StatelessWidget {
+class _TimePickerButton extends StatelessWidget {
   final String label;
   final TimeOfDay time;
   final IconData icon;
@@ -1095,11 +995,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   label,
@@ -1114,10 +1010,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
             const SizedBox(height: 8),
             Text(
               time.format(context),
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 20, fontWeight: FontWeight.w700),
             ),
           ],
         ),

@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/study_firestore_service.dart';
-import '../models/study_models.dart';
-import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
+import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
 import 'package:mi_dashboard_personal/widgets/external_link_picker_widget.dart';
+import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
+import '../models/study_models.dart';
+import '../services/study_firestore_service.dart';
 
- class CourseEditSheet extends StatefulWidget {
+class CourseEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course? initial;
-  
-  const CourseEditSheet({
-    super.key,
-    required this.svc,
-    this.initial,
-  });
+
+  const CourseEditSheet({super.key, required this.svc, this.initial});
 
   @override
   State<CourseEditSheet> createState() => _CourseEditSheetState();
@@ -35,19 +32,15 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
   void initState() {
     super.initState();
     final course = widget.initial;
-    
+
     _nameController = TextEditingController(text: course?.name ?? '');
     _teacherController = TextEditingController(text: course?.teacher ?? '');
-    _creditsController = TextEditingController(
-      text: course?.credits?.toString() ?? '',
-    );
-    _goalHoursController = TextEditingController(
-      text: course?.goalHours?.toString() ?? '',
-    );
+    _creditsController = TextEditingController(text: course?.credits?.toString() ?? '');
+    _goalHoursController = TextEditingController(text: course?.goalHours?.toString() ?? '');
     _attendancePctController = TextEditingController(
       text: course?.attendanceRequired?.toStringAsFixed(0) ?? '',
     );
-    
+
     if (course?.color != null) {
       _selectedColor = course!.color!;
     }
@@ -72,9 +65,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
       final course = Course(
         id: widget.initial?.id ?? '',
         name: _nameController.text.trim(),
-        teacher: _teacherController.text.trim().isEmpty
-            ? null
-            : _teacherController.text.trim(),
+        teacher: _teacherController.text.trim().isEmpty ? null : _teacherController.text.trim(),
         credits: int.tryParse(_creditsController.text.trim())?.toDouble(),
         colorHex: '#${_selectedColor.value.toRadixString(16).substring(2)}',
         goalHours: int.tryParse(_goalHoursController.text.trim())?.toDouble(),
@@ -111,12 +102,9 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red.shade600,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red.shade600));
       }
     }
   }
@@ -129,38 +117,46 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.2)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 24,
-            right: 24,
-            top: 24,
-          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.lg,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                                     Row(
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                      ),
+                    ),
+                  ),
+
+                  Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: _selectedColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
+                          color: _selectedColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                         ),
-                        child: Icon(
-                          Icons.school_rounded,
-                          color: _selectedColor,
-                          size: 28,
-                        ),
+                        child: Icon(Icons.school_rounded, color: _selectedColor, size: 28),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,12 +168,10 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
+                            const SizedBox(height: 4),
                             Text(
                               'Configura tu materia',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 14,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
+                              style: AppTypography.caption(context),
                             ),
                           ],
                         ),
@@ -188,12 +182,14 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
 
-                                     _TaskFormTextField(
+                  const SizedBox(height: AppSpacing.xl),
+
+                  ModernTextField(
                     controller: _nameController,
-                    label: 'Nombre del curso',
-                    icon: Icons.book_rounded,
+                    label: 'Nombre del curso*',
+                    hint: 'Ej: Álgebra lineal',
+                    prefixIcon: Icons.book_rounded,
                     validator: (value) {
                       if (value?.trim().isEmpty ?? true) {
                         return 'El nombre es obligatorio';
@@ -201,43 +197,50 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
 
-                                     _TaskFormTextField(
+                  const SizedBox(height: AppSpacing.lg),
+
+                  ModernTextField(
                     controller: _teacherController,
                     label: 'Profesor',
-                    icon: Icons.person_rounded,
+                    hint: 'Opcional',
+                    prefixIcon: Icons.person_rounded,
                   ),
-                  const SizedBox(height: 16),
 
-                                     Row(
+                  const SizedBox(height: AppSpacing.lg),
+
+                  Row(
                     children: [
                       Expanded(
-                        child: _TaskFormTextField(
+                        child: ModernTextField(
                           controller: _creditsController,
                           label: 'Créditos',
-                          icon: Icons.star_rounded,
+                          hint: 'Ej: 4',
                           keyboardType: TextInputType.number,
+                          prefixIcon: Icons.star_rounded,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: _TaskFormTextField(
+                        child: ModernTextField(
                           controller: _goalHoursController,
                           label: 'Horas meta',
-                          icon: Icons.access_time_rounded,
+                          hint: 'Ej: 40',
                           keyboardType: TextInputType.number,
+                          prefixIcon: Icons.access_time_rounded,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
 
-                                     _TaskFormTextField(
+                  const SizedBox(height: AppSpacing.lg),
+
+                  ModernTextField(
                     controller: _attendancePctController,
                     label: 'Asistencia requerida (%)',
-                    icon: Icons.how_to_reg_rounded,
+                    hint: 'Ej: 80',
                     keyboardType: TextInputType.number,
+                    prefixIcon: Icons.how_to_reg_rounded,
                     validator: (value) {
                       if (value?.trim().isNotEmpty ?? false) {
                         final pct = double.tryParse(value!.trim());
@@ -248,123 +251,60 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
 
-                                     GlobalColorPickerWidget(
+                  const SizedBox(height: AppSpacing.xl),
+
+                  GlobalColorPickerWidget(
                     initialColor: _selectedColor,
                     onColorSelected: (color) {
                       setState(() => _selectedColor = color);
                     },
                     label: 'Color del curso',
                   ),
-                  const SizedBox(height: 24),
 
-                                     ExternalLinkPickerWidget(
+                  const SizedBox(height: AppSpacing.xl),
+
+                  ExternalLinkPickerWidget(
                     initialLink: _externalLink,
                     onLinkSelected: (link) {
                       setState(() => _externalLink = link);
                     },
                     label: 'Enlaces rápidos',
                   ),
-                  const SizedBox(height: 32),
 
-                                     SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton(
-                      onPressed: _isSaving ? null : _saveCourse,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _selectedColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _isSaving ? null : () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            ),
+                          ),
+                          child: const Text('Cancelar'),
                         ),
                       ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              isEdit ? 'Guardar cambios' : 'Crear curso',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                    ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        flex: 2,
+                        child: ModernPrimaryButton(
+                          label: isEdit ? 'Guardar cambios' : 'Crear curso',
+                          icon: Icons.check,
+                          fullWidth: true,
+                          color: _selectedColor,
+                          isLoading: _isSaving,
+                          onPressed: _isSaving ? null : _saveCourse,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
- class _TaskFormTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
-
-  const _TaskFormTextField({
-    required this.controller,
-    required this.label,
-    required this.icon,
-    this.keyboardType,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: GoogleFonts.plusJakartaSans(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
           ),
         ),
       ),

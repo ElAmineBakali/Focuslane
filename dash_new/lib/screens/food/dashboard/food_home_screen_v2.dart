@@ -1,4 +1,4 @@
-ï»¿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widgets/global_ui_components.dart';
@@ -13,8 +13,8 @@ import '../shopping/shopping_lists_screen_v2.dart';
 import '../pantry/pantry_screen_v2.dart';
 import '../history/food_history_screen_v2.dart';
 
-/// Â­Æ’Ã…Ã¡ FOOD HOME SCREEN V2 - Rediseâ”œâ–’ado
-/// Dashboard principal del mâ”œâ”‚dulo de alimentaciâ”œâ”‚n con diseâ”œâ–’o moderno
+/// ­ƒÅá FOOD HOME SCREEN V2 - Redise+¦ado
+/// Dashboard principal del m+¦dulo de alimentaci+¦n con dise+¦o moderno
 class FoodHomeScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHomeScreenV2({super.key, required this.svc});
@@ -43,7 +43,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             backgroundColor: colorScheme.primaryContainer,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                'Alimentaciâ”œâ”‚n',
+                'Alimentaci+¦n',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.5,
@@ -89,7 +89,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                   );
                 },
               ),
-              // Configuraciâ”œâ”‚n de recordatorios
+              // Configuraci+¦n de recordatorios
               IconButton(
                 icon: const Icon(Icons.notifications_active_outlined),
                 tooltip: 'Recordatorios',
@@ -139,7 +139,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                     style: FocusTypography.heading4(context),
                                   ),
                                   Text(
-                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposiciâ”œâ”‚n',
+                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposici+¦n',
                                     style: FocusTypography.caption(context),
                                   ),
                                 ],
@@ -163,7 +163,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Resumen del dâ”œÂ¡a
+                  // Resumen del d+¡a
                   StreamBuilder<DailyIntakeDoc>(
                     stream: widget.svc.streamDay(todayId),
                     builder: (context, daySnap) {
@@ -224,7 +224,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Â­Æ’Ã†Ã­ Sugerencias',
+                            '­ƒÆí Sugerencias',
                             style: FocusTypography.heading3(context),
                           ),
                           const SizedBox(height: FocusSpacing.md),
@@ -278,7 +278,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Ã”Â¡Ã‰ Favoritos',
+                                'Ô¡É Favoritos',
                                 style: FocusTypography.heading3(context),
                               ),
                               TextButton(
@@ -314,9 +314,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Grid de acciones râ”œÃ­pidas
+                  // Grid de acciones r+ípidas
                   Text(
-                    'Acciones Râ”œÃ­pidas',
+                    'Acciones R+ípidas',
                     style: FocusTypography.heading3(context),
                   ),
                   const SizedBox(height: FocusSpacing.md),
@@ -470,7 +470,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             // Macros principales
             _buildMiniMacro(
               context,
-              'Calorâ”œÂ¡as',
+              'Calor+¡as',
               t['kcal'] ?? 0,
               mergedTargets['kcal'],
               colorScheme.primary,
@@ -478,7 +478,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
             _buildMiniMacro(
               context,
-              'Proteâ”œÂ¡nas',
+              'Prote+¡nas',
               t['protein'] ?? 0,
               mergedTargets['protein'],
               Colors.red,
@@ -619,9 +619,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         child: InkWell(
           onTap: () async {
-            // Aâ”œâ–’adir al diario desde favorito
+            // A+¦adir al diario desde favorito
             final todayId = _dayId(DateTime.now());
-            // Lâ”œâ”‚gica de aâ”œâ–’adir (implementar segâ”œâ•‘n sea food o recipe)
+            // L+¦gica de a+¦adir (implementar seg+¦n sea food o recipe)
           },
           borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
           child: Padding(
@@ -661,7 +661,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   }
 }
 
-/// Sheet de configuraciâ”œâ”‚n de recordatorios
+/// Sheet de configuraci+¦n de recordatorios
 class _RemindersSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
@@ -680,7 +680,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
   TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
   TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
   
-  // Intervalos de agua mâ”œÃ­s granulares (en minutos)
+  // Intervalos de agua m+ís granulares (en minutos)
   int _waterIntervalMinutes = 120; // Por defecto 2 horas
   TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
@@ -689,7 +689,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
   TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _weekendsOnly = false;
   
-  // Dâ”œÂ¡as de la semana para cada tipo de recordatorio
+  // D+¡as de la semana para cada tipo de recordatorio
   List<bool> _mealDays = List.filled(7, true); // Lun-Dom
   List<bool> _waterDays = List.filled(7, true);
   List<bool> _goalDays = List.filled(7, true);
@@ -701,7 +701,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       child: SafeArea(
@@ -758,7 +758,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               // Recordatorios de comidas
               _buildReminderSection(
                 icon: Icons.restaurant_menu,
-                title: 'Comidas del dâ”œÂ¡a',
+                title: 'Comidas del d+¡a',
                 subtitle: 'Notificaciones para desayuno, comida y cena',
                 value: _mealReminders,
                 onChanged: (v) => setState(() => _mealReminders = v),
@@ -782,7 +782,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     _dinnerTime,
                     (time) => setState(() => _dinnerTime = time),
                   ),
-                  _buildDaysSelector('Dâ”œÂ¡as activos', _mealDays),
+                  _buildDaysSelector('D+¡as activos', _mealDays),
                 ],
               ),
 
@@ -791,7 +791,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               // Recordatorios de agua
               _buildReminderSection(
                 icon: Icons.water_drop,
-                title: 'Hidrataciâ”œâ”‚n',
+                title: 'Hidrataci+¦n',
                 subtitle: 'Recordatorios recurrentes de agua',
                 value: _waterReminders,
                 onChanged: (v) => setState(() => _waterReminders = v),
@@ -823,7 +823,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     (start) => setState(() => _waterStartTime = start),
                     (end) => setState(() => _waterEndTime = end),
                   ),
-                  _buildDaysSelector('Dâ”œÂ¡as activos', _waterDays),
+                  _buildDaysSelector('D+¡as activos', _waterDays),
                 ],
               ),
 
@@ -855,7 +855,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               _buildReminderSection(
                 icon: Icons.flag,
                 title: 'Objetivos diarios',
-                subtitle: 'Revisa tu progreso de calorâ”œÂ¡as y macros',
+                subtitle: 'Revisa tu progreso de calor+¡as y macros',
                 value: _goalReminders,
                 onChanged: (v) => setState(() => _goalReminders = v),
                 expanded: _goalReminders,
@@ -872,13 +872,13 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     title: const Text('Solo en fin de semana'),
                     secondary: const Icon(Icons.weekend),
                   ),
-                  if (!_weekendsOnly) _buildDaysSelector('Dâ”œÂ¡as activos', _goalDays),
+                  if (!_weekendsOnly) _buildDaysSelector('D+¡as activos', _goalDays),
                 ],
               ),
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Botâ”œâ”‚n de guardar
+              // Bot+¦n de guardar
               ModernPrimaryButton(
                 label: 'Guardar Preferencias',
                 icon: Icons.save,

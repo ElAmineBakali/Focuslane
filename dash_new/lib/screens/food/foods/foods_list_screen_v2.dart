@@ -5,7 +5,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'food_edit_sheet_v2.dart';
 
- class FoodsListScreenV2 extends StatefulWidget {
+class FoodsListScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodsListScreenV2({super.key, required this.svc});
 
@@ -52,15 +52,16 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
                   controller: _searchController,
                   prefixIcon: Icons.search,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
-                      : null,
+                  suffixIcon:
+                      _searchQuery.isNotEmpty
+                          ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                          : null,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Row(
@@ -85,39 +86,34 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
               ],
             ),
           ).animate().slideY(begin: -0.2, duration: 300.ms),
-          
+
           Expanded(
             child: StreamBuilder<List<Food>>(
-              stream: widget.svc.streamFoods(
-                query: _searchQuery,
-                supplementsOnly: _suppsOnly,
-              ),
+              stream: widget.svc.streamFoods(query: _searchQuery, supplementsOnly: _suppsOnly),
               builder: (context, snap) {
                 if (!snap.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                
+
                 final list = snap.data!;
-                
+
                 if (list.isEmpty) {
                   return ModernEmptyState(
                     icon: Icons.restaurant_outlined,
-                    message: _searchQuery.isNotEmpty 
-                        ? 'No se encontraron alimentos'
-                        : 'No hay alimentos en tu catálogo',
-                    subtitle: _searchQuery.isNotEmpty
-                        ? 'Intenta con otro término de búsqueda'
-                        : 'Añade tu primer alimento para comenzar',
+                    message:
+                        _searchQuery.isNotEmpty
+                            ? 'No se encontraron alimentos'
+                            : 'No hay alimentos en tu catálogo',
+                    subtitle:
+                        _searchQuery.isNotEmpty
+                            ? 'Intenta con otro término de búsqueda'
+                            : 'Añade tu primer alimento para comenzar',
                     actionLabel: _searchQuery.isEmpty ? 'Añadir alimento' : null,
-                    onAction: _searchQuery.isEmpty 
-                        ? () => _showAddFoodSheet(context)
-                        : null,
+                    onAction: _searchQuery.isEmpty ? () => _showAddFoodSheet(context) : null,
                   );
                 }
-                
-                return _showGridView
-                    ? _buildGridView(list)
-                    : _buildListView(list);
+
+                return _showGridView ? _buildGridView(list) : _buildListView(list);
               },
             ),
           ),
@@ -125,7 +121,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       ),
     );
   }
-  
+
   Widget _buildGridView(List<Food> foods) {
     return GridView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -142,13 +138,11 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
           food: food,
           onTap: () => _showEditFoodSheet(context, food),
           onToggleFavorite: () => _toggleFavorite(food),
-        ).animate()
-          .fadeIn(delay: (100 + index * 50).ms)
-          .scale(duration: 200.ms);
+        ).animate().fadeIn(delay: (100 + index * 50).ms).scale(duration: 200.ms);
       },
     );
   }
-  
+
   Widget _buildListView(List<Food> foods) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -159,13 +153,11 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
           food: food,
           onTap: () => _showEditFoodSheet(context, food),
           onToggleFavorite: () => _toggleFavorite(food),
-        ).animate()
-          .fadeIn(delay: (100 + index * 50).ms)
-          .slideX(begin: -0.2, duration: 300.ms);
+        ).animate().fadeIn(delay: (100 + index * 50).ms).slideX(begin: -0.2, duration: 300.ms);
       },
     );
   }
-  
+
   void _showAddFoodSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -174,7 +166,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       builder: (_) => FoodEditSheet(svc: widget.svc),
     );
   }
-  
+
   void _showEditFoodSheet(BuildContext context, Food food) {
     showModalBottomSheet(
       context: context,
@@ -183,15 +175,13 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       builder: (_) => FoodEditSheet(svc: widget.svc, initial: food),
     );
   }
-  
+
   Future<void> _toggleFavorite(Food food) async {
     final favs = await widget.svc.streamFavorites().first;
-    final existing = favs.where((f) => 
-      f.type == FavoriteType.food && f.refId == food.id
-    ).toList();
-    
+    final existing = favs.where((f) => f.type == FavoriteType.food && f.refId == food.id).toList();
+
     if (existing.isNotEmpty) {
-             for (final fav in existing) {
+      for (final fav in existing) {
         await widget.svc.removeFavorite(fav.id);
       }
       if (mounted) {
@@ -206,14 +196,12 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
             ),
             backgroundColor: AppColors.grey700,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
           ),
         );
       }
     } else {
-             await widget.svc.addFavorite(
+      await widget.svc.addFavorite(
         Favorite(
           id: '',
           type: FavoriteType.food,
@@ -235,9 +223,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
             ),
             backgroundColor: AppColors.grey700,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
           ),
         );
       }
@@ -245,52 +231,46 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
   }
 }
 
- class _FoodGridCard extends StatefulWidget {
+class _FoodGridCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
-  
-  const _FoodGridCard({
-    required this.food,
-    required this.onTap,
-    required this.onToggleFavorite,
-  });
-  
+
+  const _FoodGridCard({required this.food, required this.onTap, required this.onToggleFavorite});
+
   @override
   State<_FoodGridCard> createState() => _FoodGridCardState();
 }
 
 class _FoodGridCardState extends State<_FoodGridCard> {
-  
   @override
   Widget build(BuildContext context) {
     final color = widget.food.color ?? AppColors.food;
-    
+
     return StreamBuilder<List<Favorite>>(
-      stream: context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
+      stream:
+          context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
       builder: (context, favSnap) {
-        final isFavorite = favSnap.data?.any((f) => 
-          f.type == FavoriteType.food && f.refId == widget.food.id
-        ) ?? false;
-        
+        final isFavorite =
+            favSnap.data?.any((f) => f.type == FavoriteType.food && f.refId == widget.food.id) ??
+            false;
+
         return _buildCard(context, color, isFavorite);
       },
     );
   }
-  
+
   Widget _buildCard(BuildContext context, Color color, bool isFavorite) {
     return Card(
       elevation: AppSpacing.elevationMd,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
       child: InkWell(
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-                         Container(
+            Container(
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -323,7 +303,6 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                 ],
               ),
             ),
-            
 
             Expanded(
               child: Padding(
@@ -363,10 +342,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                       style: AppTypography.caption(context),
                     ),
                     if (widget.food.isSupplement)
-                      ModernBadge(
-                        label: 'SUPLEMENTO',
-                        color: AppColors.gym,
-                      ),
+                      ModernBadge(label: 'SUPLEMENTO', color: AppColors.gym),
                   ],
                 ),
               ),
@@ -378,17 +354,13 @@ class _FoodGridCardState extends State<_FoodGridCard> {
   }
 }
 
- class _FoodListCard extends StatefulWidget {
+class _FoodListCard extends StatefulWidget {
   final Food food;
   final VoidCallback onTap;
   final VoidCallback onToggleFavorite;
-  
-  const _FoodListCard({
-    required this.food,
-    required this.onTap,
-    required this.onToggleFavorite,
-  });
-  
+
+  const _FoodListCard({required this.food, required this.onTap, required this.onToggleFavorite});
+
   @override
   State<_FoodListCard> createState() => _FoodListCardState();
 }
@@ -397,26 +369,25 @@ class _FoodListCardState extends State<_FoodListCard> {
   @override
   Widget build(BuildContext context) {
     final color = widget.food.color ?? AppColors.food;
-    
+
     return StreamBuilder<List<Favorite>>(
-      stream: context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
+      stream:
+          context.findAncestorStateOfType<_FoodsListScreenV2State>()?.widget.svc.streamFavorites(),
       builder: (context, favSnap) {
-        final isFavorite = favSnap.data?.any((f) => 
-          f.type == FavoriteType.food && f.refId == widget.food.id
-        ) ?? false;
-        
+        final isFavorite =
+            favSnap.data?.any((f) => f.type == FavoriteType.food && f.refId == widget.food.id) ??
+            false;
+
         return _buildCard(context, color, isFavorite);
       },
     );
   }
-  
+
   Widget _buildCard(BuildContext context, Color color, bool isFavorite) {
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
       child: InkWell(
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -436,9 +407,9 @@ class _FoodListCardState extends State<_FoodListCard> {
                   size: 32,
                 ),
               ),
-              
+
               const SizedBox(width: AppSpacing.lg),
-              
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,10 +417,7 @@ class _FoodListCardState extends State<_FoodListCard> {
                     Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            widget.food.name,
-                            style: AppTypography.heading4(context),
-                          ),
+                          child: Text(widget.food.name, style: AppTypography.heading4(context)),
                         ),
                         IconButton(
                           icon: Icon(isFavorite ? Icons.star : Icons.star_border),
@@ -459,10 +427,7 @@ class _FoodListCardState extends State<_FoodListCard> {
                       ],
                     ),
                     if (widget.food.brand != null) ...[
-                      Text(
-                        widget.food.brand!,
-                        style: AppTypography.caption(context),
-                      ),
+                      Text(widget.food.brand!, style: AppTypography.caption(context)),
                       const SizedBox(height: AppSpacing.xs),
                     ],
                     Row(
@@ -505,20 +470,13 @@ class _MacroBadge extends StatelessWidget {
   final String label;
   final double value;
   final Color color;
-  
-  const _MacroBadge({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-  
+
+  const _MacroBadge({required this.label, required this.value, required this.color});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -534,20 +492,21 @@ class _MacroBadge extends StatelessWidget {
   Future<bool> _confirm(BuildContext context, String title, String msg) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (_) => AlertDialog(
+            title: Text(title),
+            content: Text(msg),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
     );
     return ok == true;
   }

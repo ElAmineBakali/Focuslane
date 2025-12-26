@@ -7,7 +7,7 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'shopping_list_detail_screen_v2.dart';
 
- class ShoppingListsScreenV2 extends StatefulWidget {
+class ShoppingListsScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const ShoppingListsScreenV2({super.key, required this.svc});
 
@@ -73,10 +73,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildActiveListsTab(),
-          _buildHistoryTab(),
-        ],
+        children: [_buildActiveListsTab(), _buildHistoryTab()],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createNewList,
@@ -108,9 +105,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           );
         }
 
-        return _isGridView
-            ? _buildGridView(activeLists)
-            : _buildListView(activeLists);
+        return _isGridView ? _buildGridView(activeLists) : _buildListView(activeLists);
       },
     );
   }
@@ -162,10 +157,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
         }
 
         final lists = snapshot.data!;
-        final completedLists = lists
-            .where((list) => list.completedAt != null)
-            .toList()
-          ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
+        final completedLists =
+            lists.where((list) => list.completedAt != null).toList()
+              ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
 
         if (completedLists.isEmpty) {
           return const ModernEmptyState(
@@ -201,121 +195,132 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final colorScheme = Theme.of(context).colorScheme;
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          return Container(
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
-            ),
-            padding: EdgeInsets.only(
-            left: AppSpacing.md,
-            right: AppSpacing.md,
-            top: AppSpacing.md,
-            bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setModalState) {
+              final colorScheme = Theme.of(context).colorScheme;
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppSpacing.radiusXl),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text('Nueva Lista de Compra', style: AppTypography.heading3(context)),
-              const SizedBox(height: AppSpacing.md),
-              ModernTextField(
-                controller: nameController,
-                label: 'Nombre de la lista',
-                hint: 'Ej: Compra semanal, Supermercado...',
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  border: Border.all(color: isDark ? colorScheme.outline : AppColors.borderLight),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                padding: EdgeInsets.only(
+                  left: AppSpacing.md,
+                  right: AppSpacing.md,
+                  top: AppSpacing.md,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Tipo de lista', style: AppTypography.label(context)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Wrap(
-                      spacing: AppSpacing.xs,
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color:
+                              isDark
+                                  ? colorScheme.onSurface.withOpacity(0.3)
+                                  : AppColors.borderLight,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text('Nueva Lista de Compra', style: AppTypography.heading3(context)),
+                    const SizedBox(height: AppSpacing.md),
+                    ModernTextField(
+                      controller: nameController,
+                      label: 'Nombre de la lista',
+                      hint: 'Ej: Compra semanal, Supermercado...',
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isDark ? colorScheme.outline : AppColors.borderLight,
+                        ),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Tipo de lista', style: AppTypography.label(context)),
+                          const SizedBox(height: AppSpacing.xs),
+                          Wrap(
+                            spacing: AppSpacing.xs,
+                            children: [
+                              ChoiceChip(
+                                label: const Text('Semanal'),
+                                selected: scope == ShoppingScope.weekly,
+                                onSelected:
+                                    (v) => setModalState(() => scope = ShoppingScope.weekly),
+                              ),
+                              ChoiceChip(
+                                label: const Text('Quincenal'),
+                                selected: scope == ShoppingScope.biweekly,
+                                onSelected:
+                                    (v) => setModalState(() => scope = ShoppingScope.biweekly),
+                              ),
+                              ChoiceChip(
+                                label: const Text('Mensual'),
+                                selected: scope == ShoppingScope.monthly,
+                                onSelected:
+                                    (v) => setModalState(() => scope = ShoppingScope.monthly),
+                              ),
+                              ChoiceChip(
+                                label: const Text('Custom'),
+                                selected: scope == ShoppingScope.custom,
+                                onSelected:
+                                    (v) => setModalState(() => scope = ShoppingScope.custom),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    CheckboxListTile(
+                      value: makeDefault,
+                      onChanged: (v) => setModalState(() => makeDefault = v ?? false),
+                      title: const Text('Marcar como predeterminada'),
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: Colors.orange,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
                       children: [
-                        ChoiceChip(
-                          label: const Text('Semanal'),
-                          selected: scope == ShoppingScope.weekly,
-                          onSelected: (v) => setModalState(() => scope = ShoppingScope.weekly),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                          ),
                         ),
-                        ChoiceChip(
-                          label: const Text('Quincenal'),
-                          selected: scope == ShoppingScope.biweekly,
-                          onSelected: (v) => setModalState(() => scope = ShoppingScope.biweekly),
-                        ),
-                        ChoiceChip(
-                          label: const Text('Mensual'),
-                          selected: scope == ShoppingScope.monthly,
-                          onSelected: (v) => setModalState(() => scope = ShoppingScope.monthly),
-                        ),
-                        ChoiceChip(
-                          label: const Text('Custom'),
-                          selected: scope == ShoppingScope.custom,
-                          onSelected: (v) => setModalState(() => scope = ShoppingScope.custom),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed:
+                                () => Navigator.pop(context, {
+                                  'name': nameController.text,
+                                  'scope': scope,
+                                  'makeDefault': makeDefault,
+                                }),
+                            style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+                            child: const Text('Crear'),
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              CheckboxListTile(
-                value: makeDefault,
-                onChanged: (v) => setModalState(() => makeDefault = v ?? false),
-                title: const Text('Marcar como predeterminada'),
-                contentPadding: EdgeInsets.zero,
-                activeColor: Colors.orange,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancelar'),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(context, {
-                        'name': nameController.text,
-                        'scope': scope,
-                        'makeDefault': makeDefault,
-                      }),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                      ),
-                      child: const Text('Crear'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
           ),
-          );
-        },
-      ),
     );
 
     if (result != null) {
@@ -332,10 +337,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ShoppingListDetailScreenV2(
-              svc: widget.svc,
-              listId: listId,
-            ),
+            builder: (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: listId),
           ),
         );
       }
@@ -346,21 +348,15 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ShoppingListDetailScreenV2(
-          svc: widget.svc,
-          listId: list.id,
-        ),
+        builder: (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: list.id),
       ),
     );
   }
 
   Future<void> _restoreList(ShoppingList list) async {
     try {
-             await widget.svc.updateShoppingList(
-        list.id,
-        {'completedAt': null},
-      );
-      
+      await widget.svc.updateShoppingList(list.id, {'completedAt': null});
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -373,19 +369,14 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
             ),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al restaurar: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error al restaurar: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -394,21 +385,22 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
   Future<void> _deleteList(ShoppingList list) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar lista'),
-        content: Text('¿Seguro que quieres eliminar "${list.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Eliminar lista'),
+            content: Text('¿Seguro que quieres eliminar "${list.name}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -482,9 +474,7 @@ class _ShoppingListCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.orange.shade600, Colors.orange.shade400],
-                ),
+                gradient: LinearGradient(colors: [Colors.orange.shade600, Colors.orange.shade400]),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppSpacing.radiusLg),
                 ),
@@ -500,9 +490,9 @@ class _ShoppingListCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       list.name,
-                      style: AppTypography.heading4(context).copyWith(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
+                      style: AppTypography.heading4(
+                        context,
+                      ).copyWith(color: Theme.of(context).colorScheme.onPrimary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -512,31 +502,29 @@ class _ShoppingListCard extends StatelessWidget {
                       if (value == 'default') onToggleDefault();
                       if (value == 'delete') onDelete();
                     },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'default',
-                        child: Row(
-                          children: [
-                            Icon(
-                              list.isDefault ? Icons.star_border : Icons.star,
-                              size: 20,
+                    itemBuilder:
+                        (context) => [
+                          PopupMenuItem(
+                            value: 'default',
+                            child: Row(
+                              children: [
+                                Icon(list.isDefault ? Icons.star_border : Icons.star, size: 20),
+                                const SizedBox(width: AppSpacing.sm),
+                                Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
+                              ],
                             ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 20, color: Colors.red),
-                            SizedBox(width: AppSpacing.sm),
-                            Text('Eliminar', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                      ),
-                    ],
+                          ),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, size: 20, color: Colors.red),
+                                SizedBox(width: AppSpacing.sm),
+                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
                 ],
               ),
@@ -547,23 +535,16 @@ class _ShoppingListCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ModernBadge(
-                      label: _getScopeLabel(list.scope),
-                      color: AppColors.food,
-                    ),
+                    ModernBadge(label: _getScopeLabel(list.scope), color: AppColors.food),
                     const Spacer(),
-                    Text(
-                      '${list.items.length} productos',
-                      style: AppTypography.body(context),
-                    ),
+                    Text('${list.items.length} productos', style: AppTypography.body(context)),
                     const SizedBox(height: AppSpacing.xs),
                     if (total > 0)
                       Text(
                         'Estimado: €${total.toStringAsFixed(2)}',
-                        style: AppTypography.label(context).copyWith(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTypography.label(
+                          context,
+                        ).copyWith(color: Colors.orange, fontWeight: FontWeight.bold),
                       ),
                     const SizedBox(height: AppSpacing.sm),
 
@@ -575,10 +556,7 @@ class _ShoppingListCard extends StatelessWidget {
                           style: AppTypography.caption(context),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        ModernProgressBar(
-                          value: progress,
-                          color: AppColors.food,
-                        ),
+                        ModernProgressBar(value: progress, color: AppColors.food),
                       ],
                     ),
                   ],
@@ -630,7 +608,7 @@ class _ShoppingListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: [
           BoxShadow(
@@ -645,14 +623,12 @@ class _ShoppingListTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.orange.shade600, Colors.orange.shade400],
-            ),
+            gradient: LinearGradient(colors: [Colors.orange.shade600, Colors.orange.shade400]),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Icon(
             list.isDefault ? Icons.star : Icons.shopping_cart,
-            color: isDark ? colorScheme.onSurface : Colors.white,
+            color: isDark ? colorScheme.onSurface : colorScheme.surface,
           ),
         ),
         title: Text(list.name, style: AppTypography.body(context)),
@@ -674,28 +650,29 @@ class _ShoppingListTile extends StatelessWidget {
             if (value == 'default') onToggleDefault();
             if (value == 'delete') onDelete();
           },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'default',
-              child: Row(
-                children: [
-                  Icon(list.isDefault ? Icons.star_border : Icons.star, size: 20),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Eliminar', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-            ),
-          ],
+          itemBuilder:
+              (context) => [
+                PopupMenuItem(
+                  value: 'default',
+                  child: Row(
+                    children: [
+                      Icon(list.isDefault ? Icons.star_border : Icons.star, size: 20),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 20, color: Colors.red),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Eliminar', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
         ),
       ),
     );
@@ -715,26 +692,27 @@ class _ShoppingListTile extends StatelessWidget {
   }
 }
 
- class _HistoryListCard extends StatelessWidget {
+class _HistoryListCard extends StatelessWidget {
   final ShoppingList list;
   final VoidCallback onTap;
   final VoidCallback onRestore;
   final VoidCallback onDelete;
-  
+
   const _HistoryListCard({
     required this.list,
     required this.onTap,
     required this.onRestore,
     required this.onDelete,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
-    final completedDate = list.completedAt != null 
-        ? DateFormat('dd/MM/yyyy').format(list.completedAt!)
-        : 'Fecha desconocida';
-    
+    final completedDate =
+        list.completedAt != null
+            ? DateFormat('dd/MM/yyyy').format(list.completedAt!)
+            : 'Fecha desconocida';
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
@@ -754,10 +732,9 @@ class _ShoppingListTile extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               'Completada el $completedDate',
-              style: AppTypography.caption(context).copyWith(
-                color: Colors.green,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTypography.caption(
+                context,
+              ).copyWith(color: Colors.green, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
@@ -771,28 +748,29 @@ class _ShoppingListTile extends StatelessWidget {
             if (value == 'restore') onRestore();
             if (value == 'delete') onDelete();
           },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'restore',
-              child: Row(
-                children: [
-                  Icon(Icons.restore, size: 20, color: Colors.blue),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Restaurar', style: TextStyle(color: Colors.blue)),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Eliminar', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-            ),
-          ],
+          itemBuilder:
+              (context) => [
+                const PopupMenuItem(
+                  value: 'restore',
+                  child: Row(
+                    children: [
+                      Icon(Icons.restore, size: 20, color: Colors.blue),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Restaurar', style: TextStyle(color: Colors.blue)),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 20, color: Colors.red),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Eliminar', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
         ),
       ),
     );
@@ -803,10 +781,7 @@ class _HistoryListTile extends StatelessWidget {
   final Map<String, dynamic> data;
   final String docId;
 
-  const _HistoryListTile({
-    required this.data,
-    required this.docId,
-  });
+  const _HistoryListTile({required this.data, required this.docId});
 
   @override
   Widget build(BuildContext context) {
@@ -824,7 +799,7 @@ class _HistoryListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: [
           BoxShadow(
@@ -871,11 +846,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _StatItem({required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -885,16 +856,15 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: AppTypography.heading3(context).copyWith(
-            color: Theme.of(context).colorScheme.onPrimary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.heading3(
+            context,
+          ).copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: AppTypography.caption(context).copyWith(
-            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
-          ),
+          style: AppTypography.caption(
+            context,
+          ).copyWith(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
         ),
       ],
     );

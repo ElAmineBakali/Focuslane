@@ -15,20 +15,19 @@ enum EntryType { food, recipe }
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
-    final v = int.parse(
-      hex.startsWith('0x') ? hex.substring(2) : hex,
-      radix: 16,
-    );
+    final v = int.parse(hex.startsWith('0x') ? hex.substring(2) : hex, radix: 16);
     return Color(v);
   } catch (_) {
     return null;
   }
 }
 
- class Food {
+class Food {
   final String id;
   final String name;
-  final UnitKind perUnit;    final double unitSize;    final double kcal;
+  final UnitKind perUnit;
+  final double unitSize;
+  final double kcal;
   final double protein;
   final double carbs;
   final double fat;
@@ -104,7 +103,7 @@ Color? _hex(String? hex) {
     if (colorHex != null) 'colorHex': colorHex,
   };
 
-     Map<String, double> macrosFor(double qty) {
+  Map<String, double> macrosFor(double qty) {
     final ratio = unitSize == 0 ? 0 : qty / unitSize;
     return {
       'kcal': kcal * ratio,
@@ -117,18 +116,13 @@ Color? _hex(String? hex) {
   }
 }
 
- class RecipeIngredient {
+class RecipeIngredient {
   final String? foodId;
   final String? freeName;
   final double qty;
   final UnitKind unit;
 
-  const RecipeIngredient({
-    this.foodId,
-    this.freeName,
-    required this.qty,
-    required this.unit,
-  });
+  const RecipeIngredient({this.foodId, this.freeName, required this.qty, required this.unit});
 
   factory RecipeIngredient.fromMap(Map<String, dynamic> m) {
     UnitKind u(dynamic v) {
@@ -198,11 +192,7 @@ class Recipe {
       servings: (m['servings'] as num?)?.toInt() ?? 1,
       ingredients:
           ((m['ingredients'] as List?) ?? const [])
-              .map(
-                (e) => RecipeIngredient.fromMap(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
+              .map((e) => RecipeIngredient.fromMap(Map<String, dynamic>.from(e as Map)))
               .toList(),
       steps: m['steps'] ?? '',
       kcal: (m['kcal'] as num?)?.toDouble(),
@@ -230,7 +220,7 @@ class Recipe {
   };
 }
 
- class Favorite {
+class Favorite {
   final String id;
   final FavoriteType type;
   final String refId;
@@ -248,8 +238,7 @@ class Recipe {
   });
 
   factory Favorite.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) =>
-        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
     UnitKind u(dynamic v) {
       switch ('$v') {
         case 'g':
@@ -280,7 +269,7 @@ class Recipe {
   };
 }
 
- class IntakeEntry {
+class IntakeEntry {
   final String id;
   final FavoriteType type;
   final String refId;
@@ -300,8 +289,7 @@ class Recipe {
   });
 
   factory IntakeEntry.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) =>
-        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
     UnitKind u(dynamic v) {
       switch ('$v') {
         case 'g':
@@ -321,9 +309,7 @@ class Recipe {
       unit: u(m['unit']),
       nameSnapshot: m['nameSnapshot'] ?? '',
       macrosSnapshot: Map<String, double>.from(
-        (m['macrosSnapshot'] as Map?)?.map(
-              (k, v) => MapEntry('$k', (v as num).toDouble()),
-            ) ??
+        (m['macrosSnapshot'] as Map?)?.map((k, v) => MapEntry('$k', (v as num).toDouble())) ??
             const {},
       ),
     );
@@ -370,16 +356,10 @@ class DailyIntakeDoc {
               .toList(),
       waterMl: (m['waterMl'] as num?)?.toInt() ?? 0,
       totals: Map<String, double>.from(
-        (m['totals'] as Map?)?.map(
-              (k, v) => MapEntry('$k', (v as num).toDouble()),
-            ) ??
-            const {},
+        (m['totals'] as Map?)?.map((k, v) => MapEntry('$k', (v as num).toDouble())) ?? const {},
       ),
       targets: Map<String, double?>.from(
-        (m['targets'] as Map?)?.map(
-              (k, v) => MapEntry('$k', (v as num?)?.toDouble()),
-            ) ??
-            const {},
+        (m['targets'] as Map?)?.map((k, v) => MapEntry('$k', (v as num?)?.toDouble())) ?? const {},
       ),
     );
   }
@@ -392,7 +372,7 @@ class DailyIntakeDoc {
   };
 }
 
- class PlannerDayEntry {
+class PlannerDayEntry {
   final MealSlot slot;
   final FavoriteType type;
   final String refId;
@@ -421,8 +401,7 @@ class DailyIntakeDoc {
       }
     }
 
-    FavoriteType t(dynamic v) =>
-        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) => ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
 
     return PlannerDayEntry(
       slot: slot(m['slot']),
@@ -445,11 +424,7 @@ class WeekPlanner {
   final ShoppingScope scope;
   final Map<String, List<PlannerDayEntry>> days;
 
-  const WeekPlanner({
-    required this.id,
-    required this.scope,
-    required this.days,
-  });
+  const WeekPlanner({required this.id, required this.scope, required this.days});
 
   factory WeekPlanner.fromMap(String id, Map<String, dynamic> m) {
     final daysRaw = Map<String, dynamic>.from(m['days'] ?? const {});
@@ -457,11 +432,7 @@ class WeekPlanner {
     for (final k in daysRaw.keys) {
       parsed[k] =
           ((daysRaw[k] as List?) ?? const [])
-              .map(
-                (e) => PlannerDayEntry.fromMap(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
+              .map((e) => PlannerDayEntry.fromMap(Map<String, dynamic>.from(e as Map)))
               .toList();
     }
     ShoppingScope scope(dynamic v) {
@@ -486,7 +457,7 @@ class WeekPlanner {
   };
 }
 
- class ShoppingListItem {
+class ShoppingListItem {
   final String id;
   final String? foodId;
   final String name;
@@ -627,11 +598,7 @@ class ShoppingList {
     if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
   };
 
-  ShoppingList copyWith({
-    String? name,
-    List<ShoppingListItem>? items,
-    DateTime? completedAt,
-  }) {
+  ShoppingList copyWith({String? name, List<ShoppingListItem>? items, DateTime? completedAt}) {
     return ShoppingList(
       id: id,
       name: name ?? this.name,
@@ -645,7 +612,7 @@ class ShoppingList {
   }
 }
 
- class PantryItem {
+class PantryItem {
   final String id;
   final String? foodId;
   final String name;
@@ -693,27 +660,20 @@ class ShoppingList {
   };
 }
 
- 
- class PlannedMeal {
+class PlannedMeal {
   final String recipeId;
   final String? note;
 
   const PlannedMeal({required this.recipeId, this.note});
 
   factory PlannedMeal.fromMap(Map<String, dynamic> m) {
-    return PlannedMeal(
-      recipeId: m['recipeId'] ?? '',
-      note: m['note'],
-    );
+    return PlannedMeal(recipeId: m['recipeId'] ?? '', note: m['note']);
   }
 
-  Map<String, dynamic> toMap() => {
-        'recipeId': recipeId,
-        if (note != null) 'note': note,
-      };
+  Map<String, dynamic> toMap() => {'recipeId': recipeId, if (note != null) 'note': note};
 }
 
- class DayMenu {
+class DayMenu {
   final List<PlannedMeal> breakfast;
   final List<PlannedMeal> lunch;
   final List<PlannedMeal> dinner;
@@ -742,11 +702,11 @@ class ShoppingList {
   }
 
   Map<String, dynamic> toMap() => {
-        'breakfast': breakfast.map((e) => e.toMap()).toList(),
-        'lunch': lunch.map((e) => e.toMap()).toList(),
-        'dinner': dinner.map((e) => e.toMap()).toList(),
-        'snack': snack.map((e) => e.toMap()).toList(),
-      };
+    'breakfast': breakfast.map((e) => e.toMap()).toList(),
+    'lunch': lunch.map((e) => e.toMap()).toList(),
+    'dinner': dinner.map((e) => e.toMap()).toList(),
+    'snack': snack.map((e) => e.toMap()).toList(),
+  };
 
   DayMenu copyWith({
     List<PlannedMeal>? breakfast,
@@ -763,7 +723,7 @@ class ShoppingList {
   }
 }
 
- class CompletedShoppingList {
+class CompletedShoppingList {
   final String id;
   final String? plannerId;
   final List<ShoppingListItem> items;
@@ -792,32 +752,32 @@ class ShoppingList {
     return CompletedShoppingList(
       id: id,
       plannerId: m['plannerId'],
-      items: ((m['items'] as List?) ?? const [])
-          .asMap()
-          .entries
-          .map((e) => ShoppingListItem.fromMap(
-                e.key.toString(),
-                Map<String, dynamic>.from(e.value as Map),
-              ))
-          .toList(),
+      items:
+          ((m['items'] as List?) ?? const [])
+              .asMap()
+              .entries
+              .map(
+                (e) => ShoppingListItem.fromMap(
+                  e.key.toString(),
+                  Map<String, dynamic>.from(e.value as Map),
+                ),
+              )
+              .toList(),
       completedAt: parse(m['completedAt']),
       totalSpent: (m['totalSpent'] as num?)?.toDouble(),
     );
   }
 
   Map<String, dynamic> toMap() => {
-        if (plannerId != null) 'plannerId': plannerId,
-        'items': items.map((e) => e.toMap()).toList(),
-        'completedAt': completedAt.toIso8601String(),
-        if (totalSpent != null) 'totalSpent': totalSpent,
-      };
+    if (plannerId != null) 'plannerId': plannerId,
+    'items': items.map((e) => e.toMap()).toList(),
+    'completedAt': completedAt.toIso8601String(),
+    if (totalSpent != null) 'totalSpent': totalSpent,
+  };
 }
 
- 
 extension FavoriteX on Favorite {
-  Favorite copyWith({
-    String? alias,
-  }) {
+  Favorite copyWith({String? alias}) {
     return Favorite(
       id: id,
       type: type,
@@ -832,9 +792,7 @@ extension FavoriteX on Favorite {
 }
 
 extension WeekPlannerX on WeekPlanner {
-  String get name => id.startsWith('planner_') 
-      ? id.substring(8) 
-      : id;
+  String get name => id.startsWith('planner_') ? id.substring(8) : id;
 
   double? get customMultiplier => null;
 
@@ -842,16 +800,8 @@ extension WeekPlannerX on WeekPlanner {
     return {};
   }
 
-  WeekPlanner copyWith({
-    String? name,
-    double? customMultiplier,
-    Map<int, DayMenu>? dayMap,
-  }) {
-    return WeekPlanner(
-      id: id,
-      scope: scope,
-      days: days,
-    );
+  WeekPlanner copyWith({String? name, double? customMultiplier, Map<int, DayMenu>? dayMap}) {
+    return WeekPlanner(id: id, scope: scope, days: days);
   }
 }
 

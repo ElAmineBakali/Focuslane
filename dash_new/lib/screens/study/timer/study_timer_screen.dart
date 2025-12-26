@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
 import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
+import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../analytics/study_analytics_screen.dart';
@@ -17,12 +18,7 @@ class StudyTimerScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   final String? initialCourseId;
   final String? initialTaskId;
-  const StudyTimerScreen({
-    super.key,
-    required this.svc,
-    this.initialCourseId,
-    this.initialTaskId,
-  });
+  const StudyTimerScreen({super.key, required this.svc, this.initialCourseId, this.initialTaskId});
 
   @override
   State<StudyTimerScreen> createState() => _StudyTimerScreenState();
@@ -139,9 +135,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         _startBox('work', (_cfg['block'] ?? 50).toInt());
         break;
       case StudyMethod.custom:
-        final seq =
-            (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
-            const [];
+        final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
         if (seq.isEmpty) {
           AppToast.error(context, 'Secuencia vacía');
           return;
@@ -159,11 +153,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           });
         });
         setState(() {});
-        NotificationService.I.showNow(
-          id: _N_WORK_START,
-          title: 'Estudio',
-          body: 'Sesión iniciada',
-        );
+        NotificationService.I.showNow(id: _N_WORK_START, title: 'Estudio', body: 'Sesión iniciada');
         break;
     }
   }
@@ -176,10 +166,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       work,
       after: () {
         final isLong = (_cycle % ((_cfg['cycles'] ?? 4).toInt())) == 0;
-        final restMin =
-            isLong
-                ? (_cfg['long'] ?? 15).toInt()
-                : (_cfg['short'] ?? 5).toInt();
+        final restMin = isLong ? (_cfg['long'] ?? 15).toInt() : (_cfg['short'] ?? 5).toInt();
         _changePhase('rest', restMin * 60, after: () {});
       },
     );
@@ -204,11 +191,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     _changePhase(phase, minutes * 60, after: () {});
   }
 
-  void _changePhase(
-    String newPhase,
-    int seconds, {
-    required VoidCallback after,
-  }) {
+  void _changePhase(String newPhase, int seconds, {required VoidCallback after}) {
     _ticker?.cancel();
     setState(() {
       _phase = newPhase;
@@ -225,7 +208,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         t.cancel();
         if (_phase == 'work') {
           _accumulatedMinutes += (seconds / 60).round();
-                     _confettiController.play();
+          _confettiController.play();
         }
         if (_method == StudyMethod.flowtime && _phase == 'work') {
           final ratio = (_cfg['ratio'] ?? 0.2).toDouble();
@@ -238,9 +221,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           return;
         }
         if (_method == StudyMethod.custom && _phase == 'work') {
-          final seq =
-              (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
-              const [];
+          final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
           final currentRest = (seq.first['rest'] ?? 10).toInt();
           _changePhase('rest', currentRest * 60, after: () {});
           return;
@@ -327,6 +308,11 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       _ => 'Listo',
     };
     final cs = Theme.of(context).colorScheme;
+    final gradient = LinearGradient(
+      colors: [cs.primary.withOpacity(0.16), cs.surface],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
     Color phaseColor(String p) {
       switch (p) {
         case 'work':
@@ -341,48 +327,10 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     }
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Estudio',
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Presets',
-            icon: const Icon(Icons.tune_rounded),
-            onPressed: () async {
-              final picked = await showModalBottomSheet<TimerPreset>(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => PresetsSheet(svc: svc, courseId: _courseId),
-              );
-              if (picked != null) _loadPreset(picked);
-            },
-          ),
-        ],
-      ),
       body: Stack(
         children: [
-                     Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  phaseColor(_phase).withOpacity(0.1),
-                  cs.surface,
-                  cs.surface,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-                     Align(
+          Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: gradient))),
+          Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
               confettiController: _confettiController,
@@ -392,50 +340,108 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               gravity: 0.3,
             ),
           ),
-                     SafeArea(
-            child: Column(
-              children: [
-                _HeaderSelectors(
-                  svc: svc,
-                  courseId: _courseId,
-                  onCourseChanged: (v) => setState(() => _courseId = v),
-                  taskId: _taskId,
-                  onTaskChanged: (v) => setState(() => _taskId = v),
+          CustomScrollView(
+            slivers: [
+              SliverAppBar.large(
+                backgroundColor: Colors.transparent,
+                foregroundColor: cs.onSurface,
+                flexibleSpace: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [phaseColor(_phase), cs.secondary, cs.surface],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                                                 CircularTimerWidget(
+                title: Text('Timer de estudio', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800)),
+                actions: [
+                  IconButton(
+                    tooltip: 'Presets',
+                    icon: const Icon(Icons.tune_rounded),
+                    onPressed: () async {
+                      final picked = await showModalBottomSheet<TimerPreset>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => PresetsSheet(svc: svc, courseId: _courseId),
+                      );
+                      if (picked != null) _loadPreset(picked);
+                    },
+                  ),
+                  IconButton(
+                    tooltip: 'Analíticas',
+                    icon: const Icon(Icons.stacked_line_chart_rounded),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StudyAnalyticsScreen(
+                            svc: svc,
+                            courseId: _courseId,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    children: [
+                      _PhasePill(label: phaseLabel, color: phaseColor(_phase)),
+                      const SizedBox(height: AppSpacing.lg),
+                      _TimerHeroCard(
+                        colorScheme: cs,
+                        phaseColor: phaseColor(_phase),
+                        phaseLabel: phaseLabel,
+                        timeLeft: _formatTime(_timeLeft),
+                        totalTimeLabel: _totalTime > 0 ? _formatTime(_totalTime) : '--:--',
+                        cycle: _cycle,
+                        controls: _buildControlButtons(context),
+                        timer: CircularTimerWidget(
                           timeLeft: _timeLeft,
                           totalTime: _totalTime,
                           phase: phaseLabel,
                           color: phaseColor(_phase),
                           isRunning: _isRunning,
-                        )
-                            .animate()
-                            .fadeIn(duration: 600.ms)
-                            .scale(begin: const Offset(0.8, 0.8)),
-                        const SizedBox(height: 32),
-                                                 if (_method != StudyMethod.simple)
-                          _buildStatsRow(context).animate().fadeIn(
-                                delay: 200.ms,
-                                duration: 400.ms,
-                              ),
-                        const SizedBox(height: 32),
-                                                 _buildControlButtons(context).animate().fadeIn(
-                              delay: 400.ms,
-                              duration: 400.ms,
-                            ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                        ),
+                      ).animate().fadeIn(duration: 500.ms).move(begin: const Offset(0, 20)),
+                      const SizedBox(height: AppSpacing.lg),
+                      if (_method != StudyMethod.simple)
+                        _buildStatsRow(context).animate().fadeIn(delay: 100.ms, duration: 350.ms),
+                      const SizedBox(height: AppSpacing.lg),
+                      _MethodCard(
+                        method: _method,
+                        configSummary: _methodSummary(),
+                        onShowPresets: () async {
+                          final picked = await showModalBottomSheet<TimerPreset>(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => PresetsSheet(svc: svc, courseId: _courseId),
+                          );
+                          if (picked != null) _loadPreset(picked);
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      _SelectorsCard(
+                        child: _HeaderSelectors(
+                          svc: svc,
+                          courseId: _courseId,
+                          onCourseChanged: (v) => setState(() => _courseId = v),
+                          taskId: _taskId,
+                          onTaskChanged: (v) => setState(() => _taskId = v),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -444,17 +450,17 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
 
   Widget _buildStatsRow(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.2)),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _StatCard(
-            icon: Icons.loop_rounded,
-            label: 'Ciclos',
-            value: '$_cycle',
-            color: cs.primary,
-          ),
+          _StatCard(icon: Icons.loop_rounded, label: 'Ciclos', value: '$_cycle', color: cs.primary),
           _StatCard(
             icon: Icons.timer_outlined,
             label: 'Minutos',
@@ -486,51 +492,36 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             onPressed: _isRunning ? null : _start,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             icon: const Icon(Icons.play_arrow_rounded, size: 24),
             label: Text(
               'Iniciar',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           FilledButton.tonalIcon(
             onPressed: _isRunning ? _pause : null,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             icon: const Icon(Icons.pause_rounded, size: 24),
             label: Text(
               'Pausar',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           OutlinedButton.icon(
             onPressed: _reset,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             icon: const Icon(Icons.refresh_rounded, size: 24),
             label: Text(
               'Reset',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           if (_courseId != null && (_phase != 'ready' || _accumulatedMinutes > 0))
@@ -540,17 +531,12 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                 backgroundColor: cs.tertiary,
                 foregroundColor: cs.onTertiary,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               icon: const Icon(Icons.save_rounded, size: 24),
               label: Text(
                 'Guardar sesión',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
         ],
@@ -563,6 +549,28 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     final m = (s ~/ 60).toString().padLeft(2, '0');
     final r = (s % 60).toString().padLeft(2, '0');
     return '$m:$r';
+  }
+
+  String _methodSummary() {
+    switch (_method) {
+      case StudyMethod.pomodoro:
+        final work = (_cfg['work'] ?? 25).toString();
+        final short = (_cfg['short'] ?? 5).toString();
+        final long = (_cfg['long'] ?? 15).toString();
+        final cycles = (_cfg['cycles'] ?? 4).toString();
+        return 'Pomodoro • $work trabajo / $short descanso (largo $long cada $cycles)';
+      case StudyMethod.flowtime:
+        final ratio = (_cfg['ratio'] ?? 0.2).toString();
+        return 'Flowtime • Descanso proporcional (ratio $ratio)';
+      case StudyMethod.timeboxing:
+        final block = (_cfg['block'] ?? 50).toString();
+        final rest = (_cfg['rest'] ?? 10).toString();
+        return 'Timeboxing • $block min bloque / $rest min pausa';
+      case StudyMethod.custom:
+        return 'Secuencia personalizada • ${(_cfg['sequence'] as List? ?? []).length} bloques';
+      case StudyMethod.simple:
+        return 'Cronómetro simple • cuenta ascendente';
+    }
   }
 }
 
@@ -581,40 +589,267 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      width: 110,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: color.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: 26),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             value,
             style: GoogleFonts.jetBrainsMono(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             label,
             style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: color.withOpacity(0.8),
+              color: cs.onSurfaceVariant,
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PhasePill extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _PhasePill({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimerHeroCard extends StatelessWidget {
+  final ColorScheme colorScheme;
+  final Color phaseColor;
+  final String phaseLabel;
+  final String timeLeft;
+  final String totalTimeLabel;
+  final int cycle;
+  final Widget timer;
+  final Widget controls;
+
+  const _TimerHeroCard({
+    required this.colorScheme,
+    required this.phaseColor,
+    required this.phaseLabel,
+    required this.timeLeft,
+    required this.totalTimeLabel,
+    required this.cycle,
+    required this.timer,
+    required this.controls,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [phaseColor.withOpacity(0.9), colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        boxShadow: [
+          BoxShadow(
+            color: phaseColor.withOpacity(0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    phaseLabel,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: colorScheme.onPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Ciclo $cycle',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: colorScheme.onPrimary.withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  border: Border.all(color: colorScheme.onPrimary.withOpacity(0.2)),
+                ),
+                child: Text(
+                  'Total ${totalTimeLabel == '--:--' ? 'n/a' : totalTimeLabel}',
+                  style: GoogleFonts.jetBrainsMono(
+                    color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+          Center(child: timer),
+          const SizedBox(height: AppSpacing.md),
+          Center(
+            child: Text(
+              timeLeft,
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          controls,
+        ],
+      ),
+    );
+  }
+}
+
+class _MethodCard extends StatelessWidget {
+  final StudyMethod method;
+  final String configSummary;
+  final VoidCallback onShowPresets;
+
+  const _MethodCard({
+    required this.method,
+    required this.configSummary,
+    required this.onShowPresets,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+            child: Icon(Icons.schema_rounded, color: cs.onPrimaryContainer),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Modo: ${method.name.toUpperCase()}',
+                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 16),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(configSummary, style: AppTypography.caption(context)),
+              ],
+            ),
+          ),
+          FilledButton.tonal(
+            onPressed: onShowPresets,
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            ),
+            child: const Text('Presets'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SelectorsCard extends StatelessWidget {
+  final Widget child;
+  const _SelectorsCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.2)),
+      ),
+      child: child,
     );
   }
 }
@@ -636,19 +871,19 @@ class _HeaderSelectors extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return StreamBuilder<List<Course>>(
       stream: svc.streamCourses(),
       builder: (context, csnap) {
         final courses = csnap.data ?? const [];
-        
-                 final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
+
+        final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
         if (validCourseId != courseId && validCourseId == null && courseId != null) {
-                     WidgetsBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             onCourseChanged(null);
           });
         }
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -669,85 +904,74 @@ class _HeaderSelectors extends StatelessWidget {
                   if (courses.isEmpty)
                     Text(
                       'No hay cursos disponibles',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: colorScheme.error,
-                      ),
+                      style: GoogleFonts.plusJakartaSans(color: colorScheme.error),
                     )
                   else
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: courses.map((course) {
-                        final isSelected = validCourseId == course.id;
-                        final courseColor = course.color ?? colorScheme.primary;
-                        
-                        return InkWell(
-                          onTap: () => onCourseChanged(course.id),
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 14,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? courseColor.withOpacity(0.15)
-                                  : colorScheme.surfaceContainerHighest,
+                      children:
+                          courses.map((course) {
+                            final isSelected = validCourseId == course.id;
+                            final courseColor = course.color ?? colorScheme.primary;
+
+                            return InkWell(
+                              onTap: () => onCourseChanged(course.id),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: isSelected
-                                    ? courseColor
-                                    : Colors.transparent,
-                                width: 2,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color:
+                                      isSelected
+                                          ? courseColor.withOpacity(0.15)
+                                          : colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isSelected ? courseColor : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 14,
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        color: courseColor,
+                                        shape: BoxShape.circle,
+                                        boxShadow:
+                                            isSelected
+                                                ? [
+                                                  BoxShadow(
+                                                    color: courseColor.withOpacity(0.4),
+                                                    blurRadius: 8,
+                                                  ),
+                                                ]
+                                                : null,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      course.name,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 15,
+                                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                        color: isSelected ? courseColor : colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 14,
-                                  height: 14,
-                                  decoration: BoxDecoration(
-                                    color: courseColor,
-                                    shape: BoxShape.circle,
-                                    boxShadow: isSelected
-                                        ? [
-                                            BoxShadow(
-                                              color: courseColor.withOpacity(0.4),
-                                              blurRadius: 8,
-                                            ),
-                                          ]
-                                        : null,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  course.name,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 15,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w500,
-                                    color: isSelected
-                                        ? courseColor
-                                        : colorScheme.onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                 ],
               ),
             ),
             if (courseId != null)
               StreamBuilder<List<StudyTask>>(
-                stream: svc.streamTasks(
-                  courseId: courseId!,
-                  status: TaskStatus.todo,
-                ),
+                stream: svc.streamTasks(courseId: courseId!, status: TaskStatus.todo),
                 builder: (context, tsnap) {
                   final tasks = tsnap.data ?? const [];
                   return Padding(
@@ -757,12 +981,7 @@ class _HeaderSelectors extends StatelessWidget {
                       hint: const Text('Vincular tarea (opcional)'),
                       items: [
                         const DropdownMenuItem(value: null, child: Text('—')),
-                        ...tasks.map(
-                          (t) => DropdownMenuItem(
-                            value: t.id,
-                            child: Text(t.title),
-                          ),
-                        ),
+                        ...tasks.map((t) => DropdownMenuItem(value: t.id, child: Text(t.title))),
                       ],
                       onChanged: onTaskChanged,
                     ),

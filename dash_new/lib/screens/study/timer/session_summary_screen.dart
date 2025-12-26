@@ -37,10 +37,7 @@ class SessionSummaryScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Listo'),
-          ),
+          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Listo')),
         ],
       ),
     );

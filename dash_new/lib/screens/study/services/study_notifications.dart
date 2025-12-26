@@ -7,25 +7,19 @@ class StudyNotifications {
   final StudyFirestoreService svc;
   StudyNotifications(this.svc);
 
-     Future<void> scheduleTodayClasses() async {
+  Future<void> scheduleTodayClasses() async {
     final now = DateTime.now();
-    final weekday = now.weekday;      final blocks = await svc.streamSchedule().first;
+    final weekday = now.weekday;
+    final blocks = await svc.streamSchedule().first;
     for (final b in blocks) {
       if (!b.daysOfWeek.contains(weekday)) continue;
-      final startToday = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        b.start.hour,
-        b.start.minute,
-      );
+      final startToday = DateTime(now.year, now.month, now.day, b.start.hour, b.start.minute);
       final when = startToday.subtract(const Duration(minutes: 15));
       if (when.isAfter(now)) {
         await NotificationService.I.scheduleOnce(
           id: _id('CLASS', b, when),
           title: 'Clase próxima',
-          body:
-              'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
+          body: 'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
           whenLocal: when,
           useExact: true,
         );
@@ -33,7 +27,7 @@ class StudyNotifications {
     }
   }
 
-     Future<void> scheduleDueTasks() async {
+  Future<void> scheduleDueTasks() async {
     final tasks = await svc.streamTasks().first;
     for (final t in tasks) {
       if (t.due == null) continue;
@@ -67,7 +61,7 @@ class StudyNotifications {
   int _hash(String prefix, String key, DateTime when) =>
       (prefix + key + DateFormat('yyyyMMddHHmm').format(when)).hashCode;
 
-     Future<void> scheduleAll({bool classes = true, bool tasks = true}) async {
+  Future<void> scheduleAll({bool classes = true, bool tasks = true}) async {
     if (classes) {
       await scheduleTodayClasses();
     }

@@ -6,23 +6,17 @@ import '../services/study_firestore_service.dart';
 import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
 import '../timer/study_timer_screen.dart';
 
-  class CourseDetailEditableScreen extends StatefulWidget {
+class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course course;
 
-  const CourseDetailEditableScreen({
-    super.key,
-    required this.svc,
-    required this.course,
-  });
+  const CourseDetailEditableScreen({super.key, required this.svc, required this.course});
 
   @override
-  State<CourseDetailEditableScreen> createState() =>
-      _CourseDetailEditableScreenState();
+  State<CourseDetailEditableScreen> createState() => _CourseDetailEditableScreenState();
 }
 
-class _CourseDetailEditableScreenState
-    extends State<CourseDetailEditableScreen> {
+class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen> {
   late TextEditingController _nameController;
   late TextEditingController _teacherController;
   late TextEditingController _creditsController;
@@ -39,17 +33,13 @@ class _CourseDetailEditableScreenState
     super.initState();
     _nameController = TextEditingController(text: widget.course.name);
     _teacherController = TextEditingController(text: widget.course.teacher ?? '');
-    _creditsController = TextEditingController(
-      text: widget.course.credits?.toString() ?? '',
-    );
-    _goalHoursController = TextEditingController(
-      text: widget.course.goalHours?.toString() ?? '',
-    );
+    _creditsController = TextEditingController(text: widget.course.credits?.toString() ?? '');
+    _goalHoursController = TextEditingController(text: widget.course.goalHours?.toString() ?? '');
     _attendancePctController = TextEditingController(
       text: widget.course.attendanceRequired?.toStringAsFixed(0) ?? '',
     );
     _selectedColor = widget.course.color ?? Colors.blue;
-       }
+  }
 
   @override
   void dispose() {
@@ -63,9 +53,9 @@ class _CourseDetailEditableScreenState
 
   Future<void> _saveCourse() async {
     if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El nombre del curso es obligatorio')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El nombre del curso es obligatorio')));
       return;
     }
 
@@ -111,62 +101,60 @@ class _CourseDetailEditableScreenState
   Future<void> _archiveCourse() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Archivar curso',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          '¿Estás seguro de que deseas archivar este curso? Podrás restaurarlo más tarde.',
-          style: GoogleFonts.plusJakartaSans(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.orange.shade600,
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              'Archivar curso',
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
-            child: const Text('Archivar'),
+            content: Text(
+              '¿Estás seguro de que deseas archivar este curso? Podrás restaurarlo más tarde.',
+              style: GoogleFonts.plusJakartaSans(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade600),
+                child: const Text('Archivar'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirm == true && mounted) {
-             Navigator.pop(context);
+      Navigator.pop(context);
     }
   }
 
   Future<void> _deleteCourse() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Eliminar curso',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          '¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.',
-          style: GoogleFonts.plusJakartaSans(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red.shade600,
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              'Eliminar curso',
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
-            child: const Text('Eliminar'),
+            content: Text(
+              '¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.',
+              style: GoogleFonts.plusJakartaSans(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: Colors.red.shade600),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirm == true && mounted) {
@@ -177,9 +165,9 @@ class _CourseDetailEditableScreenState
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al eliminar: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
         }
       }
     }
@@ -192,7 +180,7 @@ class _CourseDetailEditableScreenState
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-                     SliverAppBar.large(
+          SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -200,12 +188,7 @@ class _CourseDetailEditableScreenState
                 widget.course.name,
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w700,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                    ),
-                  ],
+                  shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
                 ),
               ),
               background: Container(
@@ -213,10 +196,7 @@ class _CourseDetailEditableScreenState
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      _selectedColor,
-                      _selectedColor.withOpacity(0.7),
-                    ],
+                    colors: [_selectedColor, _selectedColor.withOpacity(0.7)],
                   ),
                 ),
               ),
@@ -236,28 +216,29 @@ class _CourseDetailEditableScreenState
                 ),
               PopupMenuButton(
                 icon: const Icon(Icons.more_vert_rounded),
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'archive',
-                    child: Row(
-                      children: [
-                        Icon(Icons.archive_rounded, color: Colors.orange.shade600),
-                        const SizedBox(width: 12),
-                        const Text('Archivar'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete_rounded, color: Colors.red.shade600),
-                        const SizedBox(width: 12),
-                        const Text('Eliminar'),
-                      ],
-                    ),
-                  ),
-                ],
+                itemBuilder:
+                    (context) => [
+                      PopupMenuItem(
+                        value: 'archive',
+                        child: Row(
+                          children: [
+                            Icon(Icons.archive_rounded, color: Colors.orange.shade600),
+                            const SizedBox(width: 12),
+                            const Text('Archivar'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_rounded, color: Colors.red.shade600),
+                            const SizedBox(width: 12),
+                            const Text('Eliminar'),
+                          ],
+                        ),
+                      ),
+                    ],
                 onSelected: (value) {
                   if (value == 'archive') _archiveCourse();
                   if (value == 'delete') _deleteCourse();
@@ -266,7 +247,7 @@ class _CourseDetailEditableScreenState
             ],
           ),
 
-                     SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -274,7 +255,7 @@ class _CourseDetailEditableScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                                         if (_isEditing) ...[
+                    if (_isEditing) ...[
                       Text(
                         'Información del curso',
                         style: GoogleFonts.plusJakartaSans(
@@ -283,21 +264,21 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                       const SizedBox(height: 20),
-                      
+
                       _TaskFormTextField(
                         controller: _nameController,
                         label: 'Nombre del curso',
                         icon: Icons.book_rounded,
                       ),
                       const SizedBox(height: 16),
-                      
+
                       _TaskFormTextField(
                         controller: _teacherController,
                         label: 'Profesor',
                         icon: Icons.person_rounded,
                       ),
                       const SizedBox(height: 16),
-                      
+
                       Row(
                         children: [
                           Expanded(
@@ -320,7 +301,7 @@ class _CourseDetailEditableScreenState
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       _TaskFormTextField(
                         controller: _attendancePctController,
                         label: 'Asistencia requerida (%)',
@@ -328,7 +309,7 @@ class _CourseDetailEditableScreenState
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 24),
-                      
+
                       GlobalColorPickerWidget(
                         initialColor: _selectedColor,
                         onColorSelected: (color) {
@@ -337,38 +318,37 @@ class _CourseDetailEditableScreenState
                         label: 'Color del curso',
                       ),
                       const SizedBox(height: 32),
-                      
-                                             SizedBox(
+
+                      SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: FilledButton(
                           onPressed: _isSaving ? null : _saveCourse,
                           style: FilledButton.styleFrom(
                             backgroundColor: _selectedColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: _isSaving
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                          child:
+                              _isSaving
+                                  ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colorScheme.onPrimary,
+                                    ),
+                                  )
+                                  : Text(
+                                    'Guardar cambios',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                )
-                              : Text(
-                                  'Guardar cambios',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
                         ),
                       ),
                     ] else ...[
-                                             _StatCard(
+                      _StatCard(
                         icon: Icons.school_rounded,
                         label: 'Profesor',
                         value: widget.course.teacher ?? 'No asignado',
@@ -417,7 +397,7 @@ class _CourseDetailEditableScreenState
   }
 }
 
- class _TaskFormTextField extends StatelessWidget {
+class _TaskFormTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final IconData icon;
@@ -435,10 +415,7 @@ class _CourseDetailEditableScreenState
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: GoogleFonts.plusJakartaSans(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
+      style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
@@ -454,17 +431,14 @@ class _CourseDetailEditableScreenState
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
       ),
     );
   }
 }
 
- class _StatCard extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/study_models.dart';
 
- class ModernClassBlock extends StatelessWidget {
+class ModernClassBlock extends StatelessWidget {
   final StudyClassBlock block;
   final Course? course;
   final VoidCallback? onTap;
@@ -31,10 +31,7 @@ import '../models/study_models.dart';
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [
-              blockColor.withOpacity(0.85),
-              blockColor,
-            ],
+            colors: [blockColor.withOpacity(0.85), blockColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -48,14 +45,12 @@ import '../models/study_models.dart';
         ),
         child: Stack(
           children: [
-                         Positioned.fill(
+            Positioned.fill(
               child: CustomPaint(
-                painter: _DotPatternPainter(
-                  color: Colors.white.withOpacity(0.1),
-                ),
+                painter: _DotPatternPainter(color: colorScheme.onPrimary.withOpacity(0.1)),
               ),
             ),
-                         Padding(
+            Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,29 +58,22 @@ import '../models/study_models.dart';
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.25),
+                          color: colorScheme.onPrimary.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.access_time_rounded,
-                              color: Colors.white,
-                              size: 14,
-                            ),
+                            Icon(Icons.access_time_rounded, color: colorScheme.onPrimary, size: 14),
                             const SizedBox(width: 4),
                             Text(
                               '${block.start.format(context)} - ${block.end.format(context)}',
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                               ),
                             ),
                           ],
@@ -94,20 +82,17 @@ import '../models/study_models.dart';
                       const Spacer(),
                       if (block.room != null && block.room!.isNotEmpty)
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
+                            color: colorScheme.onPrimary.withOpacity(0.25),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_rounded,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 size: 14,
                               ),
                               const SizedBox(width: 4),
@@ -116,7 +101,7 @@ import '../models/study_models.dart';
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: colorScheme.onPrimary,
                                 ),
                               ),
                             ],
@@ -130,7 +115,7 @@ import '../models/study_models.dart';
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       shadows: [
                         Shadow(
                           color: Colors.black.withOpacity(0.3),
@@ -148,7 +133,7 @@ import '../models/study_models.dart';
                       children: [
                         Icon(
                           Icons.person_rounded,
-                          color: Colors.white.withOpacity(0.9),
+                          color: colorScheme.onPrimary.withOpacity(0.9),
                           size: 16,
                         ),
                         const SizedBox(width: 6),
@@ -158,7 +143,7 @@ import '../models/study_models.dart';
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.9),
+                              color: colorScheme.onPrimary.withOpacity(0.9),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -177,16 +162,17 @@ import '../models/study_models.dart';
   }
 }
 
- class _DotPatternPainter extends CustomPainter {
+class _DotPatternPainter extends CustomPainter {
   final Color color;
 
   _DotPatternPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
 
     const spacing = 20.0;
     const dotRadius = 2.0;
@@ -202,7 +188,7 @@ import '../models/study_models.dart';
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
- class EmptyScheduleState extends StatelessWidget {
+class EmptyScheduleState extends StatelessWidget {
   final VoidCallback onAddClass;
 
   const EmptyScheduleState({super.key, required this.onAddClass});
@@ -228,11 +214,7 @@ import '../models/study_models.dart';
                   ],
                 ),
               ),
-              child: Icon(
-                Icons.calendar_today_rounded,
-                size: 70,
-                color: colorScheme.primary,
-              ),
+              child: Icon(Icons.calendar_today_rounded, size: 70, color: colorScheme.primary),
             ),
             const SizedBox(height: 32),
             Text(
@@ -246,10 +228,7 @@ import '../models/study_models.dart';
             const SizedBox(height: 12),
             Text(
               'Añade tus clases para visualizar tu horario semanal',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 16, color: colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -258,13 +237,8 @@ import '../models/study_models.dart';
               icon: const Icon(Icons.add_rounded),
               label: const Text('Añadir clase'),
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
           ],

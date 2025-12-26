@@ -8,15 +8,13 @@ class IntegratedCalendarScreen extends StatefulWidget {
   const IntegratedCalendarScreen({super.key, required this.svc});
 
   @override
-  State<IntegratedCalendarScreen> createState() =>
-      _IntegratedCalendarScreenState();
+  State<IntegratedCalendarScreen> createState() => _IntegratedCalendarScreenState();
 }
 
 class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-   
   @override
   Widget build(BuildContext context) {
     final svc = widget.svc;
@@ -38,10 +36,7 @@ class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
                   }),
               calendarFormat: CalendarFormat.month,
               startingDayOfWeek: StartingDayOfWeek.monday,
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-              ),
+              headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
             ),
           ),
           Expanded(child: _DayEventsList(svc: svc, day: _selectedDay)),
@@ -65,9 +60,7 @@ class _DayEventsList extends StatelessWidget {
         final tasks =
             (taskSnap.data ?? const [])
                 .where(
-                  (t) =>
-                      t.due != null &&
-                      DateTime(t.due!.year, t.due!.month, t.due!.day) == key,
+                  (t) => t.due != null && DateTime(t.due!.year, t.due!.month, t.due!.day) == key,
                 )
                 .toList();
         return StreamBuilder<List<StudySession>>(
@@ -75,11 +68,7 @@ class _DayEventsList extends StatelessWidget {
           builder: (context, sessSnap) {
             final sessions =
                 (sessSnap.data ?? const [])
-                    .where(
-                      (s) =>
-                          DateTime(s.date.year, s.date.month, s.date.day) ==
-                          key,
-                    )
+                    .where((s) => DateTime(s.date.year, s.date.month, s.date.day) == key)
                     .toList();
             return StreamBuilder<List<StudyClassBlock>>(
               stream: svc.streamSchedule(),
@@ -95,9 +84,7 @@ class _DayEventsList extends StatelessWidget {
                     tasks.map(
                       (t) => ListTile(
                         leading: Icon(
-                          t.type == StudyItemType.exam
-                              ? Icons.event_available
-                              : Icons.task_alt,
+                          t.type == StudyItemType.exam ? Icons.event_available : Icons.task_alt,
                         ),
                         title: Text(t.title),
                         subtitle: Text(
@@ -133,12 +120,8 @@ class _DayEventsList extends StatelessWidget {
                     ),
                   );
                 }
-                if (items.isEmpty)
-                  return const Center(child: Text('Sin eventos en este día'));
-                return ListView(
-                  padding: const EdgeInsets.all(12),
-                  children: items,
-                );
+                if (items.isEmpty) return const Center(child: Text('Sin eventos en este día'));
+                return ListView(padding: const EdgeInsets.all(12), children: items);
               },
             );
           },
@@ -147,7 +130,8 @@ class _DayEventsList extends StatelessWidget {
     );
   }
 
-  int _weekday(DateTime d) => d.weekday;  }
+  int _weekday(DateTime d) => d.weekday;
+}
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -158,9 +142,7 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Expanded(
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-          ),
+          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
           const SizedBox(width: 8),
           Expanded(child: Divider()),
         ],

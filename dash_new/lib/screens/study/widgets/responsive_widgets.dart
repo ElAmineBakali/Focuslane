@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 
- extension SafeAreaExt on BuildContext {
+extension SafeAreaExt on BuildContext {
   double get safeAreaBottomPadding =>
-      MediaQuery.of(this).viewPadding.bottom > 0
-          ? MediaQuery.of(this).viewPadding.bottom
-          : 16;
+      MediaQuery.of(this).viewPadding.bottom > 0 ? MediaQuery.of(this).viewPadding.bottom : 16;
 
   double get safeAreaTopPadding =>
-      MediaQuery.of(this).viewPadding.top > 0
-          ? MediaQuery.of(this).viewPadding.top
-          : 0;
+      MediaQuery.of(this).viewPadding.top > 0 ? MediaQuery.of(this).viewPadding.top : 0;
 
-  bool get hasNotch =>
-      MediaQuery.of(this).viewPadding.top > 24;
+  bool get hasNotch => MediaQuery.of(this).viewPadding.top > 24;
 
-  bool get hasNavigationBar =>
-      MediaQuery.of(this).viewPadding.bottom > 0;
+  bool get hasNavigationBar => MediaQuery.of(this).viewPadding.bottom > 0;
 
   double get screenWidth => MediaQuery.of(this).size.width;
   double get screenHeight => MediaQuery.of(this).size.height;
@@ -25,7 +19,7 @@ import 'package:flutter/material.dart';
   bool get isDesktop => screenWidth >= 1200;
 }
 
- class ResponsivePadding extends StatelessWidget {
+class ResponsivePadding extends StatelessWidget {
   final Widget child;
   final double horizontal;
   final double vertical;
@@ -54,7 +48,7 @@ import 'package:flutter/material.dart';
   }
 }
 
- class ResponsiveListView extends StatelessWidget {
+class ResponsiveListView extends StatelessWidget {
   final ScrollPhysics? physics;
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
@@ -77,7 +71,7 @@ import 'package:flutter/material.dart';
   @override
   Widget build(BuildContext context) {
     final bottomPadding = context.safeAreaBottomPadding;
-    
+
     if (separatorBuilder != null) {
       return ListView.separated(
         physics: physics,
@@ -111,7 +105,7 @@ import 'package:flutter/material.dart';
   }
 }
 
- class ResponsiveCustomScrollView extends StatelessWidget {
+class ResponsiveCustomScrollView extends StatelessWidget {
   final List<Widget> slivers;
   final ScrollPhysics? physics;
   final ScrollController? controller;
@@ -126,21 +120,16 @@ import 'package:flutter/material.dart';
   @override
   Widget build(BuildContext context) {
     final bottomPadding = context.safeAreaBottomPadding;
-    
+
     return CustomScrollView(
       physics: physics,
       controller: controller,
-      slivers: [
-        ...slivers,
-                 SliverToBoxAdapter(
-          child: SizedBox(height: bottomPadding),
-        ),
-      ],
+      slivers: [...slivers, SliverToBoxAdapter(child: SizedBox(height: bottomPadding))],
     );
   }
 }
 
- class ResponsiveCard extends StatelessWidget {
+class ResponsiveCard extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;
   final EdgeInsets? padding;
@@ -161,10 +150,7 @@ import 'package:flutter/material.dart';
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: padding ?? const EdgeInsets.all(16),
-          child: child,
-        ),
+        child: Padding(padding: padding ?? const EdgeInsets.all(16), child: child),
       ),
     );
   }

@@ -5,7 +5,7 @@ import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'package:intl/intl.dart';
 
- class FoodDiaryScreenV2 extends StatefulWidget {
+class FoodDiaryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodDiaryScreenV2({super.key, required this.svc});
 
@@ -16,7 +16,7 @@ import 'package:intl/intl.dart';
 class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   DateTime _date = DateTime.now();
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
-  
+
   final Map<String, String> _mealTitles = {
     'breakfast': 'Desayuno',
     'snack1': 'Media Mañana',
@@ -29,7 +29,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   @override
   Widget build(BuildContext context) {
     final dayId = _dayId(_date);
-    
+
     return Scaffold(
       appBar: ModernGradientAppBar(
         title: 'Diario de Alimentación',
@@ -52,25 +52,25 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
         stream: widget.svc.streamGlobalTargets(),
         builder: (context, globalSnap) {
           final globalTargets = globalSnap.data ?? const {};
-          
+
           return StreamBuilder<DailyIntakeDoc>(
             stream: widget.svc.streamDay(dayId),
             builder: (context, snap) {
               if (!snap.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
-              
+
               final d = snap.data!;
-              
-                             Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
+
+              Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
               for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
                 mergedTargets[k] ??= globalTargets[k];
-                    }
-                             mergedTargets['water'] ??= globalTargets['water'];
-              
+              }
+              mergedTargets['water'] ??= globalTargets['water'];
+
               return CustomScrollView(
                 slivers: [
-                                     SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: _ModernDaySelector(
                       date: _date,
                       onPrev: () => setState(() => _date = _date.subtract(const Duration(days: 1))),
@@ -78,14 +78,14 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                       onToday: () => setState(() => _date = DateTime.now()),
                     ).animate().slideY(begin: -0.2, duration: 300.ms),
                   ),
-                  
+
                   SliverToBoxAdapter(
                     child: _MacrosSummary(
                       day: d,
                       mergedTargets: mergedTargets,
                     ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, duration: 300.ms),
                   ),
-                  
+
                   SliverToBoxAdapter(
                     child: _ModernWaterCard(
                       water: d.waterMl,
@@ -93,7 +93,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                       onAdd: (ml) => widget.svc.incrementWater(dayId, ml),
                     ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, duration: 300.ms),
                   ),
-                  
+
                   if (d.entries.isEmpty)
                     SliverFillRemaining(
                       child: ModernEmptyState(
@@ -106,7 +106,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     )
                   else
                     ..._buildMealSections(d.entries, dayId),
-                  
+
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               );
@@ -116,41 +116,37 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       ),
     );
   }
-  
+
   List<Widget> _buildMealSections(List<IntakeEntry> entries, String dayId) {
     return [
       SliverPadding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         sliver: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final entry = entries[index];
-              return _EntryCard(
-                entry: entry,
-                onDuplicate: () => widget.svc.addEntry(
-                  dayId,
-                  IntakeEntry(
-                    id: '',
-                    type: entry.type,
-                    refId: entry.refId,
-                    qty: entry.qty,
-                    unit: entry.unit,
-                    nameSnapshot: entry.nameSnapshot,
-                    macrosSnapshot: entry.macrosSnapshot,
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final entry = entries[index];
+            return _EntryCard(
+              entry: entry,
+              onDuplicate:
+                  () => widget.svc.addEntry(
+                    dayId,
+                    IntakeEntry(
+                      id: '',
+                      type: entry.type,
+                      refId: entry.refId,
+                      qty: entry.qty,
+                      unit: entry.unit,
+                      nameSnapshot: entry.nameSnapshot,
+                      macrosSnapshot: entry.macrosSnapshot,
+                    ),
                   ),
-                ),
-                onDelete: () => widget.svc.deleteEntry(dayId, index),
-              ).animate()
-                .fadeIn(delay: (300 + index * 50).ms)
-                .slideX(begin: -0.2, duration: 300.ms);
-            },
-            childCount: entries.length,
-          ),
+              onDelete: () => widget.svc.deleteEntry(dayId, index),
+            ).animate().fadeIn(delay: (300 + index * 50).ms).slideX(begin: -0.2, duration: 300.ms);
+          }, childCount: entries.length),
         ),
       ),
     ];
   }
-  
+
   void _showGoalsSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -159,7 +155,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       builder: (_) => _ModernGoalsSheet(svc: widget.svc),
     );
   }
-  
+
   void _showAddEntrySheet(BuildContext context, String dayId) {
     showModalBottomSheet(
       context: context,
@@ -170,19 +166,19 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   }
 }
 
- class _ModernDaySelector extends StatelessWidget {
+class _ModernDaySelector extends StatelessWidget {
   final DateTime date;
   final VoidCallback onPrev;
   final VoidCallback onNext;
   final VoidCallback onToday;
-  
+
   const _ModernDaySelector({
     required this.date,
     required this.onPrev,
     required this.onNext,
     required this.onToday,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final isToday = _isToday(date);
@@ -190,7 +186,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       margin: const EdgeInsets.all(AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -206,9 +202,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
               IconButton(
                 onPressed: onPrev,
                 icon: const Icon(Icons.chevron_left),
-                style: IconButton.styleFrom(
-                  backgroundColor: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
-                ),
+                style: IconButton.styleFrom(backgroundColor: colorScheme.surfaceContainerHighest),
               ),
               Expanded(
                 child: Center(
@@ -219,11 +213,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                         style: AppTypography.heading4(context),
                         textAlign: TextAlign.center,
                       ),
-                      if (isToday)
-                        ModernBadge(
-                          label: 'HOY',
-                          color: colorScheme.primary,
-                        ),
+                      if (isToday) ModernBadge(label: 'HOY', color: colorScheme.primary),
                     ],
                   ),
                 ),
@@ -231,9 +221,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
               IconButton(
                 onPressed: onNext,
                 icon: const Icon(Icons.chevron_right),
-                style: IconButton.styleFrom(
-                  backgroundColor: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
-                ),
+                style: IconButton.styleFrom(backgroundColor: colorScheme.surfaceContainerHighest),
               ),
             ],
           ),
@@ -250,43 +238,35 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       ),
     );
   }
-  
+
   bool _isToday(DateTime date) {
     final now = DateTime.now();
     return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 }
 
- class _MacrosSummary extends StatelessWidget {
+class _MacrosSummary extends StatelessWidget {
   final DailyIntakeDoc day;
   final Map<String, double?> mergedTargets;
-  
-  const _MacrosSummary({
-    required this.day,
-    required this.mergedTargets,
-  });
-  
+
+  const _MacrosSummary({required this.day, required this.mergedTargets});
+
   @override
   Widget build(BuildContext context) {
     final t = day.totals;
     final g = mergedTargets;
-    
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Nutrición del Día',
-            style: AppTypography.heading3(context),
-          ),
+          Text('Nutrición del Día', style: AppTypography.heading3(context)),
           const SizedBox(height: AppSpacing.md),
-          
+
           Card(
             elevation: AppSpacing.elevationMd,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
             child: Container(
               decoration: BoxDecoration(
                 gradient: AppColors.foodGradient,
@@ -300,9 +280,16 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     children: [
                       Text(
                         'Calorías',
-                        style: AppTypography.heading3(context, color: Theme.of(context).colorScheme.onPrimary),
+                        style: AppTypography.heading3(
+                          context,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
-                      Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.onPrimary, size: 32),
+                      Icon(
+                        Icons.local_fire_department,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: 32,
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -313,17 +300,26 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     children: [
                       Text(
                         (t['kcal'] ?? 0).toStringAsFixed(0),
-                        style: AppTypography.heading1(context, color: Theme.of(context).colorScheme.onPrimary).copyWith(fontSize: 48),
+                        style: AppTypography.heading1(
+                          context,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ).copyWith(fontSize: 48),
                       ),
                       if (g['kcal'] != null) ...[
                         Text(
                           ' / ${g['kcal']!.toStringAsFixed(0)}',
-                          style: AppTypography.heading3(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+                          style: AppTypography.heading3(
+                            context,
+                            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                          ),
                         ),
                       ],
                       Text(
                         ' kcal',
-                        style: AppTypography.body(context, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+                        style: AppTypography.body(
+                          context,
+                          color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                        ),
                       ),
                     ],
                   ),
@@ -339,9 +335,9 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: AppSpacing.md),
-          
+
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -388,21 +384,21 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       ),
     );
   }
-  
+
   double _pct(double v, double? t) {
     if (t == null || t <= 0) return 0;
     return (v / t).clamp(0, 1);
   }
 }
 
- class _MacroCard extends StatelessWidget {
+class _MacroCard extends StatelessWidget {
   final String label;
   final double value;
   final double? target;
   final String unit;
   final Color color;
   final IconData icon;
-  
+
   const _MacroCard({
     required this.label,
     required this.value,
@@ -411,16 +407,14 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
     required this.color,
     required this.icon,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final pct = target != null && target! > 0 ? (value / target!).clamp(0.0, 1.0).toDouble() : 0.0;
-    
+
     return Card(
       elevation: AppSpacing.elevationSm,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
@@ -449,23 +443,12 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                   style: AppTypography.heading2(context, color: color),
                 ),
                 if (target != null) ...[
-                  Text(
-                    '/${target!.toStringAsFixed(0)}',
-                    style: AppTypography.body(context),
-                  ),
+                  Text('/${target!.toStringAsFixed(0)}', style: AppTypography.body(context)),
                 ],
-                Text(
-                  unit,
-                  style: AppTypography.caption(context),
-                ),
+                Text(unit, style: AppTypography.caption(context)),
               ],
             ),
-            if (target != null)
-              ModernProgressBar(
-                value: pct,
-                color: color,
-                height: 4,
-              ),
+            if (target != null) ModernProgressBar(value: pct, color: color, height: 4),
           ],
         ),
       ),
@@ -473,33 +456,27 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   }
 }
 
- class _ModernWaterCard extends StatelessWidget {
+class _ModernWaterCard extends StatelessWidget {
   final int water;
   final int waterTarget;
   final Function(int) onAdd;
-  
-  const _ModernWaterCard({
-    required this.water,
-    required this.waterTarget,
-    required this.onAdd,
-  });
-  
+
+  const _ModernWaterCard({required this.water, required this.waterTarget, required this.onAdd});
+
   double _pct() {
     if (waterTarget <= 0) return 0;
     return (water / waterTarget).clamp(0, 1).toDouble();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final remaining = waterTarget - water;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Card(
         elevation: AppSpacing.elevationMd,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
           child: Column(
@@ -521,10 +498,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Hidratación', style: AppTypography.heading4(context)),
-                        Text(
-                          '$water / $waterTarget ml',
-                          style: AppTypography.body(context),
-                        ),
+                        Text('$water / $waterTarget ml', style: AppTypography.body(context)),
                         if (remaining > 0)
                           Text(
                             'Faltan ${remaining}ml',
@@ -540,11 +514,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              ModernProgressBar(
-                value: _pct(),
-                color: AppColors.info,
-                height: 8,
-              ),
+              ModernProgressBar(value: _pct(), color: AppColors.info, height: 8),
               const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
@@ -588,65 +558,57 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
       ),
     );
   }
-  
+
   void _showCustomWaterDialog(BuildContext context) {
     final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Añadir agua personalizada', style: AppTypography.heading3(ctx)),
-        content: ModernTextField(
-          label: 'Cantidad (ml)',
-          hint: 'Ej: 750',
-          controller: controller,
-          keyboardType: TextInputType.number,
-          prefixIcon: Icons.water_drop,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text('Añadir agua personalizada', style: AppTypography.heading3(ctx)),
+            content: ModernTextField(
+              label: 'Cantidad (ml)',
+              hint: 'Ej: 750',
+              controller: controller,
+              keyboardType: TextInputType.number,
+              prefixIcon: Icons.water_drop,
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+              ElevatedButton(
+                onPressed: () {
+                  final ml = int.tryParse(controller.text);
+                  if (ml != null && ml > 0) {
+                    onAdd(ml);
+                    Navigator.pop(ctx);
+                  }
+                },
+                child: const Text('Añadir'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              final ml = int.tryParse(controller.text);
-              if (ml != null && ml > 0) {
-                onAdd(ml);
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('Añadir'),
-          ),
-        ],
-      ),
     );
   }
 }
 
- class _EntryCard extends StatelessWidget {
+class _EntryCard extends StatelessWidget {
   final IntakeEntry entry;
   final VoidCallback onDuplicate;
   final VoidCallback onDelete;
-  
-  const _EntryCard({
-    required this.entry,
-    required this.onDuplicate,
-    required this.onDelete,
-  });
-  
+
+  const _EntryCard({required this.entry, required this.onDuplicate, required this.onDelete});
+
   @override
   Widget build(BuildContext context) {
     final kcal = entry.macrosSnapshot['kcal'] ?? 0;
     final protein = entry.macrosSnapshot['protein'] ?? 0;
     final carbs = entry.macrosSnapshot['carbs'] ?? 0;
     final fat = entry.macrosSnapshot['fat'] ?? 0;
-    
+
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         onTap: () {},
@@ -674,10 +636,7 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          entry.nameSnapshot,
-                          style: AppTypography.heading4(context),
-                        ),
+                        Text(entry.nameSnapshot, style: AppTypography.heading4(context)),
                         Text(
                           '${entry.qty.toStringAsFixed(0)} ${entry.unit.name}',
                           style: AppTypography.caption(context),
@@ -690,28 +649,25 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                       if (v == 'dup') onDuplicate();
                       if (v == 'del') onDelete();
                     },
-                    itemBuilder: (_) => [
-                      const PopupMenuItem(
-                        value: 'dup',
-                        child: Row(
-                          children: [
-                            Icon(Icons.copy),
-                            SizedBox(width: 8),
-                            Text('Duplicar'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'del',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, color: AppColors.error),
-                            SizedBox(width: 8),
-                            Text('Eliminar', style: TextStyle(color: AppColors.error)),
-                          ],
-                        ),
-                      ),
-                    ],
+                    itemBuilder:
+                        (_) => [
+                          const PopupMenuItem(
+                            value: 'dup',
+                            child: Row(
+                              children: [Icon(Icons.copy), SizedBox(width: 8), Text('Duplicar')],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'del',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, color: AppColors.error),
+                                SizedBox(width: 8),
+                                Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
                 ],
               ),
@@ -721,10 +677,26 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _MacroChip(label: '${kcal.toStringAsFixed(0)} kcal', icon: Icons.local_fire_department, color: AppColors.food),
-                  _MacroChip(label: '${protein.toStringAsFixed(0)}g P', icon: Icons.fitness_center, color: AppColors.error),
-                  _MacroChip(label: '${carbs.toStringAsFixed(0)}g C', icon: Icons.bakery_dining, color: AppColors.warning),
-                  _MacroChip(label: '${fat.toStringAsFixed(0)}g G', icon: Icons.water_drop, color: AppColors.info),
+                  _MacroChip(
+                    label: '${kcal.toStringAsFixed(0)} kcal',
+                    icon: Icons.local_fire_department,
+                    color: AppColors.food,
+                  ),
+                  _MacroChip(
+                    label: '${protein.toStringAsFixed(0)}g P',
+                    icon: Icons.fitness_center,
+                    color: AppColors.error,
+                  ),
+                  _MacroChip(
+                    label: '${carbs.toStringAsFixed(0)}g C',
+                    icon: Icons.bakery_dining,
+                    color: AppColors.warning,
+                  ),
+                  _MacroChip(
+                    label: '${fat.toStringAsFixed(0)}g G',
+                    icon: Icons.water_drop,
+                    color: AppColors.info,
+                  ),
                 ],
               ),
             ],
@@ -739,13 +711,9 @@ class _MacroChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
-  
-  const _MacroChip({
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-  
+
+  const _MacroChip({required this.label, required this.icon, required this.color});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -759,17 +727,18 @@ class _MacroChip extends StatelessWidget {
   }
 }
 
- class _ModernAddEntrySheet extends StatefulWidget {
+class _ModernAddEntrySheet extends StatefulWidget {
   final FoodFirestoreService svc;
   final String dayId;
-  
+
   const _ModernAddEntrySheet({required this.svc, required this.dayId});
-  
+
   @override
   State<_ModernAddEntrySheet> createState() => _ModernAddEntrySheetState();
 }
 
-class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleTickerProviderStateMixin {
+class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _nameController = TextEditingController();
   final _kcalController = TextEditingController();
@@ -778,32 +747,30 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
   final _searchController = TextEditingController();
   String _searchQuery = '';
   UnitKind _unit = UnitKind.g;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-                         Container(
+            Container(
               margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               width: 40,
               height: 4,
@@ -812,19 +779,14 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
-            
-                         Padding(
+
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Row(
                 children: [
                   Icon(Icons.add_circle, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Text(
-                      'Añadir al Diario',
-                      style: AppTypography.heading2(context),
-                    ),
-                  ),
+                  Expanded(child: Text('Añadir al Diario', style: AppTypography.heading2(context))),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -832,13 +794,14 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.md),
-            
-                         TabBar(
+
+            TabBar(
               controller: _tabController,
               labelColor: colorScheme.primary,
-              unselectedLabelColor: isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+              unselectedLabelColor:
+                  isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
               indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
@@ -847,7 +810,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
                 Tab(icon: Icon(Icons.menu_book), text: 'Recetas'),
               ],
             ),
-            
+
             SizedBox(
               height: 500,
               child: TabBarView(
@@ -865,19 +828,16 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
       ),
     );
   }
-  
+
   Widget _buildQuickAddTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Añade calorías rápidamente',
-            style: AppTypography.body(context),
-          ),
+          Text('Añade calorías rápidamente', style: AppTypography.body(context)),
           const SizedBox(height: AppSpacing.xl),
-          
+
           ModernTextField(
             label: 'Nombre',
             hint: 'Ej: Snack casero',
@@ -885,7 +845,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
             prefixIcon: Icons.edit,
           ),
           const SizedBox(height: AppSpacing.lg),
-          
+
           Row(
             children: [
               Expanded(
@@ -910,9 +870,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
               ),
             ],
           ),
-          
+
           const SizedBox(height: AppSpacing.xl),
-          
+
           ModernPrimaryButton(
             label: 'Añadir Quick Entry',
             icon: Icons.check,
@@ -924,7 +884,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
       ),
     );
   }
-  
+
   Widget _buildFavoritesTab() {
     return Column(
       children: [
@@ -943,16 +903,12 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
           child: _buildQuantityRow(),
         ),
         Expanded(
-          child: _FavList(
-            svc: widget.svc,
-            query: _searchQuery,
-            onPick: (f) => _addFavorite(f),
-          ),
+          child: _FavList(svc: widget.svc, query: _searchQuery, onPick: (f) => _addFavorite(f)),
         ),
       ],
     );
   }
-  
+
   Widget _buildFoodsTab() {
     return Column(
       children: [
@@ -971,16 +927,12 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
           child: _buildQuantityRow(),
         ),
         Expanded(
-          child: _FoodList(
-            svc: widget.svc,
-            query: _searchQuery,
-            onPick: (f) => _addFood(f),
-          ),
+          child: _FoodList(svc: widget.svc, query: _searchQuery, onPick: (f) => _addFood(f)),
         ),
       ],
     );
   }
-  
+
   Widget _buildRecipesTab() {
     return Column(
       children: [
@@ -999,16 +951,12 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
           child: _buildQuantityRow(isRecipe: true),
         ),
         Expanded(
-          child: _RecipeList(
-            svc: widget.svc,
-            query: _searchQuery,
-            onPick: (r) => _addRecipe(r),
-          ),
+          child: _RecipeList(svc: widget.svc, query: _searchQuery, onPick: (r) => _addRecipe(r)),
         ),
       ],
     );
   }
-  
+
   Widget _buildQuantityRow({bool isRecipe = false}) {
     return Row(
       children: [
@@ -1045,19 +993,19 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
       ],
     );
   }
-  
+
   Future<void> _addQuickEntry() async {
     final name = _nameController.text.trim().isEmpty ? 'Quick add' : _nameController.text.trim();
     final kcal = double.tryParse(_kcalController.text) ?? 0;
     final protein = double.tryParse(_proteinController.text) ?? 0;
-    
+
     if (kcal <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las calorías son requeridas')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Las calorías son requeridas')));
       return;
     }
-    
+
     await widget.svc.addEntry(
       widget.dayId,
       IntakeEntry(
@@ -1077,31 +1025,32 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
         },
       ),
     );
-    
+
     if (mounted) Navigator.pop(context);
   }
-  
+
   Future<void> _addFavorite(Favorite f) async {
     final qty = double.tryParse(_qtyController.text) ?? f.defaultQty;
     final unit = _unit;
-    
+
     if (f.type == FavoriteType.food) {
       final foods = await widget.svc.streamFoods().first;
       final food = foods.firstWhere(
         (x) => x.id == f.refId,
-        orElse: () => Food(
-          id: f.refId,
-          name: f.alias ?? 'Alimento',
-          perUnit: unit,
-          unitSize: 100,
-          kcal: 0,
-          protein: 0,
-          carbs: 0,
-          fat: 0,
-          fiber: 0,
-          sodium: 0,
-          isSupplement: false,
-        ),
+        orElse:
+            () => Food(
+              id: f.refId,
+              name: f.alias ?? 'Alimento',
+              perUnit: unit,
+              unitSize: 100,
+              kcal: 0,
+              protein: 0,
+              carbs: 0,
+              fat: 0,
+              fiber: 0,
+              sodium: 0,
+              isSupplement: false,
+            ),
       );
       final mac = food.macrosFor(qty);
       await widget.svc.addEntry(
@@ -1120,12 +1069,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
       final recs = await widget.svc.streamRecipes().first;
       final r = recs.firstWhere(
         (x) => x.id == f.refId,
-        orElse: () => Recipe(
-          id: f.refId,
-          name: 'Receta',
-          servings: 1,
-          ingredients: const [],
-        ),
+        orElse: () => Recipe(id: f.refId, name: 'Receta', servings: 1, ingredients: const []),
       );
       final perServing = _calculatePerServing(r);
       final mac = perServing.map((k, v) => MapEntry(k, v * qty));
@@ -1142,15 +1086,15 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
         ),
       );
     }
-    
+
     if (mounted) Navigator.pop(context);
   }
-  
+
   Future<void> _addFood(Food f) async {
     final qty = double.tryParse(_qtyController.text) ?? f.unitSize;
     final unit = _unit;
     final mac = f.macrosFor(qty);
-    
+
     await widget.svc.addEntry(
       widget.dayId,
       IntakeEntry(
@@ -1163,15 +1107,15 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
         macrosSnapshot: mac,
       ),
     );
-    
+
     if (mounted) Navigator.pop(context);
   }
-  
+
   Future<void> _addRecipe(Recipe r) async {
     final servings = double.tryParse(_qtyController.text) ?? 1;
     final perServing = _calculatePerServing(r);
     final mac = perServing.map((k, v) => MapEntry(k, v * servings));
-    
+
     await widget.svc.addEntry(
       widget.dayId,
       IntakeEntry(
@@ -1184,10 +1128,10 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
         macrosSnapshot: mac,
       ),
     );
-    
+
     if (mounted) Navigator.pop(context);
   }
-  
+
   Map<String, double> _calculatePerServing(Recipe r) {
     final div = r.servings == 0 ? 1 : r.servings;
     return {
@@ -1201,11 +1145,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet> with SingleT
   }
 }
 
- class _ModernGoalsSheet extends StatefulWidget {
+class _ModernGoalsSheet extends StatefulWidget {
   final FoodFirestoreService svc;
-  
+
   const _ModernGoalsSheet({required this.svc});
-  
+
   @override
   State<_ModernGoalsSheet> createState() => _ModernGoalsSheetState();
 }
@@ -1217,21 +1161,19 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
   final _fatController = TextEditingController();
   final _fiberController = TextEditingController();
   final _waterController = TextEditingController();
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -1239,7 +1181,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-                             Center(
+              Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
                   width: 40,
@@ -1250,28 +1192,25 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                   ),
                 ),
               ),
-              
+
               Row(
                 children: [
                   Icon(Icons.flag, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Text(
-                      'Objetivos Nutricionales',
-                      style: AppTypography.heading2(context),
-                    ),
+                    child: Text('Objetivos Nutricionales', style: AppTypography.heading2(context)),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Configura tus objetivos diarios de nutrición',
                 style: AppTypography.body(context),
               ),
-              
+
               const SizedBox(height: AppSpacing.xl),
-              
+
               ModernTextField(
                 label: 'Calorías objetivo (kcal)',
                 hint: '2000',
@@ -1279,9 +1218,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.local_fire_department,
               ),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               ModernTextField(
                 label: 'Proteínas (g)',
                 hint: '150',
@@ -1289,9 +1228,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.fitness_center,
               ),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               ModernTextField(
                 label: 'Carbohidratos (g)',
                 hint: '250',
@@ -1299,9 +1238,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.bakery_dining,
               ),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               ModernTextField(
                 label: 'Grasas (g)',
                 hint: '65',
@@ -1309,9 +1248,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.water_drop,
               ),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               ModernTextField(
                 label: 'Fibra (g)',
                 hint: '30',
@@ -1319,9 +1258,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.eco,
               ),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               ModernTextField(
                 label: 'Agua (ml)',
                 hint: '2000',
@@ -1329,9 +1268,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 keyboardType: TextInputType.number,
                 prefixIcon: Icons.water_drop,
               ),
-              
+
               const SizedBox(height: AppSpacing.xxl),
-              
+
               ModernPrimaryButton(
                 label: 'Guardar Objetivos',
                 icon: Icons.check,
@@ -1345,7 +1284,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
       ),
     );
   }
-  
+
   Future<void> _saveGoals() async {
     await widget.svc.setGlobalTargets(
       kcal: _kcalController.text.isNotEmpty ? double.tryParse(_kcalController.text) : null,
@@ -1355,28 +1294,23 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
       fiber: _fiberController.text.isNotEmpty ? double.tryParse(_fiberController.text) : null,
       waterMl: _waterController.text.isNotEmpty ? int.tryParse(_waterController.text) : null,
     );
-    
+
     if (mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Objetivos guardados correctamente')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Objetivos guardados correctamente')));
     }
   }
 }
 
-   
- class _FavList extends StatelessWidget {
+class _FavList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Favorite> onPick;
-  
-  const _FavList({
-    required this.svc,
-    required this.query,
-    required this.onPick,
-  });
-  
+
+  const _FavList({required this.svc, required this.query, required this.onPick});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Favorite>>(
@@ -1385,13 +1319,13 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
           list = list.where((f) => (f.alias ?? '').toLowerCase().contains(ql)).toList();
         }
-        
+
         if (list.isEmpty) {
           return ModernEmptyState(
             icon: Icons.star_border,
@@ -1399,7 +1333,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
             subtitle: 'Marca alimentos o recetas como favoritos para verlos aquí',
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
@@ -1420,17 +1354,13 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
   }
 }
 
- class _FoodList extends StatelessWidget {
+class _FoodList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Food> onPick;
-  
-  const _FoodList({
-    required this.svc,
-    required this.query,
-    required this.onPick,
-  });
-  
+
+  const _FoodList({required this.svc, required this.query, required this.onPick});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Food>>(
@@ -1439,19 +1369,20 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         final list = snap.data!;
-        
+
         if (list.isEmpty) {
           return ModernEmptyState(
             icon: Icons.restaurant_outlined,
             message: 'No se encontraron alimentos',
-            subtitle: query.isNotEmpty 
-                ? 'Intenta con otro término de búsqueda' 
-                : 'Añade alimentos a tu catálogo',
+            subtitle:
+                query.isNotEmpty
+                    ? 'Intenta con otro término de búsqueda'
+                    : 'Añade alimentos a tu catálogo',
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
@@ -1459,7 +1390,8 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
             final f = list[i];
             return ModernListCard(
               title: f.name,
-              subtitle: '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
+              subtitle:
+                  '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
               leadingIcon: Icons.restaurant,
               leadingColor: f.color ?? AppColors.food,
               trailing: const Icon(Icons.add, color: AppColors.food),
@@ -1472,17 +1404,13 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
   }
 }
 
- class _RecipeList extends StatelessWidget {
+class _RecipeList extends StatelessWidget {
   final FoodFirestoreService svc;
   final String query;
   final ValueChanged<Recipe> onPick;
-  
-  const _RecipeList({
-    required this.svc,
-    required this.query,
-    required this.onPick,
-  });
-  
+
+  const _RecipeList({required this.svc, required this.query, required this.onPick});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Recipe>>(
@@ -1491,32 +1419,34 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        
+
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
           list = list.where((r) => r.name.toLowerCase().contains(ql)).toList();
         }
-        
+
         if (list.isEmpty) {
           return ModernEmptyState(
             icon: Icons.menu_book_outlined,
             message: 'No se encontraron recetas',
-            subtitle: query.isNotEmpty 
-                ? 'Intenta con otro término de búsqueda' 
-                : 'Crea recetas para verlas aquí',
+            subtitle:
+                query.isNotEmpty
+                    ? 'Intenta con otro término de búsqueda'
+                    : 'Crea recetas para verlas aquí',
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: list.length,
           itemBuilder: (_, i) {
             final r = list[i];
-            final macrosText = r.kcal != null 
-                ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
-                : '${r.servings} raciones';
-            
+            final macrosText =
+                r.kcal != null
+                    ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
+                    : '${r.servings} raciones';
+
             return ModernListCard(
               title: r.name,
               subtitle: macrosText,

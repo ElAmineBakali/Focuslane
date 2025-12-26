@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/study_firestore_service.dart';
+import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
 import '../models/study_models.dart';
+import '../services/study_firestore_service.dart';
 
- class TaskEditSheet extends StatefulWidget {
+class TaskEditSheet extends StatefulWidget {
   final StudyFirestoreService svc;
   final StudyTask? initial;
   final String? initialCourseId;
-  
-  const TaskEditSheet({
-    super.key,
-    required this.svc,
-    this.initial,
-    this.initialCourseId,
-  });
+
+  const TaskEditSheet({super.key, required this.svc, this.initial, this.initialCourseId});
 
   @override
   State<TaskEditSheet> createState() => _TaskEditSheetState();
@@ -35,10 +31,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
   void initState() {
     super.initState();
     final task = widget.initial;
-    
+
     _titleController = TextEditingController(text: task?.title ?? '');
     _notesController = TextEditingController(text: task?.notes ?? '');
-    
+
     if (task != null) {
       _courseId = task.courseId;
       _type = task.type;
@@ -60,9 +56,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
   Future<void> _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
     if (_courseId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona un curso')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Selecciona un curso')));
       return;
     }
 
@@ -77,9 +73,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
         priority: _priority,
         status: _status,
         due: _dueDate,
-        notes: _notesController.text.trim().isEmpty
-            ? null
-            : _notesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
       if (widget.initial == null) {
@@ -94,12 +88,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red.shade600,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red.shade600));
       }
     }
   }
@@ -112,35 +103,47 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.2)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 24,
-            right: 24,
-            top: 24,
-          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: StreamBuilder<List<Course>>(
             stream: widget.svc.streamCourses(),
             builder: (context, snapshot) {
               final courses = snapshot.data ?? [];
-              
+
               return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.lg,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                                             Row(
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                          decoration: BoxDecoration(
+                            color: colorScheme.outlineVariant.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                          ),
+                        ),
+                      ),
+
+                      Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                             ),
                             child: Icon(
                               _type == StudyItemType.exam
@@ -150,7 +153,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               size: 28,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,12 +165,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Organiza tus pendientes',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 14,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
+                                  style: AppTypography.caption(context),
                                 ),
                               ],
                             ),
@@ -178,9 +179,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
 
-                                             Text(
+                      const SizedBox(height: AppSpacing.xl),
+
+                      Text(
                         'Curso',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -188,39 +190,36 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
                       if (courses.isEmpty)
                         Text(
                           'No hay cursos disponibles',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: colorScheme.error,
-                          ),
+                          style: GoogleFonts.plusJakartaSans(color: colorScheme.error),
                         )
                       else
                         Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
                           children: courses.map((course) {
                             final isSelected = _courseId == course.id;
                             final courseColor = course.color ?? colorScheme.primary;
-                            
+
                             return InkWell(
                               onTap: () => setState(() => _courseId = course.id),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
+                                  horizontal: AppSpacing.lg,
+                                  vertical: AppSpacing.md,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? courseColor.withOpacity(0.15)
-                                      : colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color:
+                                      isSelected
+                                          ? courseColor.withOpacity(0.14)
+                                          : colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                                   border: Border.all(
-                                    color: isSelected
-                                        ? courseColor
-                                        : Colors.transparent,
+                                    color: isSelected ? courseColor : Colors.transparent,
                                     width: 2,
                                   ),
                                 ),
@@ -235,16 +234,13 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                                         shape: BoxShape.circle,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Text(
                                       course.name,
                                       style: GoogleFonts.plusJakartaSans(
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w500,
-                                        color: isSelected
-                                            ? courseColor
-                                            : colorScheme.onSurface,
+                                        fontWeight:
+                                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                                        color: isSelected ? courseColor : colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -253,12 +249,14 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                             );
                           }).toList(),
                         ),
-                      const SizedBox(height: 20),
 
-                                             _TaskFormTextField(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      ModernTextField(
                         controller: _titleController,
-                        label: 'Título',
-                        icon: Icons.title_rounded,
+                        label: 'Título*',
+                        hint: 'Ej: Entregar ensayo',
+                        prefixIcon: Icons.title_rounded,
                         validator: (value) {
                           if (value?.trim().isEmpty ?? true) {
                             return 'El título es obligatorio';
@@ -266,9 +264,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
 
-                                             Text(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      Text(
                         'Tipo',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -276,7 +275,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
                           Expanded(
@@ -285,24 +284,25 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               label: 'Tarea',
                               isSelected: _type == StudyItemType.task,
                               onTap: () => setState(() => _type = StudyItemType.task),
-                              color: Colors.blue,
+                              color: colorScheme.primary,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: _OptionChip(
                               icon: Icons.edit_note_rounded,
                               label: 'Examen',
                               isSelected: _type == StudyItemType.exam,
                               onTap: () => setState(() => _type = StudyItemType.exam),
-                              color: Colors.red,
+                              color: colorScheme.tertiary,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
 
-                                             Text(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      Text(
                         'Prioridad',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -310,7 +310,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
                           Expanded(
@@ -319,34 +319,35 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               label: 'Baja',
                               isSelected: _priority == Priority.low,
                               onTap: () => setState(() => _priority = Priority.low),
-                              color: Colors.green,
+                              color: colorScheme.tertiary,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: _OptionChip(
                               icon: Icons.drag_handle_rounded,
                               label: 'Normal',
                               isSelected: _priority == Priority.normal,
                               onTap: () => setState(() => _priority = Priority.normal),
-                              color: Colors.orange,
+                              color: colorScheme.primary,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: _OptionChip(
                               icon: Icons.arrow_upward_rounded,
                               label: 'Alta',
                               isSelected: _priority == Priority.high,
                               onTap: () => setState(() => _priority = Priority.high),
-                              color: Colors.red,
+                              color: colorScheme.error,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
 
-                                             Text(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      Text(
                         'Estado',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -354,7 +355,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
                           Expanded(
@@ -363,34 +364,35 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               label: 'Por hacer',
                               isSelected: _status == TaskStatus.todo,
                               onTap: () => setState(() => _status = TaskStatus.todo),
-                              color: Colors.grey,
+                              color: colorScheme.outline,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: _OptionChip(
                               icon: Icons.timelapse_rounded,
                               label: 'En progreso',
                               isSelected: _status == TaskStatus.doing,
                               onTap: () => setState(() => _status = TaskStatus.doing),
-                              color: Colors.blue,
+                              color: colorScheme.secondary,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: _OptionChip(
                               icon: Icons.check_circle_rounded,
                               label: 'Hecha',
                               isSelected: _status == TaskStatus.done,
                               onTap: () => setState(() => _status = TaskStatus.done),
-                              color: Colors.green,
+                              color: colorScheme.primary,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
 
-                                             Text(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      Text(
                         'Fecha límite',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
@@ -398,7 +400,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
                       InkWell(
                         onTap: () async {
                           final now = DateTime.now();
@@ -412,23 +414,20 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                             setState(() => _dueDate = date);
                           }
                         },
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
+                            horizontal: AppSpacing.lg,
+                            vertical: AppSpacing.md,
                           ),
                           decoration: BoxDecoration(
                             color: colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(width: 12),
+                              Icon(Icons.calendar_today_rounded, color: colorScheme.primary),
+                              const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
                                   _dueDate != null
@@ -437,9 +436,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    color: _dueDate != null
-                                        ? colorScheme.onSurface
-                                        : colorScheme.onSurfaceVariant,
+                                    color:
+                                        _dueDate != null
+                                            ? colorScheme.onSurface
+                                            : colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ),
@@ -452,45 +452,46 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
 
-                                             _TaskFormTextField(
+                      const SizedBox(height: AppSpacing.lg),
+
+                      ModernTextField(
                         controller: _notesController,
                         label: 'Notas (opcional)',
-                        icon: Icons.notes_rounded,
+                        hint: 'Especificaciones, enlaces, entregables',
+                        prefixIcon: Icons.notes_rounded,
                         maxLines: 3,
                       ),
-                      const SizedBox(height: 32),
 
-                                             SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: FilledButton(
-                          onPressed: _isSaving ? null : _saveTask,
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                      const SizedBox(height: AppSpacing.xl),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _isSaving ? null : () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                ),
+                              ),
+                              child: const Text('Cancelar'),
                             ),
                           ),
-                          child: _isSaving
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  isEdit ? 'Guardar cambios' : 'Crear tarea',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            flex: 2,
+                            child: ModernPrimaryButton(
+                              label: isEdit ? 'Guardar cambios' : 'Crear tarea',
+                              icon: Icons.check,
+                              fullWidth: true,
+                              isLoading: _isSaving,
+                              onPressed: _isSaving ? null : _saveTask,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -503,71 +504,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
   }
 }
 
- class _TaskFormTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final int? maxLines;
-  final String? Function(String?)? validator;
-
-  const _TaskFormTextField({
-    required this.controller,
-    required this.label,
-    required this.icon,
-    this.maxLines,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines ?? 1,
-      validator: validator,
-      style: GoogleFonts.plusJakartaSans(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
- class _OptionChip extends StatelessWidget {
+class _OptionChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
@@ -585,28 +522,20 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? color.withOpacity(0.15)
-              : colorScheme.surfaceContainerHighest,
+          color: isSelected ? color.withOpacity(0.15) : colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: color, width: 2)
-              : null,
+          border: isSelected ? Border.all(color: color, width: 2) : null,
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? color : colorScheme.onSurfaceVariant,
-              size: 24,
-            ),
+            Icon(icon, color: isSelected ? color : colorScheme.onSurfaceVariant, size: 24),
             const SizedBox(height: 4),
             Text(
               label,

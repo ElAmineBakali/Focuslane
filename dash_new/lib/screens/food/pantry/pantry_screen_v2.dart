@@ -4,7 +4,7 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
- class PantryScreenV2 extends StatefulWidget {
+class PantryScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const PantryScreenV2({super.key, required this.svc});
 
@@ -48,23 +48,26 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
           }
 
           final allItems = snapshot.data!;
-          final items = _showLowStockOnly
-              ? allItems.where((item) {
-                  return item.minQty != null && item.qty <= item.minQty!;
-                }).toList()
-              : allItems;
+          final items =
+              _showLowStockOnly
+                  ? allItems.where((item) {
+                    return item.minQty != null && item.qty <= item.minQty!;
+                  }).toList()
+                  : allItems;
 
-          final lowStockCount = allItems.where((item) {
-            return item.minQty != null && item.qty <= item.minQty!;
-          }).length;
+          final lowStockCount =
+              allItems.where((item) {
+                return item.minQty != null && item.qty <= item.minQty!;
+              }).length;
 
           if (items.isEmpty) {
             return ModernEmptyState(
               icon: _showLowStockOnly ? Icons.check_circle_outline : Icons.kitchen_outlined,
               message: _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
-              subtitle: _showLowStockOnly
-                  ? 'Todos los productos tienen stock suficiente'
-                  : 'Añade productos a tu despensa',
+              subtitle:
+                  _showLowStockOnly
+                      ? 'Todos los productos tienen stock suficiente'
+                      : 'Añade productos a tu despensa',
               actionLabel: _showLowStockOnly ? null : 'Añadir Producto',
               onAction: _showLowStockOnly ? null : () => _editItem(),
             );
@@ -91,7 +94,11 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.onSurface, size: 32),
+                      Icon(
+                        Icons.warning_amber,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 32,
+                      ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
@@ -120,19 +127,15 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                         ),
                         child: Text(
                           'Ver',
-                          style: AppTypography.button(context).copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                          style: AppTypography.button(
+                            context,
+                          ).copyWith(color: Theme.of(context).colorScheme.onSurface),
                         ),
                       ),
                     ],
                   ),
                 ).animate().fadeIn().slideY(begin: -0.2),
-              Expanded(
-                child: _isGridView
-                    ? _buildGridView(items)
-                    : _buildListView(items),
-              ),
+              Expanded(child: _isGridView ? _buildGridView(items) : _buildListView(items)),
             ],
           );
         },
@@ -159,7 +162,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       itemBuilder: (context, index) {
         final item = items[index];
         final isLowStock = item.minQty != null && item.qty <= item.minQty!;
-        
+
         return _PantryCard(
           item: item,
           isLowStock: isLowStock,
@@ -179,7 +182,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       itemBuilder: (context, index) {
         final item = items[index];
         final isLowStock = item.minQty != null && item.qty <= item.minQty!;
-        
+
         return _PantryTile(
           item: item,
           isLowStock: isLowStock,
@@ -195,126 +198,129 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
   Future<void> _editItem({PantryItem? initial, String? id}) async {
     final nameController = TextEditingController(text: initial?.name ?? '');
     final qtyController = TextEditingController(text: (initial?.qty ?? 1).toString());
-    final minQtyController = TextEditingController(
-      text: initial?.minQty?.toString() ?? '',
-    );
+    final minQtyController = TextEditingController(text: initial?.minQty?.toString() ?? '');
     UnitKind unit = initial?.unit ?? UnitKind.unit;
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final colorScheme = Theme.of(context).colorScheme;
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          return Container(
-            decoration: BoxDecoration(
-              color: isDark ? colorScheme.surface : Colors.white,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusXl),
-              ),
-            ),
-            padding: EdgeInsets.only(
-            left: AppSpacing.md,
-            right: AppSpacing.md,
-            top: AppSpacing.md,
-            bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setModalState) {
+              final colorScheme = Theme.of(context).colorScheme;
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppSpacing.radiusXl),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                initial == null ? 'Añadir a Despensa' : 'Editar Producto',
-                style: AppTypography.heading3(context),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ModernTextField(
-                controller: nameController,
-                label: 'Nombre del producto',
-                hint: 'Ej: Arroz, Pasta, Atún...',
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: ModernTextField(
-                      controller: qtyController,
-                      label: 'Cantidad actual',
+                padding: EdgeInsets.only(
+                  left: AppSpacing.md,
+                  right: AppSpacing.md,
+                  top: AppSpacing.md,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color:
+                              isDark
+                                  ? colorScheme.onSurface.withOpacity(0.3)
+                                  : AppColors.borderLight,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      initial == null ? 'Añadir a Despensa' : 'Editar Producto',
+                      style: AppTypography.heading3(context),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ModernTextField(
+                      controller: nameController,
+                      label: 'Nombre del producto',
+                      hint: 'Ej: Arroz, Pasta, Atún...',
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ModernTextField(
+                            controller: qtyController,
+                            label: 'Cantidad actual',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.borderLight),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            ),
+                            child: DropdownButton<UnitKind>(
+                              value: unit,
+                              isExpanded: true,
+                              underline: const SizedBox.shrink(),
+                              items: const [
+                                DropdownMenuItem(value: UnitKind.unit, child: Text('unidades')),
+                                DropdownMenuItem(value: UnitKind.g, child: Text('gramos')),
+                                DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                              ],
+                              onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ModernTextField(
+                      controller: minQtyController,
+                      label: 'Stock mínimo (opcional)',
+                      hint: 'Alerta cuando esté por debajo',
                       keyboardType: TextInputType.number,
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.borderLight),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      ),
-                      child: DropdownButton<UnitKind>(
-                        value: unit,
-                        isExpanded: true,
-                        underline: const SizedBox.shrink(),
-                        items: const [
-                          DropdownMenuItem(value: UnitKind.unit, child: Text('unidades')),
-                          DropdownMenuItem(value: UnitKind.g, child: Text('gramos')),
-                          DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
-                        ],
-                        onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
-                      ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed:
+                                () => Navigator.pop(context, {
+                                  'name': nameController.text,
+                                  'qty': double.tryParse(qtyController.text) ?? 1.0,
+                                  'unit': unit,
+                                  'minQty': double.tryParse(minQtyController.text),
+                                }),
+                            style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                            child: Text(initial == null ? 'Añadir' : 'Guardar'),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ModernTextField(
-                controller: minQtyController,
-                label: 'Stock mínimo (opcional)',
-                hint: 'Alerta cuando esté por debajo',
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancelar'),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(context, {
-                        'name': nameController.text,
-                        'qty': double.tryParse(qtyController.text) ?? 1.0,
-                        'unit': unit,
-                        'minQty': double.tryParse(minQtyController.text),
-                      }),
-                      style: FilledButton.styleFrom(backgroundColor: Colors.brown),
-                      child: Text(initial == null ? 'Añadir' : 'Guardar'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              );
+            },
           ),
-          );
-        },
-      ),
     );
 
     if (result != null) {
@@ -358,40 +364,38 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
 
     final qty = await showDialog<double>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Consumir ${item.name}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Stock actual: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-              style: AppTypography.body(context),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Consumir ${item.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Stock actual: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+                  style: AppTypography.body(context),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                ModernTextField(
+                  controller: controller,
+                  label: 'Cantidad a consumir',
+                  keyboardType: TextInputType.number,
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.md),
-            ModernTextField(
-              controller: controller,
-              label: 'Cantidad a consumir',
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, double.tryParse(controller.text)),
+                style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                child: const Text('Consumir'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, double.tryParse(controller.text)),
-            style: FilledButton.styleFrom(backgroundColor: Colors.brown),
-            child: const Text('Consumir'),
-          ),
-        ],
-      ),
     );
 
     if (qty != null && qty > 0) {
       await widget.svc.consumePantry(item.id, qty);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -406,26 +410,27 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
   Future<void> _deleteItem(PantryItem item) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar producto'),
-        content: Text('¿Seguro que quieres eliminar "${item.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Eliminar producto'),
+            content: Text('¿Seguro que quieres eliminar "${item.name}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
       await widget.svc.deletePantry(item.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -440,114 +445,113 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
 
   void _showItemDetails(PantryItem item) {
     final isLowStock = item.minQty != null && item.qty <= item.minQty!;
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppSpacing.radiusXl),
-          ),
-        ),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-                         Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isLowStock
-                          ? [Colors.amber.shade600, Colors.amber.shade400]
-                          : [Colors.brown.shade600, Colors.brown.shade400],
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.borderLight,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  child: Icon(
-                    isLowStock ? Icons.warning_amber : Icons.kitchen,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    size: 32,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item.name, style: AppTypography.heading3(context)),
-                      if (isLowStock)
-                        Text(
-                          'Stock bajo',
-                          style: AppTypography.caption(context).copyWith(
-                            color: Colors.amber,
-                            fontWeight: FontWeight.bold,
-                          ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors:
+                              isLowStock
+                                  ? [Colors.amber.shade600, Colors.amber.shade400]
+                                  : [Colors.brown.shade600, Colors.brown.shade400],
                         ),
-                    ],
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      ),
+                      child: Icon(
+                        isLowStock ? Icons.warning_amber : Icons.kitchen,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(item.name, style: AppTypography.heading3(context)),
+                          if (isLowStock)
+                            Text(
+                              'Stock bajo',
+                              style: AppTypography.caption(
+                                context,
+                              ).copyWith(color: Colors.amber, fontWeight: FontWeight.bold),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _DetailRow(
+                  icon: Icons.inventory_2,
+                  label: 'Stock actual',
+                  value: '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+                ),
+                if (item.minQty != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  _DetailRow(
+                    icon: Icons.warning_amber_outlined,
+                    label: 'Stock mínimo',
+                    value: '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
                   ),
+                ],
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _consumeItem(item);
+                        },
+                        icon: const Icon(Icons.remove_circle_outline),
+                        label: const Text('Consumir'),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _editItem(initial: item, id: item.id);
+                        },
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Editar'),
+                        style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.lg),
-            _DetailRow(
-              icon: Icons.inventory_2,
-              label: 'Stock actual',
-              value: '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-            ),
-            if (item.minQty != null) ...[
-              const SizedBox(height: AppSpacing.sm),
-              _DetailRow(
-                icon: Icons.warning_amber_outlined,
-                label: 'Stock mínimo',
-                value: '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-              ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _consumeItem(item);
-                    },
-                    icon: const Icon(Icons.remove_circle_outline),
-                    label: const Text('Consumir'),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _editItem(initial: item, id: item.id);
-                    },
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Editar'),
-                    style: FilledButton.styleFrom(backgroundColor: Colors.brown),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -563,7 +567,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
   }
 }
 
- class _PantryCard extends StatelessWidget {
+class _PantryCard extends StatelessWidget {
   final PantryItem item;
   final bool isLowStock;
   final VoidCallback onTap;
@@ -586,9 +590,7 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-            color: (Theme.of(context).brightness == Brightness.dark)
-              ? Theme.of(context).colorScheme.surface
-              : Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(
             color: isLowStock ? Colors.amber : AppColors.borderLight,
@@ -609,9 +611,10 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: isLowStock
-                      ? [Colors.amber.shade600, Colors.amber.shade400]
-                      : [Colors.brown.shade600, Colors.brown.shade400],
+                  colors:
+                      isLowStock
+                          ? [Colors.amber.shade600, Colors.amber.shade400]
+                          : [Colors.brown.shade600, Colors.brown.shade400],
                 ),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppSpacing.radiusLg),
@@ -632,38 +635,39 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                       if (value == 'edit') onEdit();
                       if (value == 'delete') onDelete();
                     },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'consume',
-                        child: Row(
-                          children: [
-                            Icon(Icons.remove_circle_outline, size: 20),
-                            SizedBox(width: AppSpacing.sm),
-                            Text('Consumir'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 20),
-                            SizedBox(width: AppSpacing.sm),
-                            Text('Editar'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 20, color: Colors.red),
-                            SizedBox(width: AppSpacing.sm),
-                            Text('Eliminar', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                      ),
-                    ],
+                    itemBuilder:
+                        (context) => const [
+                          PopupMenuItem(
+                            value: 'consume',
+                            child: Row(
+                              children: [
+                                Icon(Icons.remove_circle_outline, size: 20),
+                                SizedBox(width: AppSpacing.sm),
+                                Text('Consumir'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit, size: 20),
+                                SizedBox(width: AppSpacing.sm),
+                                Text('Editar'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, size: 20, color: Colors.red),
+                                SizedBox(width: AppSpacing.sm),
+                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
                 ],
               ),
@@ -683,25 +687,20 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    if (isLowStock)
-                      ModernBadge(
-                        label: 'STOCK BAJO',
-                        color: AppColors.warning,
-                      ),
+                    if (isLowStock) ModernBadge(label: 'STOCK BAJO', color: AppColors.warning),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-                      style: AppTypography.label(context).copyWith(
-                        color: Colors.brown,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTypography.label(
+                        context,
+                      ).copyWith(color: Colors.brown, fontWeight: FontWeight.bold),
                     ),
                     if (item.minQty != null)
                       Text(
                         'Mín: ${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-                        style: AppTypography.caption(context).copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: AppTypography.caption(
+                          context,
+                        ).copyWith(color: AppColors.textSecondary),
                       ),
                   ],
                 ),
@@ -747,9 +746,7 @@ class _PantryTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: (Theme.of(context).brightness == Brightness.dark)
-            ? Theme.of(context).colorScheme.surface
-            : Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
           color: isLowStock ? Colors.amber : AppColors.borderLight,
@@ -769,17 +766,16 @@ class _PantryTile extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: isLowStock
-                  ? [Colors.amber.shade600, Colors.amber.shade400]
-                  : [Colors.brown.shade600, Colors.brown.shade400],
+              colors:
+                  isLowStock
+                      ? [Colors.amber.shade600, Colors.amber.shade400]
+                      : [Colors.brown.shade600, Colors.brown.shade400],
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Icon(
             isLowStock ? Icons.warning_amber : Icons.kitchen,
-            color: (Theme.of(context).brightness == Brightness.dark)
-              ? Theme.of(context).colorScheme.onSurface
-              : Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         title: Text(item.name, style: AppTypography.body(context)),
@@ -804,38 +800,39 @@ class _PantryTile extends StatelessWidget {
             if (value == 'edit') onEdit();
             if (value == 'delete') onDelete();
           },
-          itemBuilder: (context) => const [
-            PopupMenuItem(
-              value: 'consume',
-              child: Row(
-                children: [
-                  Icon(Icons.remove_circle_outline, size: 20),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Consumir'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [
-                  Icon(Icons.edit, size: 20),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Editar'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Eliminar', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-            ),
-          ],
+          itemBuilder:
+              (context) => const [
+                PopupMenuItem(
+                  value: 'consume',
+                  child: Row(
+                    children: [
+                      Icon(Icons.remove_circle_outline, size: 20),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Consumir'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 20),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Editar'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 20, color: Colors.red),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Eliminar', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
         ),
       ),
     );
@@ -858,11 +855,7 @@ class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _DetailRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _DetailRow({required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -874,10 +867,9 @@ class _DetailRow extends StatelessWidget {
         const Spacer(),
         Text(
           value,
-          style: AppTypography.label(context).copyWith(
-            color: Colors.brown,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.label(
+            context,
+          ).copyWith(color: Colors.brown, fontWeight: FontWeight.bold),
         ),
       ],
     );

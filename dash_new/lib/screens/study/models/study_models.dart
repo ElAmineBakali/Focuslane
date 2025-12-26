@@ -11,10 +11,7 @@ enum StudyMethod { pomodoro, flowtime, timeboxing, custom, simple }
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
-    final v = int.parse(
-      hex.startsWith('0x') ? hex.substring(2) : hex,
-      radix: 16,
-    );
+    final v = int.parse(hex.startsWith('0x') ? hex.substring(2) : hex, radix: 16);
     return Color(v);
   } catch (_) {
     return null;
@@ -31,7 +28,7 @@ class Course {
   final bool isArchived;
   final DateTime? createdAt;
 
-     final double? attendanceRequired;
+  final double? attendanceRequired;
 
   const Course({
     required this.id,
@@ -52,12 +49,11 @@ class Course {
       try {
         if (v == null) return null;
         if (v is DateTime) return v;
-                 try {
+        try {
           if (v.toString().contains('Timestamp')) {
             return v.toDate();
           }
-        } catch (_) {
-                   }
+        } catch (_) {}
         return DateTime.tryParse(v.toString());
       } catch (_) {
         return null;
@@ -73,7 +69,8 @@ class Course {
       goalHours: (m['goalHours'] as num?)?.toDouble(),
       isArchived: m['isArchived'] == true,
       createdAt: parseCreatedAt(m['createdAt']),
-      attendanceRequired: (m['attendanceRequired'] as num?)?.toDouble(),      );
+      attendanceRequired: (m['attendanceRequired'] as num?)?.toDouble(),
+    );
   }
 
   Map<String, dynamic> toMap() => {
@@ -82,8 +79,8 @@ class Course {
     if (teacher != null) 'teacher': teacher,
     if (credits != null) 'credits': credits,
     if (goalHours != null) 'goalHours': goalHours,
-    if (attendanceRequired != null)
-      'attendanceRequired': attendanceRequired,      'isArchived': isArchived,
+    if (attendanceRequired != null) 'attendanceRequired': attendanceRequired,
+    'isArchived': isArchived,
   };
 }
 
@@ -97,8 +94,8 @@ class StudyTask {
   final TaskStatus status;
   final String? notes;
   final DateTime? createdAt;
-  
-     final String? syncedTaskId;
+
+  final String? syncedTaskId;
 
   const StudyTask({
     required this.id,
@@ -162,8 +159,8 @@ class TimerPreset {
   final String id;
   final String name;
   final StudyMethod method;
-  final Map<String, dynamic>
-  params;    final String? courseId;  
+  final Map<String, dynamic> params;
+  final String? courseId;
   const TimerPreset({
     required this.id,
     required this.name,
@@ -198,7 +195,10 @@ class StudySession {
   final String courseId;
   final String? taskId;
   final StudyMethod method;
-  final int minutes;    final int? laps;    final int? cycles;    final Map<String, dynamic> configSnapshot;
+  final int minutes;
+  final int? laps;
+  final int? cycles;
+  final Map<String, dynamic> configSnapshot;
   final String? notes;
   final DateTime date;
 
@@ -238,9 +238,7 @@ class StudySession {
       minutes: (m['minutes'] as num?)?.toInt() ?? 0,
       laps: (m['laps'] as num?)?.toInt(),
       cycles: (m['cycles'] as num?)?.toInt(),
-      configSnapshot: Map<String, dynamic>.from(
-        m['configSnapshot'] ?? const {},
-      ),
+      configSnapshot: Map<String, dynamic>.from(m['configSnapshot'] ?? const {}),
       notes: m['notes'],
       date: parseDate(m['date']),
     );
@@ -259,10 +257,11 @@ class StudySession {
   };
 }
 
- class StudyClassBlock {
+class StudyClassBlock {
   final String id;
   final String courseId;
-  final List<int> daysOfWeek;    final TimeOfDay start;
+  final List<int> daysOfWeek;
+  final TimeOfDay start;
   final TimeOfDay end;
   final String? room;
 
@@ -303,10 +302,12 @@ class StudySession {
   };
 }
 
- class GradeEntry {
+class GradeEntry {
   final String id;
-  final String taskId;    final String courseId;
-  final double grade;    final DateTime date;
+  final String taskId;
+  final String courseId;
+  final double grade;
+  final DateTime date;
   final String? notes;
 
   const GradeEntry({

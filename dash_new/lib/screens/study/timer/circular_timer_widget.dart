@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
- class CircularTimerWidget extends StatefulWidget {
+class CircularTimerWidget extends StatefulWidget {
   final int timeLeft;
   final int totalTime;
   final String phase;
@@ -55,16 +55,12 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
 
   @override
   Widget build(BuildContext context) {
-    final progress = widget.totalTime > 0
-        ? 1.0 - (widget.timeLeft / widget.totalTime)
-        : 0.0;
+    final progress = widget.totalTime > 0 ? 1.0 - (widget.timeLeft / widget.totalTime) : 0.0;
 
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
-        final pulseValue = widget.isRunning
-            ? 1.0 + (_pulseController.value * 0.05)
-            : 1.0;
+        final pulseValue = widget.isRunning ? 1.0 + (_pulseController.value * 0.05) : 1.0;
 
         return Transform.scale(
           scale: pulseValue,
@@ -73,41 +69,37 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
             height: 280,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: widget.isRunning
-                  ? [
-                      BoxShadow(
-                        color: widget.color.withOpacity(0.4),
-                        blurRadius: 30,
-                        spreadRadius: 10,
-                      ),
-                    ]
-                  : [],
+              boxShadow:
+                  widget.isRunning
+                      ? [
+                        BoxShadow(
+                          color: widget.color.withOpacity(0.4),
+                          blurRadius: 30,
+                          spreadRadius: 10,
+                        ),
+                      ]
+                      : [],
             ),
             child: Stack(
               alignment: Alignment.center,
               children: [
-                                 Container(
+                Container(
                   width: 280,
                   height: 280,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   ),
                 ),
-                                 CustomPaint(
+                CustomPaint(
                   size: const Size(280, 280),
                   painter: _CircularProgressPainter(
                     progress: progress,
                     color: widget.color,
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                 ),
-                                 Column(
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
@@ -121,10 +113,7 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                     ).animate(key: ValueKey(widget.timeLeft)).fadeIn(),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
                         color: widget.color.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(20),
@@ -166,24 +155,23 @@ class _CircularProgressPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width / 2) - 10;
 
-         final backgroundPaint = Paint()
-      ..color = backgroundColor.withOpacity(0.3)
-      ..strokeWidth = 12
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final backgroundPaint =
+        Paint()
+          ..color = backgroundColor.withOpacity(0.3)
+          ..strokeWidth = 12
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, backgroundPaint);
 
-         final progressPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          color,
-          color.withOpacity(0.6),
-        ],
-      ).createShader(Rect.fromCircle(center: center, radius: radius))
-      ..strokeWidth = 12
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final progressPaint =
+        Paint()
+          ..shader = LinearGradient(
+            colors: [color, color.withOpacity(0.6)],
+          ).createShader(Rect.fromCircle(center: center, radius: radius))
+          ..strokeWidth = 12
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
     final sweepAngle = 2 * math.pi * progress;
     canvas.drawArc(
@@ -194,10 +182,11 @@ class _CircularProgressPainter extends CustomPainter {
       progressPaint,
     );
 
-         if (progress > 0 && progress < 1) {
-      final glowPaint = Paint()
-        ..color = color.withOpacity(0.6)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    if (progress > 0 && progress < 1) {
+      final glowPaint =
+          Paint()
+            ..color = color.withOpacity(0.6)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
 
       final angle = -math.pi / 2 + sweepAngle;
       final glowX = center.dx + radius * math.cos(angle);

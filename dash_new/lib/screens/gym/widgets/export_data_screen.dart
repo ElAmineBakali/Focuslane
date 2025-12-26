@@ -49,7 +49,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
           backgroundColor: Colors.green,
           content: Row(
             children: [
-              const Icon(Icons.check_circle, color: Colors.white),
+              const Icon(Icons.check_circle),
               const SizedBox(width: 8),
               Text(
                 'Datos copiados al portapapeles',

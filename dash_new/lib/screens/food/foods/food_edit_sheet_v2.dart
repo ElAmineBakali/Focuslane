@@ -4,10 +4,10 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
- class FoodEditSheet extends StatefulWidget {
+class FoodEditSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   final Food? initial;
-  
+
   const FoodEditSheet({super.key, required this.svc, this.initial});
 
   @override
@@ -25,18 +25,18 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
   final _fatController = TextEditingController(text: '0');
   final _fiberController = TextEditingController(text: '0');
   final _sodiumController = TextEditingController(text: '0');
-  
+
   UnitKind _perUnit = UnitKind.g;
   bool _isSupplement = false;
   bool _isSaving = false;
-  
+
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     final f = widget.initial;
     if (f != null) {
       _nameController.text = f.name;
@@ -58,15 +58,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
     final isEdit = widget.initial != null;
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SafeArea(
         child: Form(
           key: _formKey,
@@ -119,7 +117,8 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               TabBar(
                 controller: _tabController,
                 labelColor: colorScheme.primary,
-                unselectedLabelColor: isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+                unselectedLabelColor:
+                    isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
                 indicatorColor: colorScheme.primary,
                 tabs: const [
                   Tab(icon: Icon(Icons.info), text: 'Información'),
@@ -131,10 +130,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 height: 500,
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
-                    _buildInfoTab(colorScheme, isDark),
-                    _buildNutritionTab(),
-                  ],
+                  children: [_buildInfoTab(colorScheme, isDark), _buildNutritionTab()],
                 ),
               ),
 
@@ -177,7 +173,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
       ),
     );
   }
-  
+
   Widget _buildInfoTab(ColorScheme colorScheme, bool isDark) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -191,18 +187,18 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
             prefixIcon: Icons.restaurant,
             validator: (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
           ),
-          
+
           const SizedBox(height: AppSpacing.lg),
-          
+
           ModernTextField(
             label: 'Marca',
             hint: 'Opcional',
             controller: _brandController,
             prefixIcon: Icons.business,
           ),
-          
+
           const SizedBox(height: AppSpacing.lg),
-          
+
           Text('Tamaño de porción', style: AppTypography.label(context)),
           const SizedBox(height: AppSpacing.sm),
           Row(
@@ -242,9 +238,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               ),
             ],
           ),
-          
+
           const SizedBox(height: AppSpacing.xl),
-          
+
           Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
@@ -265,25 +261,22 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
       ),
     );
   }
-  
+
   Widget _buildNutritionTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Información nutricional',
-            style: AppTypography.heading3(context),
-          ),
+          Text('Información nutricional', style: AppTypography.heading3(context)),
           Text(
             'Por ${_unitSizeController.text.isEmpty ? "100" : _unitSizeController.text}${_perUnit.name}',
             style: AppTypography.caption(context),
           ),
-          
+
           const SizedBox(height: AppSpacing.xl),
-          
-                     Container(
+
+          Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               gradient: AppColors.foodGradient,
@@ -294,11 +287,18 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               children: [
                 Row(
                   children: [
-                    Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.onPrimary, size: 24),
+                    Icon(
+                      Icons.local_fire_department,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      size: 24,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Calorías',
-                      style: AppTypography.heading4(context, color: Theme.of(context).colorScheme.onPrimary),
+                      style: AppTypography.heading4(
+                        context,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -314,12 +314,12 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               ],
             ),
           ),
-          
+
           const SizedBox(height: AppSpacing.xl),
 
           Text('Macronutrientes (gramos)', style: AppTypography.label(context)),
           const SizedBox(height: AppSpacing.md),
-          
+
           Row(
             children: [
               Expanded(
@@ -341,9 +341,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               ),
             ],
           ),
-          
+
           const SizedBox(height: AppSpacing.lg),
-          
+
           Row(
             children: [
               Expanded(
@@ -365,9 +365,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               ),
             ],
           ),
-          
+
           const SizedBox(height: AppSpacing.xl),
-          
+
           ModernTextField(
             label: 'Sodio (mg)',
             hint: '0',
@@ -379,12 +379,12 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
       ),
     );
   }
-  
+
   Future<void> _saveFood() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isSaving = true);
-    
+
     try {
       final food = Food(
         id: widget.initial?.id ?? '',
@@ -400,13 +400,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
         sodium: double.tryParse(_sodiumController.text) ?? 0,
         isSupplement: _isSupplement,
       );
-      
+
       if (widget.initial == null) {
         await widget.svc.createFood(food);
       } else {
         await widget.svc.updateFood(widget.initial!.id, food.toMap());
       }
-      
+
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -417,7 +417,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    widget.initial == null 
+                    widget.initial == null
                         ? 'Alimento creado correctamente'
                         : 'Alimento actualizado correctamente',
                     style: const TextStyle(fontWeight: FontWeight.w500),
@@ -466,14 +466,14 @@ class _MacroField extends StatelessWidget {
   final TextEditingController controller;
   final Color color;
   final IconData icon;
-  
+
   const _MacroField({
     required this.label,
     required this.controller,
     required this.color,
     required this.icon,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -483,10 +483,7 @@ class _MacroField extends StatelessWidget {
           children: [
             Icon(icon, size: 16, color: color),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: AppTypography.caption(context, color: color),
-            ),
+            Text(label, style: AppTypography.caption(context, color: color)),
           ],
         ),
         const SizedBox(height: 4),

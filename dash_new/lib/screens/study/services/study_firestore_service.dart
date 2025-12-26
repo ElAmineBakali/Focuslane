@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/study_models.dart';
 
-  class StudyFirestoreService {
+class StudyFirestoreService {
   final String _fallbackUserId;
   StudyFirestoreService([this._fallbackUserId = '']);
 
@@ -12,27 +12,17 @@ import '../models/study_models.dart';
     return _fallbackUserId.isNotEmpty ? _fallbackUserId : 'local';
   }
 
-  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore
-      .instance
-      .collection('users')
-      .doc(_uid)
-      .collection('study')
-      .doc('root');
+  DocumentReference<Map<String, dynamic>> get _root =>
+      FirebaseFirestore.instance.collection('users').doc(_uid).collection('study').doc('root');
 
-     Stream<List<Course>> streamCourses({bool includeArchived = false}) {
+  Stream<List<Course>> streamCourses({bool includeArchived = false}) {
     Query q = _root.collection('courses');
     if (!includeArchived) q = q.where('isArchived', isEqualTo: false);
     return q
         .orderBy('name')
         .snapshots()
         .map(
-          (s) =>
-              s.docs
-                  .map(
-                    (d) =>
-                        Course.fromMap(d.id, d.data() as Map<String, dynamic>),
-                  )
-                  .toList(),
+          (s) => s.docs.map((d) => Course.fromMap(d.id, d.data() as Map<String, dynamic>)).toList(),
         );
   }
 
@@ -50,7 +40,7 @@ import '../models/study_models.dart';
     await _root.collection('courses').doc(id).delete();
   }
 
-     Stream<List<StudyTask>> streamTasks({
+  Stream<List<StudyTask>> streamTasks({
     String? courseId,
     TaskStatus? status,
     bool highPriorityOnly = false,
@@ -58,8 +48,8 @@ import '../models/study_models.dart';
     DateTime? to,
   }) {
     Query q = _root.collection('tasks');
-    
-         if (courseId != null) {
+
+    if (courseId != null) {
       q = q.where('courseId', isEqualTo: courseId);
     }
     if (status != null) {
@@ -76,16 +66,19 @@ import '../models/study_models.dart';
     }
 
     return q.snapshots().map((s) {
-      var list = s.docs
-          .map((d) => StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>))
-          .toList();
-      
-             list.sort((a, b) {
-        final ad = a.due?.millisecondsSinceEpoch ?? DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
-        final bd = b.due?.millisecondsSinceEpoch ?? DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
+      var list =
+          s.docs.map((d) => StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>)).toList();
+
+      list.sort((a, b) {
+        final ad =
+            a.due?.millisecondsSinceEpoch ??
+            DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
+        final bd =
+            b.due?.millisecondsSinceEpoch ??
+            DateTime.now().add(Duration(days: 9999)).millisecondsSinceEpoch;
         return ad.compareTo(bd);
       });
-      
+
       return list;
     });
   }
@@ -104,7 +97,7 @@ import '../models/study_models.dart';
     await _root.collection('tasks').doc(id).delete();
   }
 
-     Stream<List<TimerPreset>> streamPresets({String? courseId}) {
+  Stream<List<TimerPreset>> streamPresets({String? courseId}) {
     Query q = _root.collection('presets');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q
@@ -113,12 +106,7 @@ import '../models/study_models.dart';
         .map(
           (s) =>
               s.docs
-                  .map(
-                    (d) => TimerPreset.fromMap(
-                      d.id,
-                      d.data() as Map<String, dynamic>,
-                    ),
-                  )
+                  .map((d) => TimerPreset.fromMap(d.id, d.data() as Map<String, dynamic>))
                   .toList(),
         );
   }
@@ -133,25 +121,12 @@ import '../models/study_models.dart';
     await _root.collection('presets').doc(id).delete();
   }
 
-     Stream<List<StudySession>> streamSessions({
-    String? courseId,
-    int limit = 100,
-  }) {
-    Query q = _root
-        .collection('sessions')
-        .orderBy('date', descending: true)
-        .limit(limit);
+  Stream<List<StudySession>> streamSessions({String? courseId, int limit = 100}) {
+    Query q = _root.collection('sessions').orderBy('date', descending: true).limit(limit);
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
       (s) =>
-          s.docs
-              .map(
-                (d) => StudySession.fromMap(
-                  d.id,
-                  d.data() as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+          s.docs.map((d) => StudySession.fromMap(d.id, d.data() as Map<String, dynamic>)).toList(),
     );
   }
 
@@ -160,18 +135,13 @@ import '../models/study_models.dart';
     await doc.set(s.toMap());
   }
 
-     Stream<List<StudyClassBlock>> streamSchedule({String? courseId}) {
+  Stream<List<StudyClassBlock>> streamSchedule({String? courseId}) {
     Query q = _root.collection('schedule');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
       (s) =>
           s.docs
-              .map(
-                (d) => StudyClassBlock.fromMap(
-                  d.id,
-                  d.data() as Map<String, dynamic>,
-                ),
-              )
+              .map((d) => StudyClassBlock.fromMap(d.id, d.data() as Map<String, dynamic>))
               .toList(),
     );
   }
@@ -190,7 +160,7 @@ import '../models/study_models.dart';
     await _root.collection('schedule').doc(id).delete();
   }
 
-     Stream<List<GradeEntry>> streamGrades({String? courseId}) {
+  Stream<List<GradeEntry>> streamGrades({String? courseId}) {
     Query q = _root.collection('grades');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q
@@ -199,12 +169,7 @@ import '../models/study_models.dart';
         .map(
           (s) =>
               s.docs
-                  .map(
-                    (d) => GradeEntry.fromMap(
-                      d.id,
-                      d.data() as Map<String, dynamic>,
-                    ),
-                  )
+                  .map((d) => GradeEntry.fromMap(d.id, d.data() as Map<String, dynamic>))
                   .toList(),
         );
   }
@@ -223,7 +188,7 @@ import '../models/study_models.dart';
     await _root.collection('grades').doc(id).delete();
   }
 
-        Stream<Map<String, String>> streamAttendanceMap(String courseId) {
+  Stream<Map<String, String>> streamAttendanceMap(String courseId) {
     return _root
         .collection('attendance')
         .doc(courseId)
@@ -234,20 +199,17 @@ import '../models/study_models.dart';
   Future<void> setAttendance({
     required String courseId,
     required DateTime day,
-    required String status,    }) async {
+    required String status,
+  }) async {
     final key =
         '${day.year.toString().padLeft(4, '0')}-'
         '${day.month.toString().padLeft(2, '0')}-'
         '${day.day.toString().padLeft(2, '0')}';
 
-    await _root.collection('attendance').doc(courseId).set({
-      key: status,
-    }, SetOptions(merge: true));
+    await _root.collection('attendance').doc(courseId).set({key: status}, SetOptions(merge: true));
   }
 
   Future<void> setAttendanceRequired(String courseId, double percent) async {
-    await _root.collection('courses').doc(courseId).update({
-      'attendanceRequired': percent,
-    });
+    await _root.collection('courses').doc(courseId).update({'attendanceRequired': percent});
   }
 }

@@ -517,7 +517,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             backgroundColor: Colors.green,
             content: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
+                const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
                 Text(
                   '✅ Rutina "${routine.name}" creada',

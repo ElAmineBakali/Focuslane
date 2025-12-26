@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/study_models.dart';
 
- class StudyTasksSyncService {
+class StudyTasksSyncService {
   final String _fallbackUserId;
   StudyTasksSyncService([this._fallbackUserId = '']);
 
@@ -20,33 +20,25 @@ import '../models/study_models.dart';
   DocumentReference<Map<String, dynamic>> get _tasksRoot =>
       _db.collection('users').doc(_uid).collection('tasks').doc('root');
 
-     Future<void> syncTaskStatusToTasks(
-    String? syncedTaskId,
-    TaskStatus newStatus,
-  ) async {
+  Future<void> syncTaskStatusToTasks(String? syncedTaskId, TaskStatus newStatus) async {
     if (syncedTaskId == null || syncedTaskId.isEmpty) return;
     try {
       await _tasksRoot.collection('items').doc(syncedTaskId).update({
         'completed': newStatus == TaskStatus.done,
       });
-    } catch (_) {
-           }
+    } catch (_) {}
   }
 
-     Future<void> syncTaskStatusToStudy(
-    String? syncedStudyTaskId,
-    bool completed,
-  ) async {
+  Future<void> syncTaskStatusToStudy(String? syncedStudyTaskId, bool completed) async {
     if (syncedStudyTaskId == null || syncedStudyTaskId.isEmpty) return;
     try {
       await _studyRoot.collection('tasks').doc(syncedStudyTaskId).update({
         'status': completed ? TaskStatus.done.name : TaskStatus.todo.name,
       });
-    } catch (_) {
-           }
+    } catch (_) {}
   }
 
-     Future<void> syncStudyTaskDataToTasks(
+  Future<void> syncStudyTaskDataToTasks(
     String? syncedTaskId,
     String? title,
     String? notes,
@@ -63,15 +55,12 @@ import '../models/study_models.dart';
         updateMap['priority'] = _studyPriorityToTaskPriorityLabel(priority);
       }
       if (updateMap.isNotEmpty) {
-        await _tasksRoot.collection('items').doc(syncedTaskId).update(
-          updateMap,
-        );
+        await _tasksRoot.collection('items').doc(syncedTaskId).update(updateMap);
       }
-    } catch (_) {
-           }
+    } catch (_) {}
   }
 
-     Future<void> syncTaskDataToStudy(
+  Future<void> syncTaskDataToStudy(
     String? syncedStudyTaskId,
     String? title,
     String? description,
@@ -85,19 +74,14 @@ import '../models/study_models.dart';
       if (description != null) updateMap['notes'] = description;
       if (dueDate != null) updateMap['due'] = dueDate.toIso8601String();
       if (priorityLabel != null) {
-        updateMap['priority'] = _taskPriorityLabelToStudyPriority(priorityLabel)
-            .name;
+        updateMap['priority'] = _taskPriorityLabelToStudyPriority(priorityLabel).name;
       }
       if (updateMap.isNotEmpty) {
-        await _studyRoot.collection('tasks').doc(syncedStudyTaskId).update(
-          updateMap,
-        );
+        await _studyRoot.collection('tasks').doc(syncedStudyTaskId).update(updateMap);
       }
-    } catch (_) {
-           }
+    } catch (_) {}
   }
 
-   
   String _studyPriorityToTaskPriorityLabel(Priority priority) {
     switch (priority) {
       case Priority.high:
