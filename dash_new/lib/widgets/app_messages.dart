@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
 
 class AppMessages {

@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -14,7 +14,8 @@ class HabitStatsScreen extends StatefulWidget {
 }
 
 class _HabitStatsScreenState extends State<HabitStatsScreen> {
-  late Habit _habit;    late DateTime _focusedDay;
+  late Habit _habit;
+  late DateTime _focusedDay;
 
   @override
   void initState() {
@@ -23,7 +24,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     _focusedDay = DateTime.now();
   }
 
-     Map<String, dynamic> _getDailyStats() {
+  Map<String, dynamic> _getDailyStats() {
     final now = DateTime.now();
     final days = List.generate(
       7,
@@ -35,7 +36,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     );
     final labels = days.map((d) => DateFormat('yyyy-MM-dd').format(d)).toList();
 
-         final raw = <double>[];
+    final raw = <double>[];
     for (final k in labels) {
       final v = _habit.history[k];
       if (v == null) {
@@ -47,7 +48,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
       }
     }
 
-         double maxVal = 1;
+    double maxVal = 1;
     if (_habit.isQuantitative) {
       maxVal = raw.fold<double>(0, (m, e) => e > m ? e : m);
       if (maxVal <= 0) maxVal = 1;
@@ -64,7 +65,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
   }
 
   Map<String, dynamic> _getMonthlyStats() {
-         final now = DateTime.now();
+    final now = DateTime.now();
     final months = List.generate(12, (i) {
       final d = DateTime(now.year, now.month - (11 - i), 1);
       return DateTime(d.year, d.month, 1);
@@ -80,7 +81,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
         m.month + 1,
         1,
       ).subtract(const Duration(days: 1));
-             final entries =
+      final entries =
           _habit.history.entries.where((e) {
             final dt = DateTime.tryParse(e.key);
             return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
@@ -100,9 +101,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
       } else {
         final total = entries.length.toDouble();
         final ok = entries.where((e) => e.value == '✔️').length.toDouble();
-        vals.add(
-          total == 0 ? 0 : (ok / total) * 100,
-        );        }
+        vals.add(total == 0 ? 0 : (ok / total) * 100);
+      }
     }
 
     return {
@@ -115,7 +115,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
 
   Future<void> _saveDayValue({
     required DateTime day,
-    required dynamic newValue,    }) async {
+    required dynamic newValue,
+  }) async {
     final key = DateFormat('yyyy-MM-dd').format(day);
 
     await HabitFirestoreService().updateHabitHistory(
@@ -139,7 +140,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     final daily = _getDailyStats();
     final monthly = _getMonthlyStats();
 
-         int currentStreak = 0, maxStreak = 0, tempStreak = 0;
+    int currentStreak = 0, maxStreak = 0, tempStreak = 0;
     final sortedKeys = _habit.history.keys.toList()..sort();
     for (final k in sortedKeys) {
       final v = _habit.history[k];
@@ -178,7 +179,6 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
             : _habit.history.values.where((v) => v == '✔️').length;
     final porcentaje = total == 0 ? 0 : (completados / total * 100).round();
 
-               
     return Scaffold(
       appBar: AppBar(title: Text('Estadísticas')),
       body: SingleChildScrollView(
@@ -186,7 +186,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-                         ListTile(
+            ListTile(
               title: Text(
                 _habit.name,
                 style: theme.textTheme.titleLarge?.copyWith(
@@ -206,7 +206,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
               ),
             ),
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Wrap(
                 spacing: 12,
@@ -239,7 +239,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
 
             const SizedBox(height: 8),
 
-                         if (_habit.isQuantitative) ...[
+            if (_habit.isQuantitative) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -255,7 +255,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
               const SizedBox(height: 16),
             ],
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
@@ -342,7 +342,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
 
             const SizedBox(height: 16),
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 _habit.isQuantitative
@@ -370,7 +370,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                               final m = labels[idx];
                               return Padding(
                                 padding: const EdgeInsets.only(top: 6),
-                                child: Text(m.substring(2)),                                );
+                                child: Text(m.substring(2)),
+                              );
                             }
                             return const SizedBox();
                           },
@@ -416,7 +417,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
 
             const SizedBox(height: 16),
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text('Calendario', style: theme.textTheme.titleMedium),
             ),
@@ -522,7 +523,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
 
             const SizedBox(height: 16),
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +592,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
   }
 }
 
- class _StatCard extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
@@ -608,7 +609,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        width: 150,          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        width: 150,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -633,8 +635,9 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
   }
 }
 
- class _EditHabitDayDialog extends StatefulWidget {
-  final String date;    final String? value;
+class _EditHabitDayDialog extends StatefulWidget {
+  final String date;
+  final String? value;
   final bool isQuantitative;
   final Function(dynamic) onSave;
 
@@ -718,7 +721,7 @@ class _EditHabitDayDialogState extends State<_EditHabitDayDialog> {
   }
 }
 
- class _QuantitativeAnalytics extends StatelessWidget {
+class _QuantitativeAnalytics extends StatelessWidget {
   final Habit habit;
   const _QuantitativeAnalytics({required this.habit});
 
@@ -726,21 +729,21 @@ class _EditHabitDayDialogState extends State<_EditHabitDayDialog> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
 
-         final weekStart = now.subtract(Duration(days: now.weekday - 1));
+    final weekStart = now.subtract(Duration(days: now.weekday - 1));
     final weekEnd = weekStart.add(
       const Duration(days: 6, hours: 23, minutes: 59),
     );
     final weekData = _filterAndSum(habit.history, weekStart, weekEnd);
 
-         final monthStart = DateTime(now.year, now.month, 1);
+    final monthStart = DateTime(now.year, now.month, 1);
     final monthEnd = DateTime(now.year, now.month + 1, 0, 23, 59);
     final monthData = _filterAndSum(habit.history, monthStart, monthEnd);
 
-         final yearStart = DateTime(now.year, 1, 1);
+    final yearStart = DateTime(now.year, 1, 1);
     final yearEnd = DateTime(now.year, 12, 31, 23, 59);
     final yearData = _filterAndSum(habit.history, yearStart, yearEnd);
 
-         final prevMonthStart = DateTime(now.year, now.month - 1, 1);
+    final prevMonthStart = DateTime(now.year, now.month - 1, 1);
     final prevMonthEnd = DateTime(now.year, now.month, 0, 23, 59);
     final prevMonthData = _filterAndSum(
       habit.history,

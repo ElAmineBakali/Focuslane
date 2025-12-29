@@ -11,7 +11,10 @@ enum StudyMethod { pomodoro, flowtime, timeboxing, custom, simple }
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
-    final v = int.parse(hex.startsWith('0x') ? hex.substring(2) : hex, radix: 16);
+    final v = int.parse(
+      hex.startsWith('0x') ? hex.substring(2) : hex,
+      radix: 16,
+    );
     return Color(v);
   } catch (_) {
     return null;
@@ -238,7 +241,9 @@ class StudySession {
       minutes: (m['minutes'] as num?)?.toInt() ?? 0,
       laps: (m['laps'] as num?)?.toInt(),
       cycles: (m['cycles'] as num?)?.toInt(),
-      configSnapshot: Map<String, dynamic>.from(m['configSnapshot'] ?? const {}),
+      configSnapshot: Map<String, dynamic>.from(
+        m['configSnapshot'] ?? const {},
+      ),
       notes: m['notes'],
       date: parseDate(m['date']),
     );

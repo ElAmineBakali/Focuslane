@@ -8,7 +8,7 @@ import '../session/session_history_screen.dart';
 import 'exercise_progress_screen.dart';
 import 'package:intl/intl.dart';
 
- class GymAnalyticsScreenV2 extends StatefulWidget {
+class GymAnalyticsScreenV2 extends StatefulWidget {
   final GymFirestoreService svc;
 
   const GymAnalyticsScreenV2({super.key, required this.svc});
@@ -20,7 +20,7 @@ import 'package:intl/intl.dart';
 class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedPeriod = '7';  
+  String _selectedPeriod = '7';
   @override
   void initState() {
     super.initState();
@@ -46,7 +46,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-                     SliverAppBar(
+          SliverAppBar(
             expandedHeight: 160,
             pinned: true,
             backgroundColor: colorScheme.primaryContainer,
@@ -64,7 +64,10 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer.withOpacity(0.8)],
+                    colors: [
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withOpacity(0.8),
+                    ],
                   ),
                 ),
                 child: SafeArea(
@@ -79,7 +82,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               ),
             ),
             actions: [
-                             IconButton(
+              IconButton(
                 icon: const Icon(Icons.history_rounded),
                 tooltip: 'Ver historial completo',
                 onPressed: () {
@@ -91,7 +94,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   );
                 },
               ),
-                             PopupMenuButton<String>(
+              PopupMenuButton<String>(
                 initialValue: _selectedPeriod,
                 icon: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -104,11 +107,21 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   ],
                 ),
                 onSelected: (value) => setState(() => _selectedPeriod = value),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(value: '7', child: Text('Últimos 7 días')),
-                  const PopupMenuItem(value: '30', child: Text('Último mes')),
-                  const PopupMenuItem(value: '90', child: Text('Últimos 90 días')),
-                ],
+                itemBuilder:
+                    (context) => [
+                      const PopupMenuItem(
+                        value: '7',
+                        child: Text('Últimos 7 días'),
+                      ),
+                      const PopupMenuItem(
+                        value: '30',
+                        child: Text('Último mes'),
+                      ),
+                      const PopupMenuItem(
+                        value: '90',
+                        child: Text('Últimos 90 días'),
+                      ),
+                    ],
               ),
             ],
             bottom: TabBar(
@@ -123,7 +136,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
 
-                     SliverFillRemaining(
+          SliverFillRemaining(
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -152,7 +165,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     }
   }
 
-           Widget _buildOverviewTab() {
+  Widget _buildOverviewTab() {
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.svc.getStatsForDateRange(_startDate, DateTime.now()),
       builder: (context, snap) {
@@ -170,7 +183,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                             _buildSectionTitle('Métricas Principales'),
+              _buildSectionTitle('Métricas Principales'),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -218,7 +231,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-                             _buildSectionTitle('Volumen Semanal'),
+              _buildSectionTitle('Volumen Semanal'),
               const SizedBox(height: 24),
               SizedBox(
                 height: 300,
@@ -227,7 +240,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-                             _buildSectionTitle('Grupos Musculares'),
+              _buildSectionTitle('Grupos Musculares'),
               const SizedBox(height: 24),
               SizedBox(
                 height: 300,
@@ -240,7 +253,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-           Widget _buildTrainingTab() {
+  Widget _buildTrainingTab() {
     return StreamBuilder<List<SessionDoc>>(
       stream: widget.svc.streamSessions(limit: 90),
       builder: (context, snap) {
@@ -251,19 +264,21 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           return _buildEmptyState('No hay sesiones en este periodo');
         }
 
-                 final routineFreq = <String, int>{};
+        final routineFreq = <String, int>{};
         for (final s in sessions) {
           routineFreq[s.routineName] = (routineFreq[s.routineName] ?? 0) + 1;
         }
 
-                 final exerciseVolume = <String, double>{};
+        final exerciseVolume = <String, double>{};
         for (final s in sessions) {
           for (final ex in s.exercises) {
-            exerciseVolume[ex.name] = (exerciseVolume[ex.name] ?? 0) + ex.volumeKg;
+            exerciseVolume[ex.name] =
+                (exerciseVolume[ex.name] ?? 0) + ex.volumeKg;
           }
         }
-        final topExercises = exerciseVolume.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+        final topExercises =
+            exerciseVolume.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -273,8 +288,14 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               _buildSectionTitle('Frecuencia por Rutina'),
               const SizedBox(height: 12),
               ...routineFreq.entries.map((e) {
-                final percentage = (e.value / sessions.length * 100).toStringAsFixed(0);
-                return _buildProgressRow(e.key, e.value, percentage, Colors.blue);
+                final percentage = (e.value / sessions.length * 100)
+                    .toStringAsFixed(0);
+                return _buildProgressRow(
+                  e.key,
+                  e.value,
+                  percentage,
+                  Colors.blue,
+                );
               }),
 
               const SizedBox(height: 24),
@@ -291,7 +312,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-           Widget _buildPhysicalTab() {
+  Widget _buildPhysicalTab() {
     return StreamBuilder<List<BodyWeightEntry>>(
       stream: widget.svc.streamBodyWeight(limit: 180),
       builder: (context, snap) {
@@ -303,7 +324,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                             if (weights.isNotEmpty) ...[
+              if (weights.isNotEmpty) ...[
                 Row(
                   children: [
                     Expanded(
@@ -322,7 +343,8 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                             ? '${(weights.last.weight - weights.first.weight) >= 0 ? '+' : ''}${(weights.last.weight - weights.first.weight).toStringAsFixed(1)} kg'
                             : '0.0 kg',
                         Icons.trending_up,
-                        (weights.length > 1 && weights.last.weight >= weights.first.weight)
+                        (weights.length > 1 &&
+                                weights.last.weight >= weights.first.weight)
                             ? Colors.green
                             : Colors.red,
                       ),
@@ -342,49 +364,54 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
               const SizedBox(height: 24),
 
-                             _buildSectionTitle('Medidas Corporales'),
+              _buildSectionTitle('Medidas Corporales'),
               const SizedBox(height: 12),
               StreamBuilder<List<MeasurementEntry>>(
                 stream: widget.svc.streamMeasurements(limit: 90),
                 builder: (context, mSnap) {
-                  final measurements = (mSnap.data ?? [])
-                      .where((m) => m.date.isAfter(_startDate))
-                      .toList();
+                  final measurements =
+                      (mSnap.data ?? [])
+                          .where((m) => m.date.isAfter(_startDate))
+                          .toList();
 
                   if (measurements.isEmpty) {
                     return _buildEmptyState('No hay medidas registradas');
                   }
 
-                                     final byMuscle = <String, List<MeasurementEntry>>{};
+                  final byMuscle = <String, List<MeasurementEntry>>{};
                   for (final m in measurements) {
                     byMuscle.putIfAbsent(m.muscle, () => []).add(m);
                   }
 
                   return Column(
-                    children: byMuscle.entries.map((e) {
-                      final latest = e.value.last.valueCm;
-                      final first = e.value.first.valueCm;
-                      final delta = latest - first;
-                      return _buildMeasurementRow(
-                        e.key,
-                        latest,
-                        delta,
-                        delta >= 0 ? Colors.green : Colors.red,
-                      );
-                    }).toList(),
+                    children:
+                        byMuscle.entries.map((e) {
+                          final latest = e.value.last.valueCm;
+                          final first = e.value.first.valueCm;
+                          final delta = latest - first;
+                          return _buildMeasurementRow(
+                            e.key,
+                            latest,
+                            delta,
+                            delta >= 0 ? Colors.green : Colors.red,
+                          );
+                        }).toList(),
                   );
                 },
               ),
 
               const SizedBox(height: 16),
 
-                             Row(
+              Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _quickAddWeight(context),
                       icon: const Icon(Icons.monitor_weight, size: 20),
-                      label: Text('Añadir Peso', style: GoogleFonts.poppins(fontSize: 13)),
+                      label: Text(
+                        'Añadir Peso',
+                        style: GoogleFonts.poppins(fontSize: 13),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -392,7 +419,10 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                     child: OutlinedButton.icon(
                       onPressed: () => _quickAddMeasurement(context),
                       icon: const Icon(Icons.straighten, size: 20),
-                      label: Text('Añadir Medida', style: GoogleFonts.poppins(fontSize: 13)),
+                      label: Text(
+                        'Añadir Medida',
+                        style: GoogleFonts.poppins(fontSize: 13),
+                      ),
                     ),
                   ),
                 ],
@@ -404,7 +434,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-           Widget _buildFeelingsTab() {
+  Widget _buildFeelingsTab() {
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.svc.getStatsForDateRange(_startDate, DateTime.now()),
       builder: (context, snap) {
@@ -447,14 +477,10 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-         
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-      ),
+      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
     );
   }
 
@@ -485,17 +511,19 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           ),
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProgressRow(String label, int count, String percentage, Color color) {
+  Widget _buildProgressRow(
+    String label,
+    int count,
+    String percentage,
+    Color color,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -542,10 +570,11 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ExerciseProgressScreen(
-                svc: widget.svc,
-                exerciseName: exerciseName,
-              ),
+              builder:
+                  (_) => ExerciseProgressScreen(
+                    svc: widget.svc,
+                    exerciseName: exerciseName,
+                  ),
             ),
           );
         },
@@ -560,7 +589,11 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   color: Colors.blue.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.fitness_center, color: Colors.blue, size: 20),
+                child: const Icon(
+                  Icons.fitness_center,
+                  color: Colors.blue,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -592,7 +625,12 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     ).animate().fadeIn().slideX(begin: 0.2, end: 0);
   }
 
-  Widget _buildMeasurementRow(String muscle, double value, double delta, Color color) {
+  Widget _buildMeasurementRow(
+    String muscle,
+    double value,
+    double delta,
+    Color color,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -680,21 +718,28 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     ).animate().fadeIn().scale();
   }
 
-  Widget _buildInterpretationCard(double energy, double fatigue, double motivation) {
+  Widget _buildInterpretationCard(
+    double energy,
+    double fatigue,
+    double motivation,
+  ) {
     String interpretation;
     IconData icon;
     Color color;
 
     if (energy >= 4 && fatigue <= 2 && motivation >= 4) {
-      interpretation = '¡Excelente estado! Tu cuerpo está respondiendo muy bien al entrenamiento.';
+      interpretation =
+          '¡Excelente estado! Tu cuerpo está respondiendo muy bien al entrenamiento.';
       icon = Icons.sentiment_very_satisfied;
       color = Colors.green;
     } else if (fatigue >= 4) {
-      interpretation = 'Fatiga elevada detectada. Considera tomar un día de descanso o reducir volumen.';
+      interpretation =
+          'Fatiga elevada detectada. Considera tomar un día de descanso o reducir volumen.';
       icon = Icons.warning_amber;
       color = Colors.orange;
     } else if (motivation <= 2) {
-      interpretation = 'Motivación baja. Intenta variar tu rutina o tomarte un descanso.';
+      interpretation =
+          'Motivación baja. Intenta variar tu rutina o tomarte un descanso.';
       icon = Icons.sentiment_dissatisfied;
       color = Colors.red;
     } else {
@@ -738,10 +783,7 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           const SizedBox(height: 16),
           Text(
             message,
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -749,7 +791,6 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-         
   Widget _buildVolumeWeeklyChart() {
     return StreamBuilder<List<SessionDoc>>(
       stream: widget.svc.streamSessions(limit: 90),
@@ -759,42 +800,50 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
         if (sessions.isEmpty) return const SizedBox();
 
-                 final weeklyVolume = <int, double>{};
+        final weeklyVolume = <int, double>{};
         for (final s in sessions) {
           final weekNum = _getWeekNumber(s.date);
           weeklyVolume[weekNum] = (weeklyVolume[weekNum] ?? 0) + s.volumeKg;
         }
 
-        final sorted = weeklyVolume.entries.toList()
-          ..sort((a, b) => a.key.compareTo(b.key));
+        final sorted =
+            weeklyVolume.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key));
 
-        final maxY = sorted.isEmpty ? 100.0 : sorted.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.1;
+        final maxY =
+            sorted.isEmpty
+                ? 100.0
+                : sorted.map((e) => e.value).reduce((a, b) => a > b ? a : b) *
+                    1.1;
 
-        final barGroups = sorted.asMap().entries.map((e) {
-          return BarChartGroupData(
-            x: e.key,
-            barRods: [
-              BarChartRodData(
-                toY: e.value.value,
-                gradient: LinearGradient(
-                  colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.secondary,
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-                width: 24,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                backDrawRodData: BackgroundBarChartRodData(
-                  show: true,
-                  toY: maxY,
-                  color: Colors.grey.withOpacity(0.1),
-                ),
-              ),
-            ],
-          );
-        }).toList();
+        final barGroups =
+            sorted.asMap().entries.map((e) {
+              return BarChartGroupData(
+                x: e.key,
+                barRods: [
+                  BarChartRodData(
+                    toY: e.value.value,
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.secondary,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                    width: 24,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(8),
+                    ),
+                    backDrawRodData: BackgroundBarChartRodData(
+                      show: true,
+                      toY: maxY,
+                      color: Colors.grey.withOpacity(0.1),
+                    ),
+                  ),
+                ],
+              );
+            }).toList();
 
         return BarChart(
           BarChartData(
@@ -813,14 +862,19 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
             titlesData: FlTitlesData(
               show: true,
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
-                    if (index < 0 || index >= sorted.length) return const SizedBox();
+                    if (index < 0 || index >= sorted.length)
+                      return const SizedBox();
                     return Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
@@ -892,19 +946,26 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
         if (sessions.isEmpty) return const SizedBox();
 
-                 final muscleVolume = <String, double>{};
+        final muscleVolume = <String, double>{};
         for (final s in sessions) {
           for (final ex in s.exercises) {
-                                      final group = _inferMuscleGroup(ex.name);
+            final group = _inferMuscleGroup(ex.name);
             muscleVolume[group] = (muscleVolume[group] ?? 0) + ex.volumeKg;
           }
         }
 
-        final sorted = muscleVolume.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+        final sorted =
+            muscleVolume.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
 
         final colors = [
-          const Color(0xFF6366F1),            const Color(0xFFEC4899),            const Color(0xFF10B981),            const Color(0xFFF59E0B),            const Color(0xFF8B5CF6),            const Color(0xFF14B8A6),          ];
+          const Color(0xFF6366F1),
+          const Color(0xFFEC4899),
+          const Color(0xFF10B981),
+          const Color(0xFFF59E0B),
+          const Color(0xFF8B5CF6),
+          const Color(0xFF14B8A6),
+        ];
 
         int touchedIndex = -1;
 
@@ -916,38 +977,51 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                 builder: (context, setState) {
                   return PieChart(
                     PieChartData(
-                      sections: sorted.take(6).toList().asMap().entries.map((e) {
-                        final isTouched = e.key == touchedIndex;
-                        final percentage = (e.value.value / sorted.fold<double>(0, (sum, item) => sum + item.value) * 100);
-                        return PieChartSectionData(
-                          value: e.value.value,
-                          title: '${percentage.toStringAsFixed(0)}%',
-                          color: colors[e.key % colors.length],
-                          radius: isTouched ? 80 : 70,
-                          titleStyle: GoogleFonts.poppins(
-                            fontSize: isTouched ? 16 : 13,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            shadows: [
-                              const Shadow(
-                                color: Colors.black38,
-                                blurRadius: 3,
-                                offset: Offset(0, 1),
+                      sections:
+                          sorted.take(6).toList().asMap().entries.map((e) {
+                            final isTouched = e.key == touchedIndex;
+                            final percentage =
+                                (e.value.value /
+                                    sorted.fold<double>(
+                                      0,
+                                      (sum, item) => sum + item.value,
+                                    ) *
+                                    100);
+                            return PieChartSectionData(
+                              value: e.value.value,
+                              title: '${percentage.toStringAsFixed(0)}%',
+                              color: colors[e.key % colors.length],
+                              radius: isTouched ? 80 : 70,
+                              titleStyle: GoogleFonts.poppins(
+                                fontSize: isTouched ? 16 : 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                shadows: [
+                                  const Shadow(
+                                    color: Colors.black38,
+                                    blurRadius: 3,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          borderSide: isTouched
-                              ? const BorderSide(color: Colors.white, width: 3)
-                              : null,
-                        );
-                      }).toList(),
+                              borderSide:
+                                  isTouched
+                                      ? const BorderSide(
+                                        color: Colors.white,
+                                        width: 3,
+                                      )
+                                      : null,
+                            );
+                          }).toList(),
                       sectionsSpace: 2,
                       centerSpaceRadius: 50,
                       pieTouchData: PieTouchData(
                         touchCallback: (event, response) {
                           setState(() {
-                            if (response != null && response.touchedSection != null) {
-                              touchedIndex = response.touchedSection!.touchedSectionIndex;
+                            if (response != null &&
+                                response.touchedSection != null) {
+                              touchedIndex =
+                                  response.touchedSection!.touchedSectionIndex;
                             } else {
                               touchedIndex = -1;
                             }
@@ -965,31 +1039,32 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: sorted.take(6).toList().asMap().entries.map((e) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: colors[e.key % colors.length],
-                            shape: BoxShape.circle,
-                          ),
+                children:
+                    sorted.take(6).toList().asMap().entries.map((e) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: colors[e.key % colors.length],
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                e.value.key,
+                                style: GoogleFonts.poppins(fontSize: 11),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            e.value.key,
-                            style: GoogleFonts.poppins(fontSize: 11),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
               ),
             ),
           ],
@@ -1001,12 +1076,15 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
   Widget _buildWeightChart(List<BodyWeightEntry> weights) {
     if (weights.isEmpty) return const SizedBox();
 
-    final spots = weights.asMap().entries.map((e) {
-      return FlSpot(e.key.toDouble(), e.value.weight);
-    }).toList();
+    final spots =
+        weights.asMap().entries.map((e) {
+          return FlSpot(e.key.toDouble(), e.value.weight);
+        }).toList();
 
-    final maxY = weights.map((w) => w.weight).reduce((a, b) => a > b ? a : b) * 1.05;
-    final minY = weights.map((w) => w.weight).reduce((a, b) => a < b ? a : b) * 0.95;
+    final maxY =
+        weights.map((w) => w.weight).reduce((a, b) => a > b ? a : b) * 1.05;
+    final minY =
+        weights.map((w) => w.weight).reduce((a, b) => a < b ? a : b) * 0.95;
 
     return LineChart(
       LineChartData(
@@ -1014,23 +1092,25 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
           show: true,
           drawVerticalLine: false,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: Colors.grey.withOpacity(0.15),
-              strokeWidth: 1,
-            );
+            return FlLine(color: Colors.grey.withOpacity(0.15), strokeWidth: 1);
           },
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               interval: (weights.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= weights.length) return const SizedBox();
+                if (index < 0 || index >= weights.length)
+                  return const SizedBox();
                 final date = weights[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -1142,7 +1222,6 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     );
   }
 
-         
   int _getWeekNumber(DateTime date) {
     final firstDayOfYear = DateTime(date.year, 1, 1);
     final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
@@ -1151,17 +1230,27 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
   String _inferMuscleGroup(String exerciseName) {
     final lower = exerciseName.toLowerCase();
-    if (lower.contains('pecho') || lower.contains('bench') || lower.contains('press banca')) {
+    if (lower.contains('pecho') ||
+        lower.contains('bench') ||
+        lower.contains('press banca')) {
       return 'Pecho';
-    } else if (lower.contains('espalda') || lower.contains('remo') || lower.contains('pull') ||
+    } else if (lower.contains('espalda') ||
+        lower.contains('remo') ||
+        lower.contains('pull') ||
         lower.contains('dominada')) {
       return 'Espalda';
-    } else if (lower.contains('pierna') || lower.contains('squat') || lower.contains('sentadilla') ||
+    } else if (lower.contains('pierna') ||
+        lower.contains('squat') ||
+        lower.contains('sentadilla') ||
         lower.contains('leg')) {
       return 'Piernas';
-    } else if (lower.contains('hombro') || lower.contains('shoulder') || lower.contains('militar')) {
+    } else if (lower.contains('hombro') ||
+        lower.contains('shoulder') ||
+        lower.contains('militar')) {
       return 'Hombros';
-    } else if (lower.contains('brazo') || lower.contains('curl') || lower.contains('tríceps') ||
+    } else if (lower.contains('brazo') ||
+        lower.contains('curl') ||
+        lower.contains('tríceps') ||
         lower.contains('bíceps')) {
       return 'Brazos';
     } else {
@@ -1169,195 +1258,210 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
     }
   }
 
-     Future<void> _quickAddWeight(BuildContext context) async {
+  Future<void> _quickAddWeight(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     final ctrl = TextEditingController();
     final colorScheme = Theme.of(context).colorScheme;
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                                 Row(
+      builder:
+          (ctx) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.monitor_weight_rounded,
+                            color: colorScheme.primary,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Registrar Peso',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                'Añade tu peso actual',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    TextFormField(
+                      controller: ctrl,
+                      autofocus: true,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Peso corporal',
+                        hintText: '72.4',
+                        suffixText: 'kg',
+                        suffixStyle: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.monitor_weight_outlined,
+                          color: colorScheme.primary,
+                        ),
+                        filled: true,
+                        fillColor: colorScheme.surfaceContainerHighest
+                            .withOpacity(0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.error,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      validator: (s) {
+                        final v = double.tryParse(
+                          (s ?? '').replaceAll(',', '.'),
+                        );
+                        if (v == null) return 'Introduce un número válido';
+                        if (v <= 0 || v > 300)
+                          return 'Peso no válido (1-300 kg)';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
+                        color: colorScheme.surfaceContainerHighest.withOpacity(
+                          0.3,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        Icons.monitor_weight_rounded,
-                        color: colorScheme.primary,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text(
-                            'Registrar Peso',
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: colorScheme.onSurfaceVariant,
                           ),
-                          Text(
-                            'Añade tu peso actual',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colorScheme.onSurfaceVariant,
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Registra tu peso por la mañana, antes de desayunar',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                                 TextFormField(
-                  controller: ctrl,
-                  autofocus: true,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Peso corporal',
-                    hintText: '72.4',
-                    suffixText: 'kg',
-                    suffixStyle: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.primary,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.monitor_weight_outlined,
-                      color: colorScheme.primary,
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.outlineVariant,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.error,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  validator: (s) {
-                    final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-                    if (v == null) return 'Introduce un número válido';
-                    if (v <= 0 || v > 300) return 'Peso no válido (1-300 kg)';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                                 Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Registra tu peso por la mañana, antes de desayunar',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: colorScheme.onSurfaceVariant,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: Text(
+                            'Cancelar',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                        const SizedBox(width: 8),
+                        FilledButton.icon(
+                          onPressed: () {
+                            if (formKey.currentState?.validate() == true) {
+                              Navigator.pop(ctx, true);
+                            }
+                          },
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.check, size: 20),
+                          label: Text(
+                            'Guardar',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Cancelar',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton.icon(
-                      onPressed: () {
-                        if (formKey.currentState?.validate() == true) {
-                          Navigator.pop(ctx, true);
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: const Icon(Icons.check, size: 20),
-                      label: Text(
-                        'Guardar',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
 
     if (ok == true && mounted) {
@@ -1376,7 +1480,8 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
         );
-        setState(() {});        }
+        setState(() {});
+      }
     }
   }
 
@@ -1389,227 +1494,249 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 450),
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                                 Row(
+      builder:
+          (ctx) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 450),
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.straighten,
-                        color: colorScheme.secondary,
-                        size: 28,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondaryContainer,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.straighten,
+                            color: colorScheme.secondary,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Registrar Medida',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                'Medición corporal',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Registrar Medida',
+                    const SizedBox(height: 24),
+
+                    TextFormField(
+                      controller: muscleCtrl,
+                      autofocus: true,
+                      textCapitalization: TextCapitalization.words,
+                      style: GoogleFonts.poppins(fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: 'Grupo muscular',
+                        hintText: 'Ej: Brazo, Pecho, Cintura...',
+                        prefixIcon: Icon(
+                          Icons.fitness_center_outlined,
+                          color: colorScheme.secondary,
+                        ),
+                        filled: true,
+                        fillColor: colorScheme.surfaceContainerHighest
+                            .withOpacity(0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.secondary,
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.error,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      validator:
+                          (s) =>
+                              (s ?? '').trim().isEmpty
+                                  ? 'Escribe el nombre del músculo'
+                                  : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: valCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Medida',
+                        hintText: '35.0',
+                        suffixText: 'cm',
+                        suffixStyle: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.secondary,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.straighten,
+                          color: colorScheme.secondary,
+                        ),
+                        filled: true,
+                        fillColor: colorScheme.surfaceContainerHighest
+                            .withOpacity(0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.secondary,
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: colorScheme.error,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      validator: (s) {
+                        final v = double.tryParse(
+                          (s ?? '').replaceAll(',', '.'),
+                        );
+                        if (v == null) return 'Introduce un número válido';
+                        if (v <= 0 || v > 200)
+                          return 'Medida no válida (1-200 cm)';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
+                    Wrap(
+                      spacing: 8,
+                      children:
+                          [
+                            'Biceps',
+                            'Triceps',
+                            'Pecho',
+                            'Espalda',
+                            'Pierna',
+                          ].map((muscle) {
+                            return ActionChip(
+                              label: Text(
+                                muscle,
+                                style: GoogleFonts.poppins(fontSize: 11),
+                              ),
+                              onPressed: () {
+                                muscleCtrl.text = muscle;
+                              },
+                              backgroundColor:
+                                  colorScheme.surfaceContainerHighest,
+                              side: BorderSide(
+                                color: colorScheme.outlineVariant,
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: Text(
+                            'Cancelar',
                             style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          Text(
-                            'Medición corporal',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        FilledButton.icon(
+                          onPressed: () {
+                            if (formKey.currentState?.validate() == true) {
+                              Navigator.pop(ctx, true);
+                            }
+                          },
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        ],
-                      ),
+                          icon: const Icon(Icons.check, size: 20),
+                          label: Text(
+                            'Guardar',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-
-                                 TextFormField(
-                  controller: muscleCtrl,
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.words,
-                  style: GoogleFonts.poppins(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Grupo muscular',
-                    hintText: 'Ej: Brazo, Pecho, Cintura...',
-                    prefixIcon: Icon(
-                      Icons.fitness_center_outlined,
-                      color: colorScheme.secondary,
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.outlineVariant,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.secondary,
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.error,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  validator: (s) => (s ?? '').trim().isEmpty ? 'Escribe el nombre del músculo' : null,
-                ),
-                const SizedBox(height: 16),
-
-                                 TextFormField(
-                  controller: valCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Medida',
-                    hintText: '35.0',
-                    suffixText: 'cm',
-                    suffixStyle: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.secondary,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.straighten,
-                      color: colorScheme.secondary,
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.outlineVariant,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.secondary,
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: colorScheme.error,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  validator: (s) {
-                    final v = double.tryParse((s ?? '').replaceAll(',', '.'));
-                    if (v == null) return 'Introduce un número válido';
-                    if (v <= 0 || v > 200) return 'Medida no válida (1-200 cm)';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                                 Wrap(
-                  spacing: 8,
-                  children: [
-                    'Biceps',
-                    'Triceps',
-                    'Pecho',
-                    'Espalda',
-                    'Pierna'
-                  ].map((muscle) {
-                    return ActionChip(
-                      label: Text(
-                        muscle,
-                        style: GoogleFonts.poppins(fontSize: 11),
-                      ),
-                      onPressed: () {
-                        muscleCtrl.text = muscle;
-                      },
-                      backgroundColor: colorScheme.surfaceContainerHighest,
-                      side: BorderSide(color: colorScheme.outlineVariant),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 24),
-
-                                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: Text(
-                        'Cancelar',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton.icon(
-                      onPressed: () {
-                        if (formKey.currentState?.validate() == true) {
-                          Navigator.pop(ctx, true);
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: const Icon(Icons.check, size: 20),
-                      label: Text(
-                        'Guardar',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
 
     if (ok == true && mounted) {
@@ -1629,7 +1756,8 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             ),
           ),
         );
-        setState(() {});        }
+        setState(() {});
+      }
     }
   }
 }

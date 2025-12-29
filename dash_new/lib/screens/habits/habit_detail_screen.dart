@@ -171,7 +171,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             key: _formKey,
             child: ListView(
               children: [
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -277,7 +277,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -340,7 +340,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(

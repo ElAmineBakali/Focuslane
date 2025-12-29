@@ -9,9 +9,12 @@ class Goal {
   final GoalStatus status;
   final DateTime? targetDate;
 
-     final double? progress;    final double? progressTarget;    final String? unit;    final List<String> tags;
+  final double? progress;
+  final double? progressTarget;
+  final String? unit;
+  final List<String> tags;
   final String? colorHex;
-  final int? order;  
+  final int? order;
   Goal({
     required this.id,
     required this.title,
@@ -61,15 +64,17 @@ class Goal {
   }
 }
 
-  class SubGoal {
+class SubGoal {
   final String id;
   final String title;
   final String? description;
-  final GoalStatus status;    final DateTime? dueDate;
+  final GoalStatus status;
+  final DateTime? dueDate;
   final double? progress;
   final double? progressTarget;
   final String? unit;
-  final String? section;    final int order;
+  final String? section;
+  final int order;
 
   const SubGoal({
     required this.id,

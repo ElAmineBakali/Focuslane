@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/global_ui_components.dart';
-import '../../../theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
-import '../timer/study_timer_screen.dart';
 import 'task_edit_sheet.dart';
-import '../settings/study_settings_sheet.dart';
+import '../timer/study_timer_screen.dart';
 
 class StudyTasksScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -37,7 +34,10 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tareas y Exámenes', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(
+          'Tareas y Exámenes',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
         elevation: 0,
         backgroundColor: colorScheme.surface,
         actions: [
@@ -49,7 +49,8 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
+                builder:
+                    (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
               );
             },
           ),
@@ -71,12 +72,18 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
               border: Border(
-                bottom: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                ),
               ),
             ),
             child: Row(
               children: [
-                Icon(Icons.view_agenda_rounded, size: 18, color: colorScheme.primary),
+                Icon(
+                  Icons.view_agenda_rounded,
+                  size: 18,
+                  color: colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Agrupar por:',
@@ -102,7 +109,8 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                       ),
                     ],
                     selected: {_groupBy},
-                    onSelectionChanged: (s) => setState(() => _groupBy = s.first),
+                    onSelectionChanged:
+                        (s) => setState(() => _groupBy = s.first),
                     style: ButtonStyle(visualDensity: VisualDensity.compact),
                   ),
                 ),
@@ -120,7 +128,8 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     highPriorityOnly: _onlyHigh,
                   ),
                   builder: (context, snap) {
-                    if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+                    if (!snap.hasData)
+                      return const Center(child: CircularProgressIndicator());
 
                     final courseMap = <String, String>{};
                     if (coursesSnap.hasData) {
@@ -133,53 +142,68 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     if (tasks.isEmpty)
                       return Center(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.task_alt_rounded,
-                              size: 120,
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                            ),
-                            const SizedBox(height: 24),
-                            Text(
-                              '¡Todo despejado!',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'No hay tareas que coincidan con tus filtros',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 32),
-                            FilledButton.icon(
-                              onPressed: () async {
-                                await showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder:
-                                      (_) => TaskEditSheet(svc: svc, initialCourseId: _courseId),
-                                );
-                              },
-                              icon: const Icon(Icons.add_rounded),
-                              label: const Text('Crear nueva tarea'),
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.task_alt_rounded,
+                                  size: 120,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.3),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
+                                const SizedBox(height: 24),
+                                Text(
+                                  '¡Todo despejado!',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w700,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No hay tareas que coincidan con tus filtros',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 16,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 32),
+                                FilledButton.icon(
+                                  onPressed: () async {
+                                    await showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder:
+                                          (_) => TaskEditSheet(
+                                            svc: svc,
+                                            initialCourseId: _courseId,
+                                          ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.add_rounded),
+                                  label: const Text('Crear nueva tarea'),
+                                  style: FilledButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            .animate()
+                            .fadeIn(duration: 600.ms)
+                            .scale(begin: const Offset(0.8, 0.8)),
                       );
 
                     final Map<String, List<StudyTask>> groups = {};
@@ -199,7 +223,9 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                       }
                     }
 
-                    final entries = groups.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+                    final entries =
+                        groups.entries.toList()
+                          ..sort((a, b) => a.key.compareTo(b.key));
 
                     return AnimationLimiter(
                       child: CustomScrollView(
@@ -207,23 +233,42 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                           for (final e in entries) ...[
                             SliverToBoxAdapter(
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  8,
+                                ),
                                 child: Text(
-                                  _groupBy == 'course'
-                                      ? courseMap[e.key] ?? 'Curso desconocido'
-                                      : (e.key == 'Sin fecha' ? e.key : e.key.substring(0, 10)),
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
+                                      _groupBy == 'course'
+                                          ? courseMap[e.key] ??
+                                              'Curso desconocido'
+                                          : (e.key == 'Sin fecha'
+                                              ? e.key
+                                              : e.key.substring(0, 10)),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                    )
+                                    .animate()
+                                    .fadeIn(duration: 300.ms)
+                                    .slideX(begin: -0.1, end: 0),
                               ),
                             ),
                             SliverPadding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate((context, i) {
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  i,
+                                ) {
                                   return AnimationConfiguration.staggeredList(
                                     position: i,
                                     duration: const Duration(milliseconds: 400),
@@ -231,14 +276,17 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                       verticalOffset: 50.0,
                                       child: FadeInAnimation(
                                         child: Padding(
-                                          padding: const EdgeInsets.only(bottom: 12),
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
                                           child: _TaskCard(
                                             task: e.value[i],
                                             onEdit: () async {
                                               await showModalBottomSheet(
                                                 context: context,
                                                 isScrollControlled: true,
-                                                backgroundColor: Colors.transparent,
+                                                backgroundColor:
+                                                    Colors.transparent,
                                                 builder:
                                                     (_) => TaskEditSheet(
                                                       svc: svc,
@@ -247,34 +295,50 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                               );
                                             },
                                             onChangeStatus: (status) async {
-                                              await svc.updateTask(e.value[i].id, {
-                                                'status': status.name,
-                                              });
+                                              await svc.updateTask(
+                                                e.value[i].id,
+                                                {'status': status.name},
+                                              );
                                               if (!context.mounted) return;
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
                                                 SnackBar(
                                                   content: Row(
                                                     children: [
                                                       Icon(
                                                         Icons.check_circle,
-                                                        color: colorScheme.onPrimary,
+                                                        color:
+                                                            colorScheme
+                                                                .onPrimary,
                                                       ),
                                                       const SizedBox(width: 12),
-                                                      Text('Estado actualizado a ${status.name}'),
+                                                      Text(
+                                                        'Estado actualizado a ${status.name}',
+                                                      ),
                                                     ],
                                                   ),
-                                                  behavior: SnackBarBehavior.floating,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
                                                   ),
                                                 ),
                                               );
                                             },
                                             onDelete: () async {
-                                              await svc.deleteTask(e.value[i].id);
+                                              await svc.deleteTask(
+                                                e.value[i].id,
+                                              );
                                               if (!context.mounted) return;
-                                              final cs = Theme.of(context).colorScheme;
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              final cs =
+                                                  Theme.of(context).colorScheme;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
                                                 SnackBar(
                                                   content: Row(
                                                     children: [
@@ -283,12 +347,18 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                                         color: cs.onError,
                                                       ),
                                                       const SizedBox(width: 12),
-                                                      const Text('Tarea eliminada'),
+                                                      const Text(
+                                                        'Tarea eliminada',
+                                                      ),
                                                     ],
                                                   ),
-                                                  behavior: SnackBarBehavior.floating,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
                                                   ),
                                                 ),
                                               );
@@ -301,7 +371,8 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                                   builder:
                                                       (_) => StudyTimerScreen(
                                                         svc: svc,
-                                                        initialCourseId: t.courseId,
+                                                        initialCourseId:
+                                                            t.courseId,
                                                         initialTaskId: t.id,
                                                       ),
                                                 ),
@@ -358,7 +429,10 @@ class _TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final icon = task.type == StudyItemType.exam ? Icons.school_rounded : Icons.assignment_rounded;
+    final icon =
+        task.type == StudyItemType.exam
+            ? Icons.school_rounded
+            : Icons.assignment_rounded;
     final prioColor = _priorityColor(context);
 
     return Card(
@@ -412,12 +486,17 @@ class _TaskCard extends StatelessWidget {
                             color: cs.onSurface,
                           ),
                         ),
-                        if (task.syncedTaskId != null && task.syncedTaskId!.isNotEmpty)
+                        if (task.syncedTaskId != null &&
+                            task.syncedTaskId!.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Row(
                               children: [
-                                Icon(Icons.sync_rounded, size: 14, color: cs.primary),
+                                Icon(
+                                  Icons.sync_rounded,
+                                  size: 14,
+                                  color: cs.primary,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Sincronizado',
@@ -434,8 +513,13 @@ class _TaskCard extends StatelessWidget {
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert_rounded, color: cs.onSurfaceVariant),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     onSelected: (v) async {
                       if (v == 'edit') onEdit();
                       if (v == 'todo') onChangeStatus(TaskStatus.todo);
@@ -491,7 +575,10 @@ class _TaskCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.delete_outline, color: Colors.red),
                                 SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                           ),
@@ -521,7 +608,11 @@ class _TaskCard extends StatelessWidget {
                     color: _statusColor(task.status, cs),
                   ),
                   if ((task.notes ?? '').isNotEmpty)
-                    _ModernChip(icon: Icons.notes_rounded, label: 'Notas', color: cs.secondary),
+                    _ModernChip(
+                      icon: Icons.notes_rounded,
+                      label: 'Notas',
+                      color: cs.secondary,
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -534,12 +625,16 @@ class _TaskCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         backgroundColor: prioColor,
                         foregroundColor: cs.onPrimary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       icon: const Icon(Icons.timer_rounded),
                       label: Text(
                         'Estudiar',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -615,7 +710,11 @@ class _ModernChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _ModernChip({required this.icon, required this.label, required this.color});
+  const _ModernChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -674,9 +773,14 @@ class _FiltersBar extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.surfaceVariant.withOpacity(0.3),
             border: Border(
-              bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+              bottom: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 1,
+              ),
             ),
           ),
           child: Column(
@@ -684,7 +788,11 @@ class _FiltersBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.book_rounded, size: 18, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.book_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Curso',
@@ -708,7 +816,9 @@ class _FiltersBar extends StatelessWidget {
                       if (selected) onCourseChanged(null);
                     },
                     avatar:
-                        selectedCourseId == null ? const Icon(Icons.check_circle, size: 18) : null,
+                        selectedCourseId == null
+                            ? const Icon(Icons.check_circle, size: 18)
+                            : null,
                   ),
                   ...courses.map((course) {
                     final isSelected = selectedCourseId == course.id;
@@ -809,22 +919,22 @@ class _FiltersBar extends StatelessWidget {
                 builder: (context) {
                   final colorScheme = Theme.of(context).colorScheme;
                   return FilterChip(
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.priority_high_rounded,
-                      size: 16,
-                      color: onlyHigh ? colorScheme.onError : Colors.red,
+                    label: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.priority_high_rounded,
+                          size: 16,
+                          color: onlyHigh ? colorScheme.onError : Colors.red,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('Solo alta prioridad'),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    const Text('Solo alta prioridad'),
-                  ],
-                ),
-                selected: onlyHigh,
-                onSelected: onOnlyHighChanged,
-                selectedColor: Colors.red.shade600,
-                checkmarkColor: colorScheme.onError,
+                    selected: onlyHigh,
+                    onSelected: onOnlyHighChanged,
+                    selectedColor: Colors.red.shade600,
+                    checkmarkColor: colorScheme.onError,
                   );
                 },
               ),

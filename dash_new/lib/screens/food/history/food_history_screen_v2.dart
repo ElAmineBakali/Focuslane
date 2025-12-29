@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../widgets/global_ui_components.dart';
-import '../../../theme/global_ui_theme.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
@@ -94,7 +93,10 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
       onSelected: (v) => setState(() => _daysRange = days),
       selectedColor: colorScheme.primary,
       labelStyle: TextStyle(
-        color: isSelected ? Theme.of(context).colorScheme.onPrimary : FocusColors.grey700,
+        color:
+            isSelected
+                ? Theme.of(context).colorScheme.onPrimary
+                : FocusColors.grey700,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
@@ -110,12 +112,17 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
         final days = snap.data ?? [];
         if (days.isEmpty) {
-          return const FocusEmptyState(icon: Icons.show_chart, message: 'Sin datos en este rango');
+          return const FocusEmptyState(
+            icon: Icons.show_chart,
+            message: 'Sin datos en este rango',
+          );
         }
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(FocusSpacing.radiusLg)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(FocusSpacing.lg),
             child: Column(
@@ -139,7 +146,11 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                 SizedBox(
                   height: 200,
                   child: LineChart(
-                    _buildLineChartData(days, (d) => d.totals['kcal'] ?? 0, FocusColors.food),
+                    _buildLineChartData(
+                      days,
+                      (d) => d.totals['kcal'] ?? 0,
+                      FocusColors.food,
+                    ),
                   ),
                 ),
               ],
@@ -159,7 +170,9 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(FocusSpacing.radiusLg)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(FocusSpacing.lg),
             child: Column(
@@ -183,7 +196,11 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                 SizedBox(
                   height: 200,
                   child: LineChart(
-                    _buildLineChartData(days, (d) => d.totals['protein'] ?? 0, Colors.red),
+                    _buildLineChartData(
+                      days,
+                      (d) => d.totals['protein'] ?? 0,
+                      Colors.red,
+                    ),
                   ),
                 ),
               ],
@@ -203,7 +220,9 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(FocusSpacing.radiusLg)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(FocusSpacing.lg),
             child: Column(
@@ -220,14 +239,21 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                       ),
                     ),
                     const SizedBox(width: FocusSpacing.md),
-                    Text('Hidratación', style: FocusTypography.heading3(context)),
+                    Text(
+                      'Hidratación',
+                      style: FocusTypography.heading3(context),
+                    ),
                   ],
                 ),
                 const SizedBox(height: FocusSpacing.lg),
                 SizedBox(
                   height: 200,
                   child: BarChart(
-                    _buildBarChartData(days, (d) => d.waterMl.toDouble(), Colors.blue),
+                    _buildBarChartData(
+                      days,
+                      (d) => d.waterMl.toDouble(),
+                      Colors.blue,
+                    ),
                   ),
                 ),
               ],
@@ -246,10 +272,13 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
         if (days.isEmpty) return const SizedBox.shrink();
 
         final avgKcal =
-            days.map((d) => d.totals['kcal'] ?? 0).reduce((a, b) => a + b) / days.length;
+            days.map((d) => d.totals['kcal'] ?? 0).reduce((a, b) => a + b) /
+            days.length;
         final avgProtein =
-            days.map((d) => d.totals['protein'] ?? 0).reduce((a, b) => a + b) / days.length;
-        final avgWater = days.map((d) => d.waterMl).reduce((a, b) => a + b) / days.length;
+            days.map((d) => d.totals['protein'] ?? 0).reduce((a, b) => a + b) /
+            days.length;
+        final avgWater =
+            days.map((d) => d.waterMl).reduce((a, b) => a + b) / days.length;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +347,10 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             showTitles: true,
             reservedSize: 40,
             getTitlesWidget: (value, meta) {
-              return Text(value.toInt().toString(), style: FocusTypography.caption(context));
+              return Text(
+                value.toInt().toString(),
+                style: FocusTypography.caption(context),
+              );
             },
           ),
         ),
@@ -332,7 +364,10 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
               if (_daysRange == 7 || index % 5 == 0) {
                 final day = DateTime.parse(days[index].id);
-                return Text('${day.day}/${day.month}', style: FocusTypography.caption(context));
+                return Text(
+                  '${day.day}/${day.month}',
+                  style: FocusTypography.caption(context),
+                );
               }
               return const SizedBox();
             },
@@ -383,7 +418,9 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
                 toY: valueGetter(e.value),
                 color: color,
                 width: 16,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
               ),
             ],
           );
@@ -397,7 +434,10 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
             showTitles: true,
             reservedSize: 40,
             getTitlesWidget: (value, meta) {
-              return Text(value.toInt().toString(), style: FocusTypography.caption(context));
+              return Text(
+                value.toInt().toString(),
+                style: FocusTypography.caption(context),
+              );
             },
           ),
         ),
@@ -411,7 +451,10 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
 
               if (_daysRange == 7 || index % 5 == 0) {
                 final day = DateTime.parse(days[index].id);
-                return Text('${day.day}/${day.month}', style: FocusTypography.caption(context));
+                return Text(
+                  '${day.day}/${day.month}',
+                  style: FocusTypography.caption(context),
+                );
               }
               return const SizedBox();
             },
@@ -443,20 +486,16 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
     for (int i = 0; i < days; i++) {
       final date = now.subtract(Duration(days: i));
       final dayId = date.toIso8601String().substring(0, 10);
-      final doc = await widget.svc.getDay(dayId);
-      if (doc != null) {
-        result.add(doc);
-      } else {
-        result.add(
-          DailyIntakeDoc(
-            id: dayId,
-            entries: const [],
-            waterMl: 0,
-            totals: const {'kcal': 0.0, 'protein': 0.0, 'carbs': 0.0, 'fat': 0.0},
-            targets: const {},
-          ),
-        );
-      }
+      await widget.svc.getDay(dayId);
+      result.add(
+        DailyIntakeDoc(
+          id: dayId,
+          entries: const [],
+          waterMl: 0,
+          totals: const {'kcal': 0.0, 'protein': 0.0, 'carbs': 0.0, 'fat': 0.0},
+          targets: const {},
+        ),
+      );
     }
 
     return result.reversed.toList();
@@ -475,7 +514,8 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
         if (completed.isEmpty) {
           return const FocusEmptyState(
             icon: Icons.shopping_bag,
-            message: 'Sin compras completadas\nCompleta una lista de compras para ver el historial',
+            message:
+                'Sin compras completadas\nCompleta una lista de compras para ver el historial',
           );
         }
 
@@ -498,8 +538,14 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
     );
   }
 
-  Widget _buildMonthGroup(BuildContext context, String month, List<CompletedShoppingList> items) {
-    final totalSpent = items.map((c) => c.totalSpent ?? 0).reduce((a, b) => a + b);
+  Widget _buildMonthGroup(
+    BuildContext context,
+    String month,
+    List<CompletedShoppingList> items,
+  ) {
+    final totalSpent = items
+        .map((c) => c.totalSpent ?? 0)
+        .reduce((a, b) => a + b);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,9 +555,15 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_formatMonth(month), style: FocusTypography.heading3(context)),
+              Text(
+                _formatMonth(month),
+                style: FocusTypography.heading3(context),
+              ),
               if (totalSpent > 0)
-                FocusBadge(text: '\$${totalSpent.toStringAsFixed(2)}', color: FocusColors.success),
+                FocusBadge(
+                  text: '\$${totalSpent.toStringAsFixed(2)}',
+                  color: FocusColors.success,
+                ),
             ],
           ),
         ),
@@ -521,24 +573,39 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
     );
   }
 
-  Widget _buildCompletedCard(BuildContext context, CompletedShoppingList completed) {
+  Widget _buildCompletedCard(
+    BuildContext context,
+    CompletedShoppingList completed,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: FocusSpacing.md),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(FocusSpacing.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
+      ),
       child: ExpansionTile(
         leading: CircleAvatar(
           backgroundColor: Colors.green,
-          child: Icon(Icons.check, color: Theme.of(context).colorScheme.onPrimary),
+          child: Icon(
+            Icons.check,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
-        title: Text(completed.plannerId ?? 'Compra', style: FocusTypography.heading4(context)),
-        subtitle: Text(_formatDate(completed.completedAt), style: FocusTypography.caption(context)),
+        title: Text(
+          completed.plannerId ?? 'Compra',
+          style: FocusTypography.heading4(context),
+        ),
+        subtitle: Text(
+          _formatDate(completed.completedAt),
+          style: FocusTypography.caption(context),
+        ),
         trailing:
             completed.totalSpent != null
                 ? Text(
                   '\$${completed.totalSpent!.toStringAsFixed(2)}',
-                  style: FocusTypography.label(
-                    context,
-                  ).copyWith(color: FocusColors.success, fontWeight: FontWeight.bold),
+                  style: FocusTypography.label(context).copyWith(
+                    color: FocusColors.success,
+                    fontWeight: FontWeight.bold,
+                  ),
                 )
                 : null,
         children:
@@ -546,13 +613,18 @@ class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
               return ListTile(
                 dense: true,
                 leading: Icon(
-                  item.checked ? Icons.check_box : Icons.check_box_outline_blank,
+                  item.checked
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank,
                   color: item.checked ? Colors.green : FocusColors.grey600,
                   size: 20,
                 ),
                 title: Text(
                   item.name,
-                  style: TextStyle(decoration: item.checked ? TextDecoration.lineThrough : null),
+                  style: TextStyle(
+                    decoration:
+                        item.checked ? TextDecoration.lineThrough : null,
+                  ),
                 ),
                 trailing: Text(
                   '${item.qty} ${item.unit.name}',

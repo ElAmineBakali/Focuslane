@@ -12,8 +12,12 @@ class StudyFirestoreService {
     return _fallbackUserId.isNotEmpty ? _fallbackUserId : 'local';
   }
 
-  DocumentReference<Map<String, dynamic>> get _root =>
-      FirebaseFirestore.instance.collection('users').doc(_uid).collection('study').doc('root');
+  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore
+      .instance
+      .collection('users')
+      .doc(_uid)
+      .collection('study')
+      .doc('root');
 
   Stream<List<Course>> streamCourses({bool includeArchived = false}) {
     Query q = _root.collection('courses');
@@ -22,7 +26,13 @@ class StudyFirestoreService {
         .orderBy('name')
         .snapshots()
         .map(
-          (s) => s.docs.map((d) => Course.fromMap(d.id, d.data() as Map<String, dynamic>)).toList(),
+          (s) =>
+              s.docs
+                  .map(
+                    (d) =>
+                        Course.fromMap(d.id, d.data() as Map<String, dynamic>),
+                  )
+                  .toList(),
         );
   }
 
@@ -67,7 +77,12 @@ class StudyFirestoreService {
 
     return q.snapshots().map((s) {
       var list =
-          s.docs.map((d) => StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>)).toList();
+          s.docs
+              .map(
+                (d) =>
+                    StudyTask.fromMap(d.id, d.data() as Map<String, dynamic>),
+              )
+              .toList();
 
       list.sort((a, b) {
         final ad =
@@ -106,7 +121,12 @@ class StudyFirestoreService {
         .map(
           (s) =>
               s.docs
-                  .map((d) => TimerPreset.fromMap(d.id, d.data() as Map<String, dynamic>))
+                  .map(
+                    (d) => TimerPreset.fromMap(
+                      d.id,
+                      d.data() as Map<String, dynamic>,
+                    ),
+                  )
                   .toList(),
         );
   }
@@ -121,12 +141,25 @@ class StudyFirestoreService {
     await _root.collection('presets').doc(id).delete();
   }
 
-  Stream<List<StudySession>> streamSessions({String? courseId, int limit = 100}) {
-    Query q = _root.collection('sessions').orderBy('date', descending: true).limit(limit);
+  Stream<List<StudySession>> streamSessions({
+    String? courseId,
+    int limit = 100,
+  }) {
+    Query q = _root
+        .collection('sessions')
+        .orderBy('date', descending: true)
+        .limit(limit);
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
     return q.snapshots().map(
       (s) =>
-          s.docs.map((d) => StudySession.fromMap(d.id, d.data() as Map<String, dynamic>)).toList(),
+          s.docs
+              .map(
+                (d) => StudySession.fromMap(
+                  d.id,
+                  d.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -141,7 +174,12 @@ class StudyFirestoreService {
     return q.snapshots().map(
       (s) =>
           s.docs
-              .map((d) => StudyClassBlock.fromMap(d.id, d.data() as Map<String, dynamic>))
+              .map(
+                (d) => StudyClassBlock.fromMap(
+                  d.id,
+                  d.data() as Map<String, dynamic>,
+                ),
+              )
               .toList(),
     );
   }
@@ -169,7 +207,12 @@ class StudyFirestoreService {
         .map(
           (s) =>
               s.docs
-                  .map((d) => GradeEntry.fromMap(d.id, d.data() as Map<String, dynamic>))
+                  .map(
+                    (d) => GradeEntry.fromMap(
+                      d.id,
+                      d.data() as Map<String, dynamic>,
+                    ),
+                  )
                   .toList(),
         );
   }
@@ -206,10 +249,14 @@ class StudyFirestoreService {
         '${day.month.toString().padLeft(2, '0')}-'
         '${day.day.toString().padLeft(2, '0')}';
 
-    await _root.collection('attendance').doc(courseId).set({key: status}, SetOptions(merge: true));
+    await _root.collection('attendance').doc(courseId).set({
+      key: status,
+    }, SetOptions(merge: true));
   }
 
   Future<void> setAttendanceRequired(String courseId, double percent) async {
-    await _root.collection('courses').doc(courseId).update({'attendanceRequired': percent});
+    await _root.collection('courses').doc(courseId).update({
+      'attendanceRequired': percent,
+    });
   }
 }

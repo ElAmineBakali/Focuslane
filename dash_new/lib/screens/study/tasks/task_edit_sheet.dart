@@ -9,7 +9,12 @@ class TaskEditSheet extends StatefulWidget {
   final StudyTask? initial;
   final String? initialCourseId;
 
-  const TaskEditSheet({super.key, required this.svc, this.initial, this.initialCourseId});
+  const TaskEditSheet({
+    super.key,
+    required this.svc,
+    this.initial,
+    this.initialCourseId,
+  });
 
   @override
   State<TaskEditSheet> createState() => _TaskEditSheetState();
@@ -73,7 +78,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
         priority: _priority,
         status: _status,
         due: _dueDate,
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        notes:
+            _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
       );
 
       if (widget.initial == null) {
@@ -88,9 +96,12 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red.shade600));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red.shade600,
+          ),
+        );
       }
     }
   }
@@ -103,12 +114,16 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
         border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.2)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: StreamBuilder<List<Course>>(
             stream: widget.svc.streamCourses(),
             builder: (context, snapshot) {
@@ -132,7 +147,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           margin: const EdgeInsets.only(bottom: AppSpacing.lg),
                           decoration: BoxDecoration(
                             color: colorScheme.outlineVariant.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusFull,
+                            ),
                           ),
                         ),
                       ),
@@ -143,7 +160,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                             padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                             child: Icon(
                               _type == StudyItemType.exam
@@ -194,60 +213,79 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       if (courses.isEmpty)
                         Text(
                           'No hay cursos disponibles',
-                          style: GoogleFonts.plusJakartaSans(color: colorScheme.error),
+                          style: GoogleFonts.plusJakartaSans(
+                            color: colorScheme.error,
+                          ),
                         )
                       else
                         Wrap(
                           spacing: AppSpacing.sm,
                           runSpacing: AppSpacing.sm,
-                          children: courses.map((course) {
-                            final isSelected = _courseId == course.id;
-                            final courseColor = course.color ?? colorScheme.primary;
+                          children:
+                              courses.map((course) {
+                                final isSelected = _courseId == course.id;
+                                final courseColor =
+                                    course.color ?? colorScheme.primary;
 
-                            return InkWell(
-                              onTap: () => setState(() => _courseId = course.id),
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.lg,
-                                  vertical: AppSpacing.md,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      isSelected
-                                          ? courseColor.withOpacity(0.14)
-                                          : colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                                  border: Border.all(
-                                    color: isSelected ? courseColor : Colors.transparent,
-                                    width: 2,
+                                return InkWell(
+                                  onTap:
+                                      () =>
+                                          setState(() => _courseId = course.id),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusMd,
                                   ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: courseColor,
-                                        shape: BoxShape.circle,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.lg,
+                                      vertical: AppSpacing.md,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isSelected
+                                              ? courseColor.withOpacity(0.14)
+                                              : colorScheme
+                                                  .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusMd,
+                                      ),
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? courseColor
+                                                : Colors.transparent,
+                                        width: 2,
                                       ),
                                     ),
-                                    const SizedBox(width: AppSpacing.sm),
-                                    Text(
-                                      course.name,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontWeight:
-                                            isSelected ? FontWeight.w600 : FontWeight.w500,
-                                        color: isSelected ? courseColor : colorScheme.onSurface,
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: courseColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: AppSpacing.sm),
+                                        Text(
+                                          course.name,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontWeight:
+                                                isSelected
+                                                    ? FontWeight.w600
+                                                    : FontWeight.w500,
+                                            color:
+                                                isSelected
+                                                    ? courseColor
+                                                    : colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                  ),
+                                );
+                              }).toList(),
                         ),
 
                       const SizedBox(height: AppSpacing.lg),
@@ -283,7 +321,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.assignment_rounded,
                               label: 'Tarea',
                               isSelected: _type == StudyItemType.task,
-                              onTap: () => setState(() => _type = StudyItemType.task),
+                              onTap:
+                                  () => setState(
+                                    () => _type = StudyItemType.task,
+                                  ),
                               color: colorScheme.primary,
                             ),
                           ),
@@ -293,7 +334,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.edit_note_rounded,
                               label: 'Examen',
                               isSelected: _type == StudyItemType.exam,
-                              onTap: () => setState(() => _type = StudyItemType.exam),
+                              onTap:
+                                  () => setState(
+                                    () => _type = StudyItemType.exam,
+                                  ),
                               color: colorScheme.tertiary,
                             ),
                           ),
@@ -318,7 +362,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.arrow_downward_rounded,
                               label: 'Baja',
                               isSelected: _priority == Priority.low,
-                              onTap: () => setState(() => _priority = Priority.low),
+                              onTap:
+                                  () =>
+                                      setState(() => _priority = Priority.low),
                               color: colorScheme.tertiary,
                             ),
                           ),
@@ -328,7 +374,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.drag_handle_rounded,
                               label: 'Normal',
                               isSelected: _priority == Priority.normal,
-                              onTap: () => setState(() => _priority = Priority.normal),
+                              onTap:
+                                  () => setState(
+                                    () => _priority = Priority.normal,
+                                  ),
                               color: colorScheme.primary,
                             ),
                           ),
@@ -338,7 +387,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.arrow_upward_rounded,
                               label: 'Alta',
                               isSelected: _priority == Priority.high,
-                              onTap: () => setState(() => _priority = Priority.high),
+                              onTap:
+                                  () =>
+                                      setState(() => _priority = Priority.high),
                               color: colorScheme.error,
                             ),
                           ),
@@ -363,7 +414,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.radio_button_unchecked_rounded,
                               label: 'Por hacer',
                               isSelected: _status == TaskStatus.todo,
-                              onTap: () => setState(() => _status = TaskStatus.todo),
+                              onTap:
+                                  () =>
+                                      setState(() => _status = TaskStatus.todo),
                               color: colorScheme.outline,
                             ),
                           ),
@@ -373,7 +426,10 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.timelapse_rounded,
                               label: 'En progreso',
                               isSelected: _status == TaskStatus.doing,
-                              onTap: () => setState(() => _status = TaskStatus.doing),
+                              onTap:
+                                  () => setState(
+                                    () => _status = TaskStatus.doing,
+                                  ),
                               color: colorScheme.secondary,
                             ),
                           ),
@@ -383,7 +439,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               icon: Icons.check_circle_rounded,
                               label: 'Hecha',
                               isSelected: _status == TaskStatus.done,
-                              onTap: () => setState(() => _status = TaskStatus.done),
+                              onTap:
+                                  () =>
+                                      setState(() => _status = TaskStatus.done),
                               color: colorScheme.primary,
                             ),
                           ),
@@ -414,7 +472,9 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                             setState(() => _dueDate = date);
                           }
                         },
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.lg,
@@ -422,11 +482,16 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           ),
                           decoration: BoxDecoration(
                             color: colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusMd,
+                            ),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.calendar_today_rounded, color: colorScheme.primary),
+                              Icon(
+                                Icons.calendar_today_rounded,
+                                color: colorScheme.primary,
+                              ),
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
@@ -446,7 +511,8 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                               if (_dueDate != null)
                                 IconButton(
                                   icon: const Icon(Icons.close_rounded),
-                                  onPressed: () => setState(() => _dueDate = null),
+                                  onPressed:
+                                      () => setState(() => _dueDate = null),
                                 ),
                             ],
                           ),
@@ -469,11 +535,18 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: _isSaving ? null : () => Navigator.pop(context),
+                              onPressed:
+                                  _isSaving
+                                      ? null
+                                      : () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.lg,
+                                ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusMd,
+                                  ),
                                 ),
                               ),
                               child: const Text('Cancelar'),
@@ -529,13 +602,20 @@ class _OptionChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.15) : colorScheme.surfaceContainerHighest,
+          color:
+              isSelected
+                  ? color.withOpacity(0.15)
+                  : colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
           border: isSelected ? Border.all(color: color, width: 2) : null,
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? color : colorScheme.onSurfaceVariant, size: 24),
+            Icon(
+              icon,
+              color: isSelected ? color : colorScheme.onSurfaceVariant,
+              size: 24,
+            ),
             const SizedBox(height: 4),
             Text(
               label,

@@ -241,11 +241,8 @@ class _SectionList extends StatelessWidget {
                     );
                     if (ok == true) await svc.deleteSubGoal(goalId, sg.id);
                   } else if (v == 'plus') {
-                    await svc.bumpSubGoalProgress(
-                      goalId,
-                      sg.id,
-                      1,
-                    );                    } else if (v == 'minus') {
+                    await svc.bumpSubGoalProgress(goalId, sg.id, 1);
+                  } else if (v == 'minus') {
                     await svc.bumpSubGoalProgress(goalId, sg.id, -1);
                   }
                 },

@@ -5,7 +5,8 @@ class FoodFirestoreService {
   final String userId;
   FoodFirestoreService(this.userId);
 
-  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore.instance
+  DocumentReference<Map<String, dynamic>> get _root => FirebaseFirestore
+      .instance
       .collection('users')
       .doc(userId.trim().isEmpty ? 'local' : userId.trim())
       .collection('food')
@@ -48,7 +49,10 @@ class FoodFirestoreService {
     await _targetsRef.set(patch, SetOptions(merge: true));
   }
 
-  Stream<List<Food>> streamFoods({String? query, bool supplementsOnly = false}) {
+  Stream<List<Food>> streamFoods({
+    String? query,
+    bool supplementsOnly = false,
+  }) {
     Query<Map<String, dynamic>> q = _root.collection('foods').orderBy('name');
 
     return q.snapshots().map((s) {
@@ -115,7 +119,9 @@ class FoodFirestoreService {
         .collection('favorites')
         .orderBy('alias', descending: false)
         .snapshots()
-        .map((s) => s.docs.map((d) => Favorite.fromMap(d.id, d.data())).toList());
+        .map(
+          (s) => s.docs.map((d) => Favorite.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   Future<String> saveFavorite(Favorite f) async {
@@ -149,7 +155,13 @@ class FoodFirestoreService {
           'fiber': 0.0,
           'sodium': 0.0,
         },
-        targets: const {'kcal': null, 'protein': null, 'carbs': null, 'fat': null, 'fiber': null},
+        targets: const {
+          'kcal': null,
+          'protein': null,
+          'carbs': null,
+          'fat': null,
+          'fiber': null,
+        },
       );
       await _dayRef(dayId).set(empty.toMap());
       return empty;
@@ -172,14 +184,23 @@ class FoodFirestoreService {
             'fiber': 0.0,
             'sodium': 0.0,
           },
-          targets: const {'kcal': null, 'protein': null, 'carbs': null, 'fat': null, 'fiber': null},
+          targets: const {
+            'kcal': null,
+            'protein': null,
+            'carbs': null,
+            'fat': null,
+            'fiber': null,
+          },
         );
       }
       return DailyIntakeDoc.fromMap(d.id, d.data() as Map<String, dynamic>);
     });
   }
 
-  Future<void> _recalcTotals(String dayId, List<Map<String, dynamic>> entries) async {
+  Future<void> _recalcTotals(
+    String dayId,
+    List<Map<String, dynamic>> entries,
+  ) async {
     double kcal = 0, p = 0, c = 0, f = 0, fib = 0, s = 0;
     for (final e in entries) {
       final m = Map<String, dynamic>.from(e['macrosSnapshot'] as Map);
@@ -192,7 +213,14 @@ class FoodFirestoreService {
     }
     await _dayRef(dayId).set({
       'entries': entries,
-      'totals': {'kcal': kcal, 'protein': p, 'carbs': c, 'fat': f, 'fiber': fib, 'sodium': s},
+      'totals': {
+        'kcal': kcal,
+        'protein': p,
+        'carbs': c,
+        'fat': f,
+        'fiber': fib,
+        'sodium': s,
+      },
     }, SetOptions(merge: true));
   }
 
@@ -207,7 +235,11 @@ class FoodFirestoreService {
     await _recalcTotals(dayId, entries);
   }
 
-  Future<void> updateEntry(String dayId, int index, Map<String, dynamic> patch) async {
+  Future<void> updateEntry(
+    String dayId,
+    int index,
+    Map<String, dynamic> patch,
+  ) async {
     final snap = await _dayRef(dayId).get();
     if (!snap.exists) return;
     final entries =
@@ -262,7 +294,8 @@ class FoodFirestoreService {
   }
 
   Stream<DailyIntakeDoc> streamDailyIntake(String dayId) => streamDay(dayId);
-  Future<void> addIntakeEntry(String dayId, IntakeEntry entry) => addEntry(dayId, entry);
+  Future<void> addIntakeEntry(String dayId, IntakeEntry entry) =>
+      addEntry(dayId, entry);
   Future<void> removeIntakeEntry(String dayId, String entryId) async {
     final index = int.tryParse(entryId);
     if (index != null) await deleteEntry(dayId, index);
@@ -378,8 +411,13 @@ class FoodFirestoreService {
     await _root.collection('mealPlanners').doc(id).update({'name': name});
   }
 
-  Stream<List<PlannerDayEntry>> streamPlannerDay(String plannerId, int dayIndex) {
-    return _root.collection('mealPlanners').doc(plannerId).snapshots().map((snap) {
+  Stream<List<PlannerDayEntry>> streamPlannerDay(
+    String plannerId,
+    int dayIndex,
+  ) {
+    return _root.collection('mealPlanners').doc(plannerId).snapshots().map((
+      snap,
+    ) {
       if (!snap.exists) return [];
       final data = snap.data() as Map<String, dynamic>;
       final days = data['days'] as Map<String, dynamic>?;
@@ -387,12 +425,18 @@ class FoodFirestoreService {
       final dayData = days['$dayIndex'] as List?;
       if (dayData == null) return [];
       return dayData
-          .map((e) => PlannerDayEntry.fromMap(Map<String, dynamic>.from(e as Map)))
+          .map(
+            (e) => PlannerDayEntry.fromMap(Map<String, dynamic>.from(e as Map)),
+          )
           .toList();
     });
   }
 
-  Future<void> addPlannerEntry(String plannerId, int dayIndex, PlannerDayEntry entry) async {
+  Future<void> addPlannerEntry(
+    String plannerId,
+    int dayIndex,
+    PlannerDayEntry entry,
+  ) async {
     final ref = _root.collection('mealPlanners').doc(plannerId);
     final snap = await ref.get();
     final data = snap.data() ?? {};
@@ -403,7 +447,11 @@ class FoodFirestoreService {
     await ref.update({'days': days});
   }
 
-  Future<void> removePlannerEntry(String plannerId, int dayIndex, String entryId) async {
+  Future<void> removePlannerEntry(
+    String plannerId,
+    int dayIndex,
+    String entryId,
+  ) async {
     final ref = _root.collection('mealPlanners').doc(plannerId);
     final snap = await ref.get();
     final data = snap.data() ?? {};
@@ -419,7 +467,10 @@ class FoodFirestoreService {
         .collection('shoppingLists')
         .orderBy('name')
         .snapshots()
-        .map((s) => s.docs.map((d) => ShoppingList.fromMap(d.id, d.data())).toList());
+        .map(
+          (s) =>
+              s.docs.map((d) => ShoppingList.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   Future<String> createShoppingList(
@@ -463,7 +514,11 @@ class FoodFirestoreService {
     await _root.collection('shoppingLists').doc(id).delete();
   }
 
-  Future<void> upsertShoppingItem(String listId, String itemId, ShoppingListItem item) async {
+  Future<void> upsertShoppingItem(
+    String listId,
+    String itemId,
+    ShoppingListItem item,
+  ) async {
     await upsertShoppingItemInternal(listId, itemId: itemId, item: item);
   }
 
@@ -520,7 +575,11 @@ class FoodFirestoreService {
     await toggleCheckedByIndex(listId, index, checked);
   }
 
-  Future<void> toggleCheckedByIndex(String listId, int index, bool checked) async {
+  Future<void> toggleCheckedByIndex(
+    String listId,
+    int index,
+    bool checked,
+  ) async {
     final ref = _root.collection('shoppingLists').doc(listId);
     final snap = await ref.get();
     final items =
@@ -540,7 +599,9 @@ class FoodFirestoreService {
         .collection('pantry')
         .orderBy('name')
         .snapshots()
-        .map((s) => s.docs.map((d) => PantryItem.fromMap(d.id, d.data())).toList());
+        .map(
+          (s) => s.docs.map((d) => PantryItem.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   Future<void> upsertPantry(PantryItem item) async {
@@ -591,7 +652,12 @@ class FoodFirestoreService {
     if (scope == ShoppingScope.biweekly) multiplier = 2.0;
     if (scope == ShoppingScope.monthly) multiplier = 4.0;
 
-    Future<void> addFood(String? foodId, String name, double qty, UnitKind unit) async {
+    Future<void> addFood(
+      String? foodId,
+      String name,
+      double qty,
+      UnitKind unit,
+    ) async {
       final key = foodId ?? name.toLowerCase();
       final current = aggregate[key];
       if (current == null) {
@@ -614,9 +680,13 @@ class FoodFirestoreService {
             await addFood(f.id, f.name, entry.servings * f.unitSize, f.perUnit);
           }
         } else {
-          final recSnap = await _root.collection('recipes').doc(entry.refId).get();
+          final recSnap =
+              await _root.collection('recipes').doc(entry.refId).get();
           if (!recSnap.exists) continue;
-          final rec = Recipe.fromMap(recSnap.id, recSnap.data() as Map<String, dynamic>);
+          final rec = Recipe.fromMap(
+            recSnap.id,
+            recSnap.data() as Map<String, dynamic>,
+          );
           final ratio = entry.servings / (rec.servings == 0 ? 1 : rec.servings);
           for (final ing in rec.ingredients) {
             if (ing.foodId != null) {
@@ -625,7 +695,12 @@ class FoodFirestoreService {
                 await addFood(f.id, f.name, ing.qty * ratio, ing.unit);
               }
             } else {
-              await addFood(null, (ing.freeName ?? 'Ingrediente'), ing.qty * ratio, ing.unit);
+              await addFood(
+                null,
+                (ing.freeName ?? 'Ingrediente'),
+                ing.qty * ratio,
+                ing.unit,
+              );
             }
           }
         }
@@ -634,7 +709,11 @@ class FoodFirestoreService {
 
     String listId = targetListId ?? '';
     if (listId.isEmpty) {
-      listId = await createShoppingList('Lista $weekId', scope: scope, isDefault: false);
+      listId = await createShoppingList(
+        'Lista $weekId',
+        scope: scope,
+        isDefault: false,
+      );
     }
     final items =
         aggregate.values
@@ -645,7 +724,9 @@ class FoodFirestoreService {
                     foodId: e['foodId'] as String?,
                     name: e['name'] as String,
                     qty: (e['qty'] as double),
-                    unit: UnitKind.values.firstWhere((u) => u.name == e['unit']),
+                    unit: UnitKind.values.firstWhere(
+                      (u) => u.name == e['unit'],
+                    ),
                   ).toMap(),
             )
             .toList();

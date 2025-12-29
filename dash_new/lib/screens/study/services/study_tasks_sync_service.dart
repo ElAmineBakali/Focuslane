@@ -20,7 +20,10 @@ class StudyTasksSyncService {
   DocumentReference<Map<String, dynamic>> get _tasksRoot =>
       _db.collection('users').doc(_uid).collection('tasks').doc('root');
 
-  Future<void> syncTaskStatusToTasks(String? syncedTaskId, TaskStatus newStatus) async {
+  Future<void> syncTaskStatusToTasks(
+    String? syncedTaskId,
+    TaskStatus newStatus,
+  ) async {
     if (syncedTaskId == null || syncedTaskId.isEmpty) return;
     try {
       await _tasksRoot.collection('items').doc(syncedTaskId).update({
@@ -29,7 +32,10 @@ class StudyTasksSyncService {
     } catch (_) {}
   }
 
-  Future<void> syncTaskStatusToStudy(String? syncedStudyTaskId, bool completed) async {
+  Future<void> syncTaskStatusToStudy(
+    String? syncedStudyTaskId,
+    bool completed,
+  ) async {
     if (syncedStudyTaskId == null || syncedStudyTaskId.isEmpty) return;
     try {
       await _studyRoot.collection('tasks').doc(syncedStudyTaskId).update({
@@ -55,7 +61,10 @@ class StudyTasksSyncService {
         updateMap['priority'] = _studyPriorityToTaskPriorityLabel(priority);
       }
       if (updateMap.isNotEmpty) {
-        await _tasksRoot.collection('items').doc(syncedTaskId).update(updateMap);
+        await _tasksRoot
+            .collection('items')
+            .doc(syncedTaskId)
+            .update(updateMap);
       }
     } catch (_) {}
   }
@@ -74,10 +83,14 @@ class StudyTasksSyncService {
       if (description != null) updateMap['notes'] = description;
       if (dueDate != null) updateMap['due'] = dueDate.toIso8601String();
       if (priorityLabel != null) {
-        updateMap['priority'] = _taskPriorityLabelToStudyPriority(priorityLabel).name;
+        updateMap['priority'] =
+            _taskPriorityLabelToStudyPriority(priorityLabel).name;
       }
       if (updateMap.isNotEmpty) {
-        await _studyRoot.collection('tasks').doc(syncedStudyTaskId).update(updateMap);
+        await _studyRoot
+            .collection('tasks')
+            .doc(syncedStudyTaskId)
+            .update(updateMap);
       }
     } catch (_) {}
   }

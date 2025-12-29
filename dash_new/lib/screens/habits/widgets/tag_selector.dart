@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 
- class TagSelector extends StatefulWidget {
+class TagSelector extends StatefulWidget {
   final List<String> selectedTags;
   final Function(List<String>) onTagsChanged;
   final int maxTags;
@@ -67,7 +67,7 @@ class _TagSelectorState extends State<TagSelector> {
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
         child: Column(
           children: [
-                         Container(
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
@@ -105,7 +105,7 @@ class _TagSelectorState extends State<TagSelector> {
               ),
             ),
 
-                         if (_selected.isNotEmpty)
+            if (_selected.isNotEmpty)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -132,7 +132,7 @@ class _TagSelectorState extends State<TagSelector> {
                 ),
               ),
 
-                         Padding(
+            Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
@@ -164,7 +164,7 @@ class _TagSelectorState extends State<TagSelector> {
               ),
             ),
 
-                         Expanded(
+            Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
@@ -211,7 +211,7 @@ class _TagSelectorState extends State<TagSelector> {
               ),
             ),
 
-                         Container(
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,

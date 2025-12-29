@@ -2,8 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../widgets/global_ui_components.dart';
-import '../../../theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 
@@ -18,7 +16,10 @@ class StudyAnalyticsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Analíticas', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(
+          'Analíticas',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
         elevation: 0,
         backgroundColor: colorScheme.surface,
       ),
@@ -29,25 +30,25 @@ class StudyAnalyticsScreen extends StatelessWidget {
             svc: svc,
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0),
           const SizedBox(height: 16),
-          _StreakCard(
-            svc: svc,
-            courseId: courseId,
-          ).animate().fadeIn(delay: 100.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
+          _StreakCard(svc: svc, courseId: courseId)
+              .animate()
+              .fadeIn(delay: 100.ms, duration: 300.ms)
+              .slideY(begin: 0.1, end: 0),
           const SizedBox(height: 16),
-          _MinutesBarCard(
-            svc: svc,
-            courseId: courseId,
-            days: 30,
-          ).animate().fadeIn(delay: 200.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
+          _MinutesBarCard(svc: svc, courseId: courseId, days: 30)
+              .animate()
+              .fadeIn(delay: 200.ms, duration: 300.ms)
+              .slideY(begin: 0.1, end: 0),
           const SizedBox(height: 16),
-          _MethodDistributionCard(
-            svc: svc,
-            courseId: courseId,
-          ).animate().fadeIn(delay: 300.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
+          _MethodDistributionCard(svc: svc, courseId: courseId)
+              .animate()
+              .fadeIn(delay: 300.ms, duration: 300.ms)
+              .slideY(begin: 0.1, end: 0),
           const SizedBox(height: 16),
-          _ActiveDaysByCourseCard(
-            svc: svc,
-          ).animate().fadeIn(delay: 400.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
+          _ActiveDaysByCourseCard(svc: svc)
+              .animate()
+              .fadeIn(delay: 400.ms, duration: 300.ms)
+              .slideY(begin: 0.1, end: 0),
           const SizedBox(height: 80),
         ],
       ),
@@ -72,7 +73,9 @@ class _TotalHoursPerCourseCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withOpacity(0.5),
+              ),
             ),
             child: const Center(child: CircularProgressIndicator()),
           );
@@ -83,13 +86,16 @@ class _TotalHoursPerCourseCard extends StatelessWidget {
         for (final s in sessions) {
           totals[s.courseId] = (totals[s.courseId] ?? 0) + s.minutes;
         }
-        final items = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+        final items =
+            totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
         return Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+            ),
           ),
           child: Column(
             children: [
@@ -103,7 +109,11 @@ class _TotalHoursPerCourseCard extends StatelessWidget {
                         color: colorScheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.timeline, color: colorScheme.primary, size: 24),
+                      child: Icon(
+                        Icons.timeline,
+                        color: colorScheme.primary,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Text(
@@ -130,7 +140,9 @@ class _TotalHoursPerCourseCard extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         'Sin sesiones registradas',
-                        style: GoogleFonts.poppins(color: colorScheme.onSurfaceVariant),
+                        style: GoogleFonts.poppins(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -138,7 +150,10 @@ class _TotalHoursPerCourseCard extends StatelessWidget {
               else
                 ...items.map(
                   (e) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
@@ -189,7 +204,10 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData)
           return const Card(
-            child: SizedBox(height: 130, child: Center(child: CircularProgressIndicator())),
+            child: SizedBox(
+              height: 130,
+              child: Center(child: CircularProgressIndicator()),
+            ),
           );
         final map = <String, Set<DateTime>>{};
         for (final s in snap.data!) {
@@ -207,10 +225,16 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
                 title: Text('Días activos por curso'),
               ),
               if (items.isEmpty)
-                const Padding(padding: EdgeInsets.only(bottom: 12), child: Text('Sin sesiones'))
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Text('Sin sesiones'),
+                )
               else
                 ...items.map(
-                  (e) => ListTile(title: Text(e.key), trailing: Text('${e.value} días')),
+                  (e) => ListTile(
+                    title: Text(e.key),
+                    trailing: Text('${e.value} días'),
+                  ),
                 ),
             ],
           ),
@@ -232,11 +256,17 @@ class _StreakCard extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData)
           return const Card(
-            child: SizedBox(height: 120, child: Center(child: CircularProgressIndicator())),
+            child: SizedBox(
+              height: 120,
+              child: Center(child: CircularProgressIndicator()),
+            ),
           );
         final list = snap.data!;
         final days =
-            list.map((s) => DateTime(s.date.year, s.date.month, s.date.day)).toSet().toList()
+            list
+                .map((s) => DateTime(s.date.year, s.date.month, s.date.day))
+                .toSet()
+                .toList()
               ..sort();
         int streak = 0;
         DateTime d = DateTime.now();
@@ -246,7 +276,10 @@ class _StreakCard extends StatelessWidget {
         }
         return Card(
           child: ListTile(
-            leading: const Icon(Icons.local_fire_department, color: Colors.orange),
+            leading: const Icon(
+              Icons.local_fire_department,
+              color: Colors.orange,
+            ),
             title: const Text('Racha de estudio'),
             subtitle: Text('$streak días seguidos'),
           ),
@@ -269,7 +302,10 @@ class _MinutesBarCard extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData)
           return const Card(
-            child: SizedBox(height: 220, child: Center(child: CircularProgressIndicator())),
+            child: SizedBox(
+              height: 220,
+              child: Center(child: CircularProgressIndicator()),
+            ),
           );
         final list = snap.data!;
         final now = DateTime.now();
@@ -331,14 +367,18 @@ class _MethodDistributionCard extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData)
           return const Card(
-            child: SizedBox(height: 180, child: Center(child: CircularProgressIndicator())),
+            child: SizedBox(
+              height: 180,
+              child: Center(child: CircularProgressIndicator()),
+            ),
           );
         final list = snap.data!;
         final totals = <StudyMethod, int>{};
         for (final s in list) {
           totals[s.method] = (totals[s.method] ?? 0) + s.minutes;
         }
-        final items = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+        final items =
+            totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
         return Card(
           child: Column(
             children: [
@@ -353,7 +393,10 @@ class _MethodDistributionCard extends StatelessWidget {
                 )
               else
                 ...items.map(
-                  (e) => ListTile(title: Text(e.key.name), trailing: Text('${e.value} min')),
+                  (e) => ListTile(
+                    title: Text(e.key.name),
+                    trailing: Text('${e.value} min'),
+                  ),
                 ),
             ],
           ),

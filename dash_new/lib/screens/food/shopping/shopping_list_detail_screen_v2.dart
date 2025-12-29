@@ -8,13 +8,19 @@ class ShoppingListDetailScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   final String listId;
 
-  const ShoppingListDetailScreenV2({super.key, required this.svc, required this.listId});
+  const ShoppingListDetailScreenV2({
+    super.key,
+    required this.svc,
+    required this.listId,
+  });
 
   @override
-  State<ShoppingListDetailScreenV2> createState() => _ShoppingListDetailScreenV2State();
+  State<ShoppingListDetailScreenV2> createState() =>
+      _ShoppingListDetailScreenV2State();
 }
 
-class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2> {
+class _ShoppingListDetailScreenV2State
+    extends State<ShoppingListDetailScreenV2> {
   bool _hideCompleted = false;
 
   @override
@@ -43,11 +49,17 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
         );
 
         final visibleItems =
-            _hideCompleted ? list.items.where((i) => !i.checked).toList() : list.items;
+            _hideCompleted
+                ? list.items.where((i) => !i.checked).toList()
+                : list.items;
 
         final purchasedCount = list.items.where((i) => i.checked).length;
-        final progress = list.items.isEmpty ? 0.0 : purchasedCount / list.items.length;
-        final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
+        final progress =
+            list.items.isEmpty ? 0.0 : purchasedCount / list.items.length;
+        final total = list.items.fold<double>(
+          0,
+          (sum, item) => sum + (item.total ?? 0),
+        );
         final totalPurchased = list.items
             .where((i) => i.checked)
             .fold<double>(0, (sum, item) => sum + (item.total ?? 0));
@@ -58,9 +70,12 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
             useThemeColors: true,
             actions: [
               IconButton(
-                icon: Icon(_hideCompleted ? Icons.visibility : Icons.visibility_off),
+                icon: Icon(
+                  _hideCompleted ? Icons.visibility : Icons.visibility_off,
+                ),
                 tooltip: _hideCompleted ? 'Mostrar todos' : 'Ocultar comprados',
-                onPressed: () => setState(() => _hideCompleted = !_hideCompleted),
+                onPressed:
+                    () => setState(() => _hideCompleted = !_hideCompleted),
               ),
               IconButton(
                 icon: const Icon(Icons.add),
@@ -80,9 +95,16 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                           value: 'complete',
                           child: Row(
                             children: [
-                              Icon(Icons.archive, size: 20, color: Colors.green),
+                              Icon(
+                                Icons.archive,
+                                size: 20,
+                                color: Colors.green,
+                              ),
                               SizedBox(width: AppSpacing.sm),
-                              Text('Archivar al historial', style: TextStyle(color: Colors.green)),
+                              Text(
+                                'Archivar al historial',
+                                style: TextStyle(color: Colors.green),
+                              ),
                             ],
                           ),
                         ),
@@ -120,7 +142,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+                        colors: [
+                          colorScheme.primaryContainer,
+                          colorScheme.secondaryContainer,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       boxShadow: [
@@ -144,7 +169,9 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                             Container(
                               width: 1,
                               height: 40,
-                              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withOpacity(0.3),
                             ),
                             _SummaryItem(
                               icon: Icons.check_circle,
@@ -154,7 +181,9 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                             Container(
                               width: 1,
                               height: 40,
-                              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withOpacity(0.3),
                             ),
                             _SummaryItem(
                               icon: Icons.euro,
@@ -172,14 +201,16 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                               children: [
                                 Text(
                                   'Progreso',
-                                  style: AppTypography.label(
-                                    context,
-                                  ).copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                                  style: AppTypography.label(context).copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
                                 ),
                                 Text(
                                   '${(progress * 100).toStringAsFixed(0)}%',
                                   style: AppTypography.label(context).copyWith(
-                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -200,7 +231,9 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                           Text(
                             'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
                             style: AppTypography.caption(context).copyWith(
-                              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -214,16 +247,23 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                     visibleItems.isEmpty
                         ? ModernEmptyState(
                           icon: Icons.shopping_cart_outlined,
-                          message: _hideCompleted ? 'Todo comprado' : 'Lista vacía',
+                          message:
+                              _hideCompleted ? 'Todo comprado' : 'Lista vacía',
                           subtitle:
                               _hideCompleted
                                   ? '¡Excelente! Has comprado todo'
                                   : 'Añade productos con el botón +',
-                          actionLabel: _hideCompleted ? null : 'Añadir Producto',
-                          onAction: _hideCompleted ? null : () => _addItemDialog(list),
+                          actionLabel:
+                              _hideCompleted ? null : 'Añadir Producto',
+                          onAction:
+                              _hideCompleted
+                                  ? null
+                                  : () => _addItemDialog(list),
                         )
                         : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                          ),
                           itemCount: visibleItems.length,
                           itemBuilder: (context, index) {
                             final item = visibleItems[index];
@@ -237,11 +277,19 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                                         originalIndex.toString(),
                                         !item.checked,
                                       ),
-                                  onEdit: () => _editItemDialog(list, originalIndex, item),
-                                  onDelete: () => _deleteItem(list, originalIndex),
+                                  onEdit:
+                                      () => _editItemDialog(
+                                        list,
+                                        originalIndex,
+                                        item,
+                                      ),
+                                  onDelete:
+                                      () => _deleteItem(list, originalIndex),
                                 )
                                 .animate()
-                                .fadeIn(delay: Duration(milliseconds: index * 30))
+                                .fadeIn(
+                                  delay: Duration(milliseconds: index * 30),
+                                )
                                 .slideX(begin: -0.2);
                           },
                         ),
@@ -283,7 +331,8 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                   left: AppSpacing.md,
                   right: AppSpacing.md,
                   top: AppSpacing.md,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -303,7 +352,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text('Añadir Producto', style: AppTypography.heading3(context)),
+                    Text(
+                      'Añadir Producto',
+                      style: AppTypography.heading3(context),
+                    ),
                     const SizedBox(height: AppSpacing.md),
                     ModernTextField(
                       controller: nameController,
@@ -323,10 +375,14 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: AppColors.borderLight),
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                             child: DropdownButton<UnitKind>(
                               value: unit,
@@ -339,7 +395,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                                       child: Text(_getUnitLabel(u)),
                                     );
                                   }).toList(),
-                              onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
+                              onChanged:
+                                  (v) => setModalState(
+                                    () => unit = v ?? UnitKind.unit,
+                                  ),
                             ),
                           ),
                         ),
@@ -367,9 +426,13 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                             onPressed:
                                 () => Navigator.pop(context, {
                                   'name': nameController.text,
-                                  'qty': double.tryParse(qtyController.text) ?? 1.0,
+                                  'qty':
+                                      double.tryParse(qtyController.text) ??
+                                      1.0,
                                   'unit': unit,
-                                  'price': double.tryParse(priceController.text),
+                                  'price': double.tryParse(
+                                    priceController.text,
+                                  ),
                                 }),
                             child: const Text('Añadir'),
                           ),
@@ -401,10 +464,16 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
     }
   }
 
-  Future<void> _editItemDialog(ShoppingList list, int index, ShoppingListItem item) async {
+  Future<void> _editItemDialog(
+    ShoppingList list,
+    int index,
+    ShoppingListItem item,
+  ) async {
     final nameController = TextEditingController(text: item.name);
     final qtyController = TextEditingController(text: item.qty.toString());
-    final priceController = TextEditingController(text: item.total?.toString() ?? '');
+    final priceController = TextEditingController(
+      text: item.total?.toString() ?? '',
+    );
     UnitKind unit = item.unit;
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -415,7 +484,6 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
           (context) => StatefulBuilder(
             builder: (context, setModalState) {
               final colorScheme = Theme.of(context).colorScheme;
-              final isDark = Theme.of(context).brightness == Brightness.dark;
               return Container(
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
@@ -427,7 +495,8 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                   left: AppSpacing.md,
                   right: AppSpacing.md,
                   top: AppSpacing.md,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -444,9 +513,15 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text('Editar Producto', style: AppTypography.heading3(context)),
+                    Text(
+                      'Editar Producto',
+                      style: AppTypography.heading3(context),
+                    ),
                     const SizedBox(height: AppSpacing.md),
-                    ModernTextField(controller: nameController, label: 'Nombre del producto'),
+                    ModernTextField(
+                      controller: nameController,
+                      label: 'Nombre del producto',
+                    ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
@@ -460,10 +535,14 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: AppColors.borderLight),
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                             child: DropdownButton<UnitKind>(
                               value: unit,
@@ -476,7 +555,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                                       child: Text(_getUnitLabel(u)),
                                     );
                                   }).toList(),
-                              onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
+                              onChanged:
+                                  (v) => setModalState(
+                                    () => unit = v ?? UnitKind.unit,
+                                  ),
                             ),
                           ),
                         ),
@@ -503,11 +585,17 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
                             onPressed:
                                 () => Navigator.pop(context, {
                                   'name': nameController.text,
-                                  'qty': double.tryParse(qtyController.text) ?? 1.0,
+                                  'qty':
+                                      double.tryParse(qtyController.text) ??
+                                      1.0,
                                   'unit': unit,
-                                  'price': double.tryParse(priceController.text),
+                                  'price': double.tryParse(
+                                    priceController.text,
+                                  ),
                                 }),
-                            style: FilledButton.styleFrom(backgroundColor: AppColors.food),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.food,
+                            ),
                             child: const Text('Guardar'),
                           ),
                         ),
@@ -537,7 +625,11 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
         notes: item.notes,
       );
 
-      await widget.svc.upsertShoppingItem(list.id, index.toString(), updatedItem);
+      await widget.svc.upsertShoppingItem(
+        list.id,
+        index.toString(),
+        updatedItem,
+      );
     }
   }
 
@@ -549,7 +641,9 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
           (context) => AlertDialog(
             backgroundColor: colorScheme.surface,
             title: const Text('Eliminar producto'),
-            content: Text('¿Seguro que quieres eliminar "${list.items[index].name}"?'),
+            content: Text(
+              '¿Seguro que quieres eliminar "${list.items[index].name}"?',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -580,7 +674,9 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
           (context) => AlertDialog(
             backgroundColor: colorScheme.surface,
             title: const Text('Limpiar comprados'),
-            content: Text('¿Eliminar ${purchased.length} productos ya comprados?'),
+            content: Text(
+              '¿Eliminar ${purchased.length} productos ya comprados?',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -682,7 +778,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.archive, color: Theme.of(context).colorScheme.onPrimary),
+                  Icon(
+                    Icons.archive,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   const Text('Lista archivada correctamente'),
                 ],
@@ -698,7 +797,10 @@ class _ShoppingListDetailScreenV2State extends State<ShoppingListDetailScreenV2>
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al archivar: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Error al archivar: $e'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       }
@@ -722,7 +824,11 @@ class _SummaryItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _SummaryItem({required this.icon, required this.label, required this.value});
+  const _SummaryItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -732,15 +838,16 @@ class _SummaryItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: AppTypography.heading3(
-            context,
-          ).copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
+          style: AppTypography.heading3(context).copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         Text(
           label,
-          style: AppTypography.caption(
-            context,
-          ).copyWith(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+          style: AppTypography.caption(context).copyWith(
+            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+          ),
         ),
       ],
     );
@@ -768,7 +875,10 @@ class _ShoppingItemCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
-          color: item.checked ? AppColors.success.withOpacity(0.5) : AppColors.borderLight,
+          color:
+              item.checked
+                  ? AppColors.success.withOpacity(0.5)
+                  : AppColors.borderLight,
           width: item.checked ? 2 : 1,
         ),
         boxShadow: [
@@ -789,7 +899,8 @@ class _ShoppingItemCard extends StatelessWidget {
           item.name,
           style: AppTypography.body(context).copyWith(
             decoration: item.checked ? TextDecoration.lineThrough : null,
-            color: item.checked ? AppColors.textSecondary : AppColors.textPrimary,
+            color:
+                item.checked ? AppColors.textSecondary : AppColors.textPrimary,
           ),
         ),
         subtitle: Row(

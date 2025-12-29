@@ -41,14 +41,14 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
 
           _habits = snapshot.data ?? [];
 
-                     final filteredHabits =
+          final filteredHabits =
               _selectedTagFilter == null
                   ? _habits
                   : _habits
                       .where((h) => h.tags.contains(_selectedTagFilter))
                       .toList();
 
-                     final allTags = <String>{};
+          final allTags = <String>{};
           for (final habit in _habits) {
             allTags.addAll(habit.tags);
           }
@@ -59,7 +59,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
 
           return Column(
             children: [
-                             if (allTags.isNotEmpty)
+              if (allTags.isNotEmpty)
                 Container(
                   height: isMobile ? 50 : 56,
                   padding: const EdgeInsets.symmetric(
@@ -95,7 +95,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                   ),
                 ),
 
-                             Expanded(
+              Expanded(
                 child:
                     filteredHabits.isEmpty
                         ? Center(
@@ -161,7 +161,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                     padding: EdgeInsets.all(isMobile ? 14 : 16),
                                     child: Row(
                                       children: [
-                                                                                 Container(
+                                        Container(
                                           width: isMobile ? 50 : 56,
                                           height: isMobile ? 50 : 56,
                                           decoration: BoxDecoration(
@@ -206,7 +206,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                         ),
                                         const SizedBox(width: 16),
 
-                                                                                 Expanded(
+                                        Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -246,7 +246,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                                 ),
                                               ],
 
-                                                                                             if (habit.tags.isNotEmpty) ...[
+                                              if (habit.tags.isNotEmpty) ...[
                                                 const SizedBox(height: 8),
                                                 Wrap(
                                                   spacing: 6,
@@ -296,7 +296,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                                 ),
                                               ],
 
-                                                                                             if (habit.currentStreak > 0) ...[
+                                              if (habit.currentStreak > 0) ...[
                                                 const SizedBox(height: 8),
                                                 Row(
                                                   children: [
@@ -324,7 +324,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                           ),
                                         ),
 
-                                                                                 if (habit.reminders.isNotEmpty)
+                                        if (habit.reminders.isNotEmpty)
                                           Container(
                                             padding: const EdgeInsets.all(6),
                                             decoration: BoxDecoration(

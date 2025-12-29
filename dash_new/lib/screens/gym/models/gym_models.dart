@@ -5,7 +5,8 @@ class Routine {
   final String name;
   final String? description;
   final bool isDefault;
-  final String splitType;    final int restSecDefault;
+  final String splitType;
+  final int restSecDefault;
   final String? colorHex;
 
   const Routine({
@@ -100,12 +101,15 @@ class RoutineExercise {
   final int targetReps;
   final int? restSec;
   final int order;
-  final String? tempo;    final double? targetRPE;
+  final String? tempo;
+  final double? targetRPE;
   final double? targetPercent1RM;
   final String? notes;
-  
-     final bool autoProgressionEnabled;
-  final String? progressionType;    final double? progressionIncrement;    final int? progressionWeeks;  
+
+  final bool autoProgressionEnabled;
+  final String? progressionType;
+  final double? progressionIncrement;
+  final int? progressionWeeks;
   const RoutineExercise({
     required this.id,
     required this.exerciseId,
@@ -162,7 +166,8 @@ class RoutineExercise {
     'order': order,
     'autoProgressionEnabled': autoProgressionEnabled,
     if (progressionType != null) 'progressionType': progressionType,
-    if (progressionIncrement != null) 'progressionIncrement': progressionIncrement,
+    if (progressionIncrement != null)
+      'progressionIncrement': progressionIncrement,
     if (progressionWeeks != null) 'progressionWeeks': progressionWeeks,
     if (tempo != null) 'tempo': tempo,
     if (targetRPE != null) 'targetRPE': targetRPE,
@@ -241,10 +246,12 @@ class SessionDoc {
   final String? notes;
   final int? durationMin;
   final double volumeKg;
-  final List<String> prList;    final List<PerformedExercise> exercises;
-  
-     final int? feelingEnergy;
-  final int? feelingFatigue;    final int? feelingMotivation;  
+  final List<String> prList;
+  final List<PerformedExercise> exercises;
+
+  final int? feelingEnergy;
+  final int? feelingFatigue;
+  final int? feelingMotivation;
   const SessionDoc({
     required this.id,
     required this.routineId,
@@ -331,7 +338,7 @@ class MeasurementEntry {
   final DateTime date;
   final String muscle;
   final double valueCm;
-  final String? site;  
+  final String? site;
   const MeasurementEntry({
     required this.id,
     required this.date,
@@ -363,11 +370,13 @@ class GymGoals {
   }
 }
 
- class PresetRoutine {
+class PresetRoutine {
   final String id;
   final String name;
   final String description;
-  final String goal;    final String level;    final String? imageAsset;
+  final String goal;
+  final String level;
+  final String? imageAsset;
   final IconData icon;
   final List<PresetDay> days;
 
@@ -388,11 +397,7 @@ class PresetDay {
   final String? icon;
   final List<PresetExercise> exercises;
 
-  const PresetDay({
-    required this.name,
-    required this.exercises,
-    this.icon,
-  });
+  const PresetDay({required this.name, required this.exercises, this.icon});
 }
 
 class PresetExercise {

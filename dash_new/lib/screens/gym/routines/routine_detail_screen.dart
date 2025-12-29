@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,7 +10,7 @@ import '../analytics/gym_analytics_screen_v2.dart';
 class RoutineDetailScreen extends StatelessWidget {
   final GymFirestoreService svc;
   final Routine routine;
-  
+
   const RoutineDetailScreen({
     super.key,
     required this.svc,
@@ -20,7 +20,7 @@ class RoutineDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -34,10 +34,7 @@ class RoutineDetailScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w700,
                   shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                    ),
+                    Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 8),
                   ],
                 ),
               ),
@@ -49,10 +46,7 @@ class RoutineDetailScreen extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          routine.color,
-                          routine.color.withOpacity(0.6),
-                        ],
+                        colors: [routine.color, routine.color.withOpacity(0.6)],
                       ),
                     ),
                   ),
@@ -72,12 +66,13 @@ class RoutineDetailScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.bar_chart_rounded),
                 tooltip: 'Estadísticas',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => GymAnalyticsScreenV2(svc: svc),
-                  ),
-                ),
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GymAnalyticsScreenV2(svc: svc),
+                      ),
+                    ),
               ),
             ],
           ),
@@ -91,9 +86,9 @@ class RoutineDetailScreen extends StatelessWidget {
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
-                
+
                 final days = snap.data!;
-                
+
                 if (days.isEmpty) {
                   return Container(
                     margin: const EdgeInsets.all(20),
@@ -136,7 +131,7 @@ class RoutineDetailScreen extends StatelessWidget {
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -165,7 +160,12 @@ class RoutineDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDayCard(BuildContext context, RoutineDay d, int index, ColorScheme s) {
+  Widget _buildDayCard(
+    BuildContext context,
+    RoutineDay d,
+    int index,
+    ColorScheme s,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -173,10 +173,7 @@ class RoutineDetailScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            s.surfaceContainerHighest,
-            s.surfaceContainer,
-          ],
+          colors: [s.surfaceContainerHighest, s.surfaceContainer],
         ),
         boxShadow: [
           BoxShadow(
@@ -190,16 +187,15 @@ class RoutineDetailScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => LiveSessionScreen(
-                svc: svc,
-                routine: routine,
-                day: d,
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) =>
+                          LiveSessionScreen(svc: svc, routine: routine, day: d),
+                ),
               ),
-            ),
-          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -261,7 +257,10 @@ class RoutineDetailScreen extends StatelessWidget {
                       ),
                     ),
                     PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert_rounded, color: s.onSurfaceVariant),
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        color: s.onSurfaceVariant,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -281,29 +280,36 @@ class RoutineDetailScreen extends StatelessWidget {
                         if (v == 'del') {
                           final ok = await showDialog<bool>(
                             context: context,
-                            builder: (_) => AlertDialog(
-                              title: Text(
-                                'Eliminar día',
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                              ),
-                              content: Text('¿Eliminar "${d.name}" y sus ejercicios?'),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: s.error,
+                            builder:
+                                (_) => AlertDialog(
+                                  title: Text(
+                                    'Eliminar día',
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                  child: const Text('Eliminar'),
+                                  content: Text(
+                                    '¿Eliminar "${d.name}" y sus ejercicios?',
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, false),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    FilledButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: s.error,
+                                      ),
+                                      child: const Text('Eliminar'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
                           );
                           if (ok == true) {
                             await svc.deleteDayCascade(routine.id, d.id);
@@ -319,28 +325,29 @@ class RoutineDetailScreen extends StatelessWidget {
                           }
                         }
                       },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(
-                          value: 'dup',
-                          child: Row(
-                            children: [
-                              Icon(Icons.content_copy_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Duplicar día'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'del',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Eliminar día'),
-                            ],
-                          ),
-                        ),
-                      ],
+                      itemBuilder:
+                          (_) => const [
+                            PopupMenuItem(
+                              value: 'dup',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.content_copy_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Duplicar día'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'del',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Eliminar día'),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ],
                 ),
@@ -363,10 +370,7 @@ class RoutineDetailScreen extends StatelessWidget {
           Icon(icon, size: 20, color: s.onInverseSurface),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(color: s.onInverseSurface),
-            ),
+            child: Text(text, style: TextStyle(color: s.onInverseSurface)),
           ),
         ],
       ),
@@ -383,110 +387,108 @@ class RoutineDetailScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 0,
-          bottom: 20 + MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              'Nuevo día',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: s.onSurface,
-              ),
-              textAlign: TextAlign.center,
+      builder:
+          (ctx) => Container(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 0,
+              bottom: 20 + MediaQuery.of(ctx).viewInsets.bottom,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'en "${routine.name}"',
-              style: TextStyle(
-                fontSize: 14,
-                color: s.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: nameCtrl,
-              autofocus: true,
-              style: const TextStyle(fontSize: 16),
-              decoration: InputDecoration(
-                labelText: 'Nombre del día',
-                hintText: 'Ej: Pecho/Espalda, Push, Pierna...',
-                prefixIcon: const Icon(Icons.label_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                filled: true,
-                fillColor: s.surfaceContainerHighest.withOpacity(0.3),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              keyboardType: TextInputType.number,
-              style: const TextStyle(fontSize: 16),
-              decoration: InputDecoration(
-                labelText: 'Descanso por defecto (opcional)',
-                hintText: '90',
-                suffixText: 'segundos',
-                prefixIcon: const Icon(Icons.timer_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                filled: true,
-                fillColor: s.surfaceContainerHighest.withOpacity(0.3),
-              ),
-              onChanged: (s) => restDefault = int.tryParse(s),
-            ),
-            const SizedBox(height: 24),
-            Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                const SizedBox(height: 8),
+                Text(
+                  'Nuevo día',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: s.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'en "${routine.name}"',
+                  style: TextStyle(fontSize: 14, color: s.onSurfaceVariant),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: nameCtrl,
+                  autofocus: true,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Nombre del día',
+                    hintText: 'Ej: Pecho/Espalda, Push, Pierna...',
+                    prefixIcon: const Icon(Icons.label_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text('Cancelar'),
+                    filled: true,
+                    fillColor: s.surfaceContainerHighest.withOpacity(0.3),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(ctx, true),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: routine.color,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                const SizedBox(height: 16),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Descanso por defecto (opcional)',
+                    hintText: '90',
+                    suffixText: 'segundos',
+                    prefixIcon: const Icon(Icons.timer_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text(
-                      'Crear día',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    filled: true,
+                    fillColor: s.surfaceContainerHighest.withOpacity(0.3),
                   ),
+                  onChanged: (s) => restDefault = int.tryParse(s),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Text('Cancelar'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: routine.color,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Text(
+                          'Crear día',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
 
     if (ok == true) {
@@ -499,7 +501,8 @@ class RoutineDetailScreen extends StatelessWidget {
           .collection('days');
 
       final snap = await col.get();
-      final nextOrder = (snap.docs
+      final nextOrder =
+          (snap.docs
               .map((d) {
                 final m = d.data();
                 return (m['order'] as num?)?.toInt() ?? 0;
@@ -530,7 +533,7 @@ class _LastDoneSubtitle extends StatelessWidget {
   final GymFirestoreService svc;
   final String routineId;
   final String dayId;
-  
+
   const _LastDoneSubtitle({
     required this.svc,
     required this.routineId,
@@ -564,29 +567,25 @@ class _LastDoneSubtitle extends StatelessWidget {
         if (!snap.hasData || !snap.data!.exists) {
           return Text(
             'Sin sesiones aún',
-            style: TextStyle(
-              fontSize: 12,
-              color: s.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }
-        
+
         final data = snap.data!.data() as Map<String, dynamic>;
-        final dt = _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);
-        
+        final dt =
+            _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);
+
         if (dt == null) {
           return Text(
             'Sin sesiones aún',
-            style: TextStyle(
-              fontSize: 12,
-              color: s.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }
 
         final lastLocal = dt.toLocal();
         final now = DateTime.now();
-        final sameDay = lastLocal.year == now.year &&
+        final sameDay =
+            lastLocal.year == now.year &&
             lastLocal.month == now.month &&
             lastLocal.day == now.day;
 

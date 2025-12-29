@@ -75,7 +75,6 @@ class CultureHomeScreen extends StatelessWidget {
     );
   }
 
-
   Widget _addTile(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Card(

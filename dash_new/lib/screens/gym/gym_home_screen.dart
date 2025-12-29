@@ -12,7 +12,7 @@ import 'widgets/export_data_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:intl/intl.dart';
 
-/// ≠É≈Ô¥©≈ GymHomeScreen redise+¶ado - Est+Ætica profesional estilo Strong/Hevy
+/// M√≥dulo GymHomeScreen redise√±ado - Est√©tica profesional estilo Strong/Heavy
 class GymHomeScreen extends StatefulWidget {
   final GymFirestoreService svc;
   const GymHomeScreen({super.key, required this.svc});
@@ -42,7 +42,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _weeklyWeightId,
       title: 'Control semanal',
-      body: 'P+Æsate y registra tu peso ≠ÉÙÎ',
+      body: 'P√©sate y registra tu peso üèãÔ∏è',
       whenLocal: nextMon,
       useExact: false,
     );
@@ -51,7 +51,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _weeklyMeasureId,
       title: 'Medidas corporales',
-      body: 'Toca medir per+°metros (pecho, brazo, cintura‘«™) ≠ÉÙ≈',
+      body: 'Toca medir per√≠metros (pecho, brazo, cintura...) üìè',
       whenLocal: nextMon2,
       useExact: false,
     );
@@ -72,7 +72,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _inactivityId,
       title: 'Vuelve al gym',
-      body: 'Llevas $xDays d+°as sin entrenar. -ÌToca sesi+¶n! ≠É∆¨',
+      body: 'Llevas $xDays d√≠as sin entrenar. ¬°Toca sesi√≥n! üí™',
       whenLocal: at,
       useExact: false,
     );
@@ -83,28 +83,29 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _NotificationSettingsSheet(
-        onSave: () async {
-          await _scheduleGymReminders();
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Recordatorios actualizados',
-                      style: GoogleFonts.poppins(),
+      builder:
+          (context) => _NotificationSettingsSheet(
+            onSave: () async {
+              await _scheduleGymReminders();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Recordatorios actualizados',
+                          style: GoogleFonts.poppins(),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
-      ),
+                  ),
+                );
+              }
+            },
+          ),
     );
   }
 
@@ -186,7 +187,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       final defaultRoutine = snap.data;
-                      
+
                       if (defaultRoutine != null) {
                         return _buildDefaultRoutineCard(defaultRoutine)
                             .animate()
@@ -196,17 +197,17 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                       return const SizedBox();
                     },
                   ),
-                  
+
                   if (true) const SizedBox(height: 20),
-                  
+
                   // Quick Stats
                   _buildQuickStats(),
-                  
+
                   const SizedBox(height: 24),
-                  
-                  // Secci+¶n de acciones r+Ìpidas
+
+                  // Secci√≥n de acciones r√°pidas
                   Text(
-                    'Acciones R+Ìpidas',
+                    'Acciones R√°pidas',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -214,14 +215,14 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   _buildQuickActionsGrid(),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Acceso a funciones principales
                   Text(
-                    'Gesti+¶n y An+Ìlisis',
+                    'Gesti√≥n y An√°lisis',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -229,7 +230,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   _buildMainFeatures(),
                 ],
               ),
@@ -242,7 +243,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
 
   Widget _buildDefaultRoutineCard(Routine routine) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -269,7 +270,9 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => RoutineDetailScreen(svc: widget.svc, routine: routine),
+                builder:
+                    (_) =>
+                        RoutineDetailScreen(svc: widget.svc, routine: routine),
               ),
             );
           },
@@ -291,9 +294,9 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                     color: colorScheme.primary,
                   ),
                 ),
-                
+
                 const SizedBox(width: 16),
-                
+
                 // Info
                 Expanded(
                   child: Column(
@@ -304,7 +307,9 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: colorScheme.onPrimaryContainer.withOpacity(0.7),
+                          color: colorScheme.onPrimaryContainer.withOpacity(
+                            0.7,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -321,13 +326,15 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                         routine.splitType,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
-                          color: colorScheme.onPrimaryContainer.withOpacity(0.7),
+                          color: colorScheme.onPrimaryContainer.withOpacity(
+                            0.7,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 Icon(
                   Icons.arrow_forward_ios,
                   color: colorScheme.onPrimaryContainer.withOpacity(0.5),
@@ -345,15 +352,18 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       stream: widget.svc.streamSessions(limit: 7),
       builder: (context, snap) {
         final sessions = snap.data ?? [];
-        final lastWeekSessions = sessions.where((s) {
-          return s.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
-        }).toList();
-        
+        final lastWeekSessions =
+            sessions.where((s) {
+              return s.date.isAfter(
+                DateTime.now().subtract(const Duration(days: 7)),
+              );
+            }).toList();
+
         final totalVolume = lastWeekSessions.fold<double>(
           0,
           (sum, s) => sum + s.volumeKg,
         );
-        
+
         return Row(
           children: [
             Expanded(
@@ -370,7 +380,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
               child: _buildStatCard(
                 'Volumen',
                 '${(totalVolume / 1000).toStringAsFixed(1)} ton',
-                '7 d+°as',
+                '7 d√≠as',
                 Icons.fitness_center,
                 Colors.orange,
               ),
@@ -423,10 +433,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
           ),
           Text(
             subtitle,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -442,20 +449,15 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       crossAxisSpacing: 12,
       childAspectRatio: 1.3,
       children: [
-        _buildActionCard(
-          'Mis Rutinas',
-          Icons.list_alt,
-          Colors.blue,
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => RoutinesListScreen(svc: widget.svc),
-              ),
-            );
-          },
-        ).animate(delay: 100.ms).fadeIn(duration: 400.ms).scale(),
-        
+        _buildActionCard('Mis Rutinas', Icons.list_alt, Colors.blue, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RoutinesListScreen(svc: widget.svc),
+            ),
+          );
+        }).animate(delay: 100.ms).fadeIn(duration: 400.ms).scale(),
+
         _buildActionCard(
           'Rutinas Destacadas',
           Icons.auto_awesome,
@@ -469,34 +471,24 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             );
           },
         ).animate(delay: 200.ms).fadeIn(duration: 400.ms).scale(),
-        
-        _buildActionCard(
-          'Anal+°ticas',
-          Icons.bar_chart,
-          Colors.green,
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => GymAnalyticsScreenV2(svc: widget.svc),
-              ),
-            );
-          },
-        ).animate(delay: 300.ms).fadeIn(duration: 400.ms).scale(),
-        
-        _buildActionCard(
-          'Exportar Datos',
-          Icons.download,
-          Colors.orange,
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ExportDataScreen(svc: widget.svc),
-              ),
-            );
-          },
-        ).animate(delay: 400.ms).fadeIn(duration: 400.ms).scale(),
+
+        _buildActionCard('Anal√≠ticas', Icons.bar_chart, Colors.green, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => GymAnalyticsScreenV2(svc: widget.svc),
+            ),
+          );
+        }).animate(delay: 300.ms).fadeIn(duration: 400.ms).scale(),
+
+        _buildActionCard('Exportar Datos', Icons.download, Colors.orange, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ExportDataScreen(svc: widget.svc),
+            ),
+          );
+        }).animate(delay: 400.ms).fadeIn(duration: 400.ms).scale(),
       ],
     );
   }
@@ -547,10 +539,10 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       stream: widget.svc.streamSessions(limit: 5),
       builder: (context, snap) {
         final sessions = snap.data ?? [];
-        
+
         return Column(
           children: [
-            // +‹ltima sesi+¶n (si existe)
+            // √öltima sesi√≥n (si existe)
             if (sessions.isNotEmpty) ...[
               _buildLastSessionCard(sessions.first)
                   .animate(delay: 500.ms)
@@ -558,22 +550,25 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                   .slideY(begin: 0.2, end: 0),
               const SizedBox(height: 12),
             ],
-            
+
             // Historial completo
             _buildFeatureCard(
-              'Historial Completo',
-              'Ver todas tus sesiones de entrenamiento',
-              Icons.history,
-              Colors.indigo,
-              () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => SessionHistoryScreen(svc: widget.svc),
-                  ),
-                );
-              },
-            ).animate(delay: 600.ms).fadeIn(duration: 400.ms).slideX(begin: 0.2, end: 0),
+                  'Historial Completo',
+                  'Ver todas tus sesiones de entrenamiento',
+                  Icons.history,
+                  Colors.indigo,
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SessionHistoryScreen(svc: widget.svc),
+                      ),
+                    );
+                  },
+                )
+                .animate(delay: 600.ms)
+                .fadeIn(duration: 400.ms)
+                .slideX(begin: 0.2, end: 0),
           ],
         );
       },
@@ -597,11 +592,15 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                     color: Colors.green.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '+‹ltima Sesi+¶n',
+                  '√öltima Sesi√≥n',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -629,10 +628,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
             const SizedBox(height: 4),
             Text(
               session.routineName,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
             ),
             const SizedBox(height: 12),
             Row(
@@ -739,16 +735,18 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
   }
 }
 
-/// ≠Éˆˆ Widget de configuraci+¶n de notificaciones
+///Widget de configuraci√≥n de notificaciones
 class _NotificationSettingsSheet extends StatefulWidget {
   final VoidCallback onSave;
   const _NotificationSettingsSheet({required this.onSave});
 
   @override
-  State<_NotificationSettingsSheet> createState() => _NotificationSettingsSheetState();
+  State<_NotificationSettingsSheet> createState() =>
+      _NotificationSettingsSheetState();
 }
 
-class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> {
+class _NotificationSettingsSheetState
+    extends State<_NotificationSettingsSheet> {
   bool _enableWeightReminder = true;
   bool _enableMeasurementsReminder = true;
   bool _enableInactivityReminder = true;
@@ -782,7 +780,7 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
               ),
             ),
 
-            // T+°tulo
+            // T√≠tulo
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -840,51 +838,94 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
                     value: _enableWeightReminder,
                     onChanged: (v) => setState(() => _enableWeightReminder = v),
                     colorScheme: colorScheme,
-                    child: _enableWeightReminder
-                        ? Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              ListTile(
-                                dense: true,
-                                leading: Icon(Icons.calendar_today, size: 20, color: colorScheme.primary),
-                                title: Text('D+°a de la semana', style: GoogleFonts.poppins(fontSize: 14)),
-                                trailing: DropdownButton<int>(
-                                  value: _weightReminderDay,
-                                  onChanged: (v) => setState(() => _weightReminderDay = v!),
-                                  items: const [
-                                    DropdownMenuItem(value: DateTime.monday, child: Text('Lunes')),
-                                    DropdownMenuItem(value: DateTime.tuesday, child: Text('Martes')),
-                                    DropdownMenuItem(value: DateTime.wednesday, child: Text('Mi+Ærcoles')),
-                                    DropdownMenuItem(value: DateTime.thursday, child: Text('Jueves')),
-                                    DropdownMenuItem(value: DateTime.friday, child: Text('Viernes')),
-                                    DropdownMenuItem(value: DateTime.saturday, child: Text('S+Ìbado')),
-                                    DropdownMenuItem(value: DateTime.sunday, child: Text('Domingo')),
-                                  ],
-                                ),
-                              ),
-                              ListTile(
-                                dense: true,
-                                leading: Icon(Icons.access_time, size: 20, color: colorScheme.primary),
-                                title: Text('Hora', style: GoogleFonts.poppins(fontSize: 14)),
-                                trailing: TextButton(
-                                  onPressed: () async {
-                                    final time = await showTimePicker(
-                                      context: context,
-                                      initialTime: _weightReminderTime,
-                                    );
-                                    if (time != null) {
-                                      setState(() => _weightReminderTime = time);
-                                    }
-                                  },
-                                  child: Text(
-                                    '${_weightReminderTime.hour.toString().padLeft(2, '0')}:${_weightReminderTime.minute.toString().padLeft(2, '0')}',
-                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    child:
+                        _enableWeightReminder
+                            ? Column(
+                              children: [
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  dense: true,
+                                  leading: Icon(
+                                    Icons.calendar_today,
+                                    size: 20,
+                                    color: colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    'D√≠a de la semana',
+                                    style: GoogleFonts.poppins(fontSize: 14),
+                                  ),
+                                  trailing: DropdownButton<int>(
+                                    value: _weightReminderDay,
+                                    onChanged:
+                                        (v) => setState(
+                                          () => _weightReminderDay = v!,
+                                        ),
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: DateTime.monday,
+                                        child: Text('Lunes'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.tuesday,
+                                        child: Text('Martes'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.wednesday,
+                                        child: Text('Mi√©rcoles'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.thursday,
+                                        child: Text('Jueves'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.friday,
+                                        child: Text('Viernes'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.saturday,
+                                        child: Text('S√°bado'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: DateTime.sunday,
+                                        child: Text('Domingo'),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        : null,
+                                ListTile(
+                                  dense: true,
+                                  leading: Icon(
+                                    Icons.access_time,
+                                    size: 20,
+                                    color: colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    'Hora',
+                                    style: GoogleFonts.poppins(fontSize: 14),
+                                  ),
+                                  trailing: TextButton(
+                                    onPressed: () async {
+                                      final time = await showTimePicker(
+                                        context: context,
+                                        initialTime: _weightReminderTime,
+                                      );
+                                      if (time != null) {
+                                        setState(
+                                          () => _weightReminderTime = time,
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      '${_weightReminderTime.hour.toString().padLeft(2, '0')}:${_weightReminderTime.minute.toString().padLeft(2, '0')}',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            : null,
                   ),
 
                   const SizedBox(height: 16),
@@ -892,38 +933,52 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
                   // Recordatorio de medidas
                   _buildSection(
                     icon: Icons.straighten,
-                    title: 'Medidas F+°sicas Semanales',
+                    title: 'Medidas F√≠sicas Semanales',
                     subtitle: 'Recordatorio para medidas corporales',
                     value: _enableMeasurementsReminder,
-                    onChanged: (v) => setState(() => _enableMeasurementsReminder = v),
+                    onChanged:
+                        (v) => setState(() => _enableMeasurementsReminder = v),
                     colorScheme: colorScheme,
-                    child: _enableMeasurementsReminder
-                        ? Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              ListTile(
-                                dense: true,
-                                leading: Icon(Icons.access_time, size: 20, color: colorScheme.primary),
-                                title: Text('Hora (Lunes)', style: GoogleFonts.poppins(fontSize: 14)),
-                                trailing: TextButton(
-                                  onPressed: () async {
-                                    final time = await showTimePicker(
-                                      context: context,
-                                      initialTime: _measurementsReminderTime,
-                                    );
-                                    if (time != null) {
-                                      setState(() => _measurementsReminderTime = time);
-                                    }
-                                  },
-                                  child: Text(
-                                    '${_measurementsReminderTime.hour.toString().padLeft(2, '0')}:${_measurementsReminderTime.minute.toString().padLeft(2, '0')}',
-                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    child:
+                        _enableMeasurementsReminder
+                            ? Column(
+                              children: [
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  dense: true,
+                                  leading: Icon(
+                                    Icons.access_time,
+                                    size: 20,
+                                    color: colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    'Hora (Lunes)',
+                                    style: GoogleFonts.poppins(fontSize: 14),
+                                  ),
+                                  trailing: TextButton(
+                                    onPressed: () async {
+                                      final time = await showTimePicker(
+                                        context: context,
+                                        initialTime: _measurementsReminderTime,
+                                      );
+                                      if (time != null) {
+                                        setState(
+                                          () =>
+                                              _measurementsReminderTime = time,
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      '${_measurementsReminderTime.hour.toString().padLeft(2, '0')}:${_measurementsReminderTime.minute.toString().padLeft(2, '0')}',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        : null,
+                              ],
+                            )
+                            : null,
                   ),
 
                   const SizedBox(height: 16),
@@ -932,44 +987,59 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
                   _buildSection(
                     icon: Icons.notifications_active,
                     title: 'Alerta de Inactividad',
-                    subtitle: 'Aviso cuando llevas d+°as sin entrenar',
+                    subtitle: 'Aviso cuando llevas d√≠as sin entrenar',
                     value: _enableInactivityReminder,
-                    onChanged: (v) => setState(() => _enableInactivityReminder = v),
+                    onChanged:
+                        (v) => setState(() => _enableInactivityReminder = v),
                     colorScheme: colorScheme,
-                    child: _enableInactivityReminder
-                        ? Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              ListTile(
-                                dense: true,
-                                leading: Icon(Icons.timer_outlined, size: 20, color: colorScheme.primary),
-                                title: Text('D+°as de inactividad', style: GoogleFonts.poppins(fontSize: 14)),
-                                subtitle: Slider(
-                                  value: _inactivityDays.toDouble(),
-                                  min: 1,
-                                  max: 7,
-                                  divisions: 6,
-                                  label: '$_inactivityDays d+°as',
-                                  onChanged: (v) => setState(() => _inactivityDays = v.round()),
-                                ),
-                                trailing: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(8),
+                    child:
+                        _enableInactivityReminder
+                            ? Column(
+                              children: [
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  dense: true,
+                                  leading: Icon(
+                                    Icons.timer_outlined,
+                                    size: 20,
+                                    color: colorScheme.primary,
                                   ),
-                                  child: Text(
-                                    '$_inactivityDays d+°as',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      color: colorScheme.primary,
+                                  title: Text(
+                                    'D√≠as de inactividad',
+                                    style: GoogleFonts.poppins(fontSize: 14),
+                                  ),
+                                  subtitle: Slider(
+                                    value: _inactivityDays.toDouble(),
+                                    min: 1,
+                                    max: 7,
+                                    divisions: 6,
+                                    label: '$_inactivityDays d√≠as',
+                                    onChanged:
+                                        (v) => setState(
+                                          () => _inactivityDays = v.round(),
+                                        ),
+                                  ),
+                                  trailing: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.primaryContainer,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '$_inactivityDays d√≠as',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.primary,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        : null,
+                              ],
+                            )
+                            : null,
                   ),
                 ],
               ),
@@ -1006,7 +1076,10 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text('Guardar y Activar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                      child: Text(
+                        'Guardar y Activar',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ],

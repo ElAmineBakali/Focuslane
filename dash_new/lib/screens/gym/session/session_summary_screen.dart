@@ -7,18 +7,14 @@ class SessionSummaryScreen extends StatefulWidget {
   final SessionDoc session;
   final GymFirestoreService? svc;
 
-  const SessionSummaryScreen({
-    super.key,
-    required this.session,
-    this.svc,
-  });
+  const SessionSummaryScreen({super.key, required this.session, this.svc});
 
   @override
   State<SessionSummaryScreen> createState() => _SessionSummaryScreenState();
 }
 
 class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
-     late int _energyValue;
+  late int _energyValue;
   late int _fatigueValue;
   late int _motivationValue;
   bool _feelingsSaved = false;
@@ -68,25 +64,24 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('¿Eliminar sesión?'),
-        content: const Text(
-          'Esta acción eliminará la sesión del historial y actualizará las estadísticas. No se puede deshacer.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('¿Eliminar sesión?'),
+            content: const Text(
+              'Esta acción eliminará la sesión del historial y actualizará las estadísticas. No se puede deshacer.',
             ),
-            child: const Text('Eliminar'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -204,7 +199,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
           ),
           const SizedBox(height: 24),
 
-                     if (!_feelingsSaved) ...[
+          if (!_feelingsSaved) ...[
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -255,7 +250,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                                         _buildFeelingSlider(
+                    _buildFeelingSlider(
                       'Energía',
                       _energyValue,
                       Icons.bolt_rounded,
@@ -264,7 +259,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                                         _buildFeelingSlider(
+                    _buildFeelingSlider(
                       'Fatiga física',
                       _fatigueValue,
                       Icons.fitness_center_rounded,
@@ -273,7 +268,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                                         _buildFeelingSlider(
+                    _buildFeelingSlider(
                       'Motivación',
                       _motivationValue,
                       Icons.favorite_rounded,
@@ -303,7 +298,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
             ),
             const SizedBox(height: 16),
           ] else ...[
-                         Card(
+            Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -315,7 +310,9 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                         const SizedBox(width: 8),
                         Text(
                           'Sensaciones registradas',
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -406,7 +403,8 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: value == i + 1 ? FontWeight.w700 : FontWeight.normal,
+                  fontWeight:
+                      value == i + 1 ? FontWeight.w700 : FontWeight.normal,
                 ),
               );
             }),

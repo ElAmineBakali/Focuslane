@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -114,9 +113,12 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _isSaving ? null : () => Navigator.pop(context),
+                      onPressed:
+                          _isSaving ? null : () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.lg,
+                        ),
                       ),
                       child: const Text('Cancelar'),
                     ),
@@ -153,7 +155,8 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
             hint: 'Ej: Pollo al horno con verduras',
             controller: _nameController,
             prefixIcon: Icons.menu_book,
-            validator: (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
+            validator:
+                (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
           ),
 
           const SizedBox(height: AppSpacing.lg),
@@ -185,9 +188,17 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
             spacing: AppSpacing.sm,
             children: [
               ..._tags.map(
-                (tag) => ModernChip(label: tag, onDelete: () => setState(() => _tags.remove(tag))),
+                (tag) => ModernChip(
+                  label: tag,
+                  onDelete: () => setState(() => _tags.remove(tag)),
+                ),
               ),
-              ModernChip(label: '+ Añadir', icon: Icons.add, color: Colors.purple, onTap: _addTag),
+              ModernChip(
+                label: '+ Añadir',
+                icon: Icons.add,
+                color: Colors.purple,
+                onTap: _addTag,
+              ),
             ],
           ),
         ],
@@ -203,7 +214,8 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
             child: ModernEmptyState(
               icon: Icons.restaurant_outlined,
               message: 'No hay ingredientes',
-              subtitle: 'Añade ingredientes para calcular automáticamente las macros',
+              subtitle:
+                  'Añade ingredientes para calcular automáticamente las macros',
               actionLabel: 'Añadir ingrediente',
               onAction: _addIngredient,
             ),
@@ -345,7 +357,10 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Información Nutricional Total', style: AppTypography.heading3(context)),
+                Text(
+                  'Información Nutricional Total',
+                  style: AppTypography.heading3(context),
+                ),
                 ModernBadge(label: 'AUTO-CALCULADO', color: AppColors.success),
               ],
             ),
@@ -395,7 +410,10 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
               prefixIcon: Icons.label,
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, controller.text.trim()),
                 child: const Text('Añadir'),
@@ -411,7 +429,9 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
 
   Future<void> _addIngredient() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad de añadir ingrediente próximamente')),
+      const SnackBar(
+        content: Text('Funcionalidad de añadir ingrediente próximamente'),
+      ),
     );
   }
 
@@ -432,7 +452,10 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
               maxLines: 3,
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, controller.text.trim()),
                 child: const Text('Añadir'),
@@ -460,7 +483,10 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
               maxLines: 3,
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, controller.text.trim()),
                 child: const Text('Guardar'),
@@ -493,9 +519,9 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
         };
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Macros calculated successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Macros calculated successfully')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -514,7 +540,10 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
       final recipe = Recipe(
         id: widget.initial?.id ?? '',
         name: _nameController.text.trim(),
-        description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
+        description:
+            _descController.text.trim().isEmpty
+                ? null
+                : _descController.text.trim(),
         servings: int.tryParse(_servingsController.text) ?? 1,
         ingredients: _ingredients,
         steps: _steps.join('\n'),
@@ -547,7 +576,9 @@ class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -580,7 +611,10 @@ class _IngredientCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(icon: const Icon(Icons.edit), onPressed: onEdit),
-            IconButton(icon: const Icon(Icons.delete, color: AppColors.error), onPressed: onDelete),
+            IconButton(
+              icon: const Icon(Icons.delete, color: AppColors.error),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),
@@ -610,7 +644,10 @@ class _StepCard extends StatelessWidget {
         leading: Container(
           width: 40,
           height: 40,
-          decoration: BoxDecoration(color: Colors.purple, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: Colors.purple,
+            shape: BoxShape.circle,
+          ),
           child: Center(
             child: Text(
               '$stepNumber',
@@ -626,7 +663,10 @@ class _StepCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(icon: const Icon(Icons.edit), onPressed: onEdit),
-            IconButton(icon: const Icon(Icons.delete, color: AppColors.error), onPressed: onDelete),
+            IconButton(
+              icon: const Icon(Icons.delete, color: AppColors.error),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),
@@ -724,7 +764,11 @@ class _MacroDisplay extends StatelessWidget {
   final String value;
   final String unit;
 
-  const _MacroDisplay({required this.label, required this.value, required this.unit});
+  const _MacroDisplay({
+    required this.label,
+    required this.value,
+    required this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -732,7 +776,10 @@ class _MacroDisplay extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTypography.heading2(context, color: Theme.of(context).colorScheme.onPrimary),
+          style: AppTypography.heading2(
+            context,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
         Text(
           unit,

@@ -14,7 +14,8 @@ class FoodEditSheet extends StatefulWidget {
   State<FoodEditSheet> createState() => _FoodEditSheetState();
 }
 
-class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProviderStateMixin {
+class _FoodEditSheetState extends State<FoodEditSheet>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _brandController = TextEditingController();
@@ -62,9 +63,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: Form(
           key: _formKey,
@@ -76,7 +81,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                  color:
+                      isDark
+                          ? colorScheme.onSurface.withOpacity(0.3)
+                          : AppColors.grey300,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
               ),
@@ -89,7 +97,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                       ),
                       child: Icon(
                         _isSupplement ? Icons.medication : Icons.restaurant,
@@ -118,7 +128,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 controller: _tabController,
                 labelColor: colorScheme.primary,
                 unselectedLabelColor:
-                    isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+                    isDark
+                        ? colorScheme.onSurface.withOpacity(0.6)
+                        : AppColors.grey600,
                 indicatorColor: colorScheme.primary,
                 tabs: const [
                   Tab(icon: Icon(Icons.info), text: 'Información'),
@@ -130,25 +142,36 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                 height: 500,
                 child: TabBarView(
                   controller: _tabController,
-                  children: [_buildInfoTab(colorScheme, isDark), _buildNutritionTab()],
+                  children: [
+                    _buildInfoTab(colorScheme, isDark),
+                    _buildNutritionTab(),
+                  ],
                 ),
               ),
 
               Container(
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  color: isDark ? colorScheme.surfaceContainerHighest : AppColors.grey100,
+                  color:
+                      isDark
+                          ? colorScheme.surfaceContainerHighest
+                          : AppColors.grey100,
                   border: Border(
-                    top: BorderSide(color: isDark ? colorScheme.outline : AppColors.grey300),
+                    top: BorderSide(
+                      color: isDark ? colorScheme.outline : AppColors.grey300,
+                    ),
                   ),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isSaving ? null : () => Navigator.pop(context),
+                        onPressed:
+                            _isSaving ? null : () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
+                          ),
                         ),
                         child: const Text('Cancelar'),
                       ),
@@ -185,7 +208,8 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
             hint: 'Ej: Pechuga de pollo',
             controller: _nameController,
             prefixIcon: Icons.restaurant,
-            validator: (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
+            validator:
+                (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
           ),
 
           const SizedBox(height: AppSpacing.lg),
@@ -217,11 +241,18 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surfaceContainerHighest : AppColors.grey100,
+                    color:
+                        isDark
+                            ? colorScheme.surfaceContainerHighest
+                            : AppColors.grey100,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    border: Border.all(color: isDark ? colorScheme.outline : AppColors.grey300),
+                    border: Border.all(
+                      color: isDark ? colorScheme.outline : AppColors.grey300,
+                    ),
                   ),
                   child: DropdownButton<UnitKind>(
                     value: _perUnit,
@@ -230,9 +261,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
                     items: const [
                       DropdownMenuItem(value: UnitKind.g, child: Text('g')),
                       DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
-                      DropdownMenuItem(value: UnitKind.unit, child: Text('unidad')),
+                      DropdownMenuItem(
+                        value: UnitKind.unit,
+                        child: Text('unidad'),
+                      ),
                     ],
-                    onChanged: (v) => setState(() => _perUnit = v ?? UnitKind.g),
+                    onChanged:
+                        (v) => setState(() => _perUnit = v ?? UnitKind.g),
                   ),
                 ),
               ),
@@ -251,8 +286,14 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
             child: SwitchListTile(
               value: _isSupplement,
               onChanged: (v) => setState(() => _isSupplement = v),
-              title: Text('Es un suplemento', style: AppTypography.heading4(context)),
-              subtitle: Text('Vitaminas, proteínas, etc.', style: AppTypography.caption(context)),
+              title: Text(
+                'Es un suplemento',
+                style: AppTypography.heading4(context),
+              ),
+              subtitle: Text(
+                'Vitaminas, proteínas, etc.',
+                style: AppTypography.caption(context),
+              ),
               secondary: Icon(Icons.medication, color: AppColors.gym),
               contentPadding: EdgeInsets.zero,
             ),
@@ -268,7 +309,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Información nutricional', style: AppTypography.heading3(context)),
+          Text(
+            'Información nutricional',
+            style: AppTypography.heading3(context),
+          ),
           Text(
             'Por ${_unitSizeController.text.isEmpty ? "100" : _unitSizeController.text}${_perUnit.name}',
             style: AppTypography.caption(context),
@@ -389,7 +433,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
       final food = Food(
         id: widget.initial?.id ?? '',
         name: _nameController.text.trim(),
-        brand: _brandController.text.trim().isEmpty ? null : _brandController.text.trim(),
+        brand:
+            _brandController.text.trim().isEmpty
+                ? null
+                : _brandController.text.trim(),
         perUnit: _perUnit,
         unitSize: double.tryParse(_unitSizeController.text) ?? 100,
         kcal: double.tryParse(_kcalController.text) ?? 0,
@@ -413,7 +460,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
+                Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -427,7 +477,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
             ),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
             margin: const EdgeInsets.all(AppSpacing.md),
           ),
         );
@@ -438,7 +490,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.error, color: Theme.of(context).colorScheme.onPrimary),
+                Icon(
+                  Icons.error,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -450,7 +505,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> with SingleTickerProvider
             ),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
             margin: const EdgeInsets.all(AppSpacing.md),
           ),
         );

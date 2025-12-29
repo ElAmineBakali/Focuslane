@@ -25,12 +25,12 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
   TimeOfDay? _selectedTime;
   late TaskPriority _selectedPriority;
 
-     late bool _isPinned;
+  late bool _isPinned;
   late RepeatRule _repeatRule;
   late bool _isCalendarVisible;
   late List<Subtask> _subtasks;
 
-     bool _enableReminder = false;
+  bool _enableReminder = false;
   DateTime? _remindDate;
   TimeOfDay? _remindTime;
 
@@ -463,7 +463,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                               ? _combine(_remindDate!, _remindTime)
                               : null;
 
-                                             final tags =
+                      final tags =
                           _tagsController.text
                               .split(',')
                               .map((t) => t.trim())
@@ -492,7 +492,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
 
                       await TaskFirestoreService.updateTask(updatedTask);
 
-                                             try {
+                      try {
                         await ReminderService.I.scheduleTaskReminder(
                           updatedTask,
                           previous: widget.task,

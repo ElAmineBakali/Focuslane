@@ -14,7 +14,7 @@ class CalendarEvent {
   final bool allDay;
   final String? notes;
 
-        final bool? completed;
+  final bool? completed;
 
   CalendarEvent({
     required this.id,
@@ -25,7 +25,8 @@ class CalendarEvent {
     this.end,
     this.allDay = false,
     this.notes,
-    this.completed,    });
+    this.completed,
+  });
 
   Map<String, dynamic> toMap() => {
     'title': title,
@@ -53,7 +54,8 @@ class CalendarEvent {
       end: (m['end'] as Timestamp?)?.toDate(),
       allDay: (m['allDay'] ?? false) as bool,
       notes: m['notes'] as String?,
-      completed: m['completed'] as bool?,      );
+      completed: m['completed'] as bool?,
+    );
   }
 
   static T _enumParse<T>(List<T> values, Object? raw, T fallback) {
@@ -65,11 +67,15 @@ class CalendarEvent {
   }
 }
 
- class Timetable {
+class Timetable {
   final String id;
   final String name;
   final bool isDefault;
-  final List<String> days;    final String startHour;    final String endHour;    final int slotMinutes;    final String? colorHex;
+  final List<String> days;
+  final String startHour;
+  final String endHour;
+  final int slotMinutes;
+  final String? colorHex;
 
   Timetable({
     required this.id,
@@ -111,7 +117,10 @@ class CalendarEvent {
 
 class TimetableSlot {
   final String id;
-  final String day;    final String start;    final String end;    final String title;
+  final String day;
+  final String start;
+  final String end;
+  final String title;
   final CalendarType type;
   final String? note;
   final String? colorHex;

@@ -61,13 +61,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       final res = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: true, 
+        withData: true,
       );
       if (res == null || res.files.isEmpty) return;
 
       final file = res.files.first;
       final Uint8List? bytes = file.bytes;
-    
+
       const maxPdfBytes = 5 * 1024 * 1024;
       if (bytes == null) {
         AppToast.error(context, 'No se pudo leer el archivo');

@@ -24,7 +24,7 @@ class GymFirestoreService {
 
   DocumentReference<Map<String, dynamic>> get root => _root;
 
-     Stream<List<Routine>> streamRoutines() {
+  Stream<List<Routine>> streamRoutines() {
     return _root
         .collection('routines')
         .orderBy('name')
@@ -121,7 +121,7 @@ class GymFirestoreService {
     await rRef.delete();
   }
 
-     Stream<List<RoutineDay>> streamDays(String routineId) {
+  Stream<List<RoutineDay>> streamDays(String routineId) {
     return _root
         .collection('routines')
         .doc(routineId)
@@ -214,7 +214,7 @@ class GymFirestoreService {
     await dRef.delete();
   }
 
-     Stream<List<RoutineExercise>> streamDayExercises(
+  Stream<List<RoutineExercise>> streamDayExercises(
     String routineId,
     String dayId,
   ) {
@@ -324,7 +324,7 @@ class GymFirestoreService {
         .delete();
   }
 
-     Future<void> saveSession(SessionDoc session) async {
+  Future<void> saveSession(SessionDoc session) async {
     final doc = _root.collection('sessions').doc();
     await doc.set(session.toMap());
 
@@ -341,7 +341,7 @@ class GymFirestoreService {
     } catch (_) {}
   }
 
-     Future<void> updateSessionFeelings(
+  Future<void> updateSessionFeelings(
     String sessionId,
     int energy,
     int fatigue,
@@ -354,25 +354,26 @@ class GymFirestoreService {
     });
   }
 
-     Future<void> deleteSession(String sessionId) async {
-         final sessionDoc = await _root.collection('sessions').doc(sessionId).get();
+  Future<void> deleteSession(String sessionId) async {
+    final sessionDoc = await _root.collection('sessions').doc(sessionId).get();
     if (!sessionDoc.exists) return;
 
     final sessionData = sessionDoc.data() as Map<String, dynamic>;
     final routineId = sessionData['routineId'] as String?;
     final dayId = sessionData['dayId'] as String?;
 
-         await _root.collection('sessions').doc(sessionId).delete();
+    await _root.collection('sessions').doc(sessionId).delete();
 
-         if (routineId != null && dayId != null) {
+    if (routineId != null && dayId != null) {
       try {
-        final remainingSessions = await _root
-            .collection('sessions')
-            .where('routineId', isEqualTo: routineId)
-            .where('dayId', isEqualTo: dayId)
-            .orderBy('date', descending: true)
-            .limit(1)
-            .get();
+        final remainingSessions =
+            await _root
+                .collection('sessions')
+                .where('routineId', isEqualTo: routineId)
+                .where('dayId', isEqualTo: dayId)
+                .orderBy('date', descending: true)
+                .limit(1)
+                .get();
 
         if (remainingSessions.docs.isNotEmpty) {
           final lastSession = SessionDoc.fromMap(
@@ -385,19 +386,19 @@ class GymFirestoreService {
               .collection('days')
               .doc(dayId)
               .update({
-            'lastDone': FieldValue.serverTimestamp(),
-            'lastDoneLocal': lastSession.date.toIso8601String(),
-          });
+                'lastDone': FieldValue.serverTimestamp(),
+                'lastDoneLocal': lastSession.date.toIso8601String(),
+              });
         } else {
-                     await _root
+          await _root
               .collection('routines')
               .doc(routineId)
               .collection('days')
               .doc(dayId)
               .update({
-            'lastDone': FieldValue.delete(),
-            'lastDoneLocal': FieldValue.delete(),
-          });
+                'lastDone': FieldValue.delete(),
+                'lastDoneLocal': FieldValue.delete(),
+              });
         }
       } catch (_) {}
     }
@@ -469,7 +470,7 @@ class GymFirestoreService {
     }, SetOptions(merge: true));
   }
 
-     Future<DateTime?> lastSessionDate() async {
+  Future<DateTime?> lastSessionDate() async {
     final snap =
         await _root
             .collection('sessions')
@@ -481,7 +482,7 @@ class GymFirestoreService {
     return DateTime.tryParse(data['date']?.toString() ?? '');
   }
 
-     Future<void> addBodyWeight(
+  Future<void> addBodyWeight(
     double kg,
     DateTime date, {
     double? trend7,
@@ -542,7 +543,7 @@ class GymFirestoreService {
     );
   }
 
-     Future<void> addMeasurement(
+  Future<void> addMeasurement(
     String muscle,
     double cm,
     DateTime date, {
@@ -580,8 +581,7 @@ class GymFirestoreService {
     );
   }
 
-     
-     Future<List<({DateTime date, double e1rm})>> getExerciseE1rmHistory(
+  Future<List<({DateTime date, double e1rm})>> getExerciseE1rmHistory(
     String exerciseName, {
     int lookback = 90,
   }) async {
@@ -592,14 +592,15 @@ class GymFirestoreService {
             .orderBy('date', descending: true)
             .limit(lookback)
             .get();
-    
+
     for (final d in snap.docs) {
       final data = d.data();
       final date = DateTime.tryParse(data['date'] ?? '');
       if (date == null) continue;
-      
+
       final list =
-          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ??
+          const [];
       for (final ex in list) {
         if ((ex['name'] ?? '') == exerciseName) {
           final sets =
@@ -619,12 +620,12 @@ class GymFirestoreService {
         }
       }
     }
-    
+
     results.sort((a, b) => a.date.compareTo(b.date));
     return results;
   }
 
-     Future<List<({DateTime date, double volume})>> getExerciseVolumeHistory(
+  Future<List<({DateTime date, double volume})>> getExerciseVolumeHistory(
     String exerciseName, {
     int lookback = 90,
   }) async {
@@ -635,14 +636,15 @@ class GymFirestoreService {
             .orderBy('date', descending: true)
             .limit(lookback)
             .get();
-    
+
     for (final d in snap.docs) {
       final data = d.data();
       final date = DateTime.tryParse(data['date'] ?? '');
       if (date == null) continue;
-      
+
       final list =
-          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ??
+          const [];
       for (final ex in list) {
         if ((ex['name'] ?? '') == exerciseName) {
           final sets =
@@ -659,29 +661,29 @@ class GymFirestoreService {
         }
       }
     }
-    
+
     results.sort((a, b) => a.date.compareTo(b.date));
     return results;
   }
 
-     Future<List<({DateTime date, double weight, int reps, double e1rm})>> getExercisePRs(
-    String exerciseName, {
-    int limit = 10,
-  }) async {
-    final allRecords = <({DateTime date, double weight, int reps, double e1rm})>[];
+  Future<List<({DateTime date, double weight, int reps, double e1rm})>>
+  getExercisePRs(String exerciseName, {int limit = 10}) async {
+    final allRecords =
+        <({DateTime date, double weight, int reps, double e1rm})>[];
     final snap =
         await _root
             .collection('sessions')
             .orderBy('date', descending: true)
             .get();
-    
+
     for (final d in snap.docs) {
       final data = d.data();
       final date = DateTime.tryParse(data['date'] ?? '');
       if (date == null) continue;
-      
+
       final list =
-          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          (data['exercises'] as List?)?.cast<Map<String, dynamic>>() ??
+          const [];
       for (final ex in list) {
         if ((ex['name'] ?? '') == exerciseName) {
           final sets =
@@ -697,22 +699,25 @@ class GymFirestoreService {
         }
       }
     }
-    
-         allRecords.sort((a, b) => b.e1rm.compareTo(a.e1rm));
+
+    allRecords.sort((a, b) => b.e1rm.compareTo(a.e1rm));
     return allRecords.take(limit).toList();
   }
 
-     Future<Map<String, dynamic>> exportAllData() async {
-         final sessions = await _root.collection('sessions').get();
-    final sessionsData = sessions.docs.map((d) => {'id': d.id, ...d.data()}).toList();
-    
-         final bodyweight = await _root.collection('bodyweight').get();
-    final bodyweightData = bodyweight.docs.map((d) => {'id': d.id, ...d.data()}).toList();
-    
-         final measurements = await _root.collection('measurements').get();
-    final measurementsData = measurements.docs.map((d) => {'id': d.id, ...d.data()}).toList();
-    
-         final routines = await _root.collection('routines').get();
+  Future<Map<String, dynamic>> exportAllData() async {
+    final sessions = await _root.collection('sessions').get();
+    final sessionsData =
+        sessions.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+
+    final bodyweight = await _root.collection('bodyweight').get();
+    final bodyweightData =
+        bodyweight.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+
+    final measurements = await _root.collection('measurements').get();
+    final measurementsData =
+        measurements.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+
+    final routines = await _root.collection('routines').get();
     final routinesData = <Map<String, dynamic>>[];
     for (final r in routines.docs) {
       final routineData = {'id': r.id, ...r.data()};
@@ -721,13 +726,14 @@ class GymFirestoreService {
       for (final d in days.docs) {
         final dayData = {'id': d.id, ...d.data()};
         final exs = await d.reference.collection('exercises').get();
-        dayData['exercises'] = exs.docs.map((e) => {'id': e.id, ...e.data()}).toList();
+        dayData['exercises'] =
+            exs.docs.map((e) => {'id': e.id, ...e.data()}).toList();
         daysData.add(dayData);
       }
       routineData['days'] = daysData;
       routinesData.add(routineData);
     }
-    
+
     return {
       'exportDate': DateTime.now().toIso8601String(),
       'userId': _uid,
@@ -738,7 +744,7 @@ class GymFirestoreService {
     };
   }
 
-     Future<Map<String, dynamic>> getStatsForDateRange(
+  Future<Map<String, dynamic>> getStatsForDateRange(
     DateTime start,
     DateTime end,
   ) async {
@@ -748,7 +754,7 @@ class GymFirestoreService {
             .where('date', isGreaterThanOrEqualTo: start.toIso8601String())
             .where('date', isLessThanOrEqualTo: end.toIso8601String())
             .get();
-    
+
     if (sessions.docs.isEmpty) {
       return {
         'totalSessions': 0,
@@ -759,7 +765,7 @@ class GymFirestoreService {
         'avgMotivation': 0.0,
       };
     }
-    
+
     double totalVolume = 0;
     int totalDuration = 0;
     int durationCount = 0;
@@ -767,7 +773,7 @@ class GymFirestoreService {
     double totalFatigue = 0;
     double totalMotivation = 0;
     int feelingsCount = 0;
-    
+
     for (final d in sessions.docs) {
       final data = d.data();
       totalVolume += (data['volumeKg'] as num?)?.toDouble() ?? 0;
@@ -776,7 +782,7 @@ class GymFirestoreService {
         totalDuration += dur;
         durationCount++;
       }
-      
+
       final energy = (data['feelingEnergy'] as num?)?.toDouble();
       final fatigue = (data['feelingFatigue'] as num?)?.toDouble();
       final motivation = (data['feelingMotivation'] as num?)?.toDouble();
@@ -787,7 +793,7 @@ class GymFirestoreService {
         feelingsCount++;
       }
     }
-    
+
     return {
       'totalSessions': sessions.docs.length,
       'totalVolume': totalVolume,
@@ -798,20 +804,20 @@ class GymFirestoreService {
     };
   }
 
-     Future<String> createRoutineFromPreset(
+  Future<String> createRoutineFromPreset(
     String name,
     String description,
     String splitType,
     List<PresetDay> presetDays,
   ) async {
-         final routineId = await createRoutine(
+    final routineId = await createRoutine(
       name: name,
       description: description,
       splitType: splitType,
       restSecDefault: 90,
     );
-    
-         for (int dayIndex = 0; dayIndex < presetDays.length; dayIndex++) {
+
+    for (int dayIndex = 0; dayIndex < presetDays.length; dayIndex++) {
       final pd = presetDays[dayIndex];
       final dayId = await addDay(
         routineId,
@@ -819,8 +825,8 @@ class GymFirestoreService {
         order: dayIndex,
         icon: pd.icon,
       );
-      
-             for (int exIndex = 0; exIndex < pd.exercises.length; exIndex++) {
+
+      for (int exIndex = 0; exIndex < pd.exercises.length; exIndex++) {
         final pe = pd.exercises[exIndex];
         final routineEx = RoutineExercise(
           id: '',
@@ -839,7 +845,7 @@ class GymFirestoreService {
         await addRoutineExercise(routineId, dayId, routineEx);
       }
     }
-    
+
     return routineId;
   }
 }

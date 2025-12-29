@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/global_ui_components.dart';
-import '../../../theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'course_edit_sheet.dart';
@@ -20,7 +18,10 @@ class CoursesListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cursos', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(
+          'Cursos',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
         elevation: 0,
         backgroundColor: colorScheme.surface,
         actions: [
@@ -54,7 +55,9 @@ class CoursesListScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => _ArchivedCoursesScreen(svc: svc)),
+                MaterialPageRoute(
+                  builder: (_) => _ArchivedCoursesScreen(svc: svc),
+                ),
               );
             },
           ),
@@ -72,7 +75,9 @@ class CoursesListScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CourseDetailEditableScreen(svc: svc, course: created),
+                builder:
+                    (_) =>
+                        CourseDetailEditableScreen(svc: svc, course: created),
               ),
             );
           }
@@ -91,64 +96,83 @@ class CoursesListScreen extends StatelessWidget {
           if (courses.isEmpty) {
             return Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 140,
-                    height: 140,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          colorScheme.primary.withOpacity(0.2),
-                          colorScheme.secondary.withOpacity(0.2),
-                        ],
-                      ),
-                    ),
-                    child: Icon(Icons.school_rounded, size: 70, color: colorScheme.primary),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    '¡Empieza tu jornada!',
-                    style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Crea tu primer curso para comenzar a organizar tu estudio',
-                    style: GoogleFonts.poppins(fontSize: 16, color: colorScheme.onSurfaceVariant),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  FilledButton.icon(
-                    onPressed: () async {
-                      final created = await showModalBottomSheet<Course?>(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (_) => CourseEditSheet(svc: svc),
-                      );
-                      if (created != null && context.mounted) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CourseDetailEditableScreen(svc: svc, course: created),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 140,
+                        height: 140,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              colorScheme.primary.withOpacity(0.2),
+                              colorScheme.secondary.withOpacity(0.2),
+                            ],
                           ),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text('Crear primer curso'),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
+                        ),
+                        child: Icon(
+                          Icons.school_rounded,
+                          size: 70,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
+                        '¡Empieza tu jornada!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Crea tu primer curso para comenzar a organizar tu estudio',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final created = await showModalBottomSheet<Course?>(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => CourseEditSheet(svc: svc),
+                          );
+                          if (created != null && context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => CourseDetailEditableScreen(
+                                      svc: svc,
+                                      course: created,
+                                    ),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text('Crear primer curso'),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .scale(begin: const Offset(0.8, 0.8)),
             );
           }
 
@@ -167,17 +191,24 @@ class CoursesListScreen extends StatelessWidget {
             itemBuilder: (context, i) {
               final course = courses[i];
               return _CourseCard(
-                svc: svc,
-                course: course,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CourseDetailEditableScreen(svc: svc, course: course),
-                    ),
-                  );
-                },
-              ).animate(delay: (i * 50).ms).fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0);
+                    svc: svc,
+                    course: course,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => CourseDetailEditableScreen(
+                                svc: svc,
+                                course: course,
+                              ),
+                        ),
+                      );
+                    },
+                  )
+                  .animate(delay: (i * 50).ms)
+                  .fadeIn(duration: 300.ms)
+                  .slideX(begin: -0.1, end: 0);
             },
           );
         },
@@ -191,7 +222,11 @@ class _CourseCard extends StatelessWidget {
   final Course course;
   final VoidCallback onTap;
 
-  const _CourseCard({required this.svc, required this.course, required this.onTap});
+  const _CourseCard({
+    required this.svc,
+    required this.course,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +251,11 @@ class _CourseCard extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
             boxShadow: [
-              BoxShadow(color: color.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(
+                color: color.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
             ],
           ),
           child: Material(
@@ -239,7 +278,11 @@ class _CourseCard extends StatelessWidget {
                             color: color.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.school_rounded, color: color, size: 28),
+                          child: Icon(
+                            Icons.school_rounded,
+                            color: color,
+                            size: 28,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -283,7 +326,10 @@ class _CourseCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.chevron_right,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ],
                     ),
 
@@ -317,7 +363,10 @@ class _CourseCard extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: progress.clamp(0.0, 1.0)),
+                          tween: Tween(
+                            begin: 0.0,
+                            end: progress.clamp(0.0, 1.0),
+                          ),
                           duration: const Duration(milliseconds: 800),
                           curve: Curves.easeOutCubic,
                           builder: (context, value, _) {
@@ -347,7 +396,11 @@ class _InfoChip extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _InfoChip({required this.icon, required this.label, required this.color});
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -365,7 +418,11 @@ class _InfoChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500, color: color),
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -384,10 +441,12 @@ class _ArchivedCoursesScreen extends StatelessWidget {
       body: StreamBuilder<List<Course>>(
         stream: svc.streamCourses(includeArchived: true),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final all = snap.data!;
           final archived = all.where((c) => c.isArchived).toList();
-          if (archived.isEmpty) return const Center(child: Text('No hay cursos archivados'));
+          if (archived.isEmpty)
+            return const Center(child: Text('No hay cursos archivados'));
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: archived.length,
@@ -400,7 +459,8 @@ class _ArchivedCoursesScreen extends StatelessWidget {
                   trailing: TextButton.icon(
                     icon: const Icon(Icons.restore_rounded),
                     label: const Text('Restaurar'),
-                    onPressed: () => svc.updateCourse(c.id, {'isArchived': false}),
+                    onPressed:
+                        () => svc.updateCourse(c.id, {'isArchived': false}),
                   ),
                 ),
               );

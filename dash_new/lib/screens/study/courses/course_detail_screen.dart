@@ -10,7 +10,11 @@ import '../attendance/attendance_screen.dart';
 class CourseDetailScreen extends StatelessWidget {
   final StudyFirestoreService svc;
   final Course course;
-  const CourseDetailScreen({super.key, required this.svc, required this.course});
+  const CourseDetailScreen({
+    super.key,
+    required this.svc,
+    required this.course,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,9 @@ class CourseDetailScreen extends StatelessWidget {
                 () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => StudyAnalyticsScreen(svc: svc, courseId: course.id),
+                    builder:
+                        (_) =>
+                            StudyAnalyticsScreen(svc: svc, courseId: course.id),
                   ),
                 ),
           ),
@@ -54,7 +60,11 @@ class CourseDetailScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => StudyTimerScreen(svc: svc, initialCourseId: course.id),
+                    builder:
+                        (_) => StudyTimerScreen(
+                          svc: svc,
+                          initialCourseId: course.id,
+                        ),
                   ),
                 );
               },
@@ -68,7 +78,11 @@ class CourseDetailScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => StudyTasksScreen(svc: svc, initialCourseId: course.id),
+                    builder:
+                        (_) => StudyTasksScreen(
+                          svc: svc,
+                          initialCourseId: course.id,
+                        ),
                   ),
                 );
               },
@@ -86,7 +100,9 @@ class CourseDetailScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => AttendanceScreen(svc: svc, course: course)),
+                  MaterialPageRoute(
+                    builder: (_) => AttendanceScreen(svc: svc, course: course),
+                  ),
                 );
               },
             ),

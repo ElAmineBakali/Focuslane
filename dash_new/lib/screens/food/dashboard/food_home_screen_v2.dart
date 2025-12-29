@@ -13,8 +13,8 @@ import '../shopping/shopping_lists_screen_v2.dart';
 import '../pantry/pantry_screen_v2.dart';
 import '../history/food_history_screen_v2.dart';
 
-/// ≠É≈· FOOD HOME SCREEN V2 - Redise+¶ado
-/// Dashboard principal del m+¶dulo de alimentaci+¶n con dise+¶o moderno
+/// FOOD HOME SCREEN V2 - Redise√±ado
+/// Dashboard principal del m√≥dulo de alimentaci√≥n con dise√±o moderno
 class FoodHomeScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodHomeScreenV2({super.key, required this.svc});
@@ -43,7 +43,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             backgroundColor: colorScheme.primaryContainer,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                'Alimentaci+¶n',
+                'Alimentaci√≥n',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.5,
@@ -68,7 +68,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                       child: Icon(
                         Icons.restaurant,
                         size: 120,
-                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.15),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary.withOpacity(0.15),
                       ),
                     ),
                   ],
@@ -89,7 +91,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                   );
                 },
               ),
-              // Configuraci+¶n de recordatorios
+              // Configuraci√≥n de recordatorios
               IconButton(
                 icon: const Icon(Icons.notifications_active_outlined),
                 tooltip: 'Recordatorios',
@@ -107,17 +109,24 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                 children: [
                   // Alerta de stock bajo
                   StreamBuilder<int>(
-                    stream: widget.svc.streamPantry().map((items) => items.where((i) => (i.qty ?? 0) < (i.minQty ?? 0)).length),
+                    stream: widget.svc.streamPantry().map(
+                      (items) =>
+                          items
+                              .where((i) => (i.qty ?? 0) < (i.minQty ?? 0))
+                              .length,
+                    ),
                     builder: (context, snap) {
                       final count = snap.data ?? 0;
                       if (count == 0) return const SizedBox.shrink();
-                      
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: FocusSpacing.lg),
                         padding: const EdgeInsets.all(FocusSpacing.lg),
                         decoration: BoxDecoration(
                           color: FocusColors.warning.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            FocusSpacing.radiusLg,
+                          ),
                           border: Border.all(
                             color: FocusColors.warning.withOpacity(0.3),
                           ),
@@ -139,7 +148,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                     style: FocusTypography.heading4(context),
                                   ),
                                   Text(
-                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposici+¶n',
+                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposici√≥n',
                                     style: FocusTypography.caption(context),
                                   ),
                                 ],
@@ -151,8 +160,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        PantryScreenV2(svc: widget.svc),
+                                    builder:
+                                        (_) => PantryScreenV2(svc: widget.svc),
                                   ),
                                 );
                               },
@@ -163,14 +172,15 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Resumen del d+°a
+                  // Resumen del d√≠a
                   StreamBuilder<DailyIntakeDoc>(
                     stream: widget.svc.streamDay(todayId),
                     builder: (context, daySnap) {
                       return StreamBuilder<Map<String, double?>>(
                         stream: widget.svc.streamGlobalTargets(),
                         builder: (context, targetsSnap) {
-                          final day = daySnap.data ??
+                          final day =
+                              daySnap.data ??
                               DailyIntakeDoc(
                                 id: todayId,
                                 entries: const [],
@@ -193,13 +203,14 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      FoodDiaryScreenV2(svc: widget.svc),
+                                  builder:
+                                      (_) => FoodDiaryScreenV2(svc: widget.svc),
                                 ),
                               );
                             },
-                            borderRadius:
-                                BorderRadius.circular(FocusSpacing.radiusLg),
+                            borderRadius: BorderRadius.circular(
+                              FocusSpacing.radiusLg,
+                            ),
                             child: _buildDaySummary(
                               context,
                               day,
@@ -224,40 +235,43 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '≠É∆Ì Sugerencias',
+                            'üí° Sugerencias',
                             style: FocusTypography.heading3(context),
                           ),
                           const SizedBox(height: FocusSpacing.md),
-                          ...suggestions.map((s) => Container(
-                                margin: const EdgeInsets.only(
-                                    bottom: FocusSpacing.sm),
-                                padding: const EdgeInsets.all(FocusSpacing.md),
-                                decoration: BoxDecoration(
-                                  color: FocusColors.info.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(
-                                      FocusSpacing.radiusMd),
-                                  border: Border.all(
-                                    color: FocusColors.info.withOpacity(0.3),
+                          ...suggestions.map(
+                            (s) => Container(
+                              margin: const EdgeInsets.only(
+                                bottom: FocusSpacing.sm,
+                              ),
+                              padding: const EdgeInsets.all(FocusSpacing.md),
+                              decoration: BoxDecoration(
+                                color: FocusColors.info.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(
+                                  FocusSpacing.radiusMd,
+                                ),
+                                border: Border.all(
+                                  color: FocusColors.info.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.lightbulb_outline,
+                                    color: FocusColors.info,
+                                    size: 20,
                                   ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.lightbulb_outline,
-                                      color: FocusColors.info,
-                                      size: 20,
+                                  const SizedBox(width: FocusSpacing.md),
+                                  Expanded(
+                                    child: Text(
+                                      s,
+                                      style: FocusTypography.bodySmall(context),
                                     ),
-                                    const SizedBox(width: FocusSpacing.md),
-                                    Expanded(
-                                      child: Text(
-                                        s,
-                                        style:
-                                            FocusTypography.bodySmall(context),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: FocusSpacing.xl),
                         ],
                       );
@@ -278,7 +292,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '‘°… Favoritos',
+                                '‚≠ê Favoritos',
                                 style: FocusTypography.heading3(context),
                               ),
                               TextButton(
@@ -314,9 +328,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                     },
                   ),
 
-                  // Grid de acciones r+Ìpidas
+                  // Grid de acciones r√°pidas
                   Text(
-                    'Acciones R+Ìpidas',
+                    'Acciones R√°pidas',
                     style: FocusTypography.heading3(context),
                   ),
                   const SizedBox(height: FocusSpacing.md),
@@ -336,8 +350,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodDiaryScreenV2(svc: widget.svc),
+                              builder:
+                                  (_) => FoodDiaryScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -351,8 +365,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodsListScreenV2(svc: widget.svc),
+                              builder:
+                                  (_) => FoodsListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -366,8 +380,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  RecipesListScreenV2(svc: widget.svc),
+                              builder:
+                                  (_) => RecipesListScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -381,8 +395,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  FoodPlannerScreenV2(svc: widget.svc),
+                              builder:
+                                  (_) => FoodPlannerScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -396,8 +410,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  ShoppingListsScreenV2(svc: widget.svc),
+                              builder:
+                                  (_) => ShoppingListsScreenV2(svc: widget.svc),
                             ),
                           );
                         },
@@ -408,12 +422,12 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         icon: Icons.kitchen,
                         color: Colors.brown,
                         onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PantryScreenV2(svc: widget.svc),
-                              ),
-                            );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PantryScreenV2(svc: widget.svc),
+                            ),
+                          );
                         },
                         animationDelay: 600.ms,
                       ),
@@ -470,7 +484,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             // Macros principales
             _buildMiniMacro(
               context,
-              'Calor+°as',
+              'Calor√≠as',
               t['kcal'] ?? 0,
               mergedTargets['kcal'],
               colorScheme.primary,
@@ -478,7 +492,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
             _buildMiniMacro(
               context,
-              'Prote+°nas',
+              'Prote√≠nas',
               t['protein'] ?? 0,
               mergedTargets['protein'],
               Colors.red,
@@ -517,10 +531,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Agua',
-                            style: FocusTypography.label(context),
-                          ),
+                          Text('Agua', style: FocusTypography.label(context)),
                           Text(
                             '${day.waterMl} / $waterTarget ml',
                             style: FocusTypography.caption(context),
@@ -529,15 +540,16 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                       ),
                       const SizedBox(height: FocusSpacing.xs),
                       ClipRRect(
-                        borderRadius:
-                            BorderRadius.circular(FocusSpacing.radiusSm),
+                        borderRadius: BorderRadius.circular(
+                          FocusSpacing.radiusSm,
+                        ),
                         child: LinearProgressIndicator(
-                          value: waterTarget > 0
-                              ? (day.waterMl / waterTarget).clamp(0.0, 1.0)
-                              : 0,
+                          value:
+                              waterTarget > 0
+                                  ? (day.waterMl / waterTarget).clamp(0.0, 1.0)
+                                  : 0,
                           backgroundColor: Colors.blue.withOpacity(0.2),
-                          valueColor:
-                              const AlwaysStoppedAnimation(Colors.blue),
+                          valueColor: const AlwaysStoppedAnimation(Colors.blue),
                           minHeight: 6,
                         ),
                       ),
@@ -560,9 +572,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     Color color,
     String unit,
   ) {
-    final progress = target != null && target > 0
-        ? (value / target).clamp(0.0, 1.0)
-        : 0.0;
+    final progress =
+        target != null && target > 0 ? (value / target).clamp(0.0, 1.0) : 0.0;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: FocusSpacing.md),
@@ -619,9 +630,9 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         child: InkWell(
           onTap: () async {
-            // A+¶adir al diario desde favorito
+            // A√±adir al diario desde favorito
             final todayId = _dayId(DateTime.now());
-            // L+¶gica de a+¶adir (implementar seg+¶n sea food o recipe)
+            // L√≥gica de a√±adir (implementar seg√∫n sea food o recipe)
           },
           borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
           child: Padding(
@@ -661,7 +672,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   }
 }
 
-/// Sheet de configuraci+¶n de recordatorios
+/// Sheet de configuraci√≥n de recordatorios
 class _RemindersSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   const _RemindersSheet({required this.svc});
@@ -675,21 +686,21 @@ class _RemindersSheetState extends State<_RemindersSheet> {
   bool _waterReminders = false;
   bool _supplementReminders = false;
   bool _goalReminders = false;
-  
+
   TimeOfDay _breakfastTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
   TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
-  
-  // Intervalos de agua m+Ìs granulares (en minutos)
+
+  // Intervalos de agua m√°s granulares (en minutos)
   int _waterIntervalMinutes = 120; // Por defecto 2 horas
   TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
-  
+
   // Intervalo de objetivos
   TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
   bool _weekendsOnly = false;
-  
-  // D+°as de la semana para cada tipo de recordatorio
+
+  // D√≠as de la semana para cada tipo de recordatorio
   List<bool> _mealDays = List.filled(7, true); // Lun-Dom
   List<bool> _waterDays = List.filled(7, true);
   List<bool> _goalDays = List.filled(7, true);
@@ -702,7 +713,9 @@ class _RemindersSheetState extends State<_RemindersSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -718,12 +731,15 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                    color:
+                        isDark
+                            ? colorScheme.onSurface.withOpacity(0.3)
+                            : AppColors.grey300,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                 ),
               ),
-              
+
               // Header
               Row(
                 children: [
@@ -758,7 +774,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               // Recordatorios de comidas
               _buildReminderSection(
                 icon: Icons.restaurant_menu,
-                title: 'Comidas del d+°a',
+                title: 'Comidas del d√≠a',
                 subtitle: 'Notificaciones para desayuno, comida y cena',
                 value: _mealReminders,
                 onChanged: (v) => setState(() => _mealReminders = v),
@@ -782,7 +798,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     _dinnerTime,
                     (time) => setState(() => _dinnerTime = time),
                   ),
-                  _buildDaysSelector('D+°as activos', _mealDays),
+                  _buildDaysSelector('D√≠as activos', _mealDays),
                 ],
               ),
 
@@ -791,7 +807,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               // Recordatorios de agua
               _buildReminderSection(
                 icon: Icons.water_drop,
-                title: 'Hidrataci+¶n',
+                title: 'Hidrataci√≥n',
                 subtitle: 'Recordatorios recurrentes de agua',
                 value: _waterReminders,
                 onChanged: (v) => setState(() => _waterReminders = v),
@@ -812,7 +828,8 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                         DropdownMenuItem(value: 180, child: Text('3 horas')),
                         DropdownMenuItem(value: 240, child: Text('4 horas')),
                       ],
-                      onChanged: (v) => setState(() => _waterIntervalMinutes = v!),
+                      onChanged:
+                          (v) => setState(() => _waterIntervalMinutes = v!),
                     ),
                   ),
                   _buildTimeRangeSelector(
@@ -823,7 +840,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     (start) => setState(() => _waterStartTime = start),
                     (end) => setState(() => _waterEndTime = end),
                   ),
-                  _buildDaysSelector('D+°as activos', _waterDays),
+                  _buildDaysSelector('D√≠as activos', _waterDays),
                 ],
               ),
 
@@ -855,7 +872,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
               _buildReminderSection(
                 icon: Icons.flag,
                 title: 'Objetivos diarios',
-                subtitle: 'Revisa tu progreso de calor+°as y macros',
+                subtitle: 'Revisa tu progreso de calor√≠as y macros',
                 value: _goalReminders,
                 onChanged: (v) => setState(() => _goalReminders = v),
                 expanded: _goalReminders,
@@ -872,13 +889,14 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     title: const Text('Solo en fin de semana'),
                     secondary: const Icon(Icons.weekend),
                   ),
-                  if (!_weekendsOnly) _buildDaysSelector('D+°as activos', _goalDays),
+                  if (!_weekendsOnly)
+                    _buildDaysSelector('D√≠as activos', _goalDays),
                 ],
               ),
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Bot+¶n de guardar
+              // Bot√≥n de guardar
               ModernPrimaryButton(
                 label: 'Guardar Preferencias',
                 icon: Icons.save,
@@ -890,7 +908,10 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     SnackBar(
                       content: Row(
                         children: [
-                          Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
+                          Icon(
+                            Icons.check_circle,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                           const SizedBox(width: AppSpacing.sm),
                           const Text('Preferencias guardadas'),
                         ],
@@ -898,7 +919,9 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                       backgroundColor: Colors.green.shade600,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                       ),
                       margin: const EdgeInsets.all(AppSpacing.md),
                     ),
@@ -922,7 +945,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
     List<Widget> children = const [],
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Card(
       elevation: 2,
       child: Column(
@@ -957,7 +980,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
     ValueChanged<TimeOfDay> onChanged,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return ListTile(
       leading: Icon(icon, color: colorScheme.primary),
       title: Text(label),
@@ -971,9 +994,9 @@ class _RemindersSheetState extends State<_RemindersSheet> {
         },
         child: Text(
           '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-          style: AppTypography.heading4(context).copyWith(
-            color: colorScheme.primary,
-          ),
+          style: AppTypography.heading4(
+            context,
+          ).copyWith(color: colorScheme.primary),
         ),
       ),
     );
@@ -988,9 +1011,12 @@ class _RemindersSheetState extends State<_RemindersSheet> {
     ValueChanged<TimeOfDay> onEndChanged,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1054,10 +1080,7 @@ class _RemindersSheetState extends State<_RemindersSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: AppTypography.caption(context),
-          ),
+          Text(label, style: AppTypography.caption(context)),
           const SizedBox(height: AppSpacing.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1068,14 +1091,16 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: days[index] 
-                      ? colorScheme.primary 
-                      : colorScheme.surfaceContainerHighest,
+                    color:
+                        days[index]
+                            ? colorScheme.primary
+                            : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     border: Border.all(
-                      color: days[index] 
-                        ? colorScheme.primary 
-                        : colorScheme.outline,
+                      color:
+                          days[index]
+                              ? colorScheme.primary
+                              : colorScheme.outline,
                       width: 1.5,
                     ),
                   ),
@@ -1083,9 +1108,10 @@ class _RemindersSheetState extends State<_RemindersSheet> {
                     child: Text(
                       dayLabels[index],
                       style: AppTypography.body(context).copyWith(
-                        color: days[index]
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : colorScheme.onSurface,
+                        color:
+                            days[index]
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

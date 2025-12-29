@@ -88,14 +88,12 @@ class ExternalLinkPickerWidget extends StatelessWidget {
                 onPressed: () => onLinkSelected(null),
                 icon: const Icon(Icons.close_rounded, size: 16),
                 label: const Text('Quitar'),
-                style: TextButton.styleFrom(
-                  foregroundColor: colorScheme.error,
-                ),
+                style: TextButton.styleFrom(foregroundColor: colorScheme.error),
               ),
           ],
         ),
         const SizedBox(height: 12),
-        
+
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -115,13 +113,15 @@ class ExternalLinkPickerWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? app.color.withOpacity(0.15)
-                      : colorScheme.surfaceContainerHighest,
+                  color:
+                      isSelected
+                          ? app.color.withOpacity(0.15)
+                          : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(16),
-                  border: isSelected
-                      ? Border.all(color: app.color, width: 2)
-                      : null,
+                  border:
+                      isSelected
+                          ? Border.all(color: app.color, width: 2)
+                          : null,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +136,8 @@ class ExternalLinkPickerWidget extends StatelessWidget {
                       app.name,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
                         color: isSelected ? app.color : colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
@@ -149,24 +150,28 @@ class ExternalLinkPickerWidget extends StatelessWidget {
             );
           },
         ),
-        
+
         const SizedBox(height: 16),
         TextField(
           decoration: InputDecoration(
             labelText: 'O pega un enlace personalizado',
             hintText: 'https://ejemplo.com',
             prefixIcon: const Icon(Icons.link_rounded),
-            suffixIcon: initialLink != null && initialLink!.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.open_in_new_rounded),
-                    onPressed: () async {
-                      final uri = Uri.parse(initialLink!);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      }
-                    },
-                  )
-                : null,
+            suffixIcon:
+                initialLink != null && initialLink!.isNotEmpty
+                    ? IconButton(
+                      icon: const Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        final uri = Uri.parse(initialLink!);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      },
+                    )
+                    : null,
           ),
           controller: TextEditingController(text: initialLink),
           onChanged: (value) {

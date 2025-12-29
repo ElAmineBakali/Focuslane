@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/global_ui_theme.dart';
+import 'global_ui_components.dart';
 
 /// Shared shell for module home screens to avoid duplicating the SliverAppBar + scaffold layout.
 class FocusModuleShell extends StatelessWidget {
@@ -34,10 +35,12 @@ class FocusModuleShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final colors = gradientColors ?? <Color>[
-      colorScheme.primaryContainer,
-      colorScheme.secondaryContainer.withOpacity(0.8),
-    ];
+    final colors =
+        gradientColors ??
+        <Color>[
+          colorScheme.primaryContainer,
+          colorScheme.secondaryContainer.withOpacity(0.8),
+        ];
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
@@ -79,12 +82,7 @@ class FocusModuleShell extends StatelessWidget {
             ),
             actions: actions,
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: bodyPadding,
-              child: body,
-            ),
-          ),
+          SliverToBoxAdapter(child: Padding(padding: bodyPadding, child: body)),
         ],
       ),
     );

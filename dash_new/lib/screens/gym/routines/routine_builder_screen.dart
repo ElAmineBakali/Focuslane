@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../widgets/exercise_picker_sheet.dart';
@@ -20,8 +20,9 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
   final _controllerName = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-     static const _palette = <Color>[
-    Color(0xFF6750A4),      Color(0xFF386641),
+  static const _palette = <Color>[
+    Color(0xFF6750A4),
+    Color(0xFF386641),
     Color(0xFF1E88E5),
     Color(0xFFD81B60),
     Color(0xFFF57C00),
@@ -39,7 +40,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     super.initState();
     _controllerName.text = widget.routine.name;
 
-         try {
+    try {
       final cInt = (widget.routine as dynamic).color as int?;
       if (cInt != null) _selectedColor = Color(cInt);
     } catch (_) {
@@ -66,7 +67,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     final changes = <String, dynamic>{};
     if (name.isNotEmpty && name != widget.routine.name) changes['name'] = name;
 
-         final argb = _selectedColor.value;
+    final argb = _selectedColor.value;
     final rgb = argb & 0x00FFFFFF;
     final hex = '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
     changes['color'] = argb;

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
 
- class ExportDataScreen extends StatefulWidget {
+class ExportDataScreen extends StatefulWidget {
   final GymFirestoreService svc;
 
   const ExportDataScreen({super.key, required this.svc});
@@ -43,7 +43,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
   void _copyToClipboard() {
     if (_exportedData != null) {
-             ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
@@ -64,8 +64,9 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
   void _saveToFile() {
     if (_exportedData != null) {
-             final fileName = 'focuslane_gym_export_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
-      
+      final fileName =
+          'focuslane_gym_export_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -90,10 +91,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
               const SizedBox(height: 4),
               Text(
                 fileName,
-                style: GoogleFonts.poppins(
-                  color: Colors.white70,
-                  fontSize: 11,
-                ),
+                style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
@@ -120,7 +118,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-                         Container(
+            Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -165,7 +163,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
 
             const SizedBox(height: 24),
 
-                         Text(
+            Text(
               '¿Qué se exportará?',
               style: GoogleFonts.poppins(
                 fontSize: 16,
@@ -173,14 +171,17 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildInfoItem(Icons.fitness_center, 'Todas las sesiones de entrenamiento'),
+            _buildInfoItem(
+              Icons.fitness_center,
+              'Todas las sesiones de entrenamiento',
+            ),
             _buildInfoItem(Icons.monitor_weight, 'Historial de peso corporal'),
             _buildInfoItem(Icons.straighten, 'Medidas corporales'),
             _buildInfoItem(Icons.list_alt, 'Rutinas completas con ejercicios'),
-            
+
             const SizedBox(height: 32),
 
-                         if (!_isExporting && _exportedData == null)
+            if (!_isExporting && _exportedData == null)
               FilledButton.icon(
                 onPressed: _exportData,
                 icon: const Icon(Icons.download),
@@ -199,21 +200,19 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ),
               ),
 
-                         if (_isExporting)
+            if (_isExporting)
               Column(
                 children: [
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
                   Text(
                     'Exportando datos...',
-                    style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.poppins(color: Colors.grey[600]),
                   ),
                 ],
               ),
 
-                         if (_errorMessage != null)
+            if (_errorMessage != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -238,7 +237,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ),
               ),
 
-                         if (_exportedData != null) ...[
+            if (_exportedData != null) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -248,7 +247,11 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 32),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 32,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -276,19 +279,16 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
-                             Row(
+
+              Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: _copyToClipboard,
                       icon: const Icon(Icons.copy),
-                      label: Text(
-                        'Copiar',
-                        style: GoogleFonts.poppins(),
-                      ),
+                      label: Text('Copiar', style: GoogleFonts.poppins()),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -299,10 +299,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                     child: FilledButton.icon(
                       onPressed: _saveToFile,
                       icon: const Icon(Icons.save),
-                      label: Text(
-                        'Guardar',
-                        style: GoogleFonts.poppins(),
-                      ),
+                      label: Text('Guardar', style: GoogleFonts.poppins()),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -310,10 +307,10 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
-                             Text(
+
+              Text(
                 'Vista previa',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
@@ -359,10 +356,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[700],
-              ),
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[700]),
             ),
           ),
           Icon(Icons.check, size: 18, color: Colors.green[600]),

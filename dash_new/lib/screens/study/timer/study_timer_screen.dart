@@ -18,7 +18,12 @@ class StudyTimerScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   final String? initialCourseId;
   final String? initialTaskId;
-  const StudyTimerScreen({super.key, required this.svc, this.initialCourseId, this.initialTaskId});
+  const StudyTimerScreen({
+    super.key,
+    required this.svc,
+    this.initialCourseId,
+    this.initialTaskId,
+  });
 
   @override
   State<StudyTimerScreen> createState() => _StudyTimerScreenState();
@@ -54,7 +59,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     super.initState();
     _courseId = widget.initialCourseId;
     _taskId = widget.initialTaskId;
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -135,7 +142,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         _startBox('work', (_cfg['block'] ?? 50).toInt());
         break;
       case StudyMethod.custom:
-        final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+        final seq =
+            (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
+            const [];
         if (seq.isEmpty) {
           AppToast.error(context, 'Secuencia vacía');
           return;
@@ -153,7 +162,11 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           });
         });
         setState(() {});
-        NotificationService.I.showNow(id: _N_WORK_START, title: 'Estudio', body: 'Sesión iniciada');
+        NotificationService.I.showNow(
+          id: _N_WORK_START,
+          title: 'Estudio',
+          body: 'Sesión iniciada',
+        );
         break;
     }
   }
@@ -166,7 +179,10 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       work,
       after: () {
         final isLong = (_cycle % ((_cfg['cycles'] ?? 4).toInt())) == 0;
-        final restMin = isLong ? (_cfg['long'] ?? 15).toInt() : (_cfg['short'] ?? 5).toInt();
+        final restMin =
+            isLong
+                ? (_cfg['long'] ?? 15).toInt()
+                : (_cfg['short'] ?? 5).toInt();
         _changePhase('rest', restMin * 60, after: () {});
       },
     );
@@ -191,7 +207,11 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     _changePhase(phase, minutes * 60, after: () {});
   }
 
-  void _changePhase(String newPhase, int seconds, {required VoidCallback after}) {
+  void _changePhase(
+    String newPhase,
+    int seconds, {
+    required VoidCallback after,
+  }) {
     _ticker?.cancel();
     setState(() {
       _phase = newPhase;
@@ -221,7 +241,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           return;
         }
         if (_method == StudyMethod.custom && _phase == 'work') {
-          final seq = (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          final seq =
+              (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
+              const [];
           final currentRest = (seq.first['rest'] ?? 10).toInt();
           _changePhase('rest', currentRest * 60, after: () {});
           return;
@@ -329,7 +351,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: gradient))),
+          Positioned.fill(
+            child: DecoratedBox(decoration: BoxDecoration(gradient: gradient)),
+          ),
           Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
@@ -354,7 +378,12 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                     ),
                   ),
                 ),
-                title: Text('Timer de estudio', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800)),
+                title: Text(
+                  'Timer de estudio',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 actions: [
                   IconButton(
                     tooltip: 'Presets',
@@ -364,7 +393,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (_) => PresetsSheet(svc: svc, courseId: _courseId),
+                        builder:
+                            (_) => PresetsSheet(svc: svc, courseId: _courseId),
                       );
                       if (picked != null) _loadPreset(picked);
                     },
@@ -376,10 +406,11 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => StudyAnalyticsScreen(
-                            svc: svc,
-                            courseId: _courseId,
-                          ),
+                          builder:
+                              (_) => StudyAnalyticsScreen(
+                                svc: svc,
+                                courseId: _courseId,
+                              ),
                         ),
                       );
                     },
@@ -394,35 +425,48 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                       _PhasePill(label: phaseLabel, color: phaseColor(_phase)),
                       const SizedBox(height: AppSpacing.lg),
                       _TimerHeroCard(
-                        colorScheme: cs,
-                        phaseColor: phaseColor(_phase),
-                        phaseLabel: phaseLabel,
-                        timeLeft: _formatTime(_timeLeft),
-                        totalTimeLabel: _totalTime > 0 ? _formatTime(_totalTime) : '--:--',
-                        cycle: _cycle,
-                        controls: _buildControlButtons(context),
-                        timer: CircularTimerWidget(
-                          timeLeft: _timeLeft,
-                          totalTime: _totalTime,
-                          phase: phaseLabel,
-                          color: phaseColor(_phase),
-                          isRunning: _isRunning,
-                        ),
-                      ).animate().fadeIn(duration: 500.ms).move(begin: const Offset(0, 20)),
+                            colorScheme: cs,
+                            phaseColor: phaseColor(_phase),
+                            phaseLabel: phaseLabel,
+                            timeLeft: _formatTime(_timeLeft),
+                            totalTimeLabel:
+                                _totalTime > 0
+                                    ? _formatTime(_totalTime)
+                                    : '--:--',
+                            cycle: _cycle,
+                            controls: _buildControlButtons(context),
+                            timer: CircularTimerWidget(
+                              timeLeft: _timeLeft,
+                              totalTime: _totalTime,
+                              phase: phaseLabel,
+                              color: phaseColor(_phase),
+                              isRunning: _isRunning,
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 500.ms)
+                          .move(begin: const Offset(0, 20)),
                       const SizedBox(height: AppSpacing.lg),
                       if (_method != StudyMethod.simple)
-                        _buildStatsRow(context).animate().fadeIn(delay: 100.ms, duration: 350.ms),
+                        _buildStatsRow(
+                          context,
+                        ).animate().fadeIn(delay: 100.ms, duration: 350.ms),
                       const SizedBox(height: AppSpacing.lg),
                       _MethodCard(
                         method: _method,
                         configSummary: _methodSummary(),
                         onShowPresets: () async {
-                          final picked = await showModalBottomSheet<TimerPreset>(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (_) => PresetsSheet(svc: svc, courseId: _courseId),
-                          );
+                          final picked =
+                              await showModalBottomSheet<TimerPreset>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder:
+                                    (_) => PresetsSheet(
+                                      svc: svc,
+                                      courseId: _courseId,
+                                    ),
+                              );
                           if (picked != null) _loadPreset(picked);
                         },
                       ),
@@ -460,7 +504,12 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _StatCard(icon: Icons.loop_rounded, label: 'Ciclos', value: '$_cycle', color: cs.primary),
+          _StatCard(
+            icon: Icons.loop_rounded,
+            label: 'Ciclos',
+            value: '$_cycle',
+            color: cs.primary,
+          ),
           _StatCard(
             icon: Icons.timer_outlined,
             label: 'Minutos',
@@ -492,51 +541,75 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             onPressed: _isRunning ? null : _start,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             icon: const Icon(Icons.play_arrow_rounded, size: 24),
             label: Text(
               'Iniciar',
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           FilledButton.tonalIcon(
             onPressed: _isRunning ? _pause : null,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             icon: const Icon(Icons.pause_rounded, size: 24),
             label: Text(
               'Pausar',
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           OutlinedButton.icon(
             onPressed: _reset,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             icon: const Icon(Icons.refresh_rounded, size: 24),
             label: Text(
               'Reset',
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          if (_courseId != null && (_phase != 'ready' || _accumulatedMinutes > 0))
+          if (_courseId != null &&
+              (_phase != 'ready' || _accumulatedMinutes > 0))
             FilledButton.icon(
               onPressed: _stopAndSave,
               style: FilledButton.styleFrom(
                 backgroundColor: cs.tertiary,
                 foregroundColor: cs.onTertiary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               icon: const Icon(Icons.save_rounded, size: 24),
               label: Text(
                 'Guardar sesión',
-                style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
         ],
@@ -592,7 +665,10 @@ class _StatCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Container(
       width: 110,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -641,7 +717,10 @@ class _PhasePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.16),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
@@ -737,11 +816,16 @@ class _TimerHeroCard extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.onPrimary.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                  border: Border.all(color: colorScheme.onPrimary.withOpacity(0.2)),
+                  border: Border.all(
+                    color: colorScheme.onPrimary.withOpacity(0.2),
+                  ),
                 ),
                 child: Text(
                   'Total ${totalTimeLabel == '--:--' ? 'n/a' : totalTimeLabel}',
@@ -814,7 +898,10 @@ class _MethodCard extends StatelessWidget {
               children: [
                 Text(
                   'Modo: ${method.name.toUpperCase()}',
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 16),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(configSummary, style: AppTypography.caption(context)),
@@ -824,7 +911,10 @@ class _MethodCard extends StatelessWidget {
           FilledButton.tonal(
             onPressed: onShowPresets,
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
             ),
             child: const Text('Presets'),
           ),
@@ -877,8 +967,11 @@ class _HeaderSelectors extends StatelessWidget {
       builder: (context, csnap) {
         final courses = csnap.data ?? const [];
 
-        final validCourseId = courses.any((c) => c.id == courseId) ? courseId : null;
-        if (validCourseId != courseId && validCourseId == null && courseId != null) {
+        final validCourseId =
+            courses.any((c) => c.id == courseId) ? courseId : null;
+        if (validCourseId != courseId &&
+            validCourseId == null &&
+            courseId != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             onCourseChanged(null);
           });
@@ -904,7 +997,9 @@ class _HeaderSelectors extends StatelessWidget {
                   if (courses.isEmpty)
                     Text(
                       'No hay cursos disponibles',
-                      style: GoogleFonts.plusJakartaSans(color: colorScheme.error),
+                      style: GoogleFonts.plusJakartaSans(
+                        color: colorScheme.error,
+                      ),
                     )
                   else
                     Wrap(
@@ -913,13 +1008,17 @@ class _HeaderSelectors extends StatelessWidget {
                       children:
                           courses.map((course) {
                             final isSelected = validCourseId == course.id;
-                            final courseColor = course.color ?? colorScheme.primary;
+                            final courseColor =
+                                course.color ?? colorScheme.primary;
 
                             return InkWell(
                               onTap: () => onCourseChanged(course.id),
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
                                 decoration: BoxDecoration(
                                   color:
                                       isSelected
@@ -927,7 +1026,10 @@ class _HeaderSelectors extends StatelessWidget {
                                           : colorScheme.surfaceContainerHighest,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: isSelected ? courseColor : Colors.transparent,
+                                    color:
+                                        isSelected
+                                            ? courseColor
+                                            : Colors.transparent,
                                     width: 2,
                                   ),
                                 ),
@@ -944,7 +1046,8 @@ class _HeaderSelectors extends StatelessWidget {
                                             isSelected
                                                 ? [
                                                   BoxShadow(
-                                                    color: courseColor.withOpacity(0.4),
+                                                    color: courseColor
+                                                        .withOpacity(0.4),
                                                     blurRadius: 8,
                                                   ),
                                                 ]
@@ -956,8 +1059,14 @@ class _HeaderSelectors extends StatelessWidget {
                                       course.name,
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 15,
-                                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                        color: isSelected ? courseColor : colorScheme.onSurface,
+                                        fontWeight:
+                                            isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w500,
+                                        color:
+                                            isSelected
+                                                ? courseColor
+                                                : colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -971,7 +1080,10 @@ class _HeaderSelectors extends StatelessWidget {
             ),
             if (courseId != null)
               StreamBuilder<List<StudyTask>>(
-                stream: svc.streamTasks(courseId: courseId!, status: TaskStatus.todo),
+                stream: svc.streamTasks(
+                  courseId: courseId!,
+                  status: TaskStatus.todo,
+                ),
                 builder: (context, tsnap) {
                   final tasks = tsnap.data ?? const [];
                   return Padding(
@@ -981,7 +1093,12 @@ class _HeaderSelectors extends StatelessWidget {
                       hint: const Text('Vincular tarea (opcional)'),
                       items: [
                         const DropdownMenuItem(value: null, child: Text('—')),
-                        ...tasks.map((t) => DropdownMenuItem(value: t.id, child: Text(t.title))),
+                        ...tasks.map(
+                          (t) => DropdownMenuItem(
+                            value: t.id,
+                            child: Text(t.title),
+                          ),
+                        ),
                       ],
                       onChanged: onTaskChanged,
                     ),

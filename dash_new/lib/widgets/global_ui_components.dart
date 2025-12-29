@@ -9,7 +9,7 @@ class FocusColors {
   static const Color habits = Color(0xFF4CAF50);
   static const Color goals = Color(0xFFE91E63);
   static const Color calendar = Color(0xFF00BCD4);
-  
+
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFF9800);
   static const Color error = Color(0xFFF44336);
@@ -21,7 +21,7 @@ class FocusColors {
   static Color grey600 = Colors.grey[600]!;
   static Color grey700 = Colors.grey[700]!;
   static Color grey800 = Colors.grey[800]!;
-  
+
   static LinearGradient createGradient(Color color) {
     return LinearGradient(
       colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
@@ -29,7 +29,7 @@ class FocusColors {
       end: Alignment.bottomRight,
     );
   }
-  
+
   static LinearGradient appBarGradient(Color primary, Color secondary) {
     return LinearGradient(
       begin: Alignment.topLeft,
@@ -40,52 +40,36 @@ class FocusColors {
 }
 
 class FocusTypography {
-  static TextStyle heading1(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 26,
-    fontWeight: FontWeight.w700,
-  );
-  
-  static TextStyle heading2(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 22,
-    fontWeight: FontWeight.w700,
-  );
-  
-  static TextStyle heading3(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 18,
-    fontWeight: FontWeight.w700,
-  );
-  
-  static TextStyle heading4(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-  );
-  
-  static TextStyle bodyLarge(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-  );
-  
-  static TextStyle bodyMedium(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-  );
-  
-  static TextStyle bodySmall(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-  );
-  
+  static TextStyle heading1(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 26, fontWeight: FontWeight.w700);
+
+  static TextStyle heading2(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700);
+
+  static TextStyle heading3(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700);
+
+  static TextStyle heading4(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600);
+
+  static TextStyle bodyLarge(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400);
+
+  static TextStyle bodyMedium(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400);
+
+  static TextStyle bodySmall(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400);
+
   static TextStyle caption(BuildContext context) => GoogleFonts.poppins(
     fontSize: 11,
     fontWeight: FontWeight.w400,
     color: Colors.grey[600],
   );
-  
-  static TextStyle label(BuildContext context) => GoogleFonts.poppins(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-  );
-  
+
+  static TextStyle label(BuildContext context) =>
+      GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600);
+
   static TextStyle valueDisplay(Color color) => GoogleFonts.poppins(
     fontSize: 24,
     fontWeight: FontWeight.w700,
@@ -100,12 +84,12 @@ class FocusSpacing {
   static const double lg = 16.0;
   static const double xl = 24.0;
   static const double xxl = 32.0;
-  
+
   static const double radiusSm = 8.0;
   static const double radiusMd = 12.0;
   static const double radiusLg = 16.0;
   static const double radiusXl = 20.0;
-  
+
   static const double cardElevation = 1.0;
   static const double iconSizeSmall = 20.0;
   static const double iconSizeMedium = 24.0;
@@ -118,7 +102,7 @@ class FocusKpiCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
-  
+
   const FocusKpiCard({
     super.key,
     required this.label,
@@ -127,7 +111,7 @@ class FocusKpiCard extends StatelessWidget {
     required this.color,
     this.onTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -166,7 +150,7 @@ class FocusStatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
-  
+
   const FocusStatCard({
     super.key,
     required this.label,
@@ -176,7 +160,7 @@ class FocusStatCard extends StatelessWidget {
     required this.color,
     this.onTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -202,9 +186,12 @@ class FocusStatCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: FocusSpacing.sm),
-              Text(label, style: FocusTypography.label(context).copyWith(
-                color: FocusColors.grey700,
-              )),
+              Text(
+                label,
+                style: FocusTypography.label(
+                  context,
+                ).copyWith(color: FocusColors.grey700),
+              ),
               Text(subtitle, style: FocusTypography.caption(context)),
             ],
           ),
@@ -220,7 +207,7 @@ class FocusActionCard extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   final Duration? animationDelay;
-  
+
   const FocusActionCard({
     super.key,
     required this.title,
@@ -229,7 +216,7 @@ class FocusActionCard extends StatelessWidget {
     required this.onTap,
     this.animationDelay,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final widget = Container(
@@ -252,7 +239,9 @@ class FocusActionCard extends StatelessWidget {
                 const SizedBox(height: FocusSpacing.md),
                 Text(
                   title,
-                  style: FocusTypography.heading4(context).copyWith(color: color),
+                  style: FocusTypography.heading4(
+                    context,
+                  ).copyWith(color: color),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -261,9 +250,12 @@ class FocusActionCard extends StatelessWidget {
         ),
       ),
     );
-    
+
     if (animationDelay != null) {
-      return widget.animate(delay: animationDelay).fadeIn(duration: 400.ms).scale();
+      return widget
+          .animate(delay: animationDelay)
+          .fadeIn(duration: 400.ms)
+          .scale();
     }
     return widget;
   }
@@ -360,22 +352,20 @@ class FocusFeatureCard extends StatelessWidget {
                   color: color.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
                 ),
-                child: Icon(icon, color: color, size: FocusSpacing.iconSizeMedium + 4),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: FocusSpacing.iconSizeMedium + 4,
+                ),
               ),
               const SizedBox(width: FocusSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: FocusTypography.heading4(context),
-                    ),
+                    Text(title, style: FocusTypography.heading4(context)),
                     const SizedBox(height: FocusSpacing.xs),
-                    Text(
-                      subtitle,
-                      style: FocusTypography.caption(context),
-                    ),
+                    Text(subtitle, style: FocusTypography.caption(context)),
                   ],
                 ),
               ),
@@ -393,7 +383,7 @@ class FocusInfoChip extends StatelessWidget {
   final String label;
   final Color? color;
   final ColorScheme? colorScheme;
-  
+
   const FocusInfoChip({
     super.key,
     required this.icon,
@@ -401,12 +391,12 @@ class FocusInfoChip extends StatelessWidget {
     this.color,
     this.colorScheme,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final cs = colorScheme ?? Theme.of(context).colorScheme;
     final chipColor = color ?? cs.onSurfaceVariant;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: FocusSpacing.sm,
@@ -423,10 +413,7 @@ class FocusInfoChip extends StatelessWidget {
           const SizedBox(width: FocusSpacing.xs),
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: chipColor,
-            ),
+            style: GoogleFonts.poppins(fontSize: 11, color: chipColor),
           ),
         ],
       ),
@@ -438,14 +425,14 @@ class FocusBadge extends StatelessWidget {
   final String text;
   final Color color;
   final IconData? icon;
-  
+
   const FocusBadge({
     super.key,
     required this.text,
     required this.color,
     this.icon,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -485,7 +472,7 @@ class FocusProgressBar extends StatelessWidget {
   final Color color;
   final bool showPercentage;
   final String? suffix;
-  
+
   const FocusProgressBar({
     super.key,
     required this.label,
@@ -495,12 +482,12 @@ class FocusProgressBar extends StatelessWidget {
     this.showPercentage = true,
     this.suffix,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final percentage = max > 0 ? (value / max * 100).clamp(0, 100).toInt() : 0;
     final progress = max > 0 ? (value / max).clamp(0.0, 1.0) : 0.0;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: FocusSpacing.md),
       child: Column(
@@ -512,9 +499,9 @@ class FocusProgressBar extends StatelessWidget {
               Text(label, style: FocusTypography.heading4(context)),
               if (showPercentage)
                 Text(
-                  suffix != null 
-                    ? '${value.toStringAsFixed(0)}/${ max.toStringAsFixed(0)} $suffix'
-                    : '$percentage%',
+                  suffix != null
+                      ? '${value.toStringAsFixed(0)}/${max.toStringAsFixed(0)} $suffix'
+                      : '$percentage%',
                   style: FocusTypography.caption(context),
                 ),
             ],
@@ -543,7 +530,7 @@ class FocusGradientAppBar extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? bottom;
   final double expandedHeight;
-  
+
   const FocusGradientAppBar({
     super.key,
     required this.title,
@@ -554,7 +541,7 @@ class FocusGradientAppBar extends StatelessWidget {
     this.bottom,
     this.expandedHeight = 160,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -573,9 +560,14 @@ class FocusGradientAppBar extends StatelessWidget {
           ),
           child: SafeArea(
             child: Center(
-              child: icon != null
-                ? Icon(icon, size: 80, color: Colors.white.withOpacity(0.15))
-                : null,
+              child:
+                  icon != null
+                      ? Icon(
+                        icon,
+                        size: 80,
+                        color: Colors.white.withOpacity(0.15),
+                      )
+                      : null,
             ),
           ),
         ),
@@ -594,7 +586,7 @@ class FocusListCard extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? trailing;
   final List<Widget>? additionalInfo;
-  
+
   const FocusListCard({
     super.key,
     required this.title,
@@ -605,7 +597,7 @@ class FocusListCard extends StatelessWidget {
     this.trailing,
     this.additionalInfo,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -627,9 +619,15 @@ class FocusListCard extends StatelessWidget {
                     padding: const EdgeInsets.all(FocusSpacing.sm),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(FocusSpacing.radiusSm),
+                      borderRadius: BorderRadius.circular(
+                        FocusSpacing.radiusSm,
+                      ),
                     ),
-                    child: Icon(icon, color: color, size: FocusSpacing.iconSizeSmall),
+                    child: Icon(
+                      icon,
+                      color: color,
+                      size: FocusSpacing.iconSizeSmall,
+                    ),
                   ),
                   const SizedBox(width: FocusSpacing.md),
                   Expanded(
@@ -638,11 +636,15 @@ class FocusListCard extends StatelessWidget {
                       children: [
                         Text(title, style: FocusTypography.heading4(context)),
                         if (subtitle != null)
-                          Text(subtitle!, style: FocusTypography.caption(context)),
+                          Text(
+                            subtitle!,
+                            style: FocusTypography.caption(context),
+                          ),
                       ],
                     ),
                   ),
-                  trailing ?? const Icon(Icons.chevron_right, color: Colors.grey),
+                  trailing ??
+                      const Icon(Icons.chevron_right, color: Colors.grey),
                 ],
               ),
               if (additionalInfo != null) ...[
@@ -667,7 +669,7 @@ class FocusEmptyState extends StatelessWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
   final Color color;
-  
+
   const FocusEmptyState({
     super.key,
     required this.icon,
@@ -676,7 +678,7 @@ class FocusEmptyState extends StatelessWidget {
     this.onAction,
     this.color = Colors.grey,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -689,9 +691,9 @@ class FocusEmptyState extends StatelessWidget {
             const SizedBox(height: FocusSpacing.lg),
             Text(
               message,
-              style: FocusTypography.bodyMedium(context).copyWith(
-                color: FocusColors.grey600,
-              ),
+              style: FocusTypography.bodyMedium(
+                context,
+              ).copyWith(color: FocusColors.grey600),
               textAlign: TextAlign.center,
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -719,7 +721,7 @@ class FocusMeterCard extends StatelessWidget {
   final double max;
   final Color color;
   final IconData? icon;
-  
+
   const FocusMeterCard({
     super.key,
     required this.label,
@@ -728,11 +730,11 @@ class FocusMeterCard extends StatelessWidget {
     required this.color,
     this.icon,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final percentage = max > 0 ? (value / max).clamp(0.0, 1.0) : 0.0;
-    
+
     return Container(
       padding: const EdgeInsets.all(FocusSpacing.lg),
       decoration: BoxDecoration(
@@ -757,7 +759,9 @@ class FocusMeterCard extends StatelessWidget {
               ),
               Text(
                 '${value.toStringAsFixed(1)}/$max',
-                style: FocusTypography.valueDisplay(color).copyWith(fontSize: 18),
+                style: FocusTypography.valueDisplay(
+                  color,
+                ).copyWith(fontSize: 18),
               ),
             ],
           ),
@@ -781,14 +785,14 @@ class FocusSection extends StatelessWidget {
   final String title;
   final Widget? action;
   final List<Widget> children;
-  
+
   const FocusSection({
     super.key,
     required this.title,
     this.action,
     required this.children,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -824,17 +828,12 @@ PageRouteBuilder<T> focusPageRoute<T>({
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
       const curve = Curves.easeInOut;
-      
-      var tween = Tween(begin: begin, end: end).chain(
-        CurveTween(curve: curve),
-      );
-      
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
       return SlideTransition(
         position: animation.drive(tween),
-        child: FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        child: FadeTransition(opacity: animation, child: child),
       );
     },
   );

@@ -1,4 +1,3 @@
-  
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'task_model.dart';
@@ -61,23 +60,23 @@ class TaskGrouper {
   static List<Task> sortTasks(List<Task> tasks) {
     final sorted = List<Task>.from(tasks);
     sorted.sort((a, b) {
-             if (a.isPinned != b.isPinned) {
+      if (a.isPinned != b.isPinned) {
         return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
       }
 
-             if (a.dueDate == null && b.dueDate == null) {
-                 final priorityComp = b.priority.index.compareTo(a.priority.index);
+      if (a.dueDate == null && b.dueDate == null) {
+        final priorityComp = b.priority.index.compareTo(a.priority.index);
         if (priorityComp != 0) return priorityComp;
-                 return (a.order ?? 0).compareTo(b.order ?? 0);
+        return (a.order ?? 0).compareTo(b.order ?? 0);
       }
       if (a.dueDate == null) return 1;
       if (b.dueDate == null) return -1;
 
       final dateComp = a.dueDate!.compareTo(b.dueDate!);
       if (dateComp != 0) return dateComp;
-             final priorityComp = b.priority.index.compareTo(a.priority.index);
+      final priorityComp = b.priority.index.compareTo(a.priority.index);
       if (priorityComp != 0) return priorityComp;
-             return (a.order ?? 0).compareTo(b.order ?? 0);
+      return (a.order ?? 0).compareTo(b.order ?? 0);
     });
     return sorted;
   }

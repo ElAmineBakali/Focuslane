@@ -27,7 +27,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final bool _syncing = false;
   bool _signingOut = false;
   DateTime? _lastSync;
 
@@ -179,19 +178,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 16),
         ],
       ),
-    );
-  }
-
-  Widget _bgChip(
-    String label,
-    BackgroundStyle val,
-    BackgroundStyle current,
-    void Function(BackgroundStyle) onPick,
-  ) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: val == current,
-      onSelected: (_) => onPick(val),
     );
   }
 

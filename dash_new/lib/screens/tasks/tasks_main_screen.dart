@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class TasksMainScreen extends StatefulWidget {
   const TasksMainScreen({super.key, this.startWithChecklist = true});
-  final bool startWithChecklist;  
+  final bool startWithChecklist;
   @override
   State<TasksMainScreen> createState() => _TasksMainScreenState();
 }
@@ -65,12 +65,12 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                   ),
                 ]
                 : [
-                                     IconButton(
+                  IconButton(
                     tooltip: 'Marcar todo',
                     icon: const Icon(Icons.done_all),
                     onPressed: () => _Checklist.checkAll(context),
                   ),
-                                     IconButton(
+                  IconButton(
                     tooltip: 'Desmarcar todo',
                     icon: const Icon(Icons.close_fullscreen),
                     onPressed: () => _Checklist.uncheckAll(context),
@@ -124,7 +124,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         return ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-                         if (groups[TaskGroup.overdue]!.isNotEmpty)
+            if (groups[TaskGroup.overdue]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -132,7 +132,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 groups[TaskGroup.overdue]!,
                 isDark ? cs.errorContainer : cs.error.withOpacity(0.1),
               ),
-                         if (groups[TaskGroup.today]!.isNotEmpty)
+            if (groups[TaskGroup.today]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -142,7 +142,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.primaryContainer.withOpacity(0.3)
                     : cs.primary.withOpacity(0.08),
               ),
-                         if (groups[TaskGroup.tomorrow]!.isNotEmpty)
+            if (groups[TaskGroup.tomorrow]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -152,7 +152,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.secondaryContainer.withOpacity(0.3)
                     : cs.secondary.withOpacity(0.08),
               ),
-                         if (groups[TaskGroup.thisWeek]!.isNotEmpty)
+            if (groups[TaskGroup.thisWeek]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -162,7 +162,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     ? cs.tertiaryContainer.withOpacity(0.3)
                     : cs.tertiary.withOpacity(0.08),
               ),
-                         if (groups[TaskGroup.later]!.isNotEmpty)
+            if (groups[TaskGroup.later]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -170,7 +170,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 groups[TaskGroup.later]!,
                 isDark ? cs.surfaceContainerHighest : cs.surfaceContainerHigh,
               ),
-                         if (groups[TaskGroup.noDate]!.isNotEmpty)
+            if (groups[TaskGroup.noDate]!.isNotEmpty)
               _buildCollapsibleTaskGroup(
                 context,
                 theme,
@@ -179,7 +179,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 isDark ? cs.surfaceContainerHigh : cs.surfaceContainer,
               ),
 
-                         if (tasks.isEmpty)
+            if (tasks.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
                 child: Center(
@@ -287,7 +287,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         task.dueDate!.isBefore(DateTime.now()) &&
         !task.completed;
 
-         final cardColor =
+    final cardColor =
         isOverdue
             ? (isDark
                 ? cs.errorContainer.withOpacity(0.3)
@@ -309,7 +309,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-                         Container(
+            Container(
               width: 4,
               height: 48,
               decoration: BoxDecoration(
@@ -326,13 +326,13 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                 final updated = task.copyWith(completed: val ?? false);
                 await TaskFirestoreService.updateTask(updated);
 
-                                 if (updated.completed) {
+                if (updated.completed) {
                   try {
                     await ReminderService.I.cancelTaskReminder(task.id);
                   } catch (e) {
                     debugPrint('Error canceling task reminder: $e');
                   }
-                                     if (task.repeatRule != RepeatRule.none) {
+                  if (task.repeatRule != RepeatRule.none) {
                     final nextDue = _nextDueDate(task.dueDate, task.repeatRule);
                     final nextRemind = _nextDateFrom(
                       task.remindAt,
@@ -360,7 +360,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                     }
                   }
                 } else {
-                                     try {
+                  try {
                     await ReminderService.I.scheduleTaskReminder(
                       updated,
                       previous: previous,
@@ -498,7 +498,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
           visualDensity: VisualDensity.compact,
           icon: Icon(Icons.delete_outline, color: cs.onSurfaceVariant),
           onPressed: () async {
-                         try {
+            try {
               await ReminderService.I.cancelTaskReminder(task.id);
             } catch (e) {
               debugPrint('Error canceling task reminder on delete: $e');
@@ -635,7 +635,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   }
 }
 
- class _TabTextButton extends StatelessWidget {
+class _TabTextButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -720,8 +720,8 @@ class _SubtaskRow extends StatelessWidget {
   }
 }
 
- class _Checklist {
-     static CollectionReference<Map<String, dynamic>> _col() {
+class _Checklist {
+  static CollectionReference<Map<String, dynamic>> _col() {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     return FirebaseFirestore.instance
         .collection('users')
@@ -732,7 +732,7 @@ class _SubtaskRow extends StatelessWidget {
   }
 
   static Stream<List<_ChecklistItem>> watchToday() {
-         return _col()
+    return _col()
         .orderBy('order')
         .snapshots()
         .map(
@@ -747,11 +747,7 @@ class _SubtaskRow extends StatelessWidget {
     final col = _col();
     final snap = await col.get();
     final next = snap.size;
-    await col.add({
-      'text': text,
-      'done': false,
-      'order': next,
-           });
+    await col.add({'text': text, 'done': false, 'order': next});
   }
 
   static Future<void> toggle(_ChecklistItem it) async {
@@ -760,7 +756,7 @@ class _SubtaskRow extends StatelessWidget {
 
   static Future<void> remove(_ChecklistItem it) async {
     await _col().doc(it.id).delete();
-         final items = await _col().orderBy('order').get();
+    final items = await _col().orderBy('order').get();
     int i = 0;
     for (final d in items.docs) {
       await d.reference.update({'order': i++});
@@ -780,11 +776,11 @@ class _SubtaskRow extends StatelessWidget {
     }
   }
 
-     static Future<void> setColor(_ChecklistItem it, String? hex) async {
+  static Future<void> setColor(_ChecklistItem it, String? hex) async {
     await _col().doc(it.id).update({'color': hex});
   }
 
-     static const int _kBatchLimit = 450;
+  static const int _kBatchLimit = 450;
 
   static Future<void> checkAll(BuildContext context) async {
     await _setAll(done: true);
@@ -914,9 +910,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                 itemBuilder: (c, i) {
                   final it = items[i];
                   final color = _colorFromHex(it.colorHex);
-                  final tileBg = color?.withOpacity(
-                    0.12,
-                  );  
+                  final tileBg = color?.withOpacity(0.12);
                   return Card(
                     key: ValueKey(it.id),
                     color: tileBg ?? Theme.of(context).cardColor,
@@ -982,8 +976,20 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
   }
 }
 
- const List<Color> _kPalette = [
-  Color(0xFFFF8A80),    Color(0xFFFFC400),    Color(0xFFFFF176),    Color(0xFFA5D6A7),    Color(0xFF66BB6A),    Color(0xFF80DEEA),    Color(0xFF81D4FA),    Color(0xFF64B5F6),    Color(0xFFCE93D8),    Color(0xFFF48FB1),    Color(0xFFBCAAA4),    Color(0xFFCFD8DC),  ];
+const List<Color> _kPalette = [
+  Color(0xFFFF8A80),
+  Color(0xFFFFC400),
+  Color(0xFFFFF176),
+  Color(0xFFA5D6A7),
+  Color(0xFF66BB6A),
+  Color(0xFF80DEEA),
+  Color(0xFF81D4FA),
+  Color(0xFF64B5F6),
+  Color(0xFFCE93D8),
+  Color(0xFFF48FB1),
+  Color(0xFFBCAAA4),
+  Color(0xFFCFD8DC),
+];
 
 String? _hexFromColor(Color? c) =>
     c == null
@@ -997,7 +1003,7 @@ Color? _colorFromHex(String? hex) {
   return Color(v);
 }
 
- class _ColorPill extends StatelessWidget {
+class _ColorPill extends StatelessWidget {
   final Color? color;
   const _ColorPill({this.color});
 
@@ -1009,7 +1015,8 @@ Color? _colorFromHex(String? hex) {
       height: 18,
       decoration: BoxDecoration(
         color: color ?? Colors.transparent,
-        borderRadius: BorderRadius.circular(4),          border: Border.all(
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
           color: color == null ? cs.outlineVariant : color!.withOpacity(.9),
           width: 1,
         ),
@@ -1018,7 +1025,7 @@ Color? _colorFromHex(String? hex) {
   }
 }
 
- class _ColorMenuButton extends StatelessWidget {
+class _ColorMenuButton extends StatelessWidget {
   final Color? current;
   final ValueChanged<Color?> onPick;
   final VoidCallback onClear;

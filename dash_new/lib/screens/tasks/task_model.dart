@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum TaskPriority {
@@ -40,20 +40,21 @@ class Task {
   final String description;
   final TaskPriority priority;
   final String? category;
-  final DateTime? dueDate;    final TimeOfDay?
-  reminderTime;    final bool completed;
+  final DateTime? dueDate;
+  final TimeOfDay? reminderTime;
+  final bool completed;
   final int? order;
-  final List<String> tags;  
-     final DateTime? remindAt;
-     final bool isPinned;
+  final List<String> tags;
+  final DateTime? remindAt;
+  final bool isPinned;
   final RepeatRule repeatRule;
   final List<Subtask> subtasks;
   final bool isCalendarVisible;
   final String? linkedNoteId;
-  
-     final String? linkedStudyCourseId;
-  
-     final String? syncedStudyTaskId;
+
+  final String? linkedStudyCourseId;
+
+  final String? syncedStudyTaskId;
 
   Task({
     required this.id,
@@ -144,7 +145,7 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
-         TimeOfDay? parsedReminderTime;
+    TimeOfDay? parsedReminderTime;
     final rtRaw = map['reminderTime'];
     if (rtRaw != null && rtRaw is Map) {
       final timeMap = Map<String, dynamic>.from(rtRaw);
@@ -155,7 +156,7 @@ class Task {
       }
     }
 
-         DateTime? parsedDueDate;
+    DateTime? parsedDueDate;
     final dd = map['dueDate'];
     if (dd is Timestamp) {
       parsedDueDate = dd.toDate();
@@ -165,7 +166,7 @@ class Task {
       parsedDueDate = DateTime.tryParse(dd);
     }
 
-         DateTime? parsedRemindAt;
+    DateTime? parsedRemindAt;
     final ra = map['remindAt'];
     if (ra is Timestamp) {
       parsedRemindAt = ra.toDate();
@@ -175,13 +176,13 @@ class Task {
       parsedRemindAt = DateTime.tryParse(ra);
     }
 
-         List<String> parsedTags = [];
+    List<String> parsedTags = [];
     final tagsRaw = map['tags'];
     if (tagsRaw is List) {
       parsedTags = tagsRaw.map((e) => e.toString()).toList();
     }
 
-         final subsRaw = map['subtasks'];
+    final subsRaw = map['subtasks'];
     List<Subtask> parsedSubs = [];
     if (subsRaw is List) {
       parsedSubs =
@@ -224,7 +225,7 @@ class Task {
   }
 }
 
- enum RepeatRule { none, daily, weekly, monthly }
+enum RepeatRule { none, daily, weekly, monthly }
 
 extension RepeatRuleX on RepeatRule {
   static RepeatRule parse(dynamic raw) {

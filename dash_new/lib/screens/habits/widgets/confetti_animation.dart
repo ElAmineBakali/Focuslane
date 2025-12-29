@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
- class ConfettiAnimation extends StatefulWidget {
+class ConfettiAnimation extends StatefulWidget {
   final VoidCallback? onComplete;
 
   const ConfettiAnimation({super.key, this.onComplete});
@@ -24,7 +24,7 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
       duration: const Duration(milliseconds: 2000),
     );
 
-         for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++) {
       _particles.add(
         _Particle(random: _random, colorScheme: Theme.of(context).colorScheme),
       );
@@ -71,16 +71,16 @@ class _Particle {
   late ParticleShape shape;
 
   _Particle({required Random random, required ColorScheme colorScheme}) {
-         x = 0.3 + random.nextDouble() * 0.4;
+    x = 0.3 + random.nextDouble() * 0.4;
     y = 0.3;
 
-         vx = (random.nextDouble() - 0.5) * 0.8;
+    vx = (random.nextDouble() - 0.5) * 0.8;
     vy = -0.3 - random.nextDouble() * 0.5;
 
-         rotation = random.nextDouble() * 2 * pi;
+    rotation = random.nextDouble() * 2 * pi;
     rotationSpeed = (random.nextDouble() - 0.5) * 12;
 
-         final colors = [
+    final colors = [
       colorScheme.primary,
       colorScheme.secondary,
       colorScheme.tertiary,
@@ -89,18 +89,18 @@ class _Particle {
     ];
     color = colors[random.nextInt(colors.length)];
 
-         size = 6 + random.nextDouble() * 8;
+    size = 6 + random.nextDouble() * 8;
 
-         shape = ParticleShape.values[random.nextInt(ParticleShape.values.length)];
+    shape = ParticleShape.values[random.nextInt(ParticleShape.values.length)];
   }
 
   void update(double progress) {
-         x += vx * 0.016;
+    x += vx * 0.016;
     y += vy * 0.016;
-    vy += 1.5 * 0.016;  
-         rotation += rotationSpeed * 0.016;
+    vy += 1.5 * 0.016;
+    rotation += rotationSpeed * 0.016;
 
-         vx *= 0.99;
+    vx *= 0.99;
   }
 }
 
@@ -189,7 +189,7 @@ class _ConfettiPainter extends CustomPainter {
   bool shouldRepaint(_ConfettiPainter oldDelegate) => true;
 }
 
- class HabitCompletedDialog extends StatefulWidget {
+class HabitCompletedDialog extends StatefulWidget {
   final String habitName;
   final String? emoji;
   final bool isPerfectDay;
@@ -229,7 +229,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
 
     _controller.forward();
 
-         Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
         setState(() => _showConfetti = false);
       }
@@ -250,12 +250,12 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
 
     return Stack(
       children: [
-                 if (_showConfetti)
+        if (_showConfetti)
           Positioned.fill(
             child: IgnorePointer(child: ConfettiAnimation(onComplete: () {})),
           ),
 
-                 Dialog(
+        Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
@@ -275,7 +275,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                                     FadeTransition(
+                  FadeTransition(
                     opacity: _fadeAnimation,
                     child: Container(
                       width: isMobile ? 80 : 100,
@@ -304,7 +304,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
 
                   SizedBox(height: isMobile ? 16 : 20),
 
-                                     Text(
+                  Text(
                     widget.isPerfectDay ? '¡Día perfecto!' : '¡Bien hecho!',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -329,7 +329,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
 
                   SizedBox(height: isMobile ? 20 : 24),
 
-                                     FilledButton(
+                  FilledButton(
                     onPressed: () => Navigator.pop(context),
                     style: FilledButton.styleFrom(
                       backgroundColor: cs.primary,

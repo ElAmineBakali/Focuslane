@@ -44,7 +44,8 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
     final courses = await widget.svc.streamCourses().first;
     final courseNotifs = <String, bool>{};
     for (final course in courses) {
-      courseNotifs[course.id] = prefs.getBool('study_notify_course_${course.id}') ?? true;
+      courseNotifs[course.id] =
+          prefs.getBool('study_notify_course_${course.id}') ?? true;
     }
 
     setState(() {
@@ -73,9 +74,9 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
     final notif = StudyNotifications(widget.svc);
     await notif.scheduleAll(classes: _notifyClasses, tasks: _notifyTasks);
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Recordatorios reprogramados')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Recordatorios reprogramados')),
+      );
     }
   }
 
@@ -89,7 +90,10 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
       child: SafeArea(
         child:
             _loading
-                ? const SizedBox(height: 300, child: Center(child: CircularProgressIndicator()))
+                ? const SizedBox(
+                  height: 300,
+                  child: Center(child: CircularProgressIndicator()),
+                )
                 : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -98,7 +102,9 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withOpacity(0.4),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -112,8 +118,12 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Theme.of(context).colorScheme.primary.withOpacity(0.15),
-                                  Theme.of(context).colorScheme.secondary.withOpacity(0.15),
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.secondary.withOpacity(0.15),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -140,7 +150,10 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                                   'Configura recordatorios personalizados',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 14,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -165,38 +178,52 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                             _SectionTitle(
                               icon: Icons.toggle_on_rounded,
                               title: 'Configuración General',
-                              subtitle: 'Activa o desactiva tipos de notificaciones',
+                              subtitle:
+                                  'Activa o desactiva tipos de notificaciones',
                             ),
                             const SizedBox(height: 16),
 
                             _NotificationTile(
-                              icon: Icons.schedule_rounded,
-                              title: 'Recordatorios de clases',
-                              subtitle: 'Notificación antes de cada clase programada',
-                              value: _notifyClasses,
-                              onChanged: (v) => setState(() => _notifyClasses = v),
-                              color: Colors.blue,
-                            ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
+                                  icon: Icons.schedule_rounded,
+                                  title: 'Recordatorios de clases',
+                                  subtitle:
+                                      'Notificación antes de cada clase programada',
+                                  value: _notifyClasses,
+                                  onChanged:
+                                      (v) => setState(() => _notifyClasses = v),
+                                  color: Colors.blue,
+                                )
+                                .animate()
+                                .fadeIn(duration: 300.ms)
+                                .slideX(begin: -0.1, end: 0),
 
                             const SizedBox(height: 12),
 
                             if (_notifyClasses)
                               _TimeSelector(
-                                label: 'Con cuánta anticipación',
-                                value: _classesAdvanceMinutes,
-                                options: const [5, 10, 15, 30, 60],
-                                unit: 'min antes',
-                                onChanged: (v) => setState(() => _classesAdvanceMinutes = v),
-                              ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
+                                    label: 'Con cuánta anticipación',
+                                    value: _classesAdvanceMinutes,
+                                    options: const [5, 10, 15, 30, 60],
+                                    unit: 'min antes',
+                                    onChanged:
+                                        (v) => setState(
+                                          () => _classesAdvanceMinutes = v,
+                                        ),
+                                  )
+                                  .animate()
+                                  .fadeIn(duration: 300.ms)
+                                  .slideX(begin: -0.1, end: 0),
 
                             const SizedBox(height: 12),
 
                             _NotificationTile(
                                   icon: Icons.assignment_rounded,
                                   title: 'Recordatorios de tareas y exámenes',
-                                  subtitle: 'Alertas antes de las fechas límite',
+                                  subtitle:
+                                      'Alertas antes de las fechas límite',
                                   value: _notifyTasks,
-                                  onChanged: (v) => setState(() => _notifyTasks = v),
+                                  onChanged:
+                                      (v) => setState(() => _notifyTasks = v),
                                   color: Colors.purple,
                                 )
                                 .animate()
@@ -207,12 +234,18 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
 
                             if (_notifyTasks)
                               _TimeSelector(
-                                label: 'Con cuánta anticipación',
-                                value: _tasksAdvanceHours,
-                                options: const [1, 6, 12, 24, 48],
-                                unit: 'horas antes',
-                                onChanged: (v) => setState(() => _tasksAdvanceHours = v),
-                              ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
+                                    label: 'Con cuánta anticipación',
+                                    value: _tasksAdvanceHours,
+                                    options: const [1, 6, 12, 24, 48],
+                                    unit: 'horas antes',
+                                    onChanged:
+                                        (v) => setState(
+                                          () => _tasksAdvanceHours = v,
+                                        ),
+                                  )
+                                  .animate()
+                                  .fadeIn(duration: 300.ms)
+                                  .slideX(begin: -0.1, end: 0),
 
                             const SizedBox(height: 32),
 
@@ -231,16 +264,20 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                                   return Container(
                                     padding: const EdgeInsets.all(20),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceVariant.withOpacity(0.3),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceVariant
+                                          .withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Center(
                                       child: Text(
                                         'No hay cursos creados',
                                         style: GoogleFonts.plusJakartaSans(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ),
@@ -250,13 +287,17 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                                 return Column(
                                   children:
                                       courses.map((course) {
-                                        final isEnabled = _courseNotifications[course.id] ?? true;
+                                        final isEnabled =
+                                            _courseNotifications[course.id] ??
+                                            true;
                                         return _CourseTile(
                                               course: course,
                                               value: isEnabled,
                                               onChanged: (v) {
                                                 setState(() {
-                                                  _courseNotifications[course.id] = v;
+                                                  _courseNotifications[course
+                                                          .id] =
+                                                      v;
                                                 });
                                               },
                                             )
@@ -279,7 +320,9 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                                       await _reschedule();
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -301,20 +344,26 @@ class _StudySettingsSheetState extends State<StudySettingsSheet> {
                                       await _save();
                                       if (mounted) Navigator.pop(context);
                                       if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               'Ajustes guardados correctamente',
-                                              style: GoogleFonts.plusJakartaSans(),
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(),
                                             ),
-                                            backgroundColor: Colors.green.shade600,
+                                            backgroundColor:
+                                                Colors.green.shade600,
                                             behavior: SnackBarBehavior.floating,
                                           ),
                                         );
                                       }
                                     },
                                     style: FilledButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -348,7 +397,11 @@ class _SectionTitle extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _SectionTitle({required this.icon, required this.title, required this.subtitle});
+  const _SectionTitle({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -403,10 +456,16 @@ class _NotificationTile extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(value ? 0.1 : 0.05), color.withOpacity(value ? 0.05 : 0.02)],
+          colors: [
+            color.withOpacity(value ? 0.1 : 0.05),
+            color.withOpacity(value ? 0.05 : 0.02),
+          ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(value ? 0.3 : 0.1), width: value ? 2 : 1),
+        border: Border.all(
+          color: color.withOpacity(value ? 0.3 : 0.1),
+          width: value ? 2 : 1,
+        ),
       ),
       child: SwitchListTile(
         value: value,
@@ -421,7 +480,10 @@ class _NotificationTile extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 15),
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
         ),
         subtitle: Text(
           subtitle,
@@ -458,7 +520,9 @@ class _TimeSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,30 +545,46 @@ class _TimeSelector extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => onChanged(option),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         gradient:
                             isSelected
                                 ? LinearGradient(
                                   colors: [
-                                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                    Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.3),
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.secondary.withOpacity(0.3),
                                   ],
                                 )
                                 : null,
-                        color: !isSelected ? Theme.of(context).colorScheme.surface : null,
+                        color:
+                            !isSelected
+                                ? Theme.of(context).colorScheme.surface
+                                : null,
                         borderRadius: BorderRadius.circular(8),
                         border:
                             isSelected
-                                ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+                                ? Border.all(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2,
+                                )
                                 : Border.all(
-                                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withOpacity(0.2),
                                 ),
                       ),
                       child: Text(
                         '$option $unit',
                         style: GoogleFonts.plusJakartaSans(
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
                           fontSize: 13,
                         ),
                       ),
@@ -523,7 +603,11 @@ class _CourseTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _CourseTile({required this.course, required this.value, required this.onChanged});
+  const _CourseTile({
+    required this.course,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -548,11 +632,17 @@ class _CourseTile extends StatelessWidget {
         secondary: Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(color: course.color ?? Colors.grey, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: course.color ?? Colors.grey,
+            shape: BoxShape.circle,
+          ),
         ),
         title: Text(
           course.name,
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 14),
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
         subtitle:
             course.teacher != null

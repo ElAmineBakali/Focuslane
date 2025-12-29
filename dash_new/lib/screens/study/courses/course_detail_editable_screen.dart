@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
-import '../timer/study_timer_screen.dart';
 
 class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   final Course course;
 
-  const CourseDetailEditableScreen({super.key, required this.svc, required this.course});
+  const CourseDetailEditableScreen({
+    super.key,
+    required this.svc,
+    required this.course,
+  });
 
   @override
-  State<CourseDetailEditableScreen> createState() => _CourseDetailEditableScreenState();
+  State<CourseDetailEditableScreen> createState() =>
+      _CourseDetailEditableScreenState();
 }
 
-class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen> {
+class _CourseDetailEditableScreenState
+    extends State<CourseDetailEditableScreen> {
   late TextEditingController _nameController;
   late TextEditingController _teacherController;
   late TextEditingController _creditsController;
@@ -24,7 +28,6 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
   late TextEditingController _attendancePctController;
 
   Color _selectedColor = Colors.blue;
-  String? _externalLink;
   bool _isEditing = false;
   bool _isSaving = false;
 
@@ -32,9 +35,15 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.course.name);
-    _teacherController = TextEditingController(text: widget.course.teacher ?? '');
-    _creditsController = TextEditingController(text: widget.course.credits?.toString() ?? '');
-    _goalHoursController = TextEditingController(text: widget.course.goalHours?.toString() ?? '');
+    _teacherController = TextEditingController(
+      text: widget.course.teacher ?? '',
+    );
+    _creditsController = TextEditingController(
+      text: widget.course.credits?.toString() ?? '',
+    );
+    _goalHoursController = TextEditingController(
+      text: widget.course.goalHours?.toString() ?? '',
+    );
     _attendancePctController = TextEditingController(
       text: widget.course.attendanceRequired?.toStringAsFixed(0) ?? '',
     );
@@ -53,9 +62,9 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
 
   Future<void> _saveCourse() async {
     if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('El nombre del curso es obligatorio')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El nombre del curso es obligatorio')),
+      );
       return;
     }
 
@@ -64,11 +73,16 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
     try {
       await widget.svc.updateCourse(widget.course.id, {
         'name': _nameController.text.trim(),
-        'teacher': _teacherController.text.trim().isEmpty ? null : _teacherController.text.trim(),
+        'teacher':
+            _teacherController.text.trim().isEmpty
+                ? null
+                : _teacherController.text.trim(),
         'credits': double.tryParse(_creditsController.text.trim()),
         'colorHex': '#${_selectedColor.value.toRadixString(16).substring(2)}',
         'goalHours': double.tryParse(_goalHoursController.text.trim()),
-        'attendanceRequired': double.tryParse(_attendancePctController.text.trim()),
+        'attendanceRequired': double.tryParse(
+          _attendancePctController.text.trim(),
+        ),
       });
 
       if (mounted) {
@@ -118,7 +132,9 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade600),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.orange.shade600,
+                ),
                 child: const Text('Archivar'),
               ),
             ],
@@ -150,7 +166,9 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.red.shade600),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                ),
                 child: const Text('Eliminar'),
               ),
             ],
@@ -188,7 +206,9 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
                 widget.course.name,
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w700,
-                  shadows: [Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
+                  shadows: [
+                    Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 8),
+                  ],
                 ),
               ),
               background: Container(
@@ -222,7 +242,10 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
                         value: 'archive',
                         child: Row(
                           children: [
-                            Icon(Icons.archive_rounded, color: Colors.orange.shade600),
+                            Icon(
+                              Icons.archive_rounded,
+                              color: Colors.orange.shade600,
+                            ),
                             const SizedBox(width: 12),
                             const Text('Archivar'),
                           ],
@@ -232,7 +255,10 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_rounded, color: Colors.red.shade600),
+                            Icon(
+                              Icons.delete_rounded,
+                              color: Colors.red.shade600,
+                            ),
                             const SizedBox(width: 12),
                             const Text('Eliminar'),
                           ],
@@ -326,7 +352,9 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
                           onPressed: _isSaving ? null : _saveCourse,
                           style: FilledButton.styleFrom(
                             backgroundColor: _selectedColor,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
                           child:
                               _isSaving
@@ -381,7 +409,8 @@ class _CourseDetailEditableScreenState extends State<CourseDetailEditableScreen>
                         _StatCard(
                           icon: Icons.how_to_reg_rounded,
                           label: 'Asistencia requerida',
-                          value: '${widget.course.attendanceRequired!.toStringAsFixed(0)}%',
+                          value:
+                              '${widget.course.attendanceRequired!.toStringAsFixed(0)}%',
                           color: Colors.purple,
                         ),
                       ],
@@ -415,7 +444,10 @@ class _TaskFormTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w500),
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
@@ -431,7 +463,10 @@ class _TaskFormTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
         ),
       ),
     );

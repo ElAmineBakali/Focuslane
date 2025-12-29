@@ -5,7 +5,8 @@ enum EstadoPlan { planificado, usado, saltado }
 class PlanOutfit {
   final String id;
   final DateTime fecha;
-  final String? parteDelDia;    final String outfitId;
+  final String? parteDelDia;
+  final String outfitId;
   final EstadoPlan estado;
   final String nota;
 
@@ -35,7 +36,7 @@ class PlanOutfit {
 
   Map<String, dynamic> toFirestore() {
     return {
-             'fecha': Timestamp.fromDate(fecha),
+      'fecha': Timestamp.fromDate(fecha),
       'parteDelDia': parteDelDia,
       'outfitId': outfitId,
       'estado': estado.name,

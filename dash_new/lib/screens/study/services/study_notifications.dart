@@ -13,13 +13,20 @@ class StudyNotifications {
     final blocks = await svc.streamSchedule().first;
     for (final b in blocks) {
       if (!b.daysOfWeek.contains(weekday)) continue;
-      final startToday = DateTime(now.year, now.month, now.day, b.start.hour, b.start.minute);
+      final startToday = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        b.start.hour,
+        b.start.minute,
+      );
       final when = startToday.subtract(const Duration(minutes: 15));
       if (when.isAfter(now)) {
         await NotificationService.I.scheduleOnce(
           id: _id('CLASS', b, when),
           title: 'Clase próxima',
-          body: 'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
+          body:
+              'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
           whenLocal: when,
           useExact: true,
         );

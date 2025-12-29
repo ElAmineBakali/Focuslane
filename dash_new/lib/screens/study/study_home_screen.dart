@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/global_ui_components.dart';
-import '../../theme/global_ui_theme.dart';
 import 'courses/courses_list_screen.dart';
 import 'tasks/study_tasks_screen.dart';
 import 'timer/study_timer_screen.dart';
@@ -68,7 +67,10 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                       children: [
                         const Icon(Icons.check_circle),
                         const SizedBox(width: 8),
-                        Text('Recordatorios actualizados', style: GoogleFonts.poppins()),
+                        Text(
+                          'Recordatorios actualizados',
+                          style: GoogleFonts.poppins(),
+                        ),
                       ],
                     ),
                   ),
@@ -96,7 +98,10 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Estudio',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w700, letterSpacing: -0.5),
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
               ),
               background: Container(
                 decoration: BoxDecoration(
@@ -195,12 +200,13 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
               builder: (context, coursesSnap) {
                 final sessions = sessionsSnap.data ?? [];
                 final tasks = tasksSnap.data ?? [];
-                final courses = coursesSnap.data ?? [];
 
                 // Calcular estadísticas
                 final thisWeekSessions =
                     sessions.where((s) {
-                      return s.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
+                      return s.date.isAfter(
+                        DateTime.now().subtract(const Duration(days: 7)),
+                      );
                     }).toList();
 
                 final totalMinutes = thisWeekSessions.fold<int>(
@@ -213,7 +219,8 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                     tasks
                         .where(
                           (t) =>
-                        t.status == TaskStatus.todo || t.status == TaskStatus.doing,
+                              t.status == TaskStatus.todo ||
+                              t.status == TaskStatus.doing,
                         )
                         .length;
 
@@ -221,7 +228,10 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     gradient: LinearGradient(
-                      colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+                      colors: [
+                        colorScheme.primaryContainer,
+                        colorScheme.secondaryContainer,
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -231,7 +241,11 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.insights, color: colorScheme.primary, size: 28),
+                          Icon(
+                            Icons.insights,
+                            color: colorScheme.primary,
+                            size: 28,
+                          ),
                           const SizedBox(width: 12),
                           Text(
                             'Esta Semana',
@@ -296,7 +310,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => CoursesListScreen(svc: widget.svc)),
+              MaterialPageRoute(
+                builder: (_) => CoursesListScreen(svc: widget.svc),
+              ),
             );
           },
           animationDelay: 100.ms,
@@ -308,7 +324,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => StudyTasksScreen(svc: widget.svc)),
+              MaterialPageRoute(
+                builder: (_) => StudyTasksScreen(svc: widget.svc),
+              ),
             );
           },
           animationDelay: 150.ms,
@@ -320,7 +338,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => StudyTimerScreen(svc: widget.svc)),
+              MaterialPageRoute(
+                builder: (_) => StudyTimerScreen(svc: widget.svc),
+              ),
             );
           },
           animationDelay: 200.ms,
@@ -332,7 +352,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ScheduleScreen(svc: widget.svc)),
+              MaterialPageRoute(
+                builder: (_) => ScheduleScreen(svc: widget.svc),
+              ),
             );
           },
           animationDelay: 250.ms,
@@ -354,7 +376,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => StudyAnalyticsScreen(svc: widget.svc)),
+              MaterialPageRoute(
+                builder: (_) => StudyAnalyticsScreen(svc: widget.svc),
+              ),
             );
           },
         ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.2, end: 0),
@@ -375,7 +399,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => _AttendanceOverviewScreen(svc: widget.svc)),
+                  MaterialPageRoute(
+                    builder: (_) => _AttendanceOverviewScreen(svc: widget.svc),
+                  ),
                 );
               },
             ).animate().fadeIn(delay: 350.ms).slideX(begin: -0.2, end: 0);
@@ -407,7 +433,12 @@ class _AttendanceOverviewScreen extends StatelessWidget {
 
           final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
           return ListView.builder(
-            padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12 + bottomPadding),
+            padding: EdgeInsets.only(
+              left: 12,
+              right: 12,
+              top: 12,
+              bottom: 12 + bottomPadding,
+            ),
             itemCount: courses.length,
             itemBuilder: (context, index) {
               final course = courses[index];
@@ -445,13 +476,18 @@ class _AttendanceCard extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5), width: 1),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+              width: 1,
+            ),
           ),
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => AttendanceScreen(svc: svc, course: course)),
+                MaterialPageRoute(
+                  builder: (_) => AttendanceScreen(svc: svc, course: course),
+                ),
               );
             },
             borderRadius: BorderRadius.circular(20),
@@ -483,10 +519,15 @@ class _AttendanceCard extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color:
-                                meets ? colorScheme.primaryContainer : colorScheme.errorContainer,
+                                meets
+                                    ? colorScheme.primaryContainer
+                                    : colorScheme.errorContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -514,7 +555,8 @@ class _AttendanceCard extends StatelessWidget {
                           return LinearProgressIndicator(
                             value: value,
                             minHeight: 10,
-                            backgroundColor: colorScheme.surfaceContainerHighest,
+                            backgroundColor:
+                                colorScheme.surfaceContainerHighest,
                             valueColor: AlwaysStoppedAnimation(
                               meets ? courseColor : colorScheme.error,
                             ),
@@ -593,7 +635,9 @@ class _StatItem extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color.withOpacity(0.8)),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: color.withOpacity(0.8)),
           ),
         ],
       ),
@@ -630,13 +674,19 @@ class _StatPill extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           value,
-          style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w700, color: color),
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
         ),
         Text(
           label,
           style: GoogleFonts.poppins(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
+            color: Theme.of(
+              context,
+            ).colorScheme.onPrimaryContainer.withOpacity(0.7),
           ),
         ),
       ],
@@ -725,10 +775,12 @@ class _NotificationSettingsSheet extends StatefulWidget {
   const _NotificationSettingsSheet({required this.onSave});
 
   @override
-  State<_NotificationSettingsSheet> createState() => _NotificationSettingsSheetState();
+  State<_NotificationSettingsSheet> createState() =>
+      _NotificationSettingsSheetState();
 }
 
-class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> {
+class _NotificationSettingsSheetState
+    extends State<_NotificationSettingsSheet> {
   static const _kNotifyClasses = 'study_notify_classes';
   static const _kNotifyTasks = 'study_notify_tasks';
 
@@ -861,11 +913,16 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
                       },
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       child: Text(
                         'Guardar cambios',
-                        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -903,7 +960,11 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
         onChanged: onChanged,
         title: Row(
           children: [
-            Icon(icon, color: value ? colorScheme.primary : colorScheme.onSurfaceVariant, size: 20),
+            Icon(
+              icon,
+              color: value ? colorScheme.primary : colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Text(
               title,
@@ -919,7 +980,10 @@ class _NotificationSettingsSheetState extends State<_NotificationSettingsSheet> 
           padding: const EdgeInsets.only(left: 32),
           child: Text(
             subtitle,
-            style: GoogleFonts.poppins(fontSize: 13, color: colorScheme.onSurfaceVariant),
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

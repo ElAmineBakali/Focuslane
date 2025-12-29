@@ -22,8 +22,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     _focusedDay = DateTime.now();
   }
 
-  String _key(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
-
   @override
   Widget build(BuildContext context) {
     final c = widget.course;
@@ -37,7 +35,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: gradient))),
+          Positioned.fill(
+            child: DecoratedBox(decoration: BoxDecoration(gradient: gradient)),
+          ),
           CustomScrollView(
             slivers: [
               SliverAppBar.large(
@@ -64,7 +64,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     final absent = map.values.where((v) => v == 'X').length;
                     final noClass = map.values.where((v) => v == '-').length;
                     final totalCount = attended + absent;
-                    final double pct = totalCount == 0 ? 0.0 : (attended * 100.0 / totalCount);
+                    final double pct =
+                        totalCount == 0 ? 0.0 : (attended * 100.0 / totalCount);
 
                     final double target = c.attendanceRequired ?? 0.0;
                     final bool meets = pct >= target;
@@ -91,12 +92,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ),
 
                           const SizedBox(height: AppSpacing.md),
-                          _LegendRow(attendColor: attendColor, absentColor: absentColor, freeColor: freeColor),
+                          _LegendRow(
+                            attendColor: attendColor,
+                            absentColor: absentColor,
+                            freeColor: freeColor,
+                          ),
 
                           const SizedBox(height: AppSpacing.lg),
                           _CalendarCard(
                             focusedDay: _focusedDay,
-                            onFocusedChanged: (d) => setState(() => _focusedDay = d),
+                            onFocusedChanged:
+                                (d) => setState(() => _focusedDay = d),
                             map: map,
                             onEdit: _editDay,
                             attendColor: attendColor,
@@ -106,21 +112,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                           const SizedBox(height: AppSpacing.lg),
                           _ActionButtons(
-                            onAttend: () => widget.svc.setAttendance(
-                              courseId: c.id,
-                              day: DateTime.now(),
-                              status: 'A',
-                            ),
-                            onAbsent: () => widget.svc.setAttendance(
-                              courseId: c.id,
-                              day: DateTime.now(),
-                              status: 'X',
-                            ),
-                            onNoClass: () => widget.svc.setAttendance(
-                              courseId: c.id,
-                              day: DateTime.now(),
-                              status: '-',
-                            ),
+                            onAttend:
+                                () => widget.svc.setAttendance(
+                                  courseId: c.id,
+                                  day: DateTime.now(),
+                                  status: 'A',
+                                ),
+                            onAbsent:
+                                () => widget.svc.setAttendance(
+                                  courseId: c.id,
+                                  day: DateTime.now(),
+                                  status: 'X',
+                                ),
+                            onNoClass:
+                                () => widget.svc.setAttendance(
+                                  courseId: c.id,
+                                  day: DateTime.now(),
+                                  status: '-',
+                                ),
                           ),
                         ],
                       ),
@@ -141,43 +150,58 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       backgroundColor: cs.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.check, color: cs.primary),
-                title: const Text('Asistió'),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.svc.setAttendance(courseId: widget.course.id, day: day, status: 'A');
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.close, color: cs.error),
-                title: const Text('No asistió'),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.svc.setAttendance(courseId: widget.course.id, day: day, status: 'X');
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.remove, color: cs.tertiary),
-                title: const Text('Sin clase'),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.svc.setAttendance(courseId: widget.course.id, day: day, status: '-');
-                },
-              ),
-              if (current != null) const SizedBox(height: AppSpacing.sm),
-            ],
-          ),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusLg),
         ),
       ),
+      builder:
+          (_) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.check, color: cs.primary),
+                    title: const Text('Asistió'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      widget.svc.setAttendance(
+                        courseId: widget.course.id,
+                        day: day,
+                        status: 'A',
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.close, color: cs.error),
+                    title: const Text('No asistió'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      widget.svc.setAttendance(
+                        courseId: widget.course.id,
+                        day: day,
+                        status: 'X',
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.remove, color: cs.tertiary),
+                    title: const Text('Sin clase'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      widget.svc.setAttendance(
+                        courseId: widget.course.id,
+                        day: day,
+                        status: '-',
+                      );
+                    },
+                  ),
+                  if (current != null) const SizedBox(height: AppSpacing.sm),
+                ],
+              ),
+            ),
+          ),
     );
   }
 }
@@ -243,7 +267,10 @@ class _StatsHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Asistencia actual', style: AppTypography.label(context)),
+                    Text(
+                      'Asistencia actual',
+                      style: AppTypography.label(context),
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -269,10 +296,19 @@ class _StatsHeader extends StatelessWidget {
     );
   }
 
-  Widget _chip(BuildContext ctx, IconData icon, String label, int value, Color color) {
+  Widget _chip(
+    BuildContext ctx,
+    IconData icon,
+    String label,
+    int value,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           color: color.withOpacity(0.12),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -316,7 +352,11 @@ class _LegendRow extends StatelessWidget {
   Widget _legendChip(Color color, String label) {
     return Row(
       children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: AppSpacing.xs),
         Text(label),
       ],
@@ -391,17 +431,31 @@ class _CalendarCard extends StatelessWidget {
               if (st == 'A') {
                 bg = attendColor.withOpacity(.85);
                 textColor = cs.onPrimary;
-                child = const Icon(Icons.check, size: 18, color: Color(0xFFFFFFFF));
+                child = const Icon(
+                  Icons.check,
+                  size: 18,
+                  color: Color(0xFFFFFFFF),
+                );
               } else if (st == 'X') {
                 bg = absentColor.withOpacity(.9);
                 textColor = cs.onPrimary;
-                child = const Icon(Icons.close, size: 18, color: Color(0xFFFFFFFF));
+                child = const Icon(
+                  Icons.close,
+                  size: 18,
+                  color: Color(0xFFFFFFFF),
+                );
               } else if (st == '-') {
                 bg = cs.surfaceContainerHighest.withOpacity(.5);
-                child = Text('${day.day}', style: AppTypography.label(context, color: textColor));
+                child = Text(
+                  '${day.day}',
+                  style: AppTypography.label(context, color: textColor),
+                );
               } else {
                 bg = cs.surfaceContainerHighest.withOpacity(.25);
-                child = Text('${day.day}', style: AppTypography.label(context, color: textColor));
+                child = Text(
+                  '${day.day}',
+                  style: AppTypography.label(context, color: textColor),
+                );
               }
 
               return GestureDetector(

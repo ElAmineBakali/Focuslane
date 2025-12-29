@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 
- class EmojiIconPicker extends StatefulWidget {
+class EmojiIconPicker extends StatefulWidget {
   final String? selectedEmoji;
   final String? selectedIconCode;
   final Function(String? emoji, String? iconCode) onSelect;
@@ -23,7 +23,7 @@ class _EmojiIconPickerState extends State<EmojiIconPicker>
   String? _tempEmoji;
   String? _tempIconCode;
 
-     static const Map<String, List<String>> emojiCategories = {
+  static const Map<String, List<String>> emojiCategories = {
     'Salud': ['💪', '🏃', '🧘', '💧', '🥗', '😴', '❤️', '🩺', '💊'],
     'Educación': ['📚', '📖', '✍️', '🎓', '📝', '🗣️', '🧠', '💡', '🔬'],
     'Deporte': ['⚽', '🏀', '🎾', '🏐', '🏊', '🚴', '🏋️', '🧗', '🤸'],

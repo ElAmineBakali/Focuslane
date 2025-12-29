@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
- class HabitReminder {
-  final String id;    final TimeOfDay time;    final List<int>
-  daysOfWeek;    final bool enabled;  
+class HabitReminder {
+  final String id;
+  final TimeOfDay time;
+  final List<int> daysOfWeek;
+  final bool enabled;
   HabitReminder({
     required this.id,
     required this.time,
@@ -63,9 +65,14 @@ class Habit {
   int order;
   bool daily;
   DateTime lastUpdated;
-  String colorHex;  
-     String? emoji;    String? iconCode;    List<String> tags;    List<HabitReminder> reminders;    int currentStreak;    int bestStreak;  
-     var values;
+  String colorHex;
+  String? emoji;
+  String? iconCode;
+  List<String> tags;
+  List<HabitReminder> reminders;
+  int currentStreak;
+  int bestStreak;
+  var values;
   var textColor;
 
   Habit({
@@ -97,7 +104,7 @@ class Habit {
 
   Map<String, dynamic> toMap() {
     return {
-             'name': name,
+      'name': name,
       'description': description,
       'frequency': frequency,
       'reminderTime': reminderTime,
@@ -111,7 +118,7 @@ class Habit {
       'daily': daily,
       'lastUpdated': Timestamp.fromDate(lastUpdated),
       'colorHex': colorHex,
-             'emoji': emoji,
+      'emoji': emoji,
       'iconCode': iconCode,
       'tags': tags,
       'reminders': reminders.map((r) => r.toMap()).toList(),
@@ -158,7 +165,7 @@ class Habit {
       daily: map['daily'] ?? true,
       lastUpdated: toDate(map['lastUpdated']),
       colorHex: map['colorHex'] ?? '0xFF000000',
-             emoji: map['emoji'],
+      emoji: map['emoji'],
       iconCode: map['iconCode'],
       tags: List<String>.from(map['tags'] ?? []),
       reminders: parseReminders(map['reminders']),

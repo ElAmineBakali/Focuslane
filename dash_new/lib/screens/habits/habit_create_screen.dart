@@ -10,7 +10,8 @@ import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.da
 import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
 
 class HabitCreateScreen extends StatefulWidget {
-  final Habit? habit;    const HabitCreateScreen({super.key, this.habit});
+  final Habit? habit;
+  const HabitCreateScreen({super.key, this.habit});
 
   @override
   State<HabitCreateScreen> createState() => _HabitCreateScreenState();
@@ -27,7 +28,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   String _unit = '';
   Color _selectedColor = Colors.blue;
 
-     String? _emoji;
+  String? _emoji;
   String? _iconCode;
   List<String> _tags = [];
   List<HabitReminder> _reminders = [];
@@ -221,7 +222,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -303,7 +304,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                                 TextFormField(
+                TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Nombre del hábito',
@@ -317,7 +318,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 12),
 
-                                 TextFormField(
+                TextFormField(
                   controller: _descriptionController,
                   decoration: const InputDecoration(labelText: 'Descripción'),
                   maxLines: 2,
@@ -325,7 +326,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 12),
 
-                                 DropdownButtonFormField<String>(
+                DropdownButtonFormField<String>(
                   initialValue: _frequency,
                   decoration: const InputDecoration(labelText: 'Frecuencia'),
                   items: const [
@@ -338,7 +339,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -410,7 +411,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                                 Card(
+                Card(
                   elevation: 0,
                   color: cs.surfaceContainerHigh,
                   shape: RoundedRectangleBorder(
@@ -464,7 +465,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                                 SwitchListTile(
+                SwitchListTile(
                   title: const Text('¿Es cuantitativo?'),
                   subtitle: Text(
                     'Permite registrar números (ej: páginas leídas, km corridos)',
@@ -494,7 +495,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 20),
 
-                                 Row(
+                Row(
                   children: [
                     const Text(
                       'Color del hábito:',
@@ -518,7 +519,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 24),
 
-                                 Center(
+                Center(
                   child: FilledButton.icon(
                     onPressed: _submit,
                     icon: Icon(

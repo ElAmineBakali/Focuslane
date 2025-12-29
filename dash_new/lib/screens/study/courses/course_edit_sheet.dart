@@ -35,8 +35,12 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
 
     _nameController = TextEditingController(text: course?.name ?? '');
     _teacherController = TextEditingController(text: course?.teacher ?? '');
-    _creditsController = TextEditingController(text: course?.credits?.toString() ?? '');
-    _goalHoursController = TextEditingController(text: course?.goalHours?.toString() ?? '');
+    _creditsController = TextEditingController(
+      text: course?.credits?.toString() ?? '',
+    );
+    _goalHoursController = TextEditingController(
+      text: course?.goalHours?.toString() ?? '',
+    );
     _attendancePctController = TextEditingController(
       text: course?.attendanceRequired?.toStringAsFixed(0) ?? '',
     );
@@ -65,11 +69,16 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
       final course = Course(
         id: widget.initial?.id ?? '',
         name: _nameController.text.trim(),
-        teacher: _teacherController.text.trim().isEmpty ? null : _teacherController.text.trim(),
+        teacher:
+            _teacherController.text.trim().isEmpty
+                ? null
+                : _teacherController.text.trim(),
         credits: int.tryParse(_creditsController.text.trim())?.toDouble(),
         colorHex: '#${_selectedColor.value.toRadixString(16).substring(2)}',
         goalHours: int.tryParse(_goalHoursController.text.trim())?.toDouble(),
-        attendanceRequired: double.tryParse(_attendancePctController.text.trim()),
+        attendanceRequired: double.tryParse(
+          _attendancePctController.text.trim(),
+        ),
       );
 
       Course? result;
@@ -102,9 +111,12 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red.shade600));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red.shade600,
+          ),
+        );
       }
     }
   }
@@ -117,12 +129,16 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
         border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.2)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
@@ -141,7 +157,9 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
                       decoration: BoxDecoration(
                         color: colorScheme.outlineVariant.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusFull,
+                        ),
                       ),
                     ),
                   ),
@@ -152,9 +170,15 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: _selectedColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
                         ),
-                        child: Icon(Icons.school_rounded, color: _selectedColor, size: 28),
+                        child: Icon(
+                          Icons.school_rounded,
+                          color: _selectedColor,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
@@ -278,11 +302,16 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: _isSaving ? null : () => Navigator.pop(context),
+                          onPressed:
+                              _isSaving ? null : () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg,
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                           ),
                           child: const Text('Cancelar'),

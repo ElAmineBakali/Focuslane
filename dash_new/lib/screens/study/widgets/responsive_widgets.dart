@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 extension SafeAreaExt on BuildContext {
   double get safeAreaBottomPadding =>
-      MediaQuery.of(this).viewPadding.bottom > 0 ? MediaQuery.of(this).viewPadding.bottom : 16;
+      MediaQuery.of(this).viewPadding.bottom > 0
+          ? MediaQuery.of(this).viewPadding.bottom
+          : 16;
 
   double get safeAreaTopPadding =>
-      MediaQuery.of(this).viewPadding.top > 0 ? MediaQuery.of(this).viewPadding.top : 0;
+      MediaQuery.of(this).viewPadding.top > 0
+          ? MediaQuery.of(this).viewPadding.top
+          : 0;
 
   bool get hasNotch => MediaQuery.of(this).viewPadding.top > 24;
 
@@ -124,7 +128,10 @@ class ResponsiveCustomScrollView extends StatelessWidget {
     return CustomScrollView(
       physics: physics,
       controller: controller,
-      slivers: [...slivers, SliverToBoxAdapter(child: SizedBox(height: bottomPadding))],
+      slivers: [
+        ...slivers,
+        SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+      ],
     );
   }
 }
@@ -150,7 +157,10 @@ class ResponsiveCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(padding: padding ?? const EdgeInsets.all(16), child: child),
+        child: Padding(
+          padding: padding ?? const EdgeInsets.all(16),
+          child: child,
+        ),
       ),
     );
   }

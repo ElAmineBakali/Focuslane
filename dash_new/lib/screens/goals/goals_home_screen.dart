@@ -1,9 +1,10 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../goals/services/goals_firestore_service.dart';
 import '../goals/models/goals_models.dart';
 import '../../widgets/ui_scaffold.dart';
 import 'goal_edit_sheet.dart';
-import 'goal_detail_screen.dart';  
+import 'goal_detail_screen.dart';
+
 class GoalsHomeScreen extends StatefulWidget {
   const GoalsHomeScreen({super.key});
   static const route = '/goals';
@@ -16,7 +17,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
   @override
   void initState() {
     super.initState();
-         GoalsFirestoreService.I.backfillGoalsOrder();
+    GoalsFirestoreService.I.backfillGoalsOrder();
   }
 
   @override

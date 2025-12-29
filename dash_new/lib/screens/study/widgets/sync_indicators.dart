@@ -11,7 +11,11 @@ class SyncIndicators {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.sync_rounded, size: 14, color: Theme.of(context).colorScheme.primary),
+          Icon(
+            Icons.sync_rounded,
+            size: 14,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           const SizedBox(width: 4),
           Text(
             'Sincronizado',
@@ -26,7 +30,11 @@ class SyncIndicators {
   }
 
   static Widget syncIcon(BuildContext context, {double size = 16}) {
-    return Icon(Icons.sync_rounded, size: size, color: Theme.of(context).colorScheme.primary);
+    return Icon(
+      Icons.sync_rounded,
+      size: size,
+      color: Theme.of(context).colorScheme.primary,
+    );
   }
 
   static Widget unsyncBadge(BuildContext context) {
@@ -39,13 +47,17 @@ class SyncIndicators {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.cloud_off_rounded, size: 14, color: Theme.of(context).colorScheme.outline),
+          Icon(
+            Icons.cloud_off_rounded,
+            size: 14,
+            color: Theme.of(context).colorScheme.outline,
+          ),
           const SizedBox(width: 4),
           Text(
             'Sin sincronizar',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
         ],
       ),
@@ -58,7 +70,9 @@ class SyncIndicators {
       height: size,
       child: CircularProgressIndicator(
         strokeWidth: 2,
-        valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+        valueColor: AlwaysStoppedAnimation(
+          Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }

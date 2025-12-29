@@ -61,7 +61,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                 controller: _tabController,
                 indicatorColor: Theme.of(context).colorScheme.onPrimary,
                 labelColor: Theme.of(context).colorScheme.onPrimary,
-                unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                unselectedLabelColor: Theme.of(
+                  context,
+                ).colorScheme.onPrimary.withOpacity(0.7),
                 tabs: const [
                   Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
                   Tab(icon: Icon(Icons.history), text: 'Historial'),
@@ -105,7 +107,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           );
         }
 
-        return _isGridView ? _buildGridView(activeLists) : _buildListView(activeLists);
+        return _isGridView
+            ? _buildGridView(activeLists)
+            : _buildListView(activeLists);
       },
     );
   }
@@ -139,11 +143,14 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
       itemBuilder: (context, index) {
         final list = lists[index];
         return _ShoppingListTile(
-          list: list,
-          onTap: () => _openListDetail(list),
-          onDelete: () => _deleteList(list),
-          onToggleDefault: () => _toggleDefault(list),
-        ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).slideX(begin: -0.2);
+              list: list,
+              onTap: () => _openListDetail(list),
+              onDelete: () => _deleteList(list),
+              onToggleDefault: () => _toggleDefault(list),
+            )
+            .animate()
+            .fadeIn(delay: Duration(milliseconds: index * 30))
+            .slideX(begin: -0.2);
       },
     );
   }
@@ -175,11 +182,14 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           itemBuilder: (context, index) {
             final list = completedLists[index];
             return _HistoryListCard(
-              list: list,
-              onTap: () => _openListDetail(list),
-              onRestore: () => _restoreList(list),
-              onDelete: () => _deleteList(list),
-            ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).slideX(begin: -0.2);
+                  list: list,
+                  onTap: () => _openListDetail(list),
+                  onRestore: () => _restoreList(list),
+                  onDelete: () => _deleteList(list),
+                )
+                .animate()
+                .fadeIn(delay: Duration(milliseconds: index * 30))
+                .slideX(begin: -0.2);
           },
         );
       },
@@ -211,7 +221,8 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                   left: AppSpacing.md,
                   right: AppSpacing.md,
                   top: AppSpacing.md,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -231,7 +242,10 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    Text('Nueva Lista de Compra', style: AppTypography.heading3(context)),
+                    Text(
+                      'Nueva Lista de Compra',
+                      style: AppTypography.heading3(context),
+                    ),
                     const SizedBox(height: AppSpacing.md),
                     ModernTextField(
                       controller: nameController,
@@ -243,14 +257,22 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                       padding: const EdgeInsets.all(AppSpacing.sm),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: isDark ? colorScheme.outline : AppColors.borderLight,
+                          color:
+                              isDark
+                                  ? colorScheme.outline
+                                  : AppColors.borderLight,
                         ),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Tipo de lista', style: AppTypography.label(context)),
+                          Text(
+                            'Tipo de lista',
+                            style: AppTypography.label(context),
+                          ),
                           const SizedBox(height: AppSpacing.xs),
                           Wrap(
                             spacing: AppSpacing.xs,
@@ -259,25 +281,33 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                                 label: const Text('Semanal'),
                                 selected: scope == ShoppingScope.weekly,
                                 onSelected:
-                                    (v) => setModalState(() => scope = ShoppingScope.weekly),
+                                    (v) => setModalState(
+                                      () => scope = ShoppingScope.weekly,
+                                    ),
                               ),
                               ChoiceChip(
                                 label: const Text('Quincenal'),
                                 selected: scope == ShoppingScope.biweekly,
                                 onSelected:
-                                    (v) => setModalState(() => scope = ShoppingScope.biweekly),
+                                    (v) => setModalState(
+                                      () => scope = ShoppingScope.biweekly,
+                                    ),
                               ),
                               ChoiceChip(
                                 label: const Text('Mensual'),
                                 selected: scope == ShoppingScope.monthly,
                                 onSelected:
-                                    (v) => setModalState(() => scope = ShoppingScope.monthly),
+                                    (v) => setModalState(
+                                      () => scope = ShoppingScope.monthly,
+                                    ),
                               ),
                               ChoiceChip(
                                 label: const Text('Custom'),
                                 selected: scope == ShoppingScope.custom,
                                 onSelected:
-                                    (v) => setModalState(() => scope = ShoppingScope.custom),
+                                    (v) => setModalState(
+                                      () => scope = ShoppingScope.custom,
+                                    ),
                               ),
                             ],
                           ),
@@ -287,7 +317,8 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                     const SizedBox(height: AppSpacing.md),
                     CheckboxListTile(
                       value: makeDefault,
-                      onChanged: (v) => setModalState(() => makeDefault = v ?? false),
+                      onChanged:
+                          (v) => setModalState(() => makeDefault = v ?? false),
                       title: const Text('Marcar como predeterminada'),
                       contentPadding: EdgeInsets.zero,
                       activeColor: Colors.orange,
@@ -310,7 +341,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
                                   'scope': scope,
                                   'makeDefault': makeDefault,
                                 }),
-                            style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                            ),
                             child: const Text('Crear'),
                           ),
                         ),
@@ -337,7 +370,9 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: listId),
+            builder:
+                (_) =>
+                    ShoppingListDetailScreenV2(svc: widget.svc, listId: listId),
           ),
         );
       }
@@ -348,7 +383,8 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: list.id),
+        builder:
+            (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: list.id),
       ),
     );
   }
@@ -362,21 +398,29 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.restore, color: Theme.of(context).colorScheme.onPrimary),
+                Icon(
+                  Icons.restore,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text('Lista "${list.name}" restaurada'),
               ],
             ),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al restaurar: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Error al restaurar: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -448,9 +492,10 @@ class _ShoppingListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
+    final total = list.items.fold<double>(
+      0,
+      (sum, item) => sum + (item.total ?? 0),
+    );
     final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
 
@@ -474,7 +519,9 @@ class _ShoppingListCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.orange.shade600, Colors.orange.shade400]),
+                gradient: LinearGradient(
+                  colors: [Colors.orange.shade600, Colors.orange.shade400],
+                ),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppSpacing.radiusLg),
                 ),
@@ -490,14 +537,17 @@ class _ShoppingListCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       list.name,
-                      style: AppTypography.heading4(
-                        context,
-                      ).copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                      style: AppTypography.heading4(context).copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onPrimary),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                     onSelected: (value) {
                       if (value == 'default') onToggleDefault();
                       if (value == 'delete') onDelete();
@@ -508,9 +558,18 @@ class _ShoppingListCard extends StatelessWidget {
                             value: 'default',
                             child: Row(
                               children: [
-                                Icon(list.isDefault ? Icons.star_border : Icons.star, size: 20),
+                                Icon(
+                                  list.isDefault
+                                      ? Icons.star_border
+                                      : Icons.star,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: AppSpacing.sm),
-                                Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
+                                Text(
+                                  list.isDefault
+                                      ? 'Quitar predeterminada'
+                                      : 'Predeterminada',
+                                ),
                               ],
                             ),
                           ),
@@ -520,7 +579,10 @@ class _ShoppingListCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.delete, size: 20, color: Colors.red),
                                 SizedBox(width: AppSpacing.sm),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                           ),
@@ -535,16 +597,23 @@ class _ShoppingListCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ModernBadge(label: _getScopeLabel(list.scope), color: AppColors.food),
+                    ModernBadge(
+                      label: _getScopeLabel(list.scope),
+                      color: AppColors.food,
+                    ),
                     const Spacer(),
-                    Text('${list.items.length} productos', style: AppTypography.body(context)),
+                    Text(
+                      '${list.items.length} productos',
+                      style: AppTypography.body(context),
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     if (total > 0)
                       Text(
                         'Estimado: €${total.toStringAsFixed(2)}',
-                        style: AppTypography.label(
-                          context,
-                        ).copyWith(color: Colors.orange, fontWeight: FontWeight.bold),
+                        style: AppTypography.label(context).copyWith(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     const SizedBox(height: AppSpacing.sm),
 
@@ -556,7 +625,10 @@ class _ShoppingListCard extends StatelessWidget {
                           style: AppTypography.caption(context),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        ModernProgressBar(value: progress, color: AppColors.food),
+                        ModernProgressBar(
+                          value: progress,
+                          color: AppColors.food,
+                        ),
                       ],
                     ),
                   ],
@@ -601,7 +673,10 @@ class _ShoppingListTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
+    final total = list.items.fold<double>(
+      0,
+      (sum, item) => sum + (item.total ?? 0),
+    );
     final purchased = list.items.where((i) => i.checked).length;
     final progress = list.items.isEmpty ? 0.0 : purchased / list.items.length;
 
@@ -623,7 +698,9 @@ class _ShoppingListTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.orange.shade600, Colors.orange.shade400]),
+            gradient: LinearGradient(
+              colors: [Colors.orange.shade600, Colors.orange.shade400],
+            ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Icon(
@@ -642,7 +719,10 @@ class _ShoppingListTile extends StatelessWidget {
               style: AppTypography.caption(context),
             ),
             const SizedBox(height: AppSpacing.xs),
-            ModernProgressBar(value: progress, color: Theme.of(context).colorScheme.primary),
+            ModernProgressBar(
+              value: progress,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -656,9 +736,16 @@ class _ShoppingListTile extends StatelessWidget {
                   value: 'default',
                   child: Row(
                     children: [
-                      Icon(list.isDefault ? Icons.star_border : Icons.star, size: 20),
+                      Icon(
+                        list.isDefault ? Icons.star_border : Icons.star,
+                        size: 20,
+                      ),
                       const SizedBox(width: AppSpacing.sm),
-                      Text(list.isDefault ? 'Quitar predeterminada' : 'Predeterminada'),
+                      Text(
+                        list.isDefault
+                            ? 'Quitar predeterminada'
+                            : 'Predeterminada',
+                      ),
                     ],
                   ),
                 ),
@@ -707,7 +794,10 @@ class _HistoryListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = list.items.fold<double>(0, (sum, item) => sum + (item.total ?? 0));
+    final total = list.items.fold<double>(
+      0,
+      (sum, item) => sum + (item.total ?? 0),
+    );
     final completedDate =
         list.completedAt != null
             ? DateFormat('dd/MM/yyyy').format(list.completedAt!)
@@ -773,100 +863,6 @@ class _HistoryListCard extends StatelessWidget {
               ],
         ),
       ),
-    );
-  }
-}
-
-class _HistoryListTile extends StatelessWidget {
-  final Map<String, dynamic> data;
-  final String docId;
-
-  const _HistoryListTile({required this.data, required this.docId});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final name = data['name'] as String? ?? 'Lista';
-    final items = (data['items'] as List?) ?? [];
-    final completedAt = data['completedAt'] as Timestamp?;
-    final total = items.fold<double>(
-      0,
-      (sum, item) => sum + ((item['total'] as num?)?.toDouble() ?? 0),
-    );
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          ),
-          child: Icon(Icons.check_circle, color: Colors.green.shade600),
-        ),
-        title: Text(name, style: AppTypography.body(context)),
-        subtitle: Text(
-          '${items.length} productos • €${total.toStringAsFixed(2)}\n${_formatDate(completedAt)}',
-          style: AppTypography.caption(context),
-        ),
-        isThreeLine: true,
-      ),
-    );
-  }
-
-  String _formatDate(Timestamp? timestamp) {
-    if (timestamp == null) return '';
-    final date = timestamp.toDate();
-    final now = DateTime.now();
-    final diff = now.difference(date);
-
-    if (diff.inDays == 0) return 'Hoy';
-    if (diff.inDays == 1) return 'Ayer';
-    if (diff.inDays < 7) return 'Hace ${diff.inDays} días';
-    return '${date.day}/${date.month}/${date.year}';
-  }
-}
-
-class _StatItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _StatItem({required this.icon, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: Theme.of(context).colorScheme.onPrimary, size: 28),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          value,
-          style: AppTypography.heading3(
-            context,
-          ).copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          label,
-          style: AppTypography.caption(
-            context,
-          ).copyWith(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
-        ),
-      ],
     );
   }
 }

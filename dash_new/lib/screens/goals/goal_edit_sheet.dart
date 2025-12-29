@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../goals/services/goals_firestore_service.dart';
 import '../goals/models/goals_models.dart';
 import '../../widgets/ui_scaffold.dart';
@@ -54,7 +54,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.initial != null;
-     
+
     return TaskFormTheme(
       child: Padding(
         padding: EdgeInsets.only(

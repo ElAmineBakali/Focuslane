@@ -25,12 +25,11 @@ class LiveSessionScreen extends StatefulWidget {
 }
 
 class _LiveSessionScreenState extends State<LiveSessionScreen> {
-  final Map<String, List<SessionSet>> _performed = {};    final Map<String, int> _restLeft = {};    final Map<String, Timer?> _timers = {};
+  final Map<String, List<SessionSet>> _performed = {};
+  final Map<String, int> _restLeft = {};
+  final Map<String, Timer?> _timers = {};
   final _notesCtrl = TextEditingController();
   late final DateTime _startAt;
-
-     static const int _inactivityId = 22001;
-  static const int _inactivityDays = 3;
 
   int _restNotifId(String exName) =>
       ('gym_rest_${widget.routine.id}_${widget.day.id}_$exName').hashCode;
@@ -51,12 +50,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   void _startRest(String exName, int seconds) async {
-         await NotificationService.I.cancel(_restNotifId(exName));
+    await NotificationService.I.cancel(_restNotifId(exName));
 
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = seconds);
 
-         final when = DateTime.now().add(Duration(seconds: seconds));
+    final when = DateTime.now().add(Duration(seconds: seconds));
     await NotificationService.I.scheduleOnce(
       id: _restNotifId(exName),
       title: 'Descanso terminado',
@@ -70,7 +69,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
       if (left <= 0) {
         t.cancel();
         setState(() => _restLeft[exName] = 0);
-               } else {
+      } else {
         setState(() => _restLeft[exName] = left);
       }
     });
@@ -79,12 +78,13 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   void _stopRest(String exName) async {
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = 0);
-         await NotificationService.I.cancel(_restNotifId(exName));
+    await NotificationService.I.cancel(_restNotifId(exName));
   }
 
   Future<void> _addSetDialog(String exName) async {
     final s = Theme.of(context).colorScheme;
-    final last = (_performed[exName] ?? []).isNotEmpty ? _performed[exName]!.last : null;
+    final last =
+        (_performed[exName] ?? []).isNotEmpty ? _performed[exName]!.last : null;
     final wCtrl = TextEditingController(
       text: last?.weight.toStringAsFixed(1) ?? '',
     );
@@ -93,135 +93,154 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: widget.routine.color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                Icons.add_circle_rounded,
-                color: widget.routine.color,
-              ),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Nueva serie',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    exName,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: s.onSurfaceVariant,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+            title: Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: wCtrl,
-                    autofocus: true,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      labelText: 'Peso',
-                      suffixText: 'kg',
-                      prefixIcon: const Icon(Icons.fitness_center_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      filled: true,
-                      fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                    ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: widget.routine.color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.add_circle_rounded,
+                    color: widget.routine.color,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: TextField(
-                    controller: rCtrl,
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      labelText: 'Reps',
-                      prefixIcon: const Icon(Icons.repeat_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Nueva serie',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      filled: true,
-                      fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                    ),
+                      Text(
+                        exName,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: s.onSurfaceVariant,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: rpeCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(fontSize: 16),
-              decoration: InputDecoration(
-                labelText: 'RPE (opcional)',
-                hintText: '1-10',
-                prefixIcon: const Icon(Icons.trending_up_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: wCtrl,
+                        autofocus: true,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          labelText: 'Peso',
+                          suffixText: 'kg',
+                          prefixIcon: const Icon(Icons.fitness_center_rounded),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          filled: true,
+                          fillColor: s.surfaceContainerHighest.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: rCtrl,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          labelText: 'Reps',
+                          prefixIcon: const Icon(Icons.repeat_rounded),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          filled: true,
+                          fillColor: s.surfaceContainerHighest.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                filled: true,
-                fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-              ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: rpeCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'RPE (opcional)',
+                    hintText: '1-10',
+                    prefixIcon: const Icon(Icons.trending_up_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    filled: true,
+                    fillColor: s.surfaceContainerHighest.withOpacity(0.5),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          OutlinedButton(
-            onPressed: () => Navigator.pop(context, false),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            actions: [
+              OutlinedButton(
+                onPressed: () => Navigator.pop(context, false),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Cancelar'),
               ),
-            ),
-            child: const Text('Cancelar'),
+              FilledButton.icon(
+                onPressed: () => Navigator.pop(context, true),
+                icon: const Icon(Icons.check_rounded),
+                label: const Text('Añadir'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: widget.routine.color,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
           ),
-          FilledButton.icon(
-            onPressed: () => Navigator.pop(context, true),
-            icon: const Icon(Icons.check_rounded),
-            label: const Text('Añadir'),
-            style: FilledButton.styleFrom(
-              backgroundColor: widget.routine.color,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
-    
+
     if (ok == true) {
       final set = SessionSet(
         weight: double.tryParse(wCtrl.text) ?? 0,
@@ -282,16 +301,13 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     await widget.svc.saveSession(doc);
     await widget.svc.markDayCompleted(widget.routine.id, widget.day.id);
 
-         await GymNotificationService.I.scheduleInactivityReminder();
+    await GymNotificationService.I.scheduleInactivityReminder();
 
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => SessionSummaryScreen(
-          session: doc,
-          svc: widget.svc,
-        ),
+        builder: (_) => SessionSummaryScreen(session: doc, svc: widget.svc),
       ),
     );
   }
@@ -300,7 +316,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   Widget build(BuildContext context) {
     final svc = widget.svc;
     final s = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -309,12 +325,16 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
             pinned: true,
             expandedHeight: 160,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
+              titlePadding: const EdgeInsets.only(
+                left: 16,
+                bottom: 16,
+                right: 16,
+              ),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                                     Flexible(
+                  Flexible(
                     child: Text(
                       widget.day.name,
                       style: GoogleFonts.poppins(
@@ -331,7 +351,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                                     Container(
+                  Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 5,
@@ -504,10 +524,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            s.surfaceContainerHighest,
-            s.surfaceContainer,
-          ],
+          colors: [s.surfaceContainerHighest, s.surfaceContainer],
         ),
         boxShadow: [
           BoxShadow(
@@ -567,9 +584,17 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          _buildMetaChip('${e.targetSets} × ${e.targetReps}', Icons.repeat_rounded, s),
+                          _buildMetaChip(
+                            '${e.targetSets} × ${e.targetReps}',
+                            Icons.repeat_rounded,
+                            s,
+                          ),
                           if (e.restSec != null)
-                            _buildMetaChip('${e.restSec}s', Icons.timer_rounded, s),
+                            _buildMetaChip(
+                              '${e.restSec}s',
+                              Icons.timer_rounded,
+                              s,
+                            ),
                           if ((e.tempo ?? '').isNotEmpty)
                             _buildMetaChip(e.tempo!, Icons.speed_rounded, s),
                         ],
@@ -578,7 +603,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                   ),
                 ),
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert_rounded, color: s.onSurfaceVariant),
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: s.onSurfaceVariant,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -586,27 +614,33 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     if (v == 'del') {
                       final ok = await showDialog<bool>(
                         context: context,
-                        builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          title: Text(
-                            'Eliminar ejercicio',
-                            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                          ),
-                          content: Text('¿Eliminar "$exName" de este día?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancelar'),
+                        builder:
+                            (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              title: Text(
+                                'Eliminar ejercicio',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              content: Text('¿Eliminar "$exName" de este día?'),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: s.error,
+                                  ),
+                                  child: const Text('Eliminar'),
+                                ),
+                              ],
                             ),
-                            FilledButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              style: FilledButton.styleFrom(backgroundColor: s.error),
-                              child: const Text('Eliminar'),
-                            ),
-                          ],
-                        ),
                       );
                       if (ok == true) {
                         await widget.svc.deleteRoutineExercise(
@@ -618,22 +652,25 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                           _performed.remove(exName);
                           _restLeft.remove(exName);
                         });
-                        await NotificationService.I.cancel(_restNotifId(exName));
+                        await NotificationService.I.cancel(
+                          _restNotifId(exName),
+                        );
                       }
                     }
                   },
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(
-                      value: 'del',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_rounded, size: 20),
-                          SizedBox(width: 12),
-                          Text('Eliminar'),
-                        ],
-                      ),
-                    ),
-                  ],
+                  itemBuilder:
+                      (_) => const [
+                        PopupMenuItem(
+                          value: 'del',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_rounded, size: 20),
+                              SizedBox(width: 12),
+                              Text('Eliminar'),
+                            ],
+                          ),
+                        ),
+                      ],
                 ),
               ],
             ),
@@ -643,7 +680,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                 children: [
                   if (e.targetRPE != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: s.tertiaryContainer,
                         borderRadius: BorderRadius.circular(8),
@@ -661,7 +701,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     const SizedBox(width: 8),
                   if (e.targetPercent1RM != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: s.secondaryContainer,
                         borderRadius: BorderRadius.circular(8),
@@ -689,7 +732,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                   onPressed: () => _addSetDialog(exName),
                   style: FilledButton.styleFrom(
                     backgroundColor: widget.routine.color,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -700,14 +746,16 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     restLeft > 0 ? Icons.timer_rounded : Icons.timer_outlined,
                     size: 20,
                   ),
-                  label: Text(
-                    restLeft > 0 ? '${restLeft}s' : 'Descansar',
-                  ),
-                  onPressed: restLeft > 0
-                      ? null
-                      : () => _startRest(exName, e.restSec ?? 90),
+                  label: Text(restLeft > 0 ? '${restLeft}s' : 'Descansar'),
+                  onPressed:
+                      restLeft > 0
+                          ? null
+                          : () => _startRest(exName, e.restSec ?? 90),
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -719,7 +767,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                     label: const Text('Parar'),
                     onPressed: () => _stopRest(exName),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -802,7 +853,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.content_copy_rounded, size: 20),
+                              icon: const Icon(
+                                Icons.content_copy_rounded,
+                                size: 20,
+                              ),
                               tooltip: 'Copiar',
                               onPressed: () {
                                 setState(() {
@@ -819,7 +873,11 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                               },
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete_rounded, size: 20, color: s.error),
+                              icon: Icon(
+                                Icons.delete_rounded,
+                                size: 20,
+                                color: s.error,
+                              ),
                               tooltip: 'Eliminar',
                               onPressed: () {
                                 setState(() {

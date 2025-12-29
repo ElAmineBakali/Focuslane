@@ -47,7 +47,9 @@ class ModernClassBlock extends StatelessWidget {
           children: [
             Positioned.fill(
               child: CustomPaint(
-                painter: _DotPatternPainter(color: colorScheme.onPrimary.withOpacity(0.1)),
+                painter: _DotPatternPainter(
+                  color: colorScheme.onPrimary.withOpacity(0.1),
+                ),
               ),
             ),
             Padding(
@@ -58,7 +60,10 @@ class ModernClassBlock extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: colorScheme.onPrimary.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(8),
@@ -66,7 +71,11 @@ class ModernClassBlock extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.access_time_rounded, color: colorScheme.onPrimary, size: 14),
+                            Icon(
+                              Icons.access_time_rounded,
+                              color: colorScheme.onPrimary,
+                              size: 14,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               '${block.start.format(context)} - ${block.end.format(context)}',
@@ -82,7 +91,10 @@ class ModernClassBlock extends StatelessWidget {
                       const Spacer(),
                       if (block.room != null && block.room!.isNotEmpty)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: colorScheme.onPrimary.withOpacity(0.25),
                             borderRadius: BorderRadius.circular(8),
@@ -127,7 +139,8 @@ class ModernClassBlock extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (course?.teacher != null && course!.teacher!.isNotEmpty) ...[
+                  if (course?.teacher != null &&
+                      course!.teacher!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -200,49 +213,64 @@ class EmptyScheduleState extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.primary.withOpacity(0.2),
-                    colorScheme.secondary.withOpacity(0.2),
-                  ],
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.primary.withOpacity(0.2),
+                        colorScheme.secondary.withOpacity(0.2),
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.calendar_today_rounded,
+                    size: 70,
+                    color: colorScheme.primary,
+                  ),
                 ),
-              ),
-              child: Icon(Icons.calendar_today_rounded, size: 70, color: colorScheme.primary),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              '¡Horario vacío!',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Añade tus clases para visualizar tu horario semanal',
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            FilledButton.icon(
-              onPressed: onAddClass,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Añadir clase'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-            ),
-          ],
-        ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.8, 0.8)),
+                const SizedBox(height: 32),
+                Text(
+                  '¡Horario vacío!',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Añade tus clases para visualizar tu horario semanal',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                FilledButton.icon(
+                  onPressed: onAddClass,
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Añadir clase'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(duration: 600.ms)
+            .scale(begin: const Offset(0.8, 0.8)),
       ),
     );
   }

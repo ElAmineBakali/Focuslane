@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'gym_models.dart';
 
- final List<PresetRoutine> presetRoutines = [
-     PresetRoutine(
+final List<PresetRoutine> presetRoutines = [
+  PresetRoutine(
     id: 'arnold_classic',
     name: 'Arnold Classic Split',
-    description: 'Rutina legendaria de Arnold Schwarzenegger. 6 días/semana enfocada en volumen alto e hipertrofia. Ideal para avanzados.',
+    description:
+        'Rutina legendaria de Arnold Schwarzenegger. 6 días/semana enfocada en volumen alto e hipertrofia. Ideal para avanzados.',
     goal: 'mass',
     level: 'advanced',
     icon: Icons.military_tech,
@@ -169,10 +170,11 @@ import 'gym_models.dart';
     ],
   ),
 
-     PresetRoutine(
+  PresetRoutine(
     id: 'ppl_beginner',
     name: 'PPL Novato',
-    description: 'Push Pull Legs clásico. 6 días/semana con volumen moderado. Perfecto para principiantes que buscan estructura.',
+    description:
+        'Push Pull Legs clásico. 6 días/semana con volumen moderado. Perfecto para principiantes que buscan estructura.',
     goal: 'general',
     level: 'beginner',
     icon: Icons.trending_up,
@@ -306,10 +308,11 @@ import 'gym_models.dart';
     ],
   ),
 
-     PresetRoutine(
+  PresetRoutine(
     id: 'full_body_3x',
     name: 'Full Body 3x Semana',
-    description: 'Rutina de cuerpo completo 3 días/semana. Ideal para principiantes o personas con poco tiempo.',
+    description:
+        'Rutina de cuerpo completo 3 días/semana. Ideal para principiantes o personas con poco tiempo.',
     goal: 'general',
     level: 'beginner',
     icon: Icons.all_inclusive,
@@ -440,10 +443,11 @@ import 'gym_models.dart';
     ],
   ),
 
-     PresetRoutine(
+  PresetRoutine(
     id: 'hypertrophy_advanced',
     name: 'Hipertrofia Avanzada',
-    description: 'Rutina de 5 días enfocada en máximo crecimiento muscular. Volumen alto, intensidad controlada.',
+    description:
+        'Rutina de 5 días enfocada en máximo crecimiento muscular. Volumen alto, intensidad controlada.',
     goal: 'mass',
     level: 'advanced',
     icon: Icons.auto_awesome,
@@ -664,10 +668,11 @@ import 'gym_models.dart';
     ],
   ),
 
-     PresetRoutine(
+  PresetRoutine(
     id: 'calisthenics_full',
     name: 'Calistenia Full Body',
-    description: 'Entrenamiento con peso corporal. Sin pesas, enfocado en control, fuerza relativa y habilidad.',
+    description:
+        'Entrenamiento con peso corporal. Sin pesas, enfocado en control, fuerza relativa y habilidad.',
     goal: 'strength',
     level: 'intermediate',
     icon: Icons.sports_gymnastics,
@@ -758,10 +763,11 @@ import 'gym_models.dart';
     ],
   ),
 
-     PresetRoutine(
+  PresetRoutine(
     id: 'strength_5x5',
     name: 'Fuerza 5x5',
-    description: 'Programa de fuerza pura. 5 series de 5 reps en grandes levantamientos. Ganar fuerza máxima.',
+    description:
+        'Programa de fuerza pura. 5 series de 5 reps en grandes levantamientos. Ganar fuerza máxima.',
     goal: 'strength',
     level: 'intermediate',
     icon: Icons.bolt,

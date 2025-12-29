@@ -13,13 +13,19 @@ class NoteAttachment {
   );
 }
 
- class Note {
+class Note {
   final String id;
   final String title;
-     final String content;    final List<FormatSpan> spans;    final List<dynamic>? delta;    final List<String> tags;
+  final String content;
+  final List<FormatSpan> spans;
+  final List<dynamic>? delta;
+  final List<String> tags;
   final bool isPinned;
   final String? colorHex;
-  final String? coverUrl;    final String? style;    final List<NoteAttachment> attachments;    final DateTime createdAt;
+  final String? coverUrl;
+  final String? style;
+  final List<NoteAttachment> attachments;
+  final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? date;
   final List<String> linkedTaskIds;
@@ -152,8 +158,9 @@ class NoteAttachment {
   }
 }
 
- class FormatSpan {
-  final int start;    final int length;
+class FormatSpan {
+  final int start;
+  final int length;
   final bool bold;
   final bool italic;
   final bool underline;

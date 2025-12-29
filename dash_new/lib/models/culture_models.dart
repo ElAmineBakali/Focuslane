@@ -6,7 +6,7 @@ double _asDouble(dynamic v) => (v is num) ? v.toDouble() : 0.0;
 int _asInt(dynamic v) => (v is num) ? v.toInt() : 0;
 DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
 
- class Book {
+class Book {
   final String id;
   final String title;
   final String? author;
@@ -16,10 +16,12 @@ DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
   final int currentPage;
   final String? shortSummary;
   final String? deepSummary;
-  final double? rating;    final ItemStatus status;
+  final double? rating;
+  final ItemStatus status;
   final List<String> tags;
   final String? coverUrl;
-  final String? pdfUrl;    final DateTime? startedAt;
+  final String? pdfUrl;
+  final DateTime? startedAt;
   final DateTime? finishedAt;
 
   Book({
@@ -36,7 +38,8 @@ DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
     this.status = ItemStatus.pending,
     this.tags = const [],
     this.coverUrl,
-    this.pdfUrl,      this.startedAt,
+    this.pdfUrl,
+    this.startedAt,
     this.finishedAt,
   });
 
@@ -53,7 +56,8 @@ DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
     'status': status.name,
     'tags': tags,
     'coverUrl': coverUrl,
-    'pdfUrl': pdfUrl,      'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
+    'pdfUrl': pdfUrl,
+    'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
     'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
   };
 
@@ -76,7 +80,8 @@ DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
       ),
       tags: (d['tags'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       coverUrl: d['coverUrl'] as String?,
-      pdfUrl: d['pdfUrl'] as String?,        startedAt: (d['startedAt'] as Timestamp?)?.toDate(),
+      pdfUrl: d['pdfUrl'] as String?,
+      startedAt: (d['startedAt'] as Timestamp?)?.toDate(),
       finishedAt: (d['finishedAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -85,7 +90,8 @@ DateTime _asDate(dynamic v) => (v is Timestamp) ? v.toDate() : DateTime.now();
 class BookSession {
   final String id;
   final DateTime date;
-  final int pages;    final int minutes;
+  final int pages;
+  final int minutes;
   final String? notes;
 
   BookSession({
@@ -136,7 +142,7 @@ class BookQuote {
   }
 }
 
- class Series {
+class Series {
   final String id;
   final String title;
   final String? platform;
@@ -239,7 +245,7 @@ class Episode {
   }
 }
 
- class Movie {
+class Movie {
   final String id;
   final String title;
   final int? year;
@@ -300,7 +306,7 @@ class Episode {
   }
 }
 
- class Album {
+class Album {
   final String id;
   final String title;
   final String artist;
@@ -363,14 +369,18 @@ class Episode {
   }
 }
 
- class Game {
+class Game {
   final String id;
   final String title;
-  final String platform;    final ItemStatus status;    final double? rating;
-  final double hours;    final int progressPct;    final List<String> tags;
+  final String platform;
+  final ItemStatus status;
+  final double? rating;
+  final double hours;
+  final int progressPct;
+  final List<String> tags;
   final String? coverUrl;
   final String? notes;
-  final int? difficulty;  
+  final int? difficulty;
   Game({
     required this.id,
     required this.title,
@@ -423,7 +433,8 @@ class GameSession {
   final String id;
   final DateTime date;
   final int minutes;
-  final int? progressAfter;    final String? notes;
+  final int? progressAfter;
+  final String? notes;
 
   GameSession({
     required this.id,
@@ -452,8 +463,9 @@ class GameSession {
   }
 }
 
- class CultureCollectionItemRef {
-  final String type;    final String id;
+class CultureCollectionItemRef {
+  final String type;
+  final String id;
   final int order;
   CultureCollectionItemRef({
     required this.type,

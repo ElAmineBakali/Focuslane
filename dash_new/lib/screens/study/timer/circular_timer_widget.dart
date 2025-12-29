@@ -55,12 +55,14 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
 
   @override
   Widget build(BuildContext context) {
-    final progress = widget.totalTime > 0 ? 1.0 - (widget.timeLeft / widget.totalTime) : 0.0;
+    final progress =
+        widget.totalTime > 0 ? 1.0 - (widget.timeLeft / widget.totalTime) : 0.0;
 
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
-        final pulseValue = widget.isRunning ? 1.0 + (_pulseController.value * 0.05) : 1.0;
+        final pulseValue =
+            widget.isRunning ? 1.0 + (_pulseController.value * 0.05) : 1.0;
 
         return Transform.scale(
           scale: pulseValue,
@@ -88,7 +90,9 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                   height: 280,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   ),
                 ),
                 CustomPaint(
@@ -96,7 +100,8 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                   painter: _CircularProgressPainter(
                     progress: progress,
                     color: widget.color,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                 ),
                 Column(
@@ -113,7 +118,10 @@ class _CircularTimerWidgetState extends State<CircularTimerWidget>
                     ).animate(key: ValueKey(widget.timeLeft)).fadeIn(),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: widget.color.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(20),

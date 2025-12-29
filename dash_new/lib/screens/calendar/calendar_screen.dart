@@ -78,8 +78,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return List<CalendarEvent>.of(_eventsByDay[k] ?? const <CalendarEvent>[]);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -162,8 +160,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: Colors.grey,
                 shape: BoxShape.circle,
               ),
-              todayDecoration:
-                  const BoxDecoration(),
+              todayDecoration: const BoxDecoration(),
               selectedDecoration: BoxDecoration(
                 color: s.primary,
                 shape: BoxShape.circle,

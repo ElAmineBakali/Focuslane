@@ -58,7 +58,6 @@ import 'screens/food/foods/foods_list_screen_v2.dart';
 import 'screens/food/recipes/recipes_list_screen_v2.dart';
 import 'screens/food/planner/food_planner_screen_v2.dart';
 import 'screens/food/shopping/shopping_lists_screen_v2.dart';
-import 'screens/food/shopping/shopping_list_detail_screen_v2.dart';
 import 'screens/food/pantry/pantry_screen_v2.dart';
 import 'screens/food/history/food_history_screen_v2.dart';
 import 'screens/finance/finance_routes.dart';
@@ -66,6 +65,7 @@ import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
+import 'package:mi_dashboard_personal/screens/home_variants.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -112,6 +112,14 @@ Future<void> main() async {
       FirebaseFirestore.instance.settings = const Settings(
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
+    }
+  } catch (_) {}
+
+  // Ensure an authenticated user exists for modules that require it (e.g., Gym)
+  try {
+    final auth = fb_auth.FirebaseAuth.instance;
+    if (auth.currentUser == null) {
+      await auth.signInAnonymously();
     }
   } catch (_) {}
 
@@ -258,12 +266,10 @@ class _MyAppState extends State<MyApp> {
             );
           },
 
-          home:
-              user == null
-                  ? const _AuthScreen()
-                  : HomeScreen(toggleTheme: toggleTheme, themeMode: _themeMode),
+            home: const HomeScreenV1HubModular(),
 
           routes: {
+            '/home-variants': (_) => const HomeVariantsGallery(),
             '/settings':
                 (_) => SettingsScreen(
                   currentPreset: _preset,

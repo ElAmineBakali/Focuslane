@@ -5,7 +5,7 @@ import '../services/gym_firestore_service.dart';
 import '../models/preset_routines_data.dart';
 import '../models/gym_models.dart';
 
- class PresetRoutinesScreen extends StatefulWidget {
+class PresetRoutinesScreen extends StatefulWidget {
   final GymFirestoreService svc;
 
   const PresetRoutinesScreen({super.key, required this.svc});
@@ -34,7 +34,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-                     SliverAppBar.large(
+          SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
             stretch: true,
@@ -42,9 +42,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Rutinas Destacadas',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
               ),
               background: Container(
                 decoration: BoxDecoration(
@@ -68,7 +66,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             ),
           ),
 
-                     SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -102,16 +100,13 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
             ),
           ),
 
-                     SliverPadding(
+          SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final routine = filteredRoutines[index];
-                  return _buildRoutineCard(routine, index);
-                },
-                childCount: filteredRoutines.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final routine = filteredRoutines[index];
+                return _buildRoutineCard(routine, index);
+              }, childCount: filteredRoutines.length),
             ),
           ),
         ],
@@ -131,23 +126,24 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: goals.map((goal) {
-        final isSelected = _selectedGoal == goal.$1;
-        return FilterChip(
-          selected: isSelected,
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(goal.$3, size: 16),
-              const SizedBox(width: 4),
-              Text(goal.$2),
-            ],
-          ),
-          onSelected: (selected) {
-            setState(() => _selectedGoal = goal.$1);
-          },
-        );
-      }).toList(),
+      children:
+          goals.map((goal) {
+            final isSelected = _selectedGoal == goal.$1;
+            return FilterChip(
+              selected: isSelected,
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(goal.$3, size: 16),
+                  const SizedBox(width: 4),
+                  Text(goal.$2),
+                ],
+              ),
+              onSelected: (selected) {
+                setState(() => _selectedGoal = goal.$1);
+              },
+            );
+          }).toList(),
     );
   }
 
@@ -162,23 +158,24 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: levels.map((level) {
-        final isSelected = _selectedLevel == level.$1;
-        return FilterChip(
-          selected: isSelected,
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(level.$3, size: 16),
-              const SizedBox(width: 4),
-              Text(level.$2),
-            ],
-          ),
-          onSelected: (selected) {
-            setState(() => _selectedLevel = level.$1);
-          },
-        );
-      }).toList(),
+      children:
+          levels.map((level) {
+            final isSelected = _selectedLevel == level.$1;
+            return FilterChip(
+              selected: isSelected,
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(level.$3, size: 16),
+                  const SizedBox(width: 4),
+                  Text(level.$2),
+                ],
+              ),
+              onSelected: (selected) {
+                setState(() => _selectedLevel = level.$1);
+              },
+            );
+          }).toList(),
     );
   }
 
@@ -187,111 +184,123 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     Color levelColor = _getLevelColor(routine.level);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: InkWell(
-        onTap: () => _showRoutineDetails(routine),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
+          margin: const EdgeInsets.only(bottom: 16),
+          elevation: 3,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              colors: [
-                goalColor.withOpacity(0.05),
-                Colors.transparent,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          child: InkWell(
+            onTap: () => _showRoutineDetails(routine),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [goalColor.withOpacity(0.05), Colors.transparent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                                         Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: goalColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(routine.icon, color: goalColor, size: 32),
-                    ),
-                    const SizedBox(width: 16),
-                    
-                                         Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            routine.name,
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                            ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: goalColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(height: 4),
-                          Wrap(
-                            spacing: 6,
+                          child: Icon(routine.icon, color: goalColor, size: 32),
+                        ),
+                        const SizedBox(width: 16),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildBadge(_getGoalLabel(routine.goal), goalColor),
-                              _buildBadge(_getLevelLabel(routine.level), levelColor),
+                              Text(
+                                routine.name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 6,
+                                children: [
+                                  _buildBadge(
+                                    _getGoalLabel(routine.goal),
+                                    goalColor,
+                                  ),
+                                  _buildBadge(
+                                    _getLevelLabel(routine.level),
+                                    levelColor,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+
+                        Icon(Icons.chevron_right, color: Colors.grey[400]),
+                      ],
                     ),
-                    
-                    Icon(Icons.chevron_right, color: Colors.grey[400]),
-                  ],
-                ),
-                
-                const SizedBox(height: 12),
-                
-                                 Text(
-                  routine.description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: Colors.grey[700],
-                    height: 1.4,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                
-                const SizedBox(height: 12),
-                
-                                 Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 6),
+
+                    const SizedBox(height: 12),
+
                     Text(
-                      '${routine.days.length} días/semana',
+                      routine.description,
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: Colors.grey[600],
+                        color: Colors.grey[700],
+                        height: 1.4,
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
-                    Text(
-                      'Ver detalles',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: goalColor,
-                      ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${routine.days.length} días/semana',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Ver detalles',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: goalColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ).animate(delay: (100 * index).ms).fadeIn(duration: 400.ms).slideX(begin: 0.2, end: 0);
+        )
+        .animate(delay: (100 * index).ms)
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: 0.2, end: 0);
   }
 
   Widget _buildBadge(String text, Color color) {
@@ -318,117 +327,122 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.8,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              children: [
-                                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.8,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
                   ),
                 ),
-                
-                                 Expanded(
-                  child: ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(20),
-                    children: [
-                                             Row(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.all(20),
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: _getGoalColor(routine.goal).withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Icon(
-                              routine.icon,
-                              color: _getGoalColor(routine.goal),
-                              size: 40,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  routine.name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: _getGoalColor(
+                                    routine.goal,
+                                  ).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 6,
+                                child: Icon(
+                                  routine.icon,
+                                  color: _getGoalColor(routine.goal),
+                                  size: 40,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildBadge(
-                                      _getGoalLabel(routine.goal),
-                                      _getGoalColor(routine.goal),
+                                    Text(
+                                      routine.name,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                    _buildBadge(
-                                      _getLevelLabel(routine.level),
-                                      _getLevelColor(routine.level),
+                                    const SizedBox(height: 4),
+                                    Wrap(
+                                      spacing: 6,
+                                      children: [
+                                        _buildBadge(
+                                          _getGoalLabel(routine.goal),
+                                          _getGoalColor(routine.goal),
+                                        ),
+                                        _buildBadge(
+                                          _getLevelLabel(routine.level),
+                                          _getLevelColor(routine.level),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Text(
+                            routine.description,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                              height: 1.5,
                             ),
                           ),
+
+                          const SizedBox(height: 24),
+
+                          Text(
+                            'Estructura (${routine.days.length} días)',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          ...routine.days.asMap().entries.map((entry) {
+                            final day = entry.value;
+                            return _buildDayCard(day, entry.key + 1);
+                          }),
+
+                          const SizedBox(height: 80),
                         ],
                       ),
-                      
-                      const SizedBox(height: 20),
-                      
-                                             Text(
-                        routine.description,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          height: 1.5,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                                             Text(
-                        'Estructura (${routine.days.length} días)',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      ...routine.days.asMap().entries.map((entry) {
-                        final day = entry.value;
-                        return _buildDayCard(day, entry.key + 1);
-                      }),
-                      
-                      const SizedBox(height: 80),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     ).then((_) {
-             _askToApplyRoutine(routine);
+      _askToApplyRoutine(routine);
     });
   }
 
@@ -452,17 +466,21 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
           '${day.exercises.length} ejercicios',
           style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
         ),
-        children: day.exercises.map((ex) {
-          return ListTile(
-            dense: true,
-            leading: const Icon(Icons.fitness_center, size: 20),
-            title: Text(ex.name, style: GoogleFonts.poppins(fontSize: 13)),
-            subtitle: Text(
-              '${ex.targetSets} × ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
-              style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600]),
-            ),
-          );
-        }).toList(),
+        children:
+            day.exercises.map((ex) {
+              return ListTile(
+                dense: true,
+                leading: const Icon(Icons.fitness_center, size: 20),
+                title: Text(ex.name, style: GoogleFonts.poppins(fontSize: 13)),
+                subtitle: Text(
+                  '${ex.targetSets} × ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -470,37 +488,38 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
   void _askToApplyRoutine(PresetRoutine routine) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          '¿Aplicar rutina?',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          '¿Quieres crear "${routine.name}" como tu nueva rutina? Podrás editarla después.',
-          style: GoogleFonts.poppins(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              '¿Aplicar rutina?',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+            content: Text(
+              '¿Quieres crear "${routine.name}" como tu nueva rutina? Podrás editarla después.',
+              style: GoogleFonts.poppins(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => _applyRoutine(routine),
+                child: const Text('Aplicar'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => _applyRoutine(routine),
-            child: const Text('Aplicar'),
-          ),
-        ],
-      ),
     );
   }
 
   Future<void> _applyRoutine(PresetRoutine routine) async {
-    Navigator.pop(context);      
-         showDialog(
+    Navigator.pop(context);
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-    
+
     try {
       await widget.svc.createRoutineFromPreset(
         routine.name,
@@ -508,9 +527,10 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
         _mapGoalToSplitType(routine.goal),
         routine.days,
       );
-      
+
       if (mounted) {
-        Navigator.pop(context);          Navigator.pop(context);          
+        Navigator.pop(context);
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -530,7 +550,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       }
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context);          
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -612,8 +632,10 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
   String _mapGoalToSplitType(String goal) {
     switch (goal) {
       case 'strength':
-        return 'UL';        case 'mass':
-        return 'PPL';        default:
+        return 'UL';
+      case 'mass':
+        return 'PPL';
+      default:
         return 'Custom';
     }
   }

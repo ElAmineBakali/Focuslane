@@ -12,7 +12,7 @@ class RoutinesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -113,10 +113,7 @@ class RoutinesListScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            r.color.withOpacity(0.15),
-            r.color.withOpacity(0.05),
-          ],
+          colors: [r.color.withOpacity(0.15), r.color.withOpacity(0.05)],
         ),
         border: Border.all(
           color: r.isDefault ? r.color : s.outlineVariant.withOpacity(0.5),
@@ -211,7 +208,10 @@ class RoutinesListScreen extends StatelessWidget {
                       ),
                     ),
                     PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert_rounded, color: s.onSurfaceVariant),
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        color: s.onSurfaceVariant,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -222,75 +222,83 @@ class RoutinesListScreen extends StatelessWidget {
                         if (v == 'del') {
                           final ok = await showDialog<bool>(
                             context: context,
-                            builder: (_) => AlertDialog(
-                              title: Text(
-                                'Eliminar rutina',
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                              ),
-                              content: Text('¿Eliminar "${r.name}" y todo su contenido?'),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: s.error,
+                            builder:
+                                (_) => AlertDialog(
+                                  title: Text(
+                                    'Eliminar rutina',
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                  child: const Text('Eliminar'),
+                                  content: Text(
+                                    '¿Eliminar "${r.name}" y todo su contenido?',
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, false),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    FilledButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: s.error,
+                                      ),
+                                      child: const Text('Eliminar'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
                           );
                           if (ok == true) await svc.deleteRoutineCascade(r.id);
                         }
                       },
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(
-                          value: 'default',
-                          child: Row(
-                            children: [
-                              Icon(Icons.star_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Hacer predeterminada'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Editar'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'dup',
-                          child: Row(
-                            children: [
-                              Icon(Icons.content_copy_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Duplicar'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'del',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Eliminar'),
-                            ],
-                          ),
-                        ),
-                      ],
+                      itemBuilder:
+                          (_) => [
+                            const PopupMenuItem(
+                              value: 'default',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.star_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Hacer predeterminada'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Editar'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'dup',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.content_copy_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Duplicar'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'del',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_rounded, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Eliminar'),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ],
                 ),
@@ -299,11 +307,7 @@ class RoutinesListScreen extends StatelessWidget {
                   spacing: 12,
                   runSpacing: 8,
                   children: [
-                    _buildInfoChip(
-                      Icons.splitscreen_rounded,
-                      r.splitType,
-                      s,
-                    ),
+                    _buildInfoChip(Icons.splitscreen_rounded, r.splitType, s),
                     _buildInfoChip(
                       Icons.timer_rounded,
                       '${r.restSecDefault}s descanso',
@@ -344,7 +348,6 @@ class RoutinesListScreen extends StatelessWidget {
     );
   }
 
-   
   Future<void> _newRoutineSheet(BuildContext context) async {
     final res = await showModalBottomSheet<_RoutineFormResult>(
       context: context,
@@ -374,7 +377,7 @@ class RoutinesListScreen extends StatelessWidget {
       isDefault: res.isDefault,
     );
 
-         Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => RoutineDetailScreen(svc: svc, routine: created),
@@ -382,7 +385,6 @@ class RoutinesListScreen extends StatelessWidget {
     );
   }
 
-   
   Future<void> _editRoutineSheet(BuildContext context, Routine r) async {
     final res = await showModalBottomSheet<_RoutineFormResult>(
       context: context,
@@ -415,11 +417,11 @@ class RoutinesListScreen extends StatelessWidget {
   }
 }
 
- 
 class _RoutineFormResult {
   final String name;
   final String? description;
-  final String splitType;    final int restSecDefault;
+  final String splitType;
+  final int restSecDefault;
   final String colorHex;
   final bool isDefault;
 
@@ -456,8 +458,9 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   String _split = 'Custom';
   bool _isDefault = false;
 
-     static const _palette = <Color>[
-    Color(0xFF6750A4),      Color(0xFF1E88E5),
+  static const _palette = <Color>[
+    Color(0xFF6750A4),
+    Color(0xFF1E88E5),
     Color(0xFFD81B60),
     Color(0xFFF57C00),
     Color(0xFF2E7D32),
@@ -479,7 +482,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
     _restCtrl.text = '${i?.restSecDefault ?? 90}';
     _isDefault = i?.isDefault ?? false;
 
-         if (i?.colorHex != null) {
+    if (i?.colorHex != null) {
       _selected = _hexToColor(i!.colorHex);
     } else {
       _selected = _palette.first;
@@ -574,7 +577,10 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                   ),
                   DropdownMenuItem(value: 'UL', child: Text('Upper/Lower')),
                   DropdownMenuItem(value: 'FB', child: Text('Full Body')),
-                  DropdownMenuItem(value: 'Custom', child: Text('Personalizada')),
+                  DropdownMenuItem(
+                    value: 'Custom',
+                    child: Text('Personalizada'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _split = v ?? 'Custom'),
                 decoration: InputDecoration(
@@ -625,39 +631,42 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 spacing: 12,
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
-                children: _palette.map((c) {
-                  final selected = c.value == _selected.value;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selected = c),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: selected ? 50 : 44,
-                      height: selected ? 50 : 44,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          if (selected)
-                            BoxShadow(
-                              color: c.withOpacity(0.5),
-                              blurRadius: 12,
-                              spreadRadius: 2,
-                            ),
-                        ],
-                        border: selected
-                            ? Border.all(color: cs.surface, width: 3)
-                            : null,
-                      ),
-                      child: selected
-                          ? const Icon(
-                              Icons.check_rounded,
-                              size: 24,
-                              color: Colors.white,
-                            )
-                          : null,
-                    ),
-                  );
-                }).toList(),
+                children:
+                    _palette.map((c) {
+                      final selected = c.value == _selected.value;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selected = c),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: selected ? 50 : 44,
+                          height: selected ? 50 : 44,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              if (selected)
+                                BoxShadow(
+                                  color: c.withOpacity(0.5),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                            ],
+                            border:
+                                selected
+                                    ? Border.all(color: cs.surface, width: 3)
+                                    : null,
+                          ),
+                          child:
+                              selected
+                                  ? const Icon(
+                                    Icons.check_rounded,
+                                    size: 24,
+                                    color: Colors.white,
+                                  )
+                                  : null,
+                        ),
+                      );
+                    }).toList(),
               ),
               if (widget.showDefaultToggle) ...[
                 const SizedBox(height: 20),
@@ -680,11 +689,10 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                         color: cs.onSurface,
                       ),
                     ),
-                    subtitle: const Text('Se usará por defecto en tus sesiones'),
-                    secondary: Icon(
-                      Icons.star_rounded,
-                      color: cs.primary,
+                    subtitle: const Text(
+                      'Se usará por defecto en tus sesiones',
                     ),
+                    secondary: Icon(Icons.star_rounded, color: cs.primary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -718,7 +726,9 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                         ),
                       ),
                       child: Text(
-                        widget.title.startsWith('Editar') ? 'Guardar' : 'Crear rutina',
+                        widget.title.startsWith('Editar')
+                            ? 'Guardar'
+                            : 'Crear rutina',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -738,7 +748,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   void _submit() {
     if (_formKey.currentState?.validate() != true) return;
 
-         final rgb = _selected.value & 0x00FFFFFF;
+    final rgb = _selected.value & 0x00FFFFFF;
     final hex = '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 
     Navigator.pop(
@@ -756,10 +766,10 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   }
 }
 
- 
 Color _hexToColor(String hex) {
   var h = hex.replaceAll('#', '').toUpperCase();
-  if (h.length == 6) h = 'FF$h';       return Color(int.parse(h, radix: 16));
+  if (h.length == 6) h = 'FF$h';
+  return Color(int.parse(h, radix: 16));
 }
 
 String _rgbToHex(int argb) {

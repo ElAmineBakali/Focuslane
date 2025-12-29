@@ -17,15 +17,6 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
   DateTime _date = DateTime.now();
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
 
-  final Map<String, String> _mealTitles = {
-    'breakfast': 'Desayuno',
-    'snack1': 'Media Mañana',
-    'lunch': 'Almuerzo',
-    'snack2': 'Merienda',
-    'dinner': 'Cena',
-    'other': 'Otros',
-  };
-
   @override
   Widget build(BuildContext context) {
     final dayId = _dayId(_date);
@@ -38,7 +29,10 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
         actions: [
           IconButton(
             tooltip: 'Objetivos Nutricionales',
-            icon: Icon(Icons.flag_outlined, color: Theme.of(context).colorScheme.onPrimary),
+            icon: Icon(
+              Icons.flag_outlined,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: () => _showGoalsSheet(context),
           ),
         ],
@@ -62,7 +56,9 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
 
               final d = snap.data!;
 
-              Map<String, double?> mergedTargets = Map<String, double?>.from(d.targets);
+              Map<String, double?> mergedTargets = Map<String, double?>.from(
+                d.targets,
+              );
               for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
                 mergedTargets[k] ??= globalTargets[k];
               }
@@ -73,25 +69,35 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                   SliverToBoxAdapter(
                     child: _ModernDaySelector(
                       date: _date,
-                      onPrev: () => setState(() => _date = _date.subtract(const Duration(days: 1))),
-                      onNext: () => setState(() => _date = _date.add(const Duration(days: 1))),
+                      onPrev:
+                          () => setState(
+                            () =>
+                                _date = _date.subtract(const Duration(days: 1)),
+                          ),
+                      onNext:
+                          () => setState(
+                            () => _date = _date.add(const Duration(days: 1)),
+                          ),
                       onToday: () => setState(() => _date = DateTime.now()),
                     ).animate().slideY(begin: -0.2, duration: 300.ms),
                   ),
 
                   SliverToBoxAdapter(
-                    child: _MacrosSummary(
-                      day: d,
-                      mergedTargets: mergedTargets,
-                    ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, duration: 300.ms),
+                    child: _MacrosSummary(day: d, mergedTargets: mergedTargets)
+                        .animate()
+                        .fadeIn(delay: 100.ms)
+                        .slideY(begin: 0.2, duration: 300.ms),
                   ),
 
                   SliverToBoxAdapter(
                     child: _ModernWaterCard(
-                      water: d.waterMl,
-                      waterTarget: (mergedTargets['water'] ?? 2000).toInt(),
-                      onAdd: (ml) => widget.svc.incrementWater(dayId, ml),
-                    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, duration: 300.ms),
+                          water: d.waterMl,
+                          waterTarget: (mergedTargets['water'] ?? 2000).toInt(),
+                          onAdd: (ml) => widget.svc.incrementWater(dayId, ml),
+                        )
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideY(begin: 0.2, duration: 300.ms),
                   ),
 
                   if (d.entries.isEmpty)
@@ -99,7 +105,8 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
                       child: ModernEmptyState(
                         icon: Icons.restaurant_outlined,
                         message: 'No hay entradas para este día',
-                        subtitle: 'Toca el botón + para añadir tu primera comida',
+                        subtitle:
+                            'Toca el botón + para añadir tu primera comida',
                         actionLabel: 'Añadir entrada',
                         onAction: () => _showAddEntrySheet(context, dayId),
                       ),
@@ -125,22 +132,25 @@ class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
           delegate: SliverChildBuilderDelegate((context, index) {
             final entry = entries[index];
             return _EntryCard(
-              entry: entry,
-              onDuplicate:
-                  () => widget.svc.addEntry(
-                    dayId,
-                    IntakeEntry(
-                      id: '',
-                      type: entry.type,
-                      refId: entry.refId,
-                      qty: entry.qty,
-                      unit: entry.unit,
-                      nameSnapshot: entry.nameSnapshot,
-                      macrosSnapshot: entry.macrosSnapshot,
-                    ),
-                  ),
-              onDelete: () => widget.svc.deleteEntry(dayId, index),
-            ).animate().fadeIn(delay: (300 + index * 50).ms).slideX(begin: -0.2, duration: 300.ms);
+                  entry: entry,
+                  onDuplicate:
+                      () => widget.svc.addEntry(
+                        dayId,
+                        IntakeEntry(
+                          id: '',
+                          type: entry.type,
+                          refId: entry.refId,
+                          qty: entry.qty,
+                          unit: entry.unit,
+                          nameSnapshot: entry.nameSnapshot,
+                          macrosSnapshot: entry.macrosSnapshot,
+                        ),
+                      ),
+                  onDelete: () => widget.svc.deleteEntry(dayId, index),
+                )
+                .animate()
+                .fadeIn(delay: (300 + index * 50).ms)
+                .slideX(begin: -0.2, duration: 300.ms);
           }, childCount: entries.length),
         ),
       ),
@@ -193,7 +203,10 @@ class _ModernDaySelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? colorScheme.surface : AppColors.grey100,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: isDark ? Border.all(color: colorScheme.outline.withOpacity(0.2)) : null,
+        border:
+            isDark
+                ? Border.all(color: colorScheme.outline.withOpacity(0.2))
+                : null,
       ),
       child: Column(
         children: [
@@ -202,7 +215,9 @@ class _ModernDaySelector extends StatelessWidget {
               IconButton(
                 onPressed: onPrev,
                 icon: const Icon(Icons.chevron_left),
-                style: IconButton.styleFrom(backgroundColor: colorScheme.surfaceContainerHighest),
+                style: IconButton.styleFrom(
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                ),
               ),
               Expanded(
                 child: Center(
@@ -213,7 +228,8 @@ class _ModernDaySelector extends StatelessWidget {
                         style: AppTypography.heading4(context),
                         textAlign: TextAlign.center,
                       ),
-                      if (isToday) ModernBadge(label: 'HOY', color: colorScheme.primary),
+                      if (isToday)
+                        ModernBadge(label: 'HOY', color: colorScheme.primary),
                     ],
                   ),
                 ),
@@ -221,7 +237,9 @@ class _ModernDaySelector extends StatelessWidget {
               IconButton(
                 onPressed: onNext,
                 icon: const Icon(Icons.chevron_right),
-                style: IconButton.styleFrom(backgroundColor: colorScheme.surfaceContainerHighest),
+                style: IconButton.styleFrom(
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                ),
               ),
             ],
           ),
@@ -241,7 +259,9 @@ class _ModernDaySelector extends StatelessWidget {
 
   bool _isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 }
 
@@ -266,7 +286,9 @@ class _MacrosSummary extends StatelessWidget {
 
           Card(
             elevation: AppSpacing.elevationMd,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            ),
             child: Container(
               decoration: BoxDecoration(
                 gradient: AppColors.foodGradient,
@@ -310,7 +332,9 @@ class _MacrosSummary extends StatelessWidget {
                           ' / ${g['kcal']!.toStringAsFixed(0)}',
                           style: AppTypography.heading3(
                             context,
-                            color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -318,7 +342,9 @@ class _MacrosSummary extends StatelessWidget {
                         ' kcal',
                         style: AppTypography.body(
                           context,
-                          color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -328,7 +354,9 @@ class _MacrosSummary extends StatelessWidget {
                     ModernProgressBar(
                       value: _pct(t['kcal'] ?? 0, g['kcal']),
                       color: Theme.of(context).colorScheme.onPrimary,
-                      backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onPrimary.withOpacity(0.3),
                       height: 8,
                     ),
                 ],
@@ -410,11 +438,16 @@ class _MacroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pct = target != null && target! > 0 ? (value / target!).clamp(0.0, 1.0).toDouble() : 0.0;
+    final pct =
+        target != null && target! > 0
+            ? (value / target!).clamp(0.0, 1.0).toDouble()
+            : 0.0;
 
     return Card(
       elevation: AppSpacing.elevationSm,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
@@ -443,12 +476,16 @@ class _MacroCard extends StatelessWidget {
                   style: AppTypography.heading2(context, color: color),
                 ),
                 if (target != null) ...[
-                  Text('/${target!.toStringAsFixed(0)}', style: AppTypography.body(context)),
+                  Text(
+                    '/${target!.toStringAsFixed(0)}',
+                    style: AppTypography.body(context),
+                  ),
                 ],
                 Text(unit, style: AppTypography.caption(context)),
               ],
             ),
-            if (target != null) ModernProgressBar(value: pct, color: color, height: 4),
+            if (target != null)
+              ModernProgressBar(value: pct, color: color, height: 4),
           ],
         ),
       ),
@@ -461,7 +498,11 @@ class _ModernWaterCard extends StatelessWidget {
   final int waterTarget;
   final Function(int) onAdd;
 
-  const _ModernWaterCard({required this.water, required this.waterTarget, required this.onAdd});
+  const _ModernWaterCard({
+    required this.water,
+    required this.waterTarget,
+    required this.onAdd,
+  });
 
   double _pct() {
     if (waterTarget <= 0) return 0;
@@ -476,7 +517,9 @@ class _ModernWaterCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Card(
         elevation: AppSpacing.elevationMd,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
           child: Column(
@@ -490,31 +533,51 @@ class _ModernWaterCard extends StatelessWidget {
                       color: AppColors.info.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
-                    child: const Icon(Icons.water_drop, color: AppColors.info, size: 24),
+                    child: const Icon(
+                      Icons.water_drop,
+                      color: AppColors.info,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hidratación', style: AppTypography.heading4(context)),
-                        Text('$water / $waterTarget ml', style: AppTypography.body(context)),
+                        Text(
+                          'Hidratación',
+                          style: AppTypography.heading4(context),
+                        ),
+                        Text(
+                          '$water / $waterTarget ml',
+                          style: AppTypography.body(context),
+                        ),
                         if (remaining > 0)
                           Text(
                             'Faltan ${remaining}ml',
-                            style: AppTypography.caption(context, color: AppColors.warning),
+                            style: AppTypography.caption(
+                              context,
+                              color: AppColors.warning,
+                            ),
                           ),
                       ],
                     ),
                   ),
                   Text(
                     '${(_pct() * 100).toStringAsFixed(0)}%',
-                    style: AppTypography.heading3(context, color: AppColors.info),
+                    style: AppTypography.heading3(
+                      context,
+                      color: AppColors.info,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              ModernProgressBar(value: _pct(), color: AppColors.info, height: 8),
+              ModernProgressBar(
+                value: _pct(),
+                color: AppColors.info,
+                height: 8,
+              ),
               const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
@@ -565,7 +628,10 @@ class _ModernWaterCard extends StatelessWidget {
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Text('Añadir agua personalizada', style: AppTypography.heading3(ctx)),
+            title: Text(
+              'Añadir agua personalizada',
+              style: AppTypography.heading3(ctx),
+            ),
             content: ModernTextField(
               label: 'Cantidad (ml)',
               hint: 'Ej: 750',
@@ -574,7 +640,10 @@ class _ModernWaterCard extends StatelessWidget {
               prefixIcon: Icons.water_drop,
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
               ElevatedButton(
                 onPressed: () {
                   final ml = int.tryParse(controller.text);
@@ -596,7 +665,11 @@ class _EntryCard extends StatelessWidget {
   final VoidCallback onDuplicate;
   final VoidCallback onDelete;
 
-  const _EntryCard({required this.entry, required this.onDuplicate, required this.onDelete});
+  const _EntryCard({
+    required this.entry,
+    required this.onDuplicate,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -608,7 +681,9 @@ class _EntryCard extends StatelessWidget {
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         onTap: () {},
@@ -626,7 +701,9 @@ class _EntryCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
                     child: Icon(
-                      entry.type == FavoriteType.food ? Icons.restaurant : Icons.menu_book,
+                      entry.type == FavoriteType.food
+                          ? Icons.restaurant
+                          : Icons.menu_book,
                       color: AppColors.food,
                       size: 20,
                     ),
@@ -636,7 +713,10 @@ class _EntryCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(entry.nameSnapshot, style: AppTypography.heading4(context)),
+                        Text(
+                          entry.nameSnapshot,
+                          style: AppTypography.heading4(context),
+                        ),
                         Text(
                           '${entry.qty.toStringAsFixed(0)} ${entry.unit.name}',
                           style: AppTypography.caption(context),
@@ -654,7 +734,11 @@ class _EntryCard extends StatelessWidget {
                           const PopupMenuItem(
                             value: 'dup',
                             child: Row(
-                              children: [Icon(Icons.copy), SizedBox(width: 8), Text('Duplicar')],
+                              children: [
+                                Icon(Icons.copy),
+                                SizedBox(width: 8),
+                                Text('Duplicar'),
+                              ],
                             ),
                           ),
                           const PopupMenuItem(
@@ -663,7 +747,10 @@ class _EntryCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.delete, color: AppColors.error),
                                 SizedBox(width: 8),
-                                Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                                Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: AppColors.error),
+                                ),
                               ],
                             ),
                           ),
@@ -712,7 +799,11 @@ class _MacroChip extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const _MacroChip({required this.label, required this.icon, required this.color});
+  const _MacroChip({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -763,9 +854,13 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -775,7 +870,10 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                color:
+                    isDark
+                        ? colorScheme.onSurface.withOpacity(0.3)
+                        : AppColors.grey300,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
@@ -786,7 +884,12 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
                 children: [
                   Icon(Icons.add_circle, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Añadir al Diario', style: AppTypography.heading2(context))),
+                  Expanded(
+                    child: Text(
+                      'Añadir al Diario',
+                      style: AppTypography.heading2(context),
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -801,7 +904,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               controller: _tabController,
               labelColor: colorScheme.primary,
               unselectedLabelColor:
-                  isDark ? colorScheme.onSurface.withOpacity(0.6) : AppColors.grey600,
+                  isDark
+                      ? colorScheme.onSurface.withOpacity(0.6)
+                      : AppColors.grey600,
               indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
@@ -835,7 +940,10 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Añade calorías rápidamente', style: AppTypography.body(context)),
+          Text(
+            'Añade calorías rápidamente',
+            style: AppTypography.body(context),
+          ),
           const SizedBox(height: AppSpacing.xl),
 
           ModernTextField(
@@ -903,7 +1011,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           child: _buildQuantityRow(),
         ),
         Expanded(
-          child: _FavList(svc: widget.svc, query: _searchQuery, onPick: (f) => _addFavorite(f)),
+          child: _FavList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (f) => _addFavorite(f),
+          ),
         ),
       ],
     );
@@ -927,7 +1039,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           child: _buildQuantityRow(),
         ),
         Expanded(
-          child: _FoodList(svc: widget.svc, query: _searchQuery, onPick: (f) => _addFood(f)),
+          child: _FoodList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (f) => _addFood(f),
+          ),
         ),
       ],
     );
@@ -951,7 +1067,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           child: _buildQuantityRow(isRecipe: true),
         ),
         Expanded(
-          child: _RecipeList(svc: widget.svc, query: _searchQuery, onPick: (r) => _addRecipe(r)),
+          child: _RecipeList(
+            svc: widget.svc,
+            query: _searchQuery,
+            onPick: (r) => _addRecipe(r),
+          ),
         ),
       ],
     );
@@ -995,14 +1115,17 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
   }
 
   Future<void> _addQuickEntry() async {
-    final name = _nameController.text.trim().isEmpty ? 'Quick add' : _nameController.text.trim();
+    final name =
+        _nameController.text.trim().isEmpty
+            ? 'Quick add'
+            : _nameController.text.trim();
     final kcal = double.tryParse(_kcalController.text) ?? 0;
     final protein = double.tryParse(_proteinController.text) ?? 0;
 
     if (kcal <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Las calorías son requeridas')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Las calorías son requeridas')),
+      );
       return;
     }
 
@@ -1069,7 +1192,13 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
       final recs = await widget.svc.streamRecipes().first;
       final r = recs.firstWhere(
         (x) => x.id == f.refId,
-        orElse: () => Recipe(id: f.refId, name: 'Receta', servings: 1, ingredients: const []),
+        orElse:
+            () => Recipe(
+              id: f.refId,
+              name: 'Receta',
+              servings: 1,
+              ingredients: const [],
+            ),
       );
       final perServing = _calculatePerServing(r);
       final mac = perServing.map((k, v) => MapEntry(k, v * qty));
@@ -1171,9 +1300,13 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -1187,7 +1320,10 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                    color:
+                        isDark
+                            ? colorScheme.onSurface.withOpacity(0.3)
+                            : AppColors.grey300,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                 ),
@@ -1198,7 +1334,10 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                   Icon(Icons.flag, color: colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Text('Objetivos Nutricionales', style: AppTypography.heading2(context)),
+                    child: Text(
+                      'Objetivos Nutricionales',
+                      style: AppTypography.heading2(context),
+                    ),
                   ),
                 ],
               ),
@@ -1287,19 +1426,37 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
   Future<void> _saveGoals() async {
     await widget.svc.setGlobalTargets(
-      kcal: _kcalController.text.isNotEmpty ? double.tryParse(_kcalController.text) : null,
-      protein: _proteinController.text.isNotEmpty ? double.tryParse(_proteinController.text) : null,
-      carbs: _carbsController.text.isNotEmpty ? double.tryParse(_carbsController.text) : null,
-      fat: _fatController.text.isNotEmpty ? double.tryParse(_fatController.text) : null,
-      fiber: _fiberController.text.isNotEmpty ? double.tryParse(_fiberController.text) : null,
-      waterMl: _waterController.text.isNotEmpty ? int.tryParse(_waterController.text) : null,
+      kcal:
+          _kcalController.text.isNotEmpty
+              ? double.tryParse(_kcalController.text)
+              : null,
+      protein:
+          _proteinController.text.isNotEmpty
+              ? double.tryParse(_proteinController.text)
+              : null,
+      carbs:
+          _carbsController.text.isNotEmpty
+              ? double.tryParse(_carbsController.text)
+              : null,
+      fat:
+          _fatController.text.isNotEmpty
+              ? double.tryParse(_fatController.text)
+              : null,
+      fiber:
+          _fiberController.text.isNotEmpty
+              ? double.tryParse(_fiberController.text)
+              : null,
+      waterMl:
+          _waterController.text.isNotEmpty
+              ? int.tryParse(_waterController.text)
+              : null,
     );
 
     if (mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Objetivos guardados correctamente')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Objetivos guardados correctamente')),
+      );
     }
   }
 }
@@ -1309,7 +1466,11 @@ class _FavList extends StatelessWidget {
   final String query;
   final ValueChanged<Favorite> onPick;
 
-  const _FavList({required this.svc, required this.query, required this.onPick});
+  const _FavList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1323,14 +1484,18 @@ class _FavList extends StatelessWidget {
         var list = snap.data!;
         if (query.trim().isNotEmpty) {
           final ql = query.toLowerCase();
-          list = list.where((f) => (f.alias ?? '').toLowerCase().contains(ql)).toList();
+          list =
+              list
+                  .where((f) => (f.alias ?? '').toLowerCase().contains(ql))
+                  .toList();
         }
 
         if (list.isEmpty) {
           return ModernEmptyState(
             icon: Icons.star_border,
             message: 'No hay favoritos',
-            subtitle: 'Marca alimentos o recetas como favoritos para verlos aquí',
+            subtitle:
+                'Marca alimentos o recetas como favoritos para verlos aquí',
           );
         }
 
@@ -1341,8 +1506,12 @@ class _FavList extends StatelessWidget {
             final f = list[i];
             return ModernListCard(
               title: f.alias ?? '${f.type.name} • ${f.refId}',
-              subtitle: 'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
-              leadingIcon: f.type == FavoriteType.food ? Icons.restaurant : Icons.menu_book,
+              subtitle:
+                  'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
+              leadingIcon:
+                  f.type == FavoriteType.food
+                      ? Icons.restaurant
+                      : Icons.menu_book,
               leadingColor: AppColors.food,
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => onPick(f),
@@ -1359,7 +1528,11 @@ class _FoodList extends StatelessWidget {
   final String query;
   final ValueChanged<Food> onPick;
 
-  const _FoodList({required this.svc, required this.query, required this.onPick});
+  const _FoodList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1409,7 +1582,11 @@ class _RecipeList extends StatelessWidget {
   final String query;
   final ValueChanged<Recipe> onPick;
 
-  const _RecipeList({required this.svc, required this.query, required this.onPick});
+  const _RecipeList({
+    required this.svc,
+    required this.query,
+    required this.onPick,
+  });
 
   @override
   Widget build(BuildContext context) {

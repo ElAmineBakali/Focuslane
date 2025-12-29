@@ -6,7 +6,7 @@ import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../session/session_summary_screen.dart';
 
- class SessionHistoryScreen extends StatefulWidget {
+class SessionHistoryScreen extends StatefulWidget {
   final GymFirestoreService svc;
 
   const SessionHistoryScreen({super.key, required this.svc});
@@ -27,7 +27,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-                     SliverAppBar.large(
+          SliverAppBar.large(
             pinned: true,
             expandedHeight: 160,
             backgroundColor: colorScheme.primaryContainer,
@@ -58,13 +58,14 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
             ),
           ),
 
-                     SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                                     TextField(
-                    onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                  TextField(
+                    onChanged:
+                        (v) => setState(() => _searchQuery = v.toLowerCase()),
                     decoration: InputDecoration(
                       hintText: 'Buscar por nombre de rutina o día...',
                       prefixIcon: const Icon(Icons.search_rounded),
@@ -82,7 +83,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
             ),
           ),
 
-                     StreamBuilder<List<SessionDoc>>(
+          StreamBuilder<List<SessionDoc>>(
             stream: widget.svc.streamSessions(
               limit: 200,
               routineId: _selectedRoutineFilter,
@@ -96,11 +97,14 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
 
               var sessions = snap.data!;
 
-                             if (_searchQuery.isNotEmpty) {
-                sessions = sessions.where((s) {
-                  return s.routineName.toLowerCase().contains(_searchQuery) ||
-                      s.dayName.toLowerCase().contains(_searchQuery);
-                }).toList();
+              if (_searchQuery.isNotEmpty) {
+                sessions =
+                    sessions.where((s) {
+                      return s.routineName.toLowerCase().contains(
+                            _searchQuery,
+                          ) ||
+                          s.dayName.toLowerCase().contains(_searchQuery);
+                    }).toList();
               }
 
               if (sessions.isEmpty) {
@@ -128,45 +132,42 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                 );
               }
 
-                             final byMonth = <String, List<SessionDoc>>{};
+              final byMonth = <String, List<SessionDoc>>{};
               for (final s in sessions) {
                 final key = DateFormat('MMMM yyyy', 'es').format(s.date);
                 byMonth.putIfAbsent(key, () => []).add(s);
               }
 
               return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final entries = byMonth.entries.toList();
-                    final monthKey = entries[index].key;
-                    final monthSessions = entries[index].value;
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final entries = byMonth.entries.toList();
+                  final monthKey = entries[index].key;
+                  final monthSessions = entries[index].value;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                                                 Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                          child: Text(
-                            monthKey.toUpperCase(),
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: colorScheme.primary,
-                              letterSpacing: 0.5,
-                            ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          monthKey.toUpperCase(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.primary,
+                            letterSpacing: 0.5,
                           ),
                         ),
+                      ),
 
-                                                 ...monthSessions.map((s) {
-                          return _buildSessionCard(s, colorScheme);
-                        }),
+                      ...monthSessions.map((s) {
+                        return _buildSessionCard(s, colorScheme);
+                      }),
 
-                        const SizedBox(height: 8),
-                      ],
-                    ).animate().fadeIn(delay: (50 * index).ms);
-                  },
-                  childCount: byMonth.length,
-                ),
+                      const SizedBox(height: 8),
+                    ],
+                  ).animate().fadeIn(delay: (50 * index).ms);
+                }, childCount: byMonth.length),
               );
             },
           ),
@@ -187,10 +188,9 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SessionSummaryScreen(
-                session: session,
-                svc: widget.svc,
-              ),
+              builder:
+                  (_) =>
+                      SessionSummaryScreen(session: session, svc: widget.svc),
             ),
           );
         },
@@ -200,7 +200,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                             Row(
+              Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -271,7 +271,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
 
               const SizedBox(height: 12),
 
-                             Row(
+              Row(
                 children: [
                   _buildStatChip(
                     Icons.calendar_today_rounded,
@@ -293,7 +293,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                 ],
               ),
 
-                             if (session.feelingEnergy != null ||
+              if (session.feelingEnergy != null ||
                   session.feelingFatigue != null ||
                   session.feelingMotivation != null) ...[
                 const SizedBox(height: 12),

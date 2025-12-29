@@ -9,7 +9,7 @@ class AppColors {
   static const Color meditation = Color(0xFF9C27B0);
   static const Color habits = Color(0xFFFF9800);
   static const Color goals = Color(0xFFE91E63);
-  
+
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFFB020);
   static const Color error = Color(0xFFF44336);
@@ -24,11 +24,11 @@ class AppColors {
   static const Color grey700 = Color(0xFF616161);
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
-  
+
   static const Color textPrimary = grey900;
   static const Color textSecondary = grey600;
   static const Color borderLight = grey300;
-  
+
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color darkCard = Color(0xFF2C2C2C);
@@ -37,31 +37,31 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static LinearGradient gymGradient = LinearGradient(
     colors: [gym, Color(0xFF8B7FFF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static LinearGradient studyGradient = LinearGradient(
     colors: [study, Color(0xFF66BB6A)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static LinearGradient successGradient = LinearGradient(
     colors: [success, Color(0xFF66BB6A)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static LinearGradient warningGradient = LinearGradient(
     colors: [warning, Color(0xFFFFC947)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static LinearGradient errorGradient = LinearGradient(
     colors: [error, Color(0xFFEF5350)],
     begin: Alignment.topLeft,
@@ -79,7 +79,7 @@ class AppTypography {
       height: 1.2,
     );
   }
-  
+
   static TextStyle heading2(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -89,7 +89,7 @@ class AppTypography {
       height: 1.3,
     );
   }
-  
+
   static TextStyle heading3(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -99,7 +99,7 @@ class AppTypography {
       height: 1.4,
     );
   }
-  
+
   static TextStyle heading4(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -109,7 +109,7 @@ class AppTypography {
       height: 1.5,
     );
   }
-  
+
   static TextStyle body(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -119,7 +119,7 @@ class AppTypography {
       height: 1.5,
     );
   }
-  
+
   static TextStyle bodySmall(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -129,7 +129,7 @@ class AppTypography {
       height: 1.4,
     );
   }
-  
+
   static TextStyle caption(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -139,7 +139,7 @@ class AppTypography {
       height: 1.3,
     );
   }
-  
+
   static TextStyle label(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
@@ -149,7 +149,7 @@ class AppTypography {
       height: 1.4,
     );
   }
-  
+
   static TextStyle button(BuildContext context, {Color? color}) {
     return GoogleFonts.poppins(
       fontSize: 14,
@@ -160,7 +160,6 @@ class AppTypography {
   }
 }
 
- 
 class AppSpacing {
   static const double xs = 4;
   static const double sm = 8;
@@ -169,7 +168,7 @@ class AppSpacing {
   static const double xl = 24;
   static const double xxl = 32;
   static const double xxxl = 48;
-  
+
   static const double radiusXs = 4;
   static const double radiusSm = 8;
   static const double radiusMd = 12;
@@ -183,7 +182,8 @@ class AppSpacing {
   static const double elevationXl = 12;
 }
 
-class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
+class ModernGradientAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   final String title;
   final IconData? icon;
   final Color? primaryColor;
@@ -191,7 +191,7 @@ class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidge
   final List<Widget>? actions;
   final bool centerTitle;
   final bool useThemeColors;
-  
+
   const ModernGradientAppBar({
     super.key,
     required this.title,
@@ -202,16 +202,22 @@ class ModernGradientAppBar extends StatelessWidget implements PreferredSizeWidge
     this.centerTitle = false,
     this.useThemeColors = true,
   });
-  
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-  
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final primary = useThemeColors ? colorScheme.primaryContainer : (primaryColor ?? colorScheme.primaryContainer);
-    final secondary = useThemeColors ? colorScheme.secondaryContainer : (secondaryColor ?? colorScheme.secondaryContainer);
-    
+    final primary =
+        useThemeColors
+            ? colorScheme.primaryContainer
+            : (primaryColor ?? colorScheme.primaryContainer);
+    final secondary =
+        useThemeColors
+            ? colorScheme.secondaryContainer
+            : (secondaryColor ?? colorScheme.secondaryContainer);
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -250,7 +256,7 @@ class ModernActionCard extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   final Duration animationDelay;
-  
+
   const ModernActionCard({
     super.key,
     required this.title,
@@ -259,7 +265,7 @@ class ModernActionCard extends StatelessWidget {
     required this.onTap,
     this.animationDelay = Duration.zero,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -305,7 +311,7 @@ class ModernStatCard extends StatelessWidget {
   final String? unit;
   final Color color;
   final IconData? icon;
-  
+
   const ModernStatCard({
     super.key,
     required this.label,
@@ -314,7 +320,7 @@ class ModernStatCard extends StatelessWidget {
     required this.color,
     this.icon,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -327,13 +333,9 @@ class ModernStatCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (icon != null)
-              Icon(icon, color: color, size: 24),
+            if (icon != null) Icon(icon, color: color, size: 24),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              label,
-              style: AppTypography.caption(context),
-            ),
+            Text(label, style: AppTypography.caption(context)),
             const SizedBox(height: AppSpacing.xs),
             Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -345,10 +347,7 @@ class ModernStatCard extends StatelessWidget {
                 ),
                 if (unit != null) ...[
                   const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    unit!,
-                    style: AppTypography.body(context, color: color),
-                  ),
+                  Text(unit!, style: AppTypography.body(context, color: color)),
                 ],
               ],
             ),
@@ -365,7 +364,7 @@ class ModernEmptyState extends StatelessWidget {
   final String? subtitle;
   final String? actionLabel;
   final VoidCallback? onAction;
-  
+
   const ModernEmptyState({
     super.key,
     required this.icon,
@@ -374,7 +373,7 @@ class ModernEmptyState extends StatelessWidget {
     this.actionLabel,
     this.onAction,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -389,11 +388,7 @@ class ModernEmptyState extends StatelessWidget {
                 color: AppColors.grey100,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 64,
-                color: AppColors.grey400,
-              ),
+              child: Icon(icon, size: 64, color: AppColors.grey400),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
@@ -440,7 +435,7 @@ class ModernPrimaryButton extends StatelessWidget {
   final Color? color;
   final bool isLoading;
   final bool fullWidth;
-  
+
   const ModernPrimaryButton({
     super.key,
     required this.label,
@@ -450,7 +445,7 @@ class ModernPrimaryButton extends StatelessWidget {
     this.isLoading = false,
     this.fullWidth = false,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     Widget button = ElevatedButton(
@@ -467,37 +462,32 @@ class ModernPrimaryButton extends StatelessWidget {
         ),
         elevation: AppSpacing.elevationSm,
       ),
-      child: isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Colors.white),
-              ),
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 20),
-                  const SizedBox(width: AppSpacing.sm),
-                ],
-                Text(
-                  label,
-                  style: AppTypography.button(context),
+      child:
+          isLoading
+              ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
                 ),
-              ],
-            ),
+              )
+              : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 20),
+                    const SizedBox(width: AppSpacing.sm),
+                  ],
+                  Text(label, style: AppTypography.button(context)),
+                ],
+              ),
     );
-    
+
     if (fullWidth) {
-      return SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      return SizedBox(width: double.infinity, child: button);
     }
-    
+
     return button;
   }
 }
@@ -513,7 +503,7 @@ class ModernTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final void Function(String)? onChanged;
-  
+
   const ModernTextField({
     super.key,
     required this.label,
@@ -527,7 +517,7 @@ class ModernTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -572,14 +562,14 @@ class ModernBadge extends StatelessWidget {
   final String label;
   final Color color;
   final Color? textColor;
-  
+
   const ModernBadge({
     super.key,
     required this.label,
     required this.color,
     this.textColor,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -590,9 +580,7 @@ class ModernBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-        ),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Text(
         label,
@@ -608,7 +596,7 @@ class ModernChip extends StatelessWidget {
   final Color? color;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
-  
+
   const ModernChip({
     super.key,
     required this.label,
@@ -617,7 +605,7 @@ class ModernChip extends StatelessWidget {
     this.onTap,
     this.onDelete,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -676,7 +664,7 @@ class ModernListCard extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
-  
+
   const ModernListCard({
     super.key,
     required this.title,
@@ -687,7 +675,7 @@ class ModernListCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -698,29 +686,25 @@ class ModernListCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         onLongPress: onLongPress,
-        leading: leadingIcon != null
-            ? Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: (leadingColor ?? AppColors.grey400).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                ),
-                child: Icon(
-                  leadingIcon,
-                  color: leadingColor ?? AppColors.grey400,
-                ),
-              )
-            : null,
-        title: Text(
-          title,
-          style: AppTypography.heading4(context),
-        ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle!,
-                style: AppTypography.body(context),
-              )
-            : null,
+        leading:
+            leadingIcon != null
+                ? Container(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: (leadingColor ?? AppColors.grey400).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  ),
+                  child: Icon(
+                    leadingIcon,
+                    color: leadingColor ?? AppColors.grey400,
+                  ),
+                )
+                : null,
+        title: Text(title, style: AppTypography.heading4(context)),
+        subtitle:
+            subtitle != null
+                ? Text(subtitle!, style: AppTypography.body(context))
+                : null,
         trailing: trailing,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -735,7 +719,7 @@ class ModernProgressBar extends StatelessWidget {
   final Color color;
   final Color? backgroundColor;
   final double height;
-  
+
   const ModernProgressBar({
     super.key,
     required this.value,
@@ -743,7 +727,7 @@ class ModernProgressBar extends StatelessWidget {
     this.backgroundColor,
     this.height = 6,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(

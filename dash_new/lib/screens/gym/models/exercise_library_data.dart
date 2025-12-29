@@ -1,10 +1,8 @@
- 
 class ExerciseLibraryItem {
   final String id;
   final String name;
-  final String
-  category;    final String
-  muscleGroup;  
+  final String category;
+  final String muscleGroup;
   const ExerciseLibraryItem({
     required this.id,
     required this.name,
@@ -13,8 +11,8 @@ class ExerciseLibraryItem {
   });
 }
 
- const List<ExerciseLibraryItem> kExerciseLibrary = [
-     ExerciseLibraryItem(
+const List<ExerciseLibraryItem> kExerciseLibrary = [
+  ExerciseLibraryItem(
     id: 'bench_bar',
     name: 'Press banca (barra)',
     category: 'Barra',
@@ -69,7 +67,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Pecho',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'deadlift',
     name: 'Peso muerto',
     category: 'Barra',
@@ -124,7 +122,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Espalda',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'ohp',
     name: 'Press militar (barra)',
     category: 'Barra',
@@ -167,7 +165,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Hombros',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'curl_bar',
     name: 'Curl de bíceps (barra)',
     category: 'Barra',
@@ -204,7 +202,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Bíceps',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'close_grip',
     name: 'Press cerrado',
     category: 'Barra',
@@ -241,7 +239,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Tríceps',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'squat',
     name: 'Sentadilla (barra)',
     category: 'Barra',
@@ -320,7 +318,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Piernas',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'crunch',
     name: 'Crunch',
     category: 'Peso libre',
@@ -351,7 +349,7 @@ class ExerciseLibraryItem {
     muscleGroup: 'Core',
   ),
 
-     ExerciseLibraryItem(
+  ExerciseLibraryItem(
     id: 'farmer_walk',
     name: 'Farmer walk',
     category: 'Mancuernas',

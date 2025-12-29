@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
 
-  class ExerciseProgressScreen extends StatefulWidget {
+class ExerciseProgressScreen extends StatefulWidget {
   final GymFirestoreService svc;
   final String exerciseName;
   final String? exerciseId;
@@ -25,11 +25,11 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoading = true;
-  
+
   List<({DateTime date, double e1rm})> _e1rmHistory = [];
   List<({DateTime date, double volume})> _volumeHistory = [];
   List<({DateTime date, double weight, int reps, double e1rm})> _prs = [];
-  
+
   @override
   void initState() {
     super.initState();
@@ -45,17 +45,19 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     final results = await Future.wait([
       widget.svc.getExerciseE1rmHistory(widget.exerciseName, lookback: 90),
       widget.svc.getExerciseVolumeHistory(widget.exerciseName, lookback: 90),
       widget.svc.getExercisePRs(widget.exerciseName, limit: 5),
     ]);
-    
+
     setState(() {
       _e1rmHistory = results[0] as List<({DateTime date, double e1rm})>;
       _volumeHistory = results[1] as List<({DateTime date, double volume})>;
-      _prs = results[2] as List<({DateTime date, double weight, int reps, double e1rm})>;
+      _prs =
+          results[2]
+              as List<({DateTime date, double weight, int reps, double e1rm})>;
       _isLoading = false;
     });
   }
@@ -64,11 +66,11 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-                     SliverAppBar.large(
+          SliverAppBar.large(
             expandedHeight: 160,
             pinned: true,
             stretch: true,
@@ -111,17 +113,18 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             ),
           ),
 
-                     SliverFillRemaining(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildE1rmTab(),
-                      _buildVolumeTab(),
-                      _buildPRsTab(),
-                    ],
-                  ),
+          SliverFillRemaining(
+            child:
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildE1rmTab(),
+                        _buildVolumeTab(),
+                        _buildPRsTab(),
+                      ],
+                    ),
           ),
         ],
       ),
@@ -133,29 +136,48 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
       return _buildEmptyState('No hay datos de e1RM todavía');
     }
 
-    final maxE1rm = _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a > b ? a : b);
-    final minE1rm = _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a < b ? a : b);
-    final avgE1rm = _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a + b) / _e1rmHistory.length;
+    final maxE1rm = _e1rmHistory
+        .map((e) => e.e1rm)
+        .reduce((a, b) => a > b ? a : b);
+    final avgE1rm =
+        _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a + b) /
+        _e1rmHistory.length;
     final latestE1rm = _e1rmHistory.last.e1rm;
-    final improvement = _e1rmHistory.length > 1 
-        ? ((latestE1rm - _e1rmHistory.first.e1rm) / _e1rmHistory.first.e1rm * 100)
-        : 0.0;
+    final improvement =
+        _e1rmHistory.length > 1
+            ? ((latestE1rm - _e1rmHistory.first.e1rm) /
+                _e1rmHistory.first.e1rm *
+                100)
+            : 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-                     _buildKpiRow([
-            ('Actual', '${latestE1rm.toStringAsFixed(1)} kg', Icons.fitness_center, Colors.blue),
-            ('Máximo', '${maxE1rm.toStringAsFixed(1)} kg', Icons.trending_up, Colors.green),
-            ('Mejora', '${improvement >= 0 ? '+' : ''}${improvement.toStringAsFixed(1)}%', 
-              improvement >= 0 ? Icons.arrow_upward : Icons.arrow_downward, 
-              improvement >= 0 ? Colors.green : Colors.red),
+          _buildKpiRow([
+            (
+              'Actual',
+              '${latestE1rm.toStringAsFixed(1)} kg',
+              Icons.fitness_center,
+              Colors.blue,
+            ),
+            (
+              'Máximo',
+              '${maxE1rm.toStringAsFixed(1)} kg',
+              Icons.trending_up,
+              Colors.green,
+            ),
+            (
+              'Mejora',
+              '${improvement >= 0 ? '+' : ''}${improvement.toStringAsFixed(1)}%',
+              improvement >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+              improvement >= 0 ? Colors.green : Colors.red,
+            ),
           ]),
           const SizedBox(height: 24),
-          
-                     Text(
+
+          Text(
             'Evolución e1RM',
             style: GoogleFonts.poppins(
               fontSize: 18,
@@ -167,10 +189,10 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             height: 280,
             child: _buildE1rmChart(),
           ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
-          
+
           const SizedBox(height: 24),
-          
-                     _buildStatCard(
+
+          _buildStatCard(
             'Promedio General',
             '${avgE1rm.toStringAsFixed(1)} kg',
             Icons.analytics_outlined,
@@ -186,23 +208,42 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
       return _buildEmptyState('No hay datos de volumen todavía');
     }
 
-    final totalVolume = _volumeHistory.map((e) => e.volume).reduce((a, b) => a + b);
+    final totalVolume = _volumeHistory
+        .map((e) => e.volume)
+        .reduce((a, b) => a + b);
     final avgVolume = totalVolume / _volumeHistory.length;
-    final maxVolume = _volumeHistory.map((e) => e.volume).reduce((a, b) => a > b ? a : b);
+    final maxVolume = _volumeHistory
+        .map((e) => e.volume)
+        .reduce((a, b) => a > b ? a : b);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-                     _buildKpiRow([
-            ('Total', '${(totalVolume / 1000).toStringAsFixed(1)} ton', Icons.scale, Colors.orange),
-            ('Promedio', '${avgVolume.toStringAsFixed(0)} kg', Icons.analytics, Colors.blue),
-            ('Máximo', '${maxVolume.toStringAsFixed(0)} kg', Icons.trending_up, Colors.green),
+          _buildKpiRow([
+            (
+              'Total',
+              '${(totalVolume / 1000).toStringAsFixed(1)} ton',
+              Icons.scale,
+              Colors.orange,
+            ),
+            (
+              'Promedio',
+              '${avgVolume.toStringAsFixed(0)} kg',
+              Icons.analytics,
+              Colors.blue,
+            ),
+            (
+              'Máximo',
+              '${maxVolume.toStringAsFixed(0)} kg',
+              Icons.trending_up,
+              Colors.green,
+            ),
           ]),
           const SizedBox(height: 24),
-          
-                     Text(
+
+          Text(
             'Volumen por Sesión',
             style: GoogleFonts.poppins(
               fontSize: 18,
@@ -240,10 +281,10 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             ).animate().fadeIn().slideX(begin: -0.2, end: 0),
           );
         }
-        
+
         final pr = _prs[index - 1];
         final rank = index;
-        
+
         return _buildPRCard(pr, rank)
             .animate(delay: (100 * index).ms)
             .fadeIn(duration: 400.ms)
@@ -254,15 +295,18 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildKpiRow(List<(String, String, IconData, Color)> kpis) {
     return Row(
-      children: kpis.asMap().entries.map((entry) {
-        final (label, value, icon, color) = entry.value;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: entry.key < kpis.length - 1 ? 8 : 0),
-            child: _buildKpiCard(label, value, icon, color),
-          ),
-        );
-      }).toList(),
+      children:
+          kpis.asMap().entries.map((entry) {
+            final (label, value, icon, color) = entry.value;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: entry.key < kpis.length - 1 ? 8 : 0,
+                ),
+                child: _buildKpiCard(label, value, icon, color),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -292,17 +336,19 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           ),
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600]),
           ),
         ],
       ),
     ).animate().scale(delay: 100.ms, duration: 400.ms);
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -354,14 +400,15 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
     ({DateTime date, double weight, int reps, double e1rm}) pr,
     int rank,
   ) {
-    Color rankColor = rank == 1
-        ? Colors.amber
-        : rank == 2
+    Color rankColor =
+        rank == 1
+            ? Colors.amber
+            : rank == 2
             ? Colors.grey[400]!
             : rank == 3
-                ? Colors.brown[300]!
-                : Colors.blue;
-    
+            ? Colors.brown[300]!
+            : Colors.blue;
+
     IconData rankIcon = rank <= 3 ? Icons.emoji_events : Icons.military_tech;
 
     return Card(
@@ -372,17 +419,18 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: rank <= 3
-              ? LinearGradient(
-                  colors: [rankColor.withOpacity(0.1), Colors.transparent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          gradient:
+              rank <= 3
+                  ? LinearGradient(
+                    colors: [rankColor.withOpacity(0.1), Colors.transparent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
         ),
         child: Row(
           children: [
-                         Container(
+            Container(
               width: 56,
               height: 56,
               decoration: BoxDecoration(
@@ -405,8 +453,8 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               ),
             ),
             const SizedBox(width: 16),
-            
-                         Expanded(
+
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -454,13 +502,16 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildE1rmChart() {
     if (_e1rmHistory.isEmpty) return const SizedBox();
-    
-    final spots = _e1rmHistory.asMap().entries.map((e) {
-      return FlSpot(e.key.toDouble(), e.value.e1rm);
-    }).toList();
 
-    final maxY = _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a > b ? a : b) * 1.1;
-    final minY = _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a < b ? a : b) * 0.9;
+    final spots =
+        _e1rmHistory.asMap().entries.map((e) {
+          return FlSpot(e.key.toDouble(), e.value.e1rm);
+        }).toList();
+
+    final maxY =
+        _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a > b ? a : b) * 1.1;
+    final minY =
+        _e1rmHistory.map((e) => e.e1rm).reduce((a, b) => a < b ? a : b) * 0.9;
 
     return LineChart(
       LineChartData(
@@ -469,16 +520,17 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           drawVerticalLine: false,
           horizontalInterval: (maxY - minY) / 5,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: Colors.grey.withOpacity(0.2),
-              strokeWidth: 1,
-            );
+            return FlLine(color: Colors.grey.withOpacity(0.2), strokeWidth: 1);
           },
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -486,13 +538,17 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               interval: (_e1rmHistory.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= _e1rmHistory.length) return const SizedBox();
+                if (index < 0 || index >= _e1rmHistory.length)
+                  return const SizedBox();
                 final date = _e1rmHistory[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     DateFormat('d/M').format(date),
-                    style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 );
               },
@@ -506,7 +562,10 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               getTitlesWidget: (value, meta) {
                 return Text(
                   value.toStringAsFixed(0),
-                  style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600]),
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
                 );
               },
             ),
@@ -552,27 +611,32 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildVolumeChart() {
     if (_volumeHistory.isEmpty) return const SizedBox();
-    
-    final barGroups = _volumeHistory.asMap().entries.map((e) {
-      return BarChartGroupData(
-        x: e.key,
-        barRods: [
-          BarChartRodData(
-            toY: e.value.volume,
-            color: Colors.orange,
-            width: 16,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-            gradient: LinearGradient(
-              colors: [Colors.orange, Colors.deepOrange],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
-        ],
-      );
-    }).toList();
 
-    final maxY = _volumeHistory.map((e) => e.volume).reduce((a, b) => a > b ? a : b) * 1.1;
+    final barGroups =
+        _volumeHistory.asMap().entries.map((e) {
+          return BarChartGroupData(
+            x: e.key,
+            barRods: [
+              BarChartRodData(
+                toY: e.value.volume,
+                color: Colors.orange,
+                width: 16,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
+                gradient: LinearGradient(
+                  colors: [Colors.orange, Colors.deepOrange],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
+              ),
+            ],
+          );
+        }).toList();
+
+    final maxY =
+        _volumeHistory.map((e) => e.volume).reduce((a, b) => a > b ? a : b) *
+        1.1;
 
     return BarChart(
       BarChartData(
@@ -585,8 +649,12 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -594,13 +662,17 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               interval: (_volumeHistory.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= _volumeHistory.length) return const SizedBox();
+                if (index < 0 || index >= _volumeHistory.length)
+                  return const SizedBox();
                 final date = _volumeHistory[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     DateFormat('d/M').format(date),
-                    style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 );
               },
@@ -614,7 +686,10 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               getTitlesWidget: (value, meta) {
                 return Text(
                   value.toStringAsFixed(0),
-                  style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600]),
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
                 );
               },
             ),
@@ -644,14 +719,15 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.fitness_center_outlined, size: 80, color: Colors.grey[300]),
+          Icon(
+            Icons.fitness_center_outlined,
+            size: 80,
+            color: Colors.grey[300],
+          ),
           const SizedBox(height: 16),
           Text(
             message,
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],

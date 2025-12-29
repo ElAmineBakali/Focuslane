@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 
- class ReminderManager extends StatefulWidget {
+class ReminderManager extends StatefulWidget {
   final List<HabitReminder> reminders;
   final Function(List<HabitReminder>) onRemindersChanged;
 
@@ -92,7 +92,7 @@ class _ReminderManagerState extends State<ReminderManager> {
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
         child: Column(
           children: [
-                         Container(
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
@@ -130,7 +130,7 @@ class _ReminderManagerState extends State<ReminderManager> {
               ),
             ),
 
-                         Expanded(
+            Expanded(
               child:
                   _reminders.isEmpty
                       ? Center(
@@ -251,7 +251,7 @@ class _ReminderManagerState extends State<ReminderManager> {
                       ),
             ),
 
-                         Container(
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,

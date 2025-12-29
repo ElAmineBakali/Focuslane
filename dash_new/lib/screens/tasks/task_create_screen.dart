@@ -23,12 +23,12 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
   DateTime? _dueDate;
   TimeOfDay? _dueTime;
 
-     bool _isPinned = false;
+  bool _isPinned = false;
   RepeatRule _repeatRule = RepeatRule.none;
   final bool _isCalendarVisible = true;
   final List<Subtask> _subtasks = [];
 
-     bool _enableReminder = false;
+  bool _enableReminder = false;
   DateTime? _remindDate;
   TimeOfDay? _remindTime;
 
@@ -65,7 +65,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
   void _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
 
-         if (_enableReminder && _titleController.text.trim().isEmpty) {
+    if (_enableReminder && _titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('El recordatorio requiere un título')),
       );
@@ -82,7 +82,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
             ? _combine(_remindDate!, _remindTime)
             : null;
 
-         final tags =
+    final tags =
         _tagsController.text
             .split(',')
             .map((t) => t.trim())
@@ -110,7 +110,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
 
     final newId = await TaskFirestoreService.addTask(task);
 
-         if (newId != null) {
+    if (newId != null) {
       final taskWithId = task.copyWith(id: newId);
       try {
         await ReminderService.I.scheduleTaskReminder(
@@ -193,7 +193,8 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                       'Esta opción afectará al módulo Calendario próximamente',
                   child: SwitchListTile(
                     value: _isCalendarVisible,
-                    onChanged: null,                      title: const Text('Mostrar en calendario'),
+                    onChanged: null,
+                    title: const Text('Mostrar en calendario'),
                   ),
                 ),
 

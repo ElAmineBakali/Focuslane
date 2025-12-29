@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 
- class TemplateSelector extends StatelessWidget {
+class TemplateSelector extends StatelessWidget {
   final Function(HabitTemplate) onSelect;
 
   const TemplateSelector({super.key, required this.onSelect});
@@ -17,7 +17,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
         child: Column(
           children: [
-                         Container(
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
@@ -55,7 +55,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
               ),
             ),
 
-                         Expanded(
+            Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: HabitTemplates.templates.length,
@@ -80,7 +80,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
                         padding: EdgeInsets.all(isMobile ? 14 : 16),
                         child: Row(
                           children: [
-                                                         Container(
+                            Container(
                               width: isMobile ? 50 : 56,
                               height: isMobile ? 50 : 56,
                               decoration: BoxDecoration(
@@ -110,7 +110,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 
                             const SizedBox(width: 16),
 
-                                                         Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -171,7 +171,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
                               ),
                             ),
 
-                                                         Icon(
+                            Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: isMobile ? 16 : 18,
                               color: cs.onSurfaceVariant,

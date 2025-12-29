@@ -23,18 +23,23 @@ class GradesScreen extends StatelessWidget {
       body: StreamBuilder<List<GradeEntry>>(
         stream: svc.streamGrades(courseId: courseId),
         builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snap.hasData)
+            return const Center(child: CircularProgressIndicator());
           final grades = snap.data!;
           final avg =
               grades.isEmpty
                   ? 0.0
-                  : (grades.map((g) => g.grade).reduce((a, b) => a + b) / grades.length);
+                  : (grades.map((g) => g.grade).reduce((a, b) => a + b) /
+                      grades.length);
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.star_rate_rounded, color: Colors.amber),
+                  leading: const Icon(
+                    Icons.star_rate_rounded,
+                    color: Colors.amber,
+                  ),
                   title: const Text('Promedio'),
                   subtitle: Text(avg.toStringAsFixed(2)),
                 ),
@@ -45,7 +50,9 @@ class GradesScreen extends StatelessWidget {
                   child: ListTile(
                     leading: const Icon(Icons.assignment_turned_in),
                     title: Text('Tarea: ${g.taskId}'),
-                    subtitle: Text('Nota: ${g.grade.toStringAsFixed(2)} • ${g.date.toLocal()}'),
+                    subtitle: Text(
+                      'Nota: ${g.grade.toStringAsFixed(2)} • ${g.date.toLocal()}',
+                    ),
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () async {
@@ -102,7 +109,10 @@ class _AddGradeDialogState extends State<_AddGradeDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
         FilledButton(
           onPressed: () async {
             final grade = double.tryParse(_gradeCtrl.text.trim());
@@ -114,7 +124,10 @@ class _AddGradeDialogState extends State<_AddGradeDialog> {
               courseId: widget.courseId ?? '',
               grade: grade,
               date: DateTime.now(),
-              notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+              notes:
+                  _notesCtrl.text.trim().isEmpty
+                      ? null
+                      : _notesCtrl.text.trim(),
             );
             await widget.svc.addGrade(entry);
             if (mounted) Navigator.pop(context);
@@ -160,14 +173,20 @@ class _EditGradeDialogState extends State<_EditGradeDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
         FilledButton(
           onPressed: () async {
             final grade = double.tryParse(_gradeCtrl.text.trim());
             if (grade == null) return;
             await widget.svc.updateGrade(widget.grade.id, {
               'grade': grade,
-              'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+              'notes':
+                  _notesCtrl.text.trim().isEmpty
+                      ? null
+                      : _notesCtrl.text.trim(),
             });
             if (mounted) Navigator.pop(context);
           },

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
- class HabitIcons {
+class HabitIcons {
   static const Map<String, IconData> icons = {
-         'fitness': Icons.fitness_center_rounded,
+    'fitness': Icons.fitness_center_rounded,
     'run': Icons.directions_run_rounded,
     'bike': Icons.directions_bike_rounded,
     'walk': Icons.directions_walk_rounded,
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
     'nutrition': Icons.restaurant_rounded,
     'heart': Icons.favorite_rounded,
 
-         'book': Icons.menu_book_rounded,
+    'book': Icons.menu_book_rounded,
     'study': Icons.school_rounded,
     'write': Icons.edit_rounded,
     'laptop': Icons.laptop_rounded,
@@ -23,24 +23,24 @@ import 'package:flutter/material.dart';
     'music': Icons.music_note_rounded,
     'art': Icons.palette_rounded,
 
-         'calendar': Icons.calendar_today_rounded,
+    'calendar': Icons.calendar_today_rounded,
     'checklist': Icons.checklist_rounded,
     'alarm': Icons.alarm_rounded,
     'timer': Icons.timer_rounded,
     'clean': Icons.cleaning_services_rounded,
     'organize': Icons.folder_rounded,
 
-         'people': Icons.people_rounded,
+    'people': Icons.people_rounded,
     'family': Icons.family_restroom_rounded,
     'phone': Icons.phone_rounded,
     'message': Icons.message_rounded,
     'smile': Icons.sentiment_satisfied_rounded,
 
-         'money': Icons.attach_money_rounded,
+    'money': Icons.attach_money_rounded,
     'savings': Icons.savings_rounded,
     'shopping': Icons.shopping_cart_rounded,
 
-         'star': Icons.star_rounded,
+    'star': Icons.star_rounded,
     'trophy': Icons.emoji_events_rounded,
     'light': Icons.lightbulb_rounded,
     'target': Icons.track_changes_rounded,
@@ -53,7 +53,7 @@ import 'package:flutter/material.dart';
   }
 }
 
- class HabitTemplate {
+class HabitTemplate {
   final String name;
   final String? emoji;
   final String? iconCode;
@@ -77,9 +77,9 @@ import 'package:flutter/material.dart';
   });
 }
 
- class HabitTemplates {
+class HabitTemplates {
   static const List<HabitTemplate> templates = [
-         HabitTemplate(
+    HabitTemplate(
       name: 'Beber agua',
       emoji: '💧',
       iconCode: 'water',
@@ -126,7 +126,7 @@ import 'package:flutter/material.dart';
       colorHex: '0xFF4CAF50',
     ),
 
-         HabitTemplate(
+    HabitTemplate(
       name: 'Leer',
       emoji: '📚',
       iconCode: 'book',
@@ -177,7 +177,7 @@ import 'package:flutter/material.dart';
       colorHex: '0xFFE91E63',
     ),
 
-         HabitTemplate(
+    HabitTemplate(
       name: 'Levantarse temprano',
       emoji: '🌅',
       iconCode: 'alarm',
@@ -202,7 +202,7 @@ import 'package:flutter/material.dart';
       colorHex: '0xFF00BCD4',
     ),
 
-         HabitTemplate(
+    HabitTemplate(
       name: 'Llamar a familia',
       emoji: '📞',
       iconCode: 'family',
@@ -220,7 +220,7 @@ import 'package:flutter/material.dart';
       colorHex: '0xFFFFC107',
     ),
 
-         HabitTemplate(
+    HabitTemplate(
       name: 'Revisar gastos',
       emoji: '💰',
       iconCode: 'money',
@@ -241,7 +241,7 @@ import 'package:flutter/material.dart';
   ];
 }
 
- class CommonTags {
+class CommonTags {
   static const List<String> tags = [
     'Salud',
     'Deporte',

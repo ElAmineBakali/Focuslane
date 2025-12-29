@@ -5,8 +5,9 @@ class Outfit {
   final String nombre;
   final String notas;
   final bool favorito;
-  final Map<String, String?>
-  slots;    final Map<String, String>? portada;    final int vecesUsado;
+  final Map<String, String?> slots;
+  final Map<String, String>? portada;
+  final int vecesUsado;
   final DateTime? ultimaVezUsado;
 
   Outfit({
@@ -27,7 +28,7 @@ class Outfit {
       nombre: data['nombre'] ?? '',
       notas: data['notas'] ?? '',
       favorito: data['favorito'] ?? false,
-             slots: Map<String, String?>.from(data['slots'] ?? {}),
+      slots: Map<String, String?>.from(data['slots'] ?? {}),
       portada:
           data['portada'] != null
               ? Map<String, String>.from(data['portada'])
@@ -48,7 +49,7 @@ class Outfit {
       'slots': slots,
       'portada': portada,
       'vecesUsado': vecesUsado,
-             if (ultimaVezUsado != null)
+      if (ultimaVezUsado != null)
         'ultimaVezUsado': Timestamp.fromDate(ultimaVezUsado!),
     };
   }

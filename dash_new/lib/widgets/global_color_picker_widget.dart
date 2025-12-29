@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-  class GlobalColorPickerWidget extends StatefulWidget {
+class GlobalColorPickerWidget extends StatefulWidget {
   final Color? initialColor;
   final ValueChanged<Color> onColorSelected;
   final String label;
@@ -37,19 +37,16 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
     final List<String>? colorStrings = prefs.getStringList(_recentColorsKey);
     if (colorStrings != null) {
       setState(() {
-        _recentColors = colorStrings
-            .map((s) => Color(int.parse(s)))
-            .take(5)
-            .toList();
+        _recentColors =
+            colorStrings.map((s) => Color(int.parse(s))).take(5).toList();
       });
     }
   }
 
   Future<void> _saveRecentColor(Color color) async {
     final prefs = await SharedPreferences.getInstance();
-    final colorValue = color.value.toString();
-    
-         _recentColors.removeWhere((c) => c.value == color.value);
+
+    _recentColors.removeWhere((c) => c.value == color.value);
     _recentColors.insert(0, color);
     if (_recentColors.length > 5) {
       _recentColors = _recentColors.take(5).toList();
@@ -63,40 +60,41 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
 
   Future<void> _showColorPickerDialog() async {
     Color tempColor = _selectedColor;
-    
+
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Seleccionar color',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
-        ),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: _selectedColor,
-            onColorChanged: (color) => tempColor = color,
-            pickerAreaHeightPercent: 0.8,
-            displayThumbColor: true,
-            enableAlpha: false,
-            labelTypes: const [],
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              'Seleccionar color',
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+            ),
+            content: SingleChildScrollView(
+              child: ColorPicker(
+                pickerColor: _selectedColor,
+                onColorChanged: (color) => tempColor = color,
+                pickerAreaHeightPercent: 0.8,
+                displayThumbColor: true,
+                enableAlpha: false,
+                labelTypes: const [],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  setState(() => _selectedColor = tempColor);
+                  widget.onColorSelected(tempColor);
+                  _saveRecentColor(tempColor);
+                  Navigator.pop(context);
+                },
+                child: const Text('Seleccionar'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              setState(() => _selectedColor = tempColor);
-              widget.onColorSelected(tempColor);
-              _saveRecentColor(tempColor);
-              Navigator.pop(context);
-            },
-            child: const Text('Seleccionar'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -116,8 +114,8 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
           ),
         ),
         const SizedBox(height: 12),
-        
-                 InkWell(
+
+        InkWell(
           onTap: _showColorPickerDialog,
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -126,10 +124,7 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
             decoration: BoxDecoration(
               color: _selectedColor.withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: _selectedColor,
-                width: 2,
-              ),
+              border: Border.all(color: _selectedColor, width: 2),
             ),
             child: Row(
               children: [
@@ -159,16 +154,13 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
                     ),
                   ),
                 ),
-                Icon(
-                  Icons.palette_rounded,
-                  color: _selectedColor,
-                ),
+                Icon(Icons.palette_rounded, color: _selectedColor),
               ],
             ),
           ),
         ),
-        
-                 if (_recentColors.isNotEmpty) ...[
+
+        if (_recentColors.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
             'Recientes',
@@ -182,44 +174,47 @@ class _GlobalColorPickerWidgetState extends State<GlobalColorPickerWidget> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: _recentColors.map((color) {
-              final isSelected = color.value == _selectedColor.value;
-              return InkWell(
-                onTap: () {
-                  setState(() => _selectedColor = color);
-                  widget.onColorSelected(color);
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: color,
+            children:
+                _recentColors.map((color) {
+                  final isSelected = color.value == _selectedColor.value;
+                  return InkWell(
+                    onTap: () {
+                      setState(() => _selectedColor = color);
+                      widget.onColorSelected(color);
+                    },
                     borderRadius: BorderRadius.circular(12),
-                    border: isSelected
-                        ? Border.all(
-                            color: colorScheme.primary,
-                            width: 3,
-                          )
-                        : null,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(12),
+                        border:
+                            isSelected
+                                ? Border.all(
+                                  color: colorScheme.primary,
+                                  width: 3,
+                                )
+                                : null,
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: isSelected
-                      ? Icon(
-                          Icons.check_rounded,
-                          color: _getContrastColor(color),
-                          size: 24,
-                        )
-                      : null,
-                ),
-              );
-            }).toList(),
+                      child:
+                          isSelected
+                              ? Icon(
+                                Icons.check_rounded,
+                                color: _getContrastColor(color),
+                                size: 24,
+                              )
+                              : null,
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ],

@@ -24,9 +24,12 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
         useThemeColors: true,
         actions: [
           IconButton(
-            icon: Icon(_showLowStockOnly ? Icons.warning_amber : Icons.inventory_2),
+            icon: Icon(
+              _showLowStockOnly ? Icons.warning_amber : Icons.inventory_2,
+            ),
             tooltip: _showLowStockOnly ? 'Mostrar todo' : 'Solo stock bajo',
-            onPressed: () => setState(() => _showLowStockOnly = !_showLowStockOnly),
+            onPressed:
+                () => setState(() => _showLowStockOnly = !_showLowStockOnly),
           ),
           IconButton(
             icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
@@ -62,8 +65,12 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
 
           if (items.isEmpty) {
             return ModernEmptyState(
-              icon: _showLowStockOnly ? Icons.check_circle_outline : Icons.kitchen_outlined,
-              message: _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
+              icon:
+                  _showLowStockOnly
+                      ? Icons.check_circle_outline
+                      : Icons.kitchen_outlined,
+              message:
+                  _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
               subtitle:
                   _showLowStockOnly
                       ? 'Todos los productos tienen stock suficiente'
@@ -114,28 +121,36 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                             Text(
                               '$lowStockCount productos necesitan reposición',
                               style: AppTypography.caption(context).copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
                         ),
                       ),
                       TextButton(
-                        onPressed: () => setState(() => _showLowStockOnly = true),
+                        onPressed:
+                            () => setState(() => _showLowStockOnly = true),
                         style: TextButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.2),
                         ),
                         child: Text(
                           'Ver',
-                          style: AppTypography.button(
-                            context,
-                          ).copyWith(color: Theme.of(context).colorScheme.onSurface),
+                          style: AppTypography.button(context).copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ).animate().fadeIn().slideY(begin: -0.2),
-              Expanded(child: _isGridView ? _buildGridView(items) : _buildListView(items)),
+              Expanded(
+                child:
+                    _isGridView ? _buildGridView(items) : _buildListView(items),
+              ),
             ],
           );
         },
@@ -184,21 +199,28 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
         final isLowStock = item.minQty != null && item.qty <= item.minQty!;
 
         return _PantryTile(
-          item: item,
-          isLowStock: isLowStock,
-          onTap: () => _showItemDetails(item),
-          onConsume: () => _consumeItem(item),
-          onEdit: () => _editItem(initial: item, id: item.id),
-          onDelete: () => _deleteItem(item),
-        ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).slideX(begin: -0.2);
+              item: item,
+              isLowStock: isLowStock,
+              onTap: () => _showItemDetails(item),
+              onConsume: () => _consumeItem(item),
+              onEdit: () => _editItem(initial: item, id: item.id),
+              onDelete: () => _deleteItem(item),
+            )
+            .animate()
+            .fadeIn(delay: Duration(milliseconds: index * 30))
+            .slideX(begin: -0.2);
       },
     );
   }
 
   Future<void> _editItem({PantryItem? initial, String? id}) async {
     final nameController = TextEditingController(text: initial?.name ?? '');
-    final qtyController = TextEditingController(text: (initial?.qty ?? 1).toString());
-    final minQtyController = TextEditingController(text: initial?.minQty?.toString() ?? '');
+    final qtyController = TextEditingController(
+      text: (initial?.qty ?? 1).toString(),
+    );
+    final minQtyController = TextEditingController(
+      text: initial?.minQty?.toString() ?? '',
+    );
     UnitKind unit = initial?.unit ?? UnitKind.unit;
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -221,7 +243,8 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                   left: AppSpacing.md,
                   right: AppSpacing.md,
                   top: AppSpacing.md,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -264,21 +287,37 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: AppColors.borderLight),
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                             child: DropdownButton<UnitKind>(
                               value: unit,
                               isExpanded: true,
                               underline: const SizedBox.shrink(),
                               items: const [
-                                DropdownMenuItem(value: UnitKind.unit, child: Text('unidades')),
-                                DropdownMenuItem(value: UnitKind.g, child: Text('gramos')),
-                                DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
+                                DropdownMenuItem(
+                                  value: UnitKind.unit,
+                                  child: Text('unidades'),
+                                ),
+                                DropdownMenuItem(
+                                  value: UnitKind.g,
+                                  child: Text('gramos'),
+                                ),
+                                DropdownMenuItem(
+                                  value: UnitKind.ml,
+                                  child: Text('ml'),
+                                ),
                               ],
-                              onChanged: (v) => setModalState(() => unit = v ?? UnitKind.unit),
+                              onChanged:
+                                  (v) => setModalState(
+                                    () => unit = v ?? UnitKind.unit,
+                                  ),
                             ),
                           ),
                         ),
@@ -306,11 +345,17 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                             onPressed:
                                 () => Navigator.pop(context, {
                                   'name': nameController.text,
-                                  'qty': double.tryParse(qtyController.text) ?? 1.0,
+                                  'qty':
+                                      double.tryParse(qtyController.text) ??
+                                      1.0,
                                   'unit': unit,
-                                  'minQty': double.tryParse(minQtyController.text),
+                                  'minQty': double.tryParse(
+                                    minQtyController.text,
+                                  ),
                                 }),
-                            style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.brown,
+                            ),
                             child: Text(initial == null ? 'Añadir' : 'Guardar'),
                           ),
                         ),
@@ -350,7 +395,9 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(id == null ? 'Producto añadido' : 'Producto actualizado'),
+            content: Text(
+              id == null ? 'Producto añadido' : 'Producto actualizado',
+            ),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -383,9 +430,16 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
               FilledButton(
-                onPressed: () => Navigator.pop(context, double.tryParse(controller.text)),
+                onPressed:
+                    () => Navigator.pop(
+                      context,
+                      double.tryParse(controller.text),
+                    ),
                 style: FilledButton.styleFrom(backgroundColor: Colors.brown),
                 child: const Text('Consumir'),
               ),
@@ -399,7 +453,9 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)} consumidos'),
+            content: Text(
+              '${qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)} consumidos',
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -453,7 +509,9 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
           (context) => Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.radiusXl),
+              ),
             ),
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
@@ -479,10 +537,18 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                         gradient: LinearGradient(
                           colors:
                               isLowStock
-                                  ? [Colors.amber.shade600, Colors.amber.shade400]
-                                  : [Colors.brown.shade600, Colors.brown.shade400],
+                                  ? [
+                                    Colors.amber.shade600,
+                                    Colors.amber.shade400,
+                                  ]
+                                  : [
+                                    Colors.brown.shade600,
+                                    Colors.brown.shade400,
+                                  ],
                         ),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                       ),
                       child: Icon(
                         isLowStock ? Icons.warning_amber : Icons.kitchen,
@@ -495,13 +561,17 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.name, style: AppTypography.heading3(context)),
+                          Text(
+                            item.name,
+                            style: AppTypography.heading3(context),
+                          ),
                           if (isLowStock)
                             Text(
                               'Stock bajo',
-                              style: AppTypography.caption(
-                                context,
-                              ).copyWith(color: Colors.amber, fontWeight: FontWeight.bold),
+                              style: AppTypography.caption(context).copyWith(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                         ],
                       ),
@@ -512,14 +582,16 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                 _DetailRow(
                   icon: Icons.inventory_2,
                   label: 'Stock actual',
-                  value: '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+                  value:
+                      '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
                 ),
                 if (item.minQty != null) ...[
                   const SizedBox(height: AppSpacing.sm),
                   _DetailRow(
                     icon: Icons.warning_amber_outlined,
                     label: 'Stock mínimo',
-                    value: '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+                    value:
+                        '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
                   ),
                 ],
                 const SizedBox(height: AppSpacing.lg),
@@ -544,7 +616,9 @@ class _PantryScreenV2State extends State<PantryScreenV2> {
                         },
                         icon: const Icon(Icons.edit),
                         label: const Text('Editar'),
-                        style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.brown,
+                        ),
                       ),
                     ),
                   ],
@@ -629,7 +703,10 @@ class _PantryCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     onSelected: (value) {
                       if (value == 'consume') onConsume();
                       if (value == 'edit') onEdit();
@@ -663,7 +740,10 @@ class _PantryCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.delete, size: 20, color: Colors.red),
                                 SizedBox(width: AppSpacing.sm),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                           ),
@@ -687,13 +767,18 @@ class _PantryCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    if (isLowStock) ModernBadge(label: 'STOCK BAJO', color: AppColors.warning),
+                    if (isLowStock)
+                      ModernBadge(
+                        label: 'STOCK BAJO',
+                        color: AppColors.warning,
+                      ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
-                      style: AppTypography.label(
-                        context,
-                      ).copyWith(color: Colors.brown, fontWeight: FontWeight.bold),
+                      style: AppTypography.label(context).copyWith(
+                        color: Colors.brown,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     if (item.minQty != null)
                       Text(
@@ -855,7 +940,11 @@ class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _DetailRow({required this.icon, required this.label, required this.value});
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {

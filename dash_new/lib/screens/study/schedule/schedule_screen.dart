@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../services/study_notifications.dart';
@@ -35,14 +34,23 @@ class ScheduleScreen extends StatelessWidget {
           return StreamBuilder<List<StudyClassBlock>>(
             stream: svc.streamSchedule(),
             builder: (context, snap) {
-              if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+              if (!snap.hasData)
+                return const Center(child: CircularProgressIndicator());
               final blocks = snap.data!;
 
               if (isMobile) {
-                return _MobileDayByDaySchedule(blocks: blocks, courseById: byId, svc: svc);
+                return _MobileDayByDaySchedule(
+                  blocks: blocks,
+                  courseById: byId,
+                  svc: svc,
+                );
               }
 
-              return _WeeklyScheduleView(blocks: blocks, courseById: byId, svc: svc);
+              return _WeeklyScheduleView(
+                blocks: blocks,
+                courseById: byId,
+                svc: svc,
+              );
             },
           );
         },
@@ -56,7 +64,11 @@ class _WeeklyScheduleView extends StatelessWidget {
   final Map<String, Course> courseById;
   final StudyFirestoreService svc;
 
-  const _WeeklyScheduleView({required this.blocks, required this.courseById, required this.svc});
+  const _WeeklyScheduleView({
+    required this.blocks,
+    required this.courseById,
+    required this.svc,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -67,14 +79,19 @@ class _WeeklyScheduleView extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Text('Vista semanal', style: Theme.of(context).textTheme.titleLarge),
+            child: Text(
+              'Vista semanal',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
         ),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Table(
-              border: const TableBorder(horizontalInside: BorderSide(color: Colors.black12)),
+              border: const TableBorder(
+                horizontalInside: BorderSide(color: Colors.black12),
+              ),
               columnWidths: const {0: FixedColumnWidth(60)},
               children: [
                 TableRow(
@@ -82,7 +99,10 @@ class _WeeklyScheduleView extends StatelessWidget {
                     const SizedBox(),
                     ...days.map(
                       (d) => Center(
-                        child: Text(d, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(
+                          d,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -92,19 +112,29 @@ class _WeeklyScheduleView extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Text('${8 + h}:00', style: Theme.of(context).textTheme.labelMedium),
+                        child: Text(
+                          '${8 + h}:00',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
                       ),
                       ...List.generate(7, (dowIdx) {
                         final dow = dowIdx + 1;
                         final here =
                             blocks
-                                .where((b) => b.daysOfWeek.contains(dow) && b.start.hour == (8 + h))
+                                .where(
+                                  (b) =>
+                                      b.daysOfWeek.contains(dow) &&
+                                      b.start.hour == (8 + h),
+                                )
                                 .toList();
                         return Container(
                           margin: const EdgeInsets.all(4),
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Column(
@@ -121,7 +151,11 @@ class _WeeklyScheduleView extends StatelessWidget {
                                       await showModalBottomSheet(
                                         context: context,
                                         isScrollControlled: true,
-                                        builder: (_) => _EditBlockSheet(svc: svc, initial: b),
+                                        builder:
+                                            (_) => _EditBlockSheet(
+                                              svc: svc,
+                                              initial: b,
+                                            ),
                                       );
                                     },
                                     onLongPress: () async {
@@ -129,15 +163,27 @@ class _WeeklyScheduleView extends StatelessWidget {
                                         context: context,
                                         builder:
                                             (_) => AlertDialog(
-                                              title: const Text('Eliminar bloque'),
-                                              content: Text('¿Eliminar "$label"?'),
+                                              title: const Text(
+                                                'Eliminar bloque',
+                                              ),
+                                              content: Text(
+                                                '¿Eliminar "$label"?',
+                                              ),
                                               actions: [
                                                 TextButton(
-                                                  onPressed: () => Navigator.pop(context, false),
+                                                  onPressed:
+                                                      () => Navigator.pop(
+                                                        context,
+                                                        false,
+                                                      ),
                                                   child: const Text('Cancelar'),
                                                 ),
                                                 FilledButton(
-                                                  onPressed: () => Navigator.pop(context, true),
+                                                  onPressed:
+                                                      () => Navigator.pop(
+                                                        context,
+                                                        true,
+                                                      ),
                                                   child: const Text('Eliminar'),
                                                 ),
                                               ],
@@ -145,25 +191,40 @@ class _WeeklyScheduleView extends StatelessWidget {
                                       );
                                       if (ok == true) {
                                         await svc.deleteScheduleBlock(b.id);
-                                        await StudyNotifications(svc).scheduleTodayClasses();
+                                        await StudyNotifications(
+                                          svc,
+                                        ).scheduleTodayClasses();
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Bloque eliminado')),
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Bloque eliminado'),
+                                            ),
                                           );
                                         }
                                       }
                                     },
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Container(
                                           width: 4,
                                           height: 24,
-                                          margin: const EdgeInsets.only(right: 8, top: 4),
+                                          margin: const EdgeInsets.only(
+                                            right: 8,
+                                            top: 4,
+                                          ),
                                           decoration: BoxDecoration(
                                             color:
-                                                c?.color ?? Theme.of(context).colorScheme.primary,
-                                            borderRadius: BorderRadius.circular(2),
+                                                c?.color ??
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
                                           ),
                                         ),
                                         Expanded(
@@ -206,11 +267,14 @@ class _MobileDayByDaySchedule extends StatefulWidget {
   });
 
   @override
-  State<_MobileDayByDaySchedule> createState() => _MobileDayByDayScheduleState();
+  State<_MobileDayByDaySchedule> createState() =>
+      _MobileDayByDayScheduleState();
 }
 
 class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
-  final PageController _pageController = PageController(initialPage: DateTime.now().weekday - 1);
+  final PageController _pageController = PageController(
+    initialPage: DateTime.now().weekday - 1,
+  );
   late int _currentDay;
 
   @override
@@ -317,7 +381,10 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                                 : Colors.transparent,
                         border:
                             isToday && !isSelected
-                                ? Border.all(color: colorScheme.primary, width: 2)
+                                ? Border.all(
+                                  color: colorScheme.primary,
+                                  width: 2,
+                                )
                                 : null,
                       ),
                       child: Center(
@@ -326,7 +393,10 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+                            color:
+                                isSelected
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -350,7 +420,9 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
             itemBuilder: (context, pageIndex) {
               final dayOfWeek = pageIndex + 1;
               final dayBlocks =
-                  widget.blocks.where((b) => b.daysOfWeek.contains(dayOfWeek)).toList()
+                  widget.blocks
+                      .where((b) => b.daysOfWeek.contains(dayOfWeek))
+                      .toList()
                     ..sort((a, b) {
                       final aMinutes = a.start.hour * 60 + a.start.minute;
                       final bMinutes = b.start.hour * 60 + b.start.minute;
@@ -385,7 +457,11 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (_) => _EditBlockSheet(svc: widget.svc, initial: block),
+                        builder:
+                            (_) => _EditBlockSheet(
+                              svc: widget.svc,
+                              initial: block,
+                            ),
                       );
                     },
                     onLongPress: () async {
@@ -394,18 +470,23 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                         builder:
                             (_) => AlertDialog(
                               title: const Text('Eliminar clase'),
-                              content: Text('¿Eliminar "${course?.name ?? block.courseId}"?'),
+                              content: Text(
+                                '¿Eliminar "${course?.name ?? block.courseId}"?',
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
                                   child: const Text('Cancelar'),
                                 ),
                                 FilledButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  style: FilledButton.styleFrom(backgroundColor: colorScheme.error),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: colorScheme.error,
+                                  ),
                                   child: const Text('Eliminar'),
                                 ),
                               ],
@@ -413,7 +494,9 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                       );
                       if (ok == true && context.mounted) {
                         await widget.svc.deleteScheduleBlock(block.id);
-                        await StudyNotifications(widget.svc).scheduleTodayClasses();
+                        await StudyNotifications(
+                          widget.svc,
+                        ).scheduleTodayClasses();
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -504,7 +587,9 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -517,14 +602,20 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Theme.of(context).colorScheme.primary.withOpacity(0.15),
-                          Theme.of(context).colorScheme.secondary.withOpacity(0.15),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.15),
+                          Theme.of(
+                            context,
+                          ).colorScheme.secondary.withOpacity(0.15),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      widget.initial == null ? Icons.add_rounded : Icons.edit_rounded,
+                      widget.initial == null
+                          ? Icons.add_rounded
+                          : Icons.edit_rounded,
                       color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
@@ -533,7 +624,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   Expanded(
                     child: Text(
                       widget.initial == null ? 'Nuevo bloque' : 'Editar bloque',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 24, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
@@ -558,7 +652,9 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceVariant.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -578,7 +674,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                           return GestureDetector(
                             onTap: () => setState(() => _courseId = course.id),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
                                 gradient:
                                     isSelected
@@ -593,14 +692,18 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                         : null,
                                 color:
                                     !isSelected
-                                        ? Theme.of(
-                                          context,
-                                        ).colorScheme.surfaceVariant.withOpacity(0.5)
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .surfaceVariant
+                                            .withOpacity(0.5)
                                         : null,
                                 borderRadius: BorderRadius.circular(12),
                                 border:
                                     isSelected
-                                        ? Border.all(color: course.color ?? Colors.grey, width: 2)
+                                        ? Border.all(
+                                          color: course.color ?? Colors.grey,
+                                          width: 2,
+                                        )
                                         : null,
                               ),
                               child: Row(
@@ -618,7 +721,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                   Text(
                                     course.name,
                                     style: GoogleFonts.plusJakartaSans(
-                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                      fontWeight:
+                                          isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -646,7 +752,15 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                 spacing: 8,
                 runSpacing: 8,
                 children: List.generate(7, (i) {
-                  final labels = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+                  final labels = const [
+                    'Lun',
+                    'Mar',
+                    'Mié',
+                    'Jue',
+                    'Vie',
+                    'Sáb',
+                    'Dom',
+                  ];
                   final label = labels[i];
                   final sel = _days.contains(i + 1);
                   return GestureDetector(
@@ -667,19 +781,28 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                             sel
                                 ? LinearGradient(
                                   colors: [
-                                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                    Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.3),
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.secondary.withOpacity(0.3),
                                   ],
                                 )
                                 : null,
                         color:
                             !sel
-                                ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.surfaceVariant.withOpacity(0.5)
                                 : null,
                         borderRadius: BorderRadius.circular(12),
                         border:
                             sel
-                                ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+                                ? Border.all(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2,
+                                )
                                 : null,
                       ),
                       child: Center(
@@ -706,7 +829,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       time: _start,
                       icon: Icons.access_time_rounded,
                       onTap: () async {
-                        final t = await showTimePicker(context: context, initialTime: _start);
+                        final t = await showTimePicker(
+                          context: context,
+                          initialTime: _start,
+                        );
                         if (t != null) setState(() => _start = t);
                       },
                     ),
@@ -718,7 +844,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       time: _end,
                       icon: Icons.access_time_filled_rounded,
                       onTap: () async {
-                        final t = await showTimePicker(context: context, initialTime: _end);
+                        final t = await showTimePicker(
+                          context: context,
+                          initialTime: _end,
+                        );
                         if (t != null) setState(() => _end = t);
                       },
                     ),
@@ -742,15 +871,22 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                 decoration: InputDecoration(
                   hintText: 'Ej: Aula 201, Lab A',
                   hintStyle: GoogleFonts.plusJakartaSans(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withOpacity(0.5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
                 ),
                 style: GoogleFonts.plusJakartaSans(),
               ),
@@ -769,7 +905,9 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                 (context) => AlertDialog(
                                   title: Text(
                                     'Eliminar bloque',
-                                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   content: Text(
                                     '¿Estás seguro de que deseas eliminar este bloque del horario?',
@@ -777,11 +915,13 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                   ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
+                                      onPressed:
+                                          () => Navigator.pop(context, false),
                                       child: const Text('Cancelar'),
                                     ),
                                     FilledButton(
-                                      onPressed: () => Navigator.pop(context, true),
+                                      onPressed:
+                                          () => Navigator.pop(context, true),
                                       style: FilledButton.styleFrom(
                                         backgroundColor: Colors.red.shade600,
                                       ),
@@ -793,7 +933,9 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
 
                           if (confirm == true && mounted) {
                             try {
-                              await widget.svc.deleteScheduleBlock(widget.initial!.id);
+                              await widget.svc.deleteScheduleBlock(
+                                widget.initial!.id,
+                              );
                               if (mounted) {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -827,12 +969,16 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                           foregroundColor: Colors.red.shade600,
                           side: BorderSide(color: Colors.red.shade600),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         icon: const Icon(Icons.delete_outline_rounded),
                         label: Text(
                           'Eliminar',
-                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -843,11 +989,15 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: Text(
                         'Cancelar',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -856,7 +1006,8 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                     flex: 2,
                     child: FilledButton(
                       onPressed: () async {
-                        if ((_courseId == null || _courseId!.trim().isEmpty) || _days.isEmpty) {
+                        if ((_courseId == null || _courseId!.trim().isEmpty) ||
+                            _days.isEmpty) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -896,7 +1047,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                               daysOfWeek: List<int>.from(_days)..sort(),
                               start: _start,
                               end: _end,
-                              room: _room.text.trim().isEmpty ? null : _room.text.trim(),
+                              room:
+                                  _room.text.trim().isEmpty
+                                      ? null
+                                      : _room.text.trim(),
                             ).toMap();
 
                         try {
@@ -905,16 +1059,23 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                               StudyClassBlock(
                                 id: '',
                                 courseId: newMap['courseId'] as String,
-                                daysOfWeek: List<int>.from(newMap['daysOfWeek'] as List),
+                                daysOfWeek: List<int>.from(
+                                  newMap['daysOfWeek'] as List,
+                                ),
                                 start: _start,
                                 end: _end,
                                 room: newMap['room'] as String?,
                               ),
                             );
                           } else {
-                            await widget.svc.updateScheduleBlock(widget.initial!.id, newMap);
+                            await widget.svc.updateScheduleBlock(
+                              widget.initial!.id,
+                              newMap,
+                            );
                           }
-                          await StudyNotifications(widget.svc).scheduleTodayClasses();
+                          await StudyNotifications(
+                            widget.svc,
+                          ).scheduleTodayClasses();
                           if (mounted) Navigator.pop(context);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -945,11 +1106,15 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       },
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: Text(
                         'Guardar bloque',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -995,7 +1160,11 @@ class _TimePickerButton extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  icon,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   label,
@@ -1010,7 +1179,10 @@ class _TimePickerButton extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               time.format(context),
-              style: GoogleFonts.plusJakartaSans(fontSize: 20, fontWeight: FontWeight.w700),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),

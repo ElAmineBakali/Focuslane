@@ -3,30 +3,31 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-  class GymNotificationService {
+class GymNotificationService {
   GymNotificationService._();
   static final GymNotificationService I = GymNotificationService._();
 
-     static const int _inactivityId = 22001;
+  static const int _inactivityId = 22001;
   static const int _weeklyWeightId = 22002;
   static const int _mondayMeasurementsId = 22003;
 
-     static const String _keyInactivityDays = 'gym_inactivity_days';
+  static const String _keyInactivityDays = 'gym_inactivity_days';
   static const String _keyWeightReminderEnabled = 'gym_weight_reminder_enabled';
   static const String _keyWeightReminderDay = 'gym_weight_reminder_day';
   static const String _keyWeightReminderTime = 'gym_weight_reminder_time';
-  static const String _keyMeasurementsReminderEnabled = 'gym_measurements_reminder_enabled';
-  static const String _keyMeasurementsReminderTime = 'gym_measurements_reminder_time';
+  static const String _keyMeasurementsReminderEnabled =
+      'gym_measurements_reminder_enabled';
+  static const String _keyMeasurementsReminderTime =
+      'gym_measurements_reminder_time';
 
-     static const int _defaultInactivityDays = 3;
+  static const int _defaultInactivityDays = 3;
   static const int _defaultWeightDay = DateTime.monday;
   static const int _defaultWeightHour = 8;
   static const int _defaultWeightMinute = 0;
   static const int _defaultMeasurementsHour = 9;
   static const int _defaultMeasurementsMinute = 0;
 
-     
-                    Future<void> scheduleRoutineDayReminder({
+  Future<void> scheduleRoutineDayReminder({
     required String routineId,
     required String routineName,
     required String dayId,
@@ -45,7 +46,7 @@ import 'package:shared_preferences/shared_preferences.dart';
     );
   }
 
-     Future<void> cancelRoutineDayReminder({
+  Future<void> cancelRoutineDayReminder({
     required String routineId,
     required String dayId,
   }) async {
@@ -53,20 +54,21 @@ import 'package:shared_preferences/shared_preferences.dart';
     await NotificationService.I.cancelNotificationById(id);
   }
 
-     Future<void> cancelAllRoutineReminders(String routineId) async {
+  Future<void> cancelAllRoutineReminders(String routineId) async {
     final id = 'gym_routine_$routineId';
     await NotificationService.I.cancelNotificationById(id);
   }
 
-   
-        Future<void> scheduleInactivityReminder({int days = _defaultInactivityDays}) async {
+  Future<void> scheduleInactivityReminder({
+    int days = _defaultInactivityDays,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyInactivityDays, days);
 
     await NotificationService.I.cancel(_inactivityId);
-    
+
     final base = DateTime.now().add(Duration(days: days));
-    final at = DateTime(base.year, base.month, base.day, 10, 0);      
+    final at = DateTime(base.year, base.month, base.day, 10, 0);
     await NotificationService.I.scheduleOnce(
       id: _inactivityId,
       title: '🏋️ Vuelve al gym',
@@ -77,25 +79,26 @@ import 'package:shared_preferences/shared_preferences.dart';
     );
   }
 
-     Future<void> cancelInactivityReminder() async {
+  Future<void> cancelInactivityReminder() async {
     await NotificationService.I.cancel(_inactivityId);
   }
 
-     Future<int> getInactivityDays() async {
+  Future<int> getInactivityDays() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyInactivityDays) ?? _defaultInactivityDays;
   }
 
-   
-     Future<void> scheduleWeeklyWeightReminder({
+  Future<void> scheduleWeeklyWeightReminder({
     int weekday = _defaultWeightDay,
     TimeOfDay? time,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyWeightReminderEnabled, true);
     await prefs.setInt(_keyWeightReminderDay, weekday);
-    
-    final t = time ?? const TimeOfDay(hour: _defaultWeightHour, minute: _defaultWeightMinute);
+
+    final t =
+        time ??
+        const TimeOfDay(hour: _defaultWeightHour, minute: _defaultWeightMinute);
     await prefs.setInt(_keyWeightReminderTime, t.hour * 60 + t.minute);
 
     await NotificationService.I.cancel(_weeklyWeightId);
@@ -109,26 +112,30 @@ import 'package:shared_preferences/shared_preferences.dart';
     );
   }
 
-     Future<void> cancelWeeklyWeightReminder() async {
+  Future<void> cancelWeeklyWeightReminder() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyWeightReminderEnabled, false);
     await NotificationService.I.cancel(_weeklyWeightId);
   }
 
-     Future<bool> isWeightReminderEnabled() async {
+  Future<bool> isWeightReminderEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyWeightReminderEnabled) ?? false;
   }
 
-   
-     Future<void> scheduleWeeklyMeasurementsReminder({
+  Future<void> scheduleWeeklyMeasurementsReminder({
     int weekday = DateTime.monday,
     TimeOfDay? time,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyMeasurementsReminderEnabled, true);
-    
-    final t = time ?? const TimeOfDay(hour: _defaultMeasurementsHour, minute: _defaultMeasurementsMinute);
+
+    final t =
+        time ??
+        const TimeOfDay(
+          hour: _defaultMeasurementsHour,
+          minute: _defaultMeasurementsMinute,
+        );
     await prefs.setInt(_keyMeasurementsReminderTime, t.hour * 60 + t.minute);
 
     await NotificationService.I.cancel(_mondayMeasurementsId);
@@ -142,19 +149,18 @@ import 'package:shared_preferences/shared_preferences.dart';
     );
   }
 
-     Future<void> cancelWeeklyMeasurementsReminder() async {
+  Future<void> cancelWeeklyMeasurementsReminder() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyMeasurementsReminderEnabled, false);
     await NotificationService.I.cancel(_mondayMeasurementsId);
   }
 
-     Future<bool> isMeasurementsReminderEnabled() async {
+  Future<bool> isMeasurementsReminderEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyMeasurementsReminderEnabled) ?? false;
   }
 
-   
-     Day _dayIntToEnum(int weekday) {
+  Day _dayIntToEnum(int weekday) {
     switch (weekday) {
       case DateTime.monday:
         return Day.monday;
@@ -175,7 +181,7 @@ import 'package:shared_preferences/shared_preferences.dart';
     }
   }
 
-     Future<void> cancelAll() async {
+  Future<void> cancelAll() async {
     await NotificationService.I.cancel(_inactivityId);
     await NotificationService.I.cancel(_weeklyWeightId);
     await NotificationService.I.cancel(_mondayMeasurementsId);

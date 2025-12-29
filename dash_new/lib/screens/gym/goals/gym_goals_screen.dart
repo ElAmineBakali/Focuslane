@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 

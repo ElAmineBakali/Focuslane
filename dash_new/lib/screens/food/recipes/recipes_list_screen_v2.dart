@@ -36,7 +36,9 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
             onPressed:
                 () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => RecipeEditScreenV2(svc: widget.svc)),
+                  MaterialPageRoute(
+                    builder: (_) => RecipeEditScreenV2(svc: widget.svc),
+                  ),
                 ),
             tooltip: 'Añadir receta',
           ),
@@ -77,7 +79,10 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                 var list = snap.data!;
                 if (_searchQuery.isNotEmpty) {
                   final ql = _searchQuery.toLowerCase();
-                  list = list.where((r) => r.name.toLowerCase().contains(ql)).toList();
+                  list =
+                      list
+                          .where((r) => r.name.toLowerCase().contains(ql))
+                          .toList();
                 }
 
                 if (list.isEmpty) {
@@ -97,14 +102,17 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                             ? () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => RecipeEditScreenV2(svc: widget.svc),
+                                builder:
+                                    (_) => RecipeEditScreenV2(svc: widget.svc),
                               ),
                             )
                             : null,
                   );
                 }
 
-                return _showGridView ? _buildGridView(list) : _buildListView(list);
+                return _showGridView
+                    ? _buildGridView(list)
+                    : _buildListView(list);
               },
             ),
           ),
@@ -126,15 +134,22 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
       itemBuilder: (context, index) {
         final recipe = recipes[index];
         return _RecipeGridCard(
-          recipe: recipe,
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
-                ),
-              ),
-        ).animate().fadeIn(delay: (100 + index * 50).ms).scale(duration: 200.ms);
+              recipe: recipe,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => RecipeEditScreenV2(
+                            svc: widget.svc,
+                            initial: recipe,
+                          ),
+                    ),
+                  ),
+            )
+            .animate()
+            .fadeIn(delay: (100 + index * 50).ms)
+            .scale(duration: 200.ms);
       },
     );
   }
@@ -146,15 +161,22 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
       itemBuilder: (context, index) {
         final recipe = recipes[index];
         return _RecipeListCard(
-          recipe: recipe,
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RecipeEditScreenV2(svc: widget.svc, initial: recipe),
-                ),
-              ),
-        ).animate().fadeIn(delay: (100 + index * 50).ms).slideX(begin: -0.2, duration: 300.ms);
+              recipe: recipe,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => RecipeEditScreenV2(
+                            svc: widget.svc,
+                            initial: recipe,
+                          ),
+                    ),
+                  ),
+            )
+            .animate()
+            .fadeIn(delay: (100 + index * 50).ms)
+            .slideX(begin: -0.2, duration: 300.ms);
       },
     );
   }
@@ -172,7 +194,9 @@ class _RecipeGridCard extends StatelessWidget {
 
     return Card(
       elevation: AppSpacing.elevationMd,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusLg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -226,23 +250,36 @@ class _RecipeGridCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text('${recipe.servings} raciones', style: AppTypography.caption(context)),
+                    Text(
+                      '${recipe.servings} raciones',
+                      style: AppTypography.caption(context),
+                    ),
                     const Spacer(),
                     if (hasNutrition) ...[
                       Row(
                         children: [
-                          Icon(Icons.local_fire_department, size: 16, color: Colors.purple),
+                          Icon(
+                            Icons.local_fire_department,
+                            size: 16,
+                            color: Colors.purple,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${recipe.kcal!.toStringAsFixed(0)} kcal',
-                            style: AppTypography.caption(context, color: Colors.purple),
+                            style: AppTypography.caption(
+                              context,
+                              color: Colors.purple,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 2),
                       Text('totales', style: AppTypography.caption(context)),
                     ] else ...[
-                      ModernBadge(label: 'Sin macros', color: AppColors.grey500),
+                      ModernBadge(
+                        label: 'Sin macros',
+                        color: AppColors.grey500,
+                      ),
                     ],
                   ],
                 ),
@@ -268,7 +305,9 @@ class _RecipeListCard extends StatelessWidget {
     return Card(
       elevation: AppSpacing.elevationSm,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -301,12 +340,24 @@ class _RecipeListCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: Text(recipe.name, style: AppTypography.heading4(context))),
-                        if (hasNutrition) ModernBadge(label: 'MACROS', color: AppColors.success),
+                        Expanded(
+                          child: Text(
+                            recipe.name,
+                            style: AppTypography.heading4(context),
+                          ),
+                        ),
+                        if (hasNutrition)
+                          ModernBadge(
+                            label: 'MACROS',
+                            color: AppColors.success,
+                          ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    Text('${recipe.servings} raciones', style: AppTypography.body(context)),
+                    Text(
+                      '${recipe.servings} raciones',
+                      style: AppTypography.body(context),
+                    ),
                     if (recipe.description != null) ...[
                       const SizedBox(height: AppSpacing.xs),
                       Text(
@@ -320,11 +371,18 @@ class _RecipeListCard extends StatelessWidget {
                       const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
-                          Icon(Icons.local_fire_department, size: 16, color: Colors.purple),
+                          Icon(
+                            Icons.local_fire_department,
+                            size: 16,
+                            color: Colors.purple,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${recipe.kcal!.toStringAsFixed(0)} kcal totales',
-                            style: AppTypography.caption(context, color: Colors.purple),
+                            style: AppTypography.caption(
+                              context,
+                              color: Colors.purple,
+                            ),
                           ),
                         ],
                       ),

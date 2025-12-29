@@ -37,7 +37,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     if (slotsJson != null) {
       final List<dynamic> decoded = jsonDecode(slotsJson);
       setState(() {
-        _enabledSlots = decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+        _enabledSlots =
+            decoded.map((e) => Map<String, dynamic>.from(e)).toList();
         _slotsLoaded = true;
       });
     } else {
@@ -110,7 +111,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
       (s) => s['slot'] == slotKey,
       orElse: () => {'icon': _getSlotIcon(slot).codePoint},
     );
-    return IconData(config['icon'] ?? _getSlotIcon(slot).codePoint, fontFamily: 'MaterialIcons');
+    return IconData(
+      config['icon'] ?? _getSlotIcon(slot).codePoint,
+      fontFamily: 'MaterialIcons',
+    );
   }
 
   @override
@@ -121,7 +125,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         useThemeColors: true,
         actions: [
           TextButton.icon(
-            onPressed: () => setState(() => _showPlannersList = !_showPlannersList),
+            onPressed:
+                () => setState(() => _showPlannersList = !_showPlannersList),
             icon: Icon(
               Icons.restaurant_menu,
               color: Theme.of(context).colorScheme.onPrimary,
@@ -135,7 +140,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
             ),
           ),
           PopupMenuButton<ShoppingScope>(
-            icon: Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.onPrimary),
+            icon: Icon(
+              Icons.calendar_today,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             tooltip: 'Alcance del planner',
             onSelected: (scope) => setState(() => _scope = scope),
             itemBuilder:
@@ -145,7 +153,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     child: Row(
                       children: [
                         Icon(
-                          _scope == ShoppingScope.weekly ? Icons.check : Icons.calendar_view_week,
+                          _scope == ShoppingScope.weekly
+                              ? Icons.check
+                              : Icons.calendar_view_week,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -158,7 +168,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     child: Row(
                       children: [
                         Icon(
-                          _scope == ShoppingScope.biweekly ? Icons.check : Icons.calendar_view_week,
+                          _scope == ShoppingScope.biweekly
+                              ? Icons.check
+                              : Icons.calendar_view_week,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -171,7 +183,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     child: Row(
                       children: [
                         Icon(
-                          _scope == ShoppingScope.monthly ? Icons.check : Icons.calendar_view_month,
+                          _scope == ShoppingScope.monthly
+                              ? Icons.check
+                              : Icons.calendar_view_month,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -184,7 +198,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     child: Row(
                       children: [
                         Icon(
-                          _scope == ShoppingScope.custom ? Icons.check : Icons.settings,
+                          _scope == ShoppingScope.custom
+                              ? Icons.check
+                              : Icons.settings,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -195,7 +211,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                 ],
           ),
           IconButton(
-            icon: Icon(Icons.edit_calendar, color: Theme.of(context).colorScheme.onPrimary),
+            icon: Icon(
+              Icons.edit_calendar,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             tooltip: 'Configurar comidas',
             onPressed: _configureMealSlots,
           ),
@@ -218,7 +237,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               if (isMobile) _buildMobileDaySelector(),
               Expanded(
                 child:
-                    isMobile ? _buildMobileDayView(_selectedMobileDay) : _buildWeekPlannerTable(),
+                    isMobile
+                        ? _buildMobileDayView(_selectedMobileDay)
+                        : _buildWeekPlannerTable(),
               ),
             ],
           );
@@ -237,7 +258,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+          colors: [
+            colorScheme.primaryContainer,
+            colorScheme.secondaryContainer,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -260,14 +284,15 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
             return SizedBox(
               height: 120,
               child: Center(
-                child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             );
           }
 
           final theme = Theme.of(context);
           final colorScheme = theme.colorScheme;
-          final isDark = theme.brightness == Brightness.dark;
           final planners = snapshot.data!.docs;
 
           return SizedBox(
@@ -294,10 +319,15 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                     margin: const EdgeInsets.only(right: AppSpacing.sm),
                     decoration: BoxDecoration(
                       color:
-                          isSelected ? colorScheme.surface : colorScheme.surface.withOpacity(0.9),
+                          isSelected
+                              ? colorScheme.surface
+                              : colorScheme.surface.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       border: Border.all(
-                        color: isSelected ? colorScheme.primary : Colors.transparent,
+                        color:
+                            isSelected
+                                ? colorScheme.primary
+                                : Colors.transparent,
                         width: 2,
                       ),
                       boxShadow: [
@@ -317,7 +347,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                           children: [
                             Icon(
                               Icons.restaurant_menu,
-                              color: isSelected ? colorScheme.primary : AppColors.textSecondary,
+                              color:
+                                  isSelected
+                                      ? colorScheme.primary
+                                      : AppColors.textSecondary,
                               size: 20,
                             ),
                             const SizedBox(width: AppSpacing.xs),
@@ -325,8 +358,14 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                               child: Text(
                                 planner.id,
                                 style: AppTypography.label(context).copyWith(
-                                  color: isSelected ? colorScheme.primary : AppColors.textSecondary,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color:
+                                      isSelected
+                                          ? colorScheme.primary
+                                          : AppColors.textSecondary,
+                                  fontWeight:
+                                      isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -349,7 +388,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                       ],
                     ),
                   ),
-                ).animate().fadeIn().scale(delay: Duration(milliseconds: index * 50));
+                ).animate().fadeIn().scale(
+                  delay: Duration(milliseconds: index * 50),
+                );
               },
             ),
           );
@@ -415,7 +456,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                       'Tap para añadir • Mantén pulsado para eliminar',
                                       style: AppTypography.caption(
                                         context,
-                                      ).copyWith(color: AppColors.textSecondary),
+                                      ).copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -429,7 +472,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusLg,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.05),
@@ -444,15 +489,21 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                 border: TableBorder.all(
                                   color: AppColors.borderLight,
                                   width: 1,
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusLg,
+                                  ),
                                 ),
                                 children: [
                                   TableRow(
                                     decoration: BoxDecoration(
                                       gradient: AppColors.foodGradient,
                                       borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(AppSpacing.radiusLg),
-                                        topRight: Radius.circular(AppSpacing.radiusLg),
+                                        topLeft: Radius.circular(
+                                          AppSpacing.radiusLg,
+                                        ),
+                                        topRight: Radius.circular(
+                                          AppSpacing.radiusLg,
+                                        ),
                                       ),
                                     ),
                                     children: [
@@ -468,7 +519,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                     return TableRow(
                                       decoration: BoxDecoration(
                                         color:
-                                            Theme.of(context).brightness == Brightness.dark
+                                            Theme.of(context).brightness ==
+                                                    Brightness.dark
                                                 ? cs.surface
                                                 : (slotIndex.isEven
                                                     ? cs.surfaceContainerHighest
@@ -479,12 +531,17 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                           _getConfiguredSlotName(slot),
                                           _getConfiguredSlotIcon(slot),
                                         ),
-                                        ...dayKeys.asMap().entries.map((dayEntry) {
+                                        ...dayKeys.asMap().entries.map((
+                                          dayEntry,
+                                        ) {
                                           final dayIndex = dayEntry.key;
                                           final dayKey = dayEntry.value;
-                                          final entries = planner.days[dayKey] ?? const [];
+                                          final entries =
+                                              planner.days[dayKey] ?? const [];
                                           final slotEntries =
-                                              entries.where((e) => e.slot == slot).toList();
+                                              entries
+                                                  .where((e) => e.slot == slot)
+                                                  .toList();
 
                                           return _buildMealCell(
                                             planner: planner,
@@ -492,7 +549,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                                             slot: slot,
                                             entries: slotEntries,
                                             foodsMap: foodsMap,
-                                            delay: (slotIndex * 7 + dayIndex) * 30,
+                                            delay:
+                                                (slotIndex * 7 + dayIndex) * 30,
                                           );
                                         }),
                                       ],
@@ -518,13 +576,17 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
 
   Widget _buildHeaderCell(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.sm,
+      ),
       alignment: Alignment.center,
       child: Text(
         text,
-        style: AppTypography.label(
-          context,
-        ).copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
+        style: AppTypography.label(context).copyWith(
+          color: Theme.of(context).colorScheme.onPrimary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -532,7 +594,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   Widget _buildSlotHeaderCell(String text, IconData icon) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.sm,
+      ),
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
@@ -541,9 +606,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
           Expanded(
             child: Text(
               text,
-              style: AppTypography.label(
-                context,
-              ).copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+              style: AppTypography.label(context).copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -583,7 +649,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                         final food = foodsMap[plannerEntry.refId];
 
                         return GestureDetector(
-                          onLongPress: () => _deleteEntry(planner, dayKey, slot, index),
+                          onLongPress:
+                              () => _deleteEntry(planner, dayKey, slot, index),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
@@ -591,14 +658,19 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.food.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                              border: Border.all(color: AppColors.food.withOpacity(0.3)),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
+                              border: Border.all(
+                                color: AppColors.food.withOpacity(0.3),
+                              ),
                             ),
                             child: Text(
                               food?.name ?? plannerEntry.refId,
-                              style: AppTypography.caption(
-                                context,
-                              ).copyWith(color: AppColors.food, fontWeight: FontWeight.w600),
+                              style: AppTypography.caption(context).copyWith(
+                                color: AppColors.food,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         );
@@ -643,23 +715,6 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     }
   }
 
-  IconData _getSlotIconFromString(String slotName) {
-    switch (slotName) {
-      case 'Desayuno':
-        return Icons.wb_sunny_outlined;
-      case 'Snack':
-        return Icons.apple;
-      case 'Comida':
-        return Icons.lunch_dining;
-      case 'Merienda':
-        return Icons.coffee;
-      case 'Cena':
-        return Icons.dinner_dining;
-      default:
-        return Icons.restaurant;
-    }
-  }
-
   String _formatDate(dynamic timestamp) {
     if (timestamp == null) return 'Reciente';
     try {
@@ -678,14 +733,20 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
 
   Future<void> _generateShoppingList() async {
     try {
-      await widget.svc.generateShoppingFromWeek(_currentPlannerId, scopeOverride: _scope);
+      await widget.svc.generateShoppingFromWeek(
+        _currentPlannerId,
+        scopeOverride: _scope,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
+                Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text('Lista de compras generada (${_getScopeLabel(_scope)})'),
               ],
@@ -739,7 +800,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               autofocus: true,
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, controller.text),
                 child: const Text('Crear'),
@@ -838,20 +902,35 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             final food = foods[index];
                             return ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: AppColors.food.withOpacity(0.2),
+                                backgroundColor: AppColors.food.withOpacity(
+                                  0.2,
+                                ),
                                 child: const Icon(Icons.restaurant, size: 20),
                               ),
-                              title: Text(food.name, style: AppTypography.body(context)),
+                              title: Text(
+                                food.name,
+                                style: AppTypography.body(context),
+                              ),
                               subtitle:
                                   food.brand != null
-                                      ? Text(food.brand!, style: AppTypography.caption(context))
+                                      ? Text(
+                                        food.brand!,
+                                        style: AppTypography.caption(context),
+                                      )
                                       : null,
                               trailing: Text(
                                 '${food.kcal.toStringAsFixed(0)} kcal',
-                                style: AppTypography.label(context).copyWith(color: AppColors.food),
+                                style: AppTypography.label(
+                                  context,
+                                ).copyWith(color: AppColors.food),
                               ),
                               onTap: () async {
-                                await _addFoodToSlot(planner, dayKey, slot, food.id);
+                                await _addFoodToSlot(
+                                  planner,
+                                  dayKey,
+                                  slot,
+                                  food.id,
+                                );
                                 if (context.mounted) Navigator.pop(context);
                               },
                             );
@@ -871,17 +950,35 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     MealSlot slot,
     String foodId,
   ) async {
-    final dayList = List<PlannerDayEntry>.from(planner.days[dayKey] ?? const []);
-    dayList.add(PlannerDayEntry(slot: slot, type: FavoriteType.food, refId: foodId, servings: 1.0));
+    final dayList = List<PlannerDayEntry>.from(
+      planner.days[dayKey] ?? const [],
+    );
+    dayList.add(
+      PlannerDayEntry(
+        slot: slot,
+        type: FavoriteType.food,
+        refId: foodId,
+        servings: 1.0,
+      ),
+    );
 
     final newDays = Map<String, List<PlannerDayEntry>>.from(planner.days);
     newDays[dayKey] = dayList;
 
-    await widget.svc.saveWeek(WeekPlanner(id: _currentPlannerId, scope: _scope, days: newDays));
+    await widget.svc.saveWeek(
+      WeekPlanner(id: _currentPlannerId, scope: _scope, days: newDays),
+    );
   }
 
-  Future<void> _deleteEntry(WeekPlanner planner, String dayKey, MealSlot slot, int index) async {
-    final dayList = List<PlannerDayEntry>.from(planner.days[dayKey] ?? const []);
+  Future<void> _deleteEntry(
+    WeekPlanner planner,
+    String dayKey,
+    MealSlot slot,
+    int index,
+  ) async {
+    final dayList = List<PlannerDayEntry>.from(
+      planner.days[dayKey] ?? const [],
+    );
     final filtered = dayList.where((e) => e.slot == slot).toList();
 
     if (index >= filtered.length) return;
@@ -892,7 +989,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
     final newDays = Map<String, List<PlannerDayEntry>>.from(planner.days);
     newDays[dayKey] = dayList;
 
-    await widget.svc.saveWeek(WeekPlanner(id: _currentPlannerId, scope: _scope, days: newDays));
+    await widget.svc.saveWeek(
+      WeekPlanner(id: _currentPlannerId, scope: _scope, days: newDays),
+    );
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -906,7 +1005,15 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
   }
 
   Widget _buildMobileDaySelector() {
-    final days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    final days = [
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado',
+      'domingo',
+    ];
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -923,7 +1030,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
         itemCount: days.length,
         itemBuilder: (context, index) {
           final day = days[index];
@@ -937,7 +1047,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   color:
-                      isSelected ? Theme.of(context).colorScheme.onPrimary : colorScheme.onSurface,
+                      isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : colorScheme.onSurface,
                 ),
               ),
               selected: isSelected,
@@ -964,7 +1076,8 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
         }
 
         final planner =
-            snap.data ?? WeekPlanner(id: _currentPlannerId, scope: _scope, days: const {});
+            snap.data ??
+            WeekPlanner(id: _currentPlannerId, scope: _scope, days: const {});
         final slots = _slotsLoaded ? _getActiveSlots() : MealSlot.values;
 
         return StreamBuilder<List<Food>>(
@@ -984,7 +1097,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
               itemBuilder: (context, index) {
                 final slot = slots[index];
                 final entries =
-                    (planner.days[dayKey] ?? const []).where((e) => e.slot == slot).toList();
+                    (planner.days[dayKey] ?? const [])
+                        .where((e) => e.slot == slot)
+                        .toList();
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -1003,7 +1118,10 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                         ),
                         child: Row(
                           children: [
-                            Icon(_getConfiguredSlotIcon(slot), color: colorScheme.primary),
+                            Icon(
+                              _getConfiguredSlotIcon(slot),
+                              color: colorScheme.primary,
+                            ),
                             const SizedBox(width: AppSpacing.sm),
                             Text(
                               _getConfiguredSlotName(slot),
@@ -1013,8 +1131,17 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: Icon(Icons.add_circle, color: colorScheme.primary),
-                              onPressed: () => _openFoodSelector(planner, dayKey, slot, foodsMap),
+                              icon: Icon(
+                                Icons.add_circle,
+                                color: colorScheme.primary,
+                              ),
+                              onPressed:
+                                  () => _openFoodSelector(
+                                    planner,
+                                    dayKey,
+                                    slot,
+                                    foodsMap,
+                                  ),
                             ),
                           ],
                         ),
@@ -1039,8 +1166,17 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             return ListTile(
                               title: Text('Alimento no encontrado'),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _deleteEntry(planner, dayKey, slot, entryIndex),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed:
+                                    () => _deleteEntry(
+                                      planner,
+                                      dayKey,
+                                      slot,
+                                      entryIndex,
+                                    ),
                               ),
                             );
                           }
@@ -1049,7 +1185,9 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             leading: CircleAvatar(
                               backgroundColor: colorScheme.primaryContainer,
                               child: Icon(
-                                food.isSupplement ? Icons.medication : Icons.restaurant,
+                                food.isSupplement
+                                    ? Icons.medication
+                                    : Icons.restaurant,
                                 color: colorScheme.primary,
                                 size: 20,
                               ),
@@ -1060,7 +1198,13 @@ class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteEntry(planner, dayKey, slot, entryIndex),
+                              onPressed:
+                                  () => _deleteEntry(
+                                    planner,
+                                    dayKey,
+                                    slot,
+                                    entryIndex,
+                                  ),
                             ),
                           );
                         }),
@@ -1183,7 +1327,9 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
         height: 400,
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.radiusXl),
+          ),
         ),
         child: const Center(child: CircularProgressIndicator()),
       );
@@ -1192,7 +1338,9 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
       ),
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: SafeArea(
@@ -1204,7 +1352,10 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? colorScheme.onSurface.withOpacity(0.3) : AppColors.grey300,
+                color:
+                    isDark
+                        ? colorScheme.onSurface.withOpacity(0.3)
+                        : AppColors.grey300,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
@@ -1217,14 +1368,21 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                     color: colorScheme.primary.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   ),
-                  child: Icon(Icons.edit_calendar, color: colorScheme.primary, size: 28),
+                  child: Icon(
+                    Icons.edit_calendar,
+                    color: colorScheme.primary,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Configurar Comidas', style: AppTypography.heading2(context)),
+                      Text(
+                        'Configurar Comidas',
+                        style: AppTypography.heading2(context),
+                      ),
                       Text(
                         'Personaliza las comidas del día',
                         style: AppTypography.caption(context),
@@ -1232,7 +1390,10 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                     ],
                   ),
                 ),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ],
             ),
 
@@ -1265,14 +1426,22 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                       trailing: PopupMenuButton<int>(
                         icon: Icon(
                           IconData(slot['icon'], fontFamily: 'MaterialIcons'),
-                          color: slot['enabled'] ? colorScheme.primary : Colors.grey,
+                          color:
+                              slot['enabled']
+                                  ? colorScheme.primary
+                                  : Colors.grey,
                         ),
                         enabled: slot['enabled'],
-                        onSelected: (iconCode) => setState(() => slot['icon'] = iconCode),
+                        onSelected:
+                            (iconCode) =>
+                                setState(() => slot['icon'] = iconCode),
                         itemBuilder:
                             (context) =>
                                 _availableIcons.map((icon) {
-                                  return PopupMenuItem(value: icon.codePoint, child: Icon(icon));
+                                  return PopupMenuItem(
+                                    value: icon.codePoint,
+                                    child: Icon(icon),
+                                  );
                                 }).toList(),
                       ),
                     ),
@@ -1350,16 +1519,21 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                               children: [
                                 Icon(
                                   Icons.check_circle,
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
-                                const Text('Configuración guardada correctamente'),
+                                const Text(
+                                  'Configuración guardada correctamente',
+                                ),
                               ],
                             ),
                             backgroundColor: Colors.green.shade600,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
                             ),
                           ),
                         );
