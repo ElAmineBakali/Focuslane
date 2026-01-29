@@ -81,7 +81,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      // Only the Month view is currently enabled; set length to 1
+      length: 1,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Calendario'),

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../widgets/global_ui_components.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../theme/food_theme.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
+import 'widgets/food_components.dart';
+import 'widgets/food_sections.dart';
 import '../diary/food_diary_screen_v2.dart';
-import '../foods/foods_list_screen_v2.dart';
 import '../recipes/recipes_list_screen_v2.dart';
 import '../planner/food_planner_screen_v2.dart';
 import '../shopping/shopping_lists_screen_v2.dart';
-import '../pantry/pantry_screen_v2.dart';
-import '../history/food_history_screen_v2.dart';
 
-/// FOOD HOME SCREEN V2 - Rediseñado
-/// Dashboard principal del módulo de alimentación con diseño moderno
+/// FOOD HOME SCREEN - Rediseñado con estilo premium SaaS
+/// Dashboard principal del módulo Food con diseño moderno y profesional
+/// Paleta pastel: #D7CDC2, #B5A89B, #80AAA6, #A0BFBD, #D2E2E0, #E5EDEF
 class FoodHomeScreenV2 extends StatefulWidget {
   final FoodFirestoreService svc;
+  
   const FoodHomeScreenV2({super.key, required this.svc});
 
   @override
@@ -29,589 +27,97 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
   @override
   Widget build(BuildContext context) {
     final todayId = _dayId(DateTime.now());
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1200;
+    final isTablet = screenWidth >= 600 && screenWidth < 1200;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // AppBar moderno con gradiente
-          SliverAppBar.large(
-            expandedHeight: 200,
-            pinned: true,
-            stretch: true,
-            backgroundColor: colorScheme.primaryContainer,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Alimentación',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primaryContainer,
-                      colorScheme.secondaryContainer.withOpacity(0.8),
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: -20,
-                      top: 40,
-                      child: Icon(
-                        Icons.restaurant,
-                        size: 120,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withOpacity(0.15),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              // Historial
-              IconButton(
-                icon: const Icon(Icons.history),
-                tooltip: 'Historial',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FoodHistoryScreenV2(svc: widget.svc),
-                    ),
-                  );
-                },
-              ),
-              // Configuración de recordatorios
-              IconButton(
-                icon: const Icon(Icons.notifications_active_outlined),
-                tooltip: 'Recordatorios',
-                onPressed: () => _showRemindersSheet(context),
-              ),
-            ],
-          ),
-
-          // Contenido
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(FocusSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Alerta de stock bajo
-                  StreamBuilder<int>(
-                    stream: widget.svc.streamPantry().map(
-                      (items) =>
-                          items
-                              .where((i) => (i.qty ?? 0) < (i.minQty ?? 0))
-                              .length,
-                    ),
-                    builder: (context, snap) {
-                      final count = snap.data ?? 0;
-                      if (count == 0) return const SizedBox.shrink();
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: FocusSpacing.lg),
-                        padding: const EdgeInsets.all(FocusSpacing.lg),
-                        decoration: BoxDecoration(
-                          color: FocusColors.warning.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(
-                            FocusSpacing.radiusLg,
-                          ),
-                          border: Border.all(
-                            color: FocusColors.warning.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.warning_amber,
-                              color: FocusColors.warning,
-                              size: 32,
-                            ),
-                            const SizedBox(width: FocusSpacing.md),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Stock bajo en despensa',
-                                    style: FocusTypography.heading4(context),
-                                  ),
-                                  Text(
-                                    '$count producto${count > 1 ? 's' : ''} necesita${count > 1 ? 'n' : ''} reposición',
-                                    style: FocusTypography.caption(context),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => PantryScreenV2(svc: widget.svc),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ).animate().fadeIn().slideY(begin: -0.2, end: 0);
-                    },
-                  ),
-
-                  // Resumen del día
-                  StreamBuilder<DailyIntakeDoc>(
-                    stream: widget.svc.streamDay(todayId),
-                    builder: (context, daySnap) {
-                      return StreamBuilder<Map<String, double?>>(
-                        stream: widget.svc.streamGlobalTargets(),
-                        builder: (context, targetsSnap) {
-                          final day =
-                              daySnap.data ??
-                              DailyIntakeDoc(
-                                id: todayId,
-                                entries: const [],
-                                waterMl: 0,
-                                totals: const {
-                                  'kcal': 0.0,
-                                  'protein': 0.0,
-                                  'carbs': 0.0,
-                                  'fat': 0.0,
-                                  'fiber': 0.0,
-                                  'sodium': 0.0,
-                                },
-                                targets: const {},
-                              );
-
-                          final globalTargets = targetsSnap.data ?? const {};
-
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => FoodDiaryScreenV2(svc: widget.svc),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(
-                              FocusSpacing.radiusLg,
-                            ),
-                            child: _buildDaySummary(
-                              context,
-                              day,
-                              globalTargets,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: FocusSpacing.xl),
-
-                  // Sugerencias inteligentes
-                  StreamBuilder<List<String>>(
-                    stream: Stream.value([]),
-                    builder: (context, snap) {
-                      final suggestions = snap.data ?? [];
-                      if (suggestions.isEmpty) return const SizedBox.shrink();
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '💡 Sugerencias',
-                            style: FocusTypography.heading3(context),
-                          ),
-                          const SizedBox(height: FocusSpacing.md),
-                          ...suggestions.map(
-                            (s) => Container(
-                              margin: const EdgeInsets.only(
-                                bottom: FocusSpacing.sm,
-                              ),
-                              padding: const EdgeInsets.all(FocusSpacing.md),
-                              decoration: BoxDecoration(
-                                color: FocusColors.info.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(
-                                  FocusSpacing.radiusMd,
-                                ),
-                                border: Border.all(
-                                  color: FocusColors.info.withOpacity(0.3),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.lightbulb_outline,
-                                    color: FocusColors.info,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: FocusSpacing.md),
-                                  Expanded(
-                                    child: Text(
-                                      s,
-                                      style: FocusTypography.bodySmall(context),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: FocusSpacing.xl),
-                        ],
-                      );
-                    },
-                  ),
-
-                  // Favoritos
-                  StreamBuilder<List<Favorite>>(
-                    stream: widget.svc.streamFavorites(),
-                    builder: (context, snap) {
-                      final favs = snap.data ?? [];
-                      if (favs.isEmpty) return const SizedBox.shrink();
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '⭐ Favoritos',
-                                style: FocusTypography.heading3(context),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // TODO: Implementar FavoritesScreen
-                                  /* Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          FavoritesScreen(svc: widget.svc),
-                                    ),
-                                  ); */
-                                },
-                                child: const Text('Ver todos'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: FocusSpacing.md),
-                          SizedBox(
-                            height: 100,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: favs.length,
-                              itemBuilder: (_, i) {
-                                final fav = favs[i];
-                                return _buildFavoriteChip(context, fav);
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: FocusSpacing.xl),
-                        ],
-                      );
-                    },
-                  ),
-
-                  // Grid de acciones rápidas
-                  Text(
-                    'Acciones Rápidas',
-                    style: FocusTypography.heading3(context),
-                  ),
-                  const SizedBox(height: FocusSpacing.md),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: FocusSpacing.md,
-                    crossAxisSpacing: FocusSpacing.md,
-                    childAspectRatio: 1.3,
-                    children: [
-                      FocusActionCard(
-                        title: 'Diario',
-                        icon: Icons.today,
-                        color: colorScheme.primary,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => FoodDiaryScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 100.ms,
-                      ),
-                      FocusActionCard(
-                        title: 'Alimentos',
-                        icon: Icons.restaurant,
-                        color: Colors.blue,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => FoodsListScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 200.ms,
-                      ),
-                      FocusActionCard(
-                        title: 'Recetas',
-                        icon: Icons.menu_book,
-                        color: Colors.purple,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => RecipesListScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 300.ms,
-                      ),
-                      FocusActionCard(
-                        title: 'Planificador',
-                        icon: Icons.calendar_view_week,
-                        color: Colors.green,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => FoodPlannerScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 400.ms,
-                      ),
-                      FocusActionCard(
-                        title: 'Compras',
-                        icon: Icons.shopping_cart,
-                        color: Colors.orange,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => ShoppingListsScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 500.ms,
-                      ),
-                      FocusActionCard(
-                        title: 'Despensa',
-                        icon: Icons.kitchen,
-                        color: Colors.brown,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PantryScreenV2(svc: widget.svc),
-                            ),
-                          );
-                        },
-                        animationDelay: 600.ms,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 80),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDaySummary(
-    BuildContext context,
-    DailyIntakeDoc day,
-    Map<String, double?> globalTargets,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final mergedTargets = Map<String, double?>.from(day.targets);
-    for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
-      mergedTargets[k] ??= globalTargets[k];
-    }
-    mergedTargets['water'] ??= globalTargets['water'];
-
-    final t = day.totals;
-    final waterTarget = (mergedTargets['water'] ?? 2000).toInt();
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(FocusSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Resumen de Hoy',
-                  style: FocusTypography.heading3(context),
-                ),
-                Icon(Icons.chevron_right, color: FocusColors.grey600),
-              ],
-            ),
-            const SizedBox(height: FocusSpacing.lg),
-
-            // Macros principales
-            _buildMiniMacro(
-              context,
-              'Calorías',
-              t['kcal'] ?? 0,
-              mergedTargets['kcal'],
-              colorScheme.primary,
-              'kcal',
-            ),
-            _buildMiniMacro(
-              context,
-              'Proteínas',
-              t['protein'] ?? 0,
-              mergedTargets['protein'],
-              Colors.red,
-              'g',
-            ),
-            _buildMiniMacro(
-              context,
-              'Carbos',
-              t['carbs'] ?? 0,
-              mergedTargets['carbs'],
-              Colors.blue,
-              'g',
-            ),
-            _buildMiniMacro(
-              context,
-              'Grasas',
-              t['fat'] ?? 0,
-              mergedTargets['fat'],
-              Colors.green,
-              'g',
-            ),
-
-            const SizedBox(height: FocusSpacing.md),
-            const Divider(),
-            const SizedBox(height: FocusSpacing.md),
-
-            // Agua
-            Row(
-              children: [
-                Icon(Icons.water_drop, color: Colors.blue, size: 20),
-                const SizedBox(width: FocusSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Agua', style: FocusTypography.label(context)),
-                          Text(
-                            '${day.waterMl} / $waterTarget ml',
-                            style: FocusTypography.caption(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: FocusSpacing.xs),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          FocusSpacing.radiusSm,
-                        ),
-                        child: LinearProgressIndicator(
-                          value:
-                              waterTarget > 0
-                                  ? (day.waterMl / waterTarget).clamp(0.0, 1.0)
-                                  : 0,
-                          backgroundColor: Colors.blue.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation(Colors.blue),
-                          minHeight: 6,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn().scale();
-  }
-
-  Widget _buildMiniMacro(
-    BuildContext context,
-    String label,
-    double value,
-    double? target,
-    Color color,
-    String unit,
-  ) {
-    final progress =
-        target != null && target > 0 ? (value / target).clamp(0.0, 1.0) : 0.0;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: FocusSpacing.md),
-      child: Row(
+      backgroundColor: FoodTheme.getScaffoldBackground(context),
+      body: Column(
         children: [
+          // Top Bar con padding
           Container(
-            width: 4,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
+            color: FoodTheme.getCardBackground(context),
+            padding: EdgeInsets.all(
+              isDesktop ? FoodTheme.spacing24 : FoodTheme.spacing16,
+            ),
+            child: FoodTopBar(
+              onNewRecipe: () => _navigateToRecipes(context),
+              onWeeklyPlan: () => _navigateToPlanner(context),
+              onFilter: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Filtros próximamente')),
+                );
+              },
             ),
           ),
-          const SizedBox(width: FocusSpacing.md),
+          
+          // Contenido principal con scroll
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
+              padding: EdgeInsets.all(
+                isDesktop ? FoodTheme.spacing40 : FoodTheme.spacing16,
+              ),
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(label, style: FocusTypography.label(context)),
-                    Text(
-                      '${value.toStringAsFixed(0)}${target != null ? ' / ${target.toStringAsFixed(0)}' : ''} $unit',
-                      style: FocusTypography.caption(context),
-                    ),
-                  ],
+                // Sección de métricas
+                _buildMetricsSection(context, todayId, isDesktop),
+                const SizedBox(height: FoodTheme.spacing30),
+                
+                // Plan semanal
+                FoodWeeklyPlanCard(
+                  weekPlan: {
+                    '2026-01-27': {
+                      'Desayuno': 'Avena con Frutas',
+                      'Comida': 'Pollo al Horno',
+                      'Cena': 'Ensalada César',
+                    },
+                    '2026-01-28': {
+                      'Desayuno': 'Smoothie Proteico',
+                      'Comida': 'Pasta Carbonara',
+                      'Cena': 'Salmón a la Plancha',
+                    },
+                    '2026-01-29': {
+                      'Desayuno': 'Tostadas con Aguacate',
+                      'Comida': 'Arroz con Pollo',
+                      'Cena': 'Tacos de Pescado',
+                    },
+                    '2026-01-30': {
+                      'Desayuno': 'Yogurt con Granola',
+                      'Comida': 'Hamburguesa Fit',
+                      'Cena': 'Wrap de Pollo',
+                    },
+                    '2026-01-31': {
+                      'Desayuno': 'Pancakes Proteicos',
+                      'Comida': 'Sushi Bowl',
+                      'Cena': 'Pizza Casera',
+                    },
+                    '2026-02-01': {
+                      'Desayuno': 'Huevos Revueltos',
+                      'Comida': 'Pasta con Verduras',
+                      'Cena': 'Filete con Ensalada',
+                    },
+                    '2026-02-02': {
+                      'Desayuno': 'Batido Verde',
+                      'Comida': 'Burritos',
+                      'Cena': 'Sopa de Verduras',
+                    },
+                  },
+                  onGeneratePlan: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Generación automática próximamente'),
+                      ),
+                    );
+                  },
+                  onExportList: () => _navigateToShopping(context),
+                  onViewCalendar: () => _navigateToPlanner(context),
                 ),
-                const SizedBox(height: FocusSpacing.xs),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(FocusSpacing.radiusSm),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: color.withOpacity(0.2),
-                    valueColor: AlwaysStoppedAnimation(color),
-                    minHeight: 6,
-                  ),
-                ),
+                const SizedBox(height: FoodTheme.spacing30),
+                
+                // Sección inferior: Recetas y Lista de compra
+                isDesktop || isTablet
+                    ? _buildBottomSectionDesktop(context)
+                    : _buildBottomSectionMobile(context),
               ],
             ),
           ),
@@ -620,507 +126,341 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     );
   }
 
-  Widget _buildFavoriteChip(BuildContext context, Favorite fav) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 120,
-      margin: const EdgeInsets.only(right: FocusSpacing.md),
-      child: Material(
-        color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
-        child: InkWell(
-          onTap: () async {
-            // Añadir al diario desde favorito
-            final todayId = _dayId(DateTime.now());
-            // Lógica de añadir (implementar según sea food o recipe)
+  /// Sección de métricas (4 tarjetas)
+  Widget _buildMetricsSection(
+    BuildContext context,
+    String todayId,
+    bool isDesktop,
+  ) {
+    return StreamBuilder<DailyIntakeDoc>(
+      stream: widget.svc.streamDay(todayId),
+      builder: (context, daySnap) {
+        // Si hay error, usar valores por defecto sin mostrar snackbar durante build
+        final day = daySnap.data ??
+            DailyIntakeDoc(
+              id: todayId,
+              entries: const [],
+              waterMl: 0,
+              totals: const {
+                'kcal': 0.0,
+                'protein': 0.0,
+                'carbs': 0.0,
+                'fat': 0.0,
+              },
+              targets: const {},
+            );
+
+        final kcal = day.totals['kcal'] ?? 0.0;
+        final protein = day.totals['protein'] ?? 0.0;
+        
+        return StreamBuilder<List<Recipe>>(
+          stream: widget.svc.streamRecipes(),
+          builder: (context, recipesSnap) {
+            // Si hay error, usar valor por defecto
+            final recipesCount = recipesSnap.data?.length ?? 0;
+
+            return StreamBuilder<List<ShoppingList>>(
+              stream: widget.svc.streamShoppingLists(),
+              builder: (context, shoppingSnap) {
+                // Si hay error, usar valor por defecto
+                final shoppingItems =
+                    shoppingSnap.data?.expand((list) => list.items).length ?? 0;
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Responsive: 4 columnas en desktop, 2 en tablet, 1 en mobile
+                    final crossAxisCount = constraints.maxWidth >= 1200
+                        ? 4
+                        : constraints.maxWidth >= 600
+                            ? 2
+                            : 1;
+                    
+                    final cards = [
+                      FoodMetricCard(
+                        icon: Icons.local_fire_department,
+                        label: 'Calorías hoy',
+                        value: '${kcal.toStringAsFixed(0)} kcal',
+                        subtitle: 'de 2,000 objetivo',
+                        accentColor: FoodTheme.tealSoft,
+                        onTap: () => _navigateToDiary(context),
+                      ),
+                      FoodMetricCard(
+                        icon: Icons.fitness_center,
+                        label: 'Proteína hoy',
+                        value: '${protein.toStringAsFixed(0)} g',
+                        subtitle: 'de 150g objetivo',
+                        accentColor: FoodTheme.tealLight,
+                        onTap: () => _navigateToDiary(context),
+                      ),
+                      FoodMetricCard(
+                        icon: Icons.restaurant_menu,
+                        label: 'Recetas guardadas',
+                        value: '$recipesCount',
+                        subtitle: 'en tu biblioteca',
+                        accentColor: FoodTheme.taupe,
+                        onTap: () => _navigateToRecipes(context),
+                      ),
+                      FoodMetricCard(
+                        icon: Icons.shopping_cart,
+                        label: 'Lista de compra',
+                        value: '$shoppingItems items',
+                        subtitle: 'pendientes',
+                        accentColor: FoodTheme.beigeSoft,
+                        onTap: () => _navigateToShopping(context),
+                      ),
+                    ];
+
+                    if (crossAxisCount == 1) {
+                      // Mobile: columna simple
+                      return Column(
+                        children: cards
+                            .map(
+                              (card) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: FoodTheme.spacing16,
+                                ),
+                                child: card,
+                              ),
+                            )
+                            .toList(),
+                      );
+                    } else {
+                      // Desktop/Tablet: Grid
+                      return GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: FoodTheme.spacing16,
+                        mainAxisSpacing: FoodTheme.spacing16,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: 1.3,
+                        children: cards,
+                      );
+                    }
+                  },
+                );
+              },
+            );
           },
-          borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
-          child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.md),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  fav.type == FavoriteType.food
-                      ? Icons.restaurant
-                      : Icons.menu_book,
-                  color: colorScheme.primary,
-                  size: 28,
-                ),
-                const SizedBox(height: FocusSpacing.sm),
-                Text(
-                  fav.alias ?? 'Favorito',
-                  style: FocusTypography.bodySmall(context),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
+        );
+      },
+    );
+  }
+
+  /// Sección inferior para desktop (2 columnas)
+  Widget _buildBottomSectionDesktop(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Columna izquierda: Recetas recientes
+        Expanded(
+          flex: 2,
+          child: _buildRecipesSection(context),
         ),
-      ),
+        const SizedBox(width: FoodTheme.spacing24),
+        // Columna derecha: Lista de compra
+        Expanded(
+          flex: 1,
+          child: _buildShoppingSection(context),
+        ),
+      ],
     );
   }
 
-  Future<void> _showRemindersSheet(BuildContext context) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => _RemindersSheet(svc: widget.svc),
+  /// Sección inferior para mobile (columnas apiladas)
+  Widget _buildBottomSectionMobile(BuildContext context) {
+    return Column(
+      children: [
+        _buildRecipesSection(context),
+        const SizedBox(height: FoodTheme.spacing24),
+        _buildShoppingSection(context),
+      ],
     );
   }
-}
 
-/// Sheet de configuración de recordatorios
-class _RemindersSheet extends StatefulWidget {
-  final FoodFirestoreService svc;
-  const _RemindersSheet({required this.svc});
-
-  @override
-  State<_RemindersSheet> createState() => _RemindersSheetState();
-}
-
-class _RemindersSheetState extends State<_RemindersSheet> {
-  bool _mealReminders = false;
-  bool _waterReminders = false;
-  bool _supplementReminders = false;
-  bool _goalReminders = false;
-
-  TimeOfDay _breakfastTime = const TimeOfDay(hour: 8, minute: 0);
-  TimeOfDay _lunchTime = const TimeOfDay(hour: 14, minute: 0);
-  TimeOfDay _dinnerTime = const TimeOfDay(hour: 20, minute: 0);
-
-  // Intervalos de agua más granulares (en minutos)
-  int _waterIntervalMinutes = 120; // Por defecto 2 horas
-  TimeOfDay _waterStartTime = const TimeOfDay(hour: 8, minute: 0);
-  TimeOfDay _waterEndTime = const TimeOfDay(hour: 22, minute: 0);
-
-  // Intervalo de objetivos
-  TimeOfDay _goalReminderTime = const TimeOfDay(hour: 20, minute: 0);
-  bool _weekendsOnly = false;
-
-  // Días de la semana para cada tipo de recordatorio
-  List<bool> _mealDays = List.filled(7, true); // Lun-Dom
-  List<bool> _waterDays = List.filled(7, true);
-  List<bool> _goalDays = List.filled(7, true);
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  /// Sección de recetas recientes/recomendadas
+  Widget _buildRecipesSection(BuildContext context) {
+    // DATOS DE EJEMPLO para visualizar el diseño
+    final exampleRecipes = [
+      {'name': 'Pollo al Horno con Verduras', 'tags': ['Cena', 'Alto en proteína'], 'kcal': 420.0, 'protein': 45.0},
+      {'name': 'Ensalada César con Pollo', 'tags': ['Almuerzo', 'Saludable'], 'kcal': 350.0, 'protein': 38.0},
+      {'name': 'Pasta Carbonara Light', 'tags': ['Cena', 'Italiana'], 'kcal': 480.0, 'protein': 28.0},
+      {'name': 'Salmón a la Plancha', 'tags': ['Cena', 'Omega-3'], 'kcal': 380.0, 'protein': 42.0},
+      {'name': 'Smoothie Bowl Proteico', 'tags': ['Desayuno', 'Post-entreno'], 'kcal': 320.0, 'protein': 25.0},
+      {'name': 'Tacos de Pescado', 'tags': ['Almuerzo', 'Mexicana'], 'kcal': 390.0, 'protein': 35.0},
+    ];
 
     return Container(
+      padding: const EdgeInsets.all(FoodTheme.spacing24),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXl),
+        color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(FoodTheme.radiusLarge),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color:
-                        isDark
-                            ? colorScheme.onSurface.withOpacity(0.3)
-                            : AppColors.grey300,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                  ),
-                ),
-              ),
-
-              // Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    ),
-                    child: Icon(
-                      Icons.notifications_active,
-                      color: colorScheme.primary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Text(
-                      'Recordatorios',
-                      style: AppTypography.heading2(context),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Recordatorios de comidas
-              _buildReminderSection(
-                icon: Icons.restaurant_menu,
-                title: 'Comidas del día',
-                subtitle: 'Notificaciones para desayuno, comida y cena',
-                value: _mealReminders,
-                onChanged: (v) => setState(() => _mealReminders = v),
-                expanded: _mealReminders,
-                children: [
-                  _buildTimeSelector(
-                    'Desayuno',
-                    Icons.wb_sunny,
-                    _breakfastTime,
-                    (time) => setState(() => _breakfastTime = time),
-                  ),
-                  _buildTimeSelector(
-                    'Comida',
-                    Icons.restaurant,
-                    _lunchTime,
-                    (time) => setState(() => _lunchTime = time),
-                  ),
-                  _buildTimeSelector(
-                    'Cena',
-                    Icons.dinner_dining,
-                    _dinnerTime,
-                    (time) => setState(() => _dinnerTime = time),
-                  ),
-                  _buildDaysSelector('Días activos', _mealDays),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
-              // Recordatorios de agua
-              _buildReminderSection(
-                icon: Icons.water_drop,
-                title: 'Hidratación',
-                subtitle: 'Recordatorios recurrentes de agua',
-                value: _waterReminders,
-                onChanged: (v) => setState(() => _waterReminders = v),
-                expanded: _waterReminders,
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.schedule, color: colorScheme.primary),
-                    title: const Text('Intervalo'),
-                    trailing: DropdownButton<int>(
-                      value: _waterIntervalMinutes,
-                      items: const [
-                        DropdownMenuItem(value: 15, child: Text('15 min')),
-                        DropdownMenuItem(value: 30, child: Text('30 min')),
-                        DropdownMenuItem(value: 45, child: Text('45 min')),
-                        DropdownMenuItem(value: 60, child: Text('1 hora')),
-                        DropdownMenuItem(value: 90, child: Text('1.5 horas')),
-                        DropdownMenuItem(value: 120, child: Text('2 horas')),
-                        DropdownMenuItem(value: 180, child: Text('3 horas')),
-                        DropdownMenuItem(value: 240, child: Text('4 horas')),
-                      ],
-                      onChanged:
-                          (v) => setState(() => _waterIntervalMinutes = v!),
-                    ),
-                  ),
-                  _buildTimeRangeSelector(
-                    'Horario activo',
-                    Icons.access_time,
-                    _waterStartTime,
-                    _waterEndTime,
-                    (start) => setState(() => _waterStartTime = start),
-                    (end) => setState(() => _waterEndTime = end),
-                  ),
-                  _buildDaysSelector('Días activos', _waterDays),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
-              // Recordatorios de suplementos
-              _buildReminderSection(
-                icon: Icons.medication,
-                title: 'Suplementos',
-                subtitle: 'Recuerda tomar tus suplementos',
-                value: _supplementReminders,
-                onChanged: (v) => setState(() => _supplementReminders = v),
-                expanded: _supplementReminders,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Text(
-                      'Configura horarios personalizados para cada suplemento en su ficha individual',
-                      style: AppTypography.caption(context),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
-              // Recordatorios de objetivos
-              _buildReminderSection(
-                icon: Icons.flag,
-                title: 'Objetivos diarios',
-                subtitle: 'Revisa tu progreso de calorías y macros',
-                value: _goalReminders,
-                onChanged: (v) => setState(() => _goalReminders = v),
-                expanded: _goalReminders,
-                children: [
-                  _buildTimeSelector(
-                    'Hora del recordatorio',
-                    Icons.schedule,
-                    _goalReminderTime,
-                    (time) => setState(() => _goalReminderTime = time),
-                  ),
-                  SwitchListTile(
-                    value: _weekendsOnly,
-                    onChanged: (v) => setState(() => _weekendsOnly = v),
-                    title: const Text('Solo en fin de semana'),
-                    secondary: const Icon(Icons.weekend),
-                  ),
-                  if (!_weekendsOnly)
-                    _buildDaysSelector('Días activos', _goalDays),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Botón de guardar
-              ModernPrimaryButton(
-                label: 'Guardar Preferencias',
-                icon: Icons.save,
-                fullWidth: true,
-                onPressed: () {
-                  // TODO: Guardar en Firestore/SharedPreferences
-                  Navigator.pop(context);
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FoodSectionHeader(
+            title: 'Recetas Recientes',
+            subtitle: 'Tus favoritas',
+            icon: Icons.restaurant,
+            actionLabel: 'Ver todas',
+            onActionPressed: () => _navigateToRecipes(context),
+          ),
+          const SizedBox(height: FoodTheme.spacing20),
+          ...exampleRecipes.map((recipe) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: FoodTheme.spacing12),
+              child: FoodRecipeCard(
+                name: recipe['name'] as String,
+                tags: recipe['tags'] as List<String>,
+                kcal: recipe['kcal'] as double,
+                protein: recipe['protein'] as double,
+                onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          const Text('Preferencias guardadas'),
-                        ],
-                      ),
-                      backgroundColor: Colors.green.shade600,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMd,
-                        ),
-                      ),
-                      margin: const EdgeInsets.all(AppSpacing.md),
-                    ),
+                    SnackBar(content: Text('Abriendo: ${recipe['name']}')),
                   );
                 },
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReminderSection({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-    required bool expanded,
-    List<Widget> children = const [],
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Card(
-      elevation: 2,
-      child: Column(
-        children: [
-          SwitchListTile(
-            value: value,
-            onChanged: onChanged,
-            title: Text(title, style: AppTypography.heading4(context)),
-            subtitle: Text(subtitle),
-            secondary: Icon(icon, color: colorScheme.primary),
-          ),
-          if (expanded && children.isNotEmpty)
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(AppSpacing.radiusMd),
-                  bottomRight: Radius.circular(AppSpacing.radiusMd),
-                ),
-              ),
-              child: Column(children: children),
-            ),
+            );
+          }).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildTimeSelector(
-    String label,
-    IconData icon,
-    TimeOfDay time,
-    ValueChanged<TimeOfDay> onChanged,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
+  /// Sección de lista de compra
+  Widget _buildShoppingSection(BuildContext context) {
+    // DATOS DE EJEMPLO
+    final exampleItems = [
+      ShoppingItem(name: 'Pollo (1kg)', category: 'Proteínas', checked: false),
+      ShoppingItem(name: 'Arroz integral', category: 'Granos', checked: false),
+      ShoppingItem(name: 'Brócoli', category: 'Verduras', checked: true),
+      ShoppingItem(name: 'Tomates', category: 'Verduras', checked: false),
+      ShoppingItem(name: 'Aceite de oliva', category: 'Aceites', checked: false),
+      ShoppingItem(name: 'Huevos (12u)', category: 'Proteínas', checked: true),
+      ShoppingItem(name: 'Aguacate', category: 'Frutas', checked: false),
+      ShoppingItem(name: 'Yogurt griego', category: 'Lácteos', checked: false),
+    ];
 
-    return ListTile(
-      leading: Icon(icon, color: colorScheme.primary),
-      title: Text(label),
-      trailing: TextButton(
-        onPressed: () async {
-          final picked = await showTimePicker(
-            context: context,
-            initialTime: time,
-          );
-          if (picked != null) onChanged(picked);
-        },
-        child: Text(
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-          style: AppTypography.heading4(
-            context,
-          ).copyWith(color: colorScheme.primary),
-        ),
+    return FoodShoppingListCard(
+      items: exampleItems,
+    );
+  }
+
+  /// Helpers para obtener datos de recetas (placeholders por ahora)
+  List<String> _getRecipeTags(Recipe recipe) {
+    // TODO: Implementar lógica real de tags
+    final tags = <String>[];
+    
+    if (recipe.name.toLowerCase().contains('pollo') ||
+        recipe.name.toLowerCase().contains('pavo')) {
+      tags.add('High protein');
+    }
+    if (recipe.name.toLowerCase().contains('ensalada') ||
+        recipe.name.toLowerCase().contains('vegetal')) {
+      tags.add('Low carb');
+    }
+    if (recipe.name.toLowerCase().contains('vegano') ||
+        recipe.name.toLowerCase().contains('vegan')) {
+      tags.add('Vegan');
+    }
+    
+    // Tags por defecto si no hay coincidencias
+    if (tags.isEmpty) {
+      tags.add('Casera');
+    }
+    
+    return tags;
+  }
+
+  double? _calculateRecipeKcal(Recipe recipe) {
+    // TODO: Calcular calorías reales desde ingredientes
+    // Por ahora retornar un valor placeholder
+    return 450.0;
+  }
+
+  double? _calculateRecipeProtein(Recipe recipe) {
+    // TODO: Calcular proteína real desde ingredientes
+    return 32.0;
+  }
+
+  String _getCategoryLabel(String category) {
+    switch (category.toLowerCase()) {
+      case 'fruit':
+        return 'Fruta';
+      case 'protein':
+        return 'Proteína';
+      case 'dairy':
+        return 'Lácteos';
+      case 'vegetable':
+        return 'Verduras';
+      case 'grain':
+        return 'Granos';
+      default:
+        return 'Otros';
+    }
+  }
+
+  List<ShoppingItem> _getPlaceholderShoppingItems() {
+    // Placeholder para demo cuando no hay lista activa
+    return const [
+      ShoppingItem(name: 'Plátanos', category: 'Fruta', checked: false),
+      ShoppingItem(name: 'Pechuga de pollo', category: 'Proteína', checked: false),
+      ShoppingItem(name: 'Leche', category: 'Lácteos', checked: false),
+      ShoppingItem(name: 'Brócoli', category: 'Verduras', checked: true),
+      ShoppingItem(name: 'Avena', category: 'Granos', checked: false),
+      ShoppingItem(name: 'Huevos', category: 'Proteína', checked: false),
+      ShoppingItem(name: 'Manzanas', category: 'Fruta', checked: false),
+      ShoppingItem(name: 'Yogur griego', category: 'Lácteos', checked: false),
+      ShoppingItem(name: 'Espinacas', category: 'Verduras', checked: false),
+      ShoppingItem(name: 'Arroz integral', category: 'Granos', checked: true),
+      ShoppingItem(name: 'Salmón', category: 'Proteína', checked: false),
+      ShoppingItem(name: 'Aceite de oliva', category: 'Otros', checked: false),
+    ];
+  }
+
+  // Navegación
+  void _navigateToDiary(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FoodDiaryScreenV2(svc: widget.svc),
       ),
     );
   }
 
-  Widget _buildTimeRangeSelector(
-    String label,
-    IconData icon,
-    TimeOfDay startTime,
-    TimeOfDay endTime,
-    ValueChanged<TimeOfDay> onStartChanged,
-    ValueChanged<TimeOfDay> onEndChanged,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: colorScheme.primary, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-              Text(label, style: AppTypography.caption(context)),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: startTime,
-                    );
-                    if (picked != null) onStartChanged(picked);
-                  },
-                  icon: const Icon(Icons.alarm_on, size: 16),
-                  label: Text(
-                    '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: Icon(Icons.arrow_forward, size: 16),
-              ),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: endTime,
-                    );
-                    if (picked != null) onEndChanged(picked);
-                  },
-                  icon: const Icon(Icons.alarm_off, size: 16),
-                  label: Text(
-                    '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+  void _navigateToRecipes(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecipesListScreenV2(svc: widget.svc),
       ),
     );
   }
 
-  Widget _buildDaysSelector(String label, List<bool> days) {
-    final colorScheme = Theme.of(context).colorScheme;
-    const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  void _navigateToPlanner(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FoodPlannerScreenV2(svc: widget.svc),
+      ),
+    );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.caption(context)),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(7, (index) {
-              return GestureDetector(
-                onTap: () => setState(() => days[index] = !days[index]),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color:
-                        days[index]
-                            ? colorScheme.primary
-                            : colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    border: Border.all(
-                      color:
-                          days[index]
-                              ? colorScheme.primary
-                              : colorScheme.outline,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      dayLabels[index],
-                      style: AppTypography.body(context).copyWith(
-                        color:
-                            days[index]
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
+  void _navigateToShopping(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ShoppingListsScreenV2(svc: widget.svc),
       ),
     );
   }

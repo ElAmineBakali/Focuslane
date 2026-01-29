@@ -52,7 +52,7 @@ import 'screens/study/timer/study_timer_screen.dart';
 import 'screens/study/analytics/study_analytics_screen.dart';
 import 'screens/study/study_home_screen.dart';
 import 'screens/food/services/food_firestore_service.dart';
-import 'screens/food/dashboard/food_home_screen_v2.dart';
+import 'screens/food/dashboard/food_home_screen_demo.dart';
 import 'screens/food/diary/food_diary_screen_v2.dart';
 import 'screens/food/foods/foods_list_screen_v2.dart';
 import 'screens/food/recipes/recipes_list_screen_v2.dart';
@@ -65,7 +65,6 @@ import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
-import 'package:mi_dashboard_personal/screens/home_variants.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -266,10 +265,19 @@ class _MyAppState extends State<MyApp> {
             );
           },
 
-            home: const HomeScreenV1HubModular(),
+            home: HomeScreen(
+              toggleTheme: (isDark) {
+                setState(() => _themeMode = isDark ? ThemeMode.dark : ThemeMode.light);
+                ThemePrefs.save(
+                  preset: _preset,
+                  mode: _themeMode,
+                  bg: _bgStyle,
+                );
+              },
+              themeMode: _themeMode,
+            ),
 
           routes: {
-            '/home-variants': (_) => const HomeVariantsGallery(),
             '/settings':
                 (_) => SettingsScreen(
                   currentPreset: _preset,
@@ -349,7 +357,7 @@ class _MyAppState extends State<MyApp> {
             '/study/timer': (_) => StudyTimerScreen(svc: _studySvc),
             '/study/analytics': (_) => StudyAnalyticsScreen(svc: _studySvc),
 
-            '/food': (_) => FoodHomeScreenV2(svc: _foodSvc),
+            '/food': (_) => const FoodHomeDemoScreen(),
             '/food/diary': (_) => FoodDiaryScreenV2(svc: _foodSvc),
             '/food/foods': (_) => FoodsListScreenV2(svc: _foodSvc),
             '/food/recipes': (_) => RecipesListScreenV2(svc: _foodSvc),
