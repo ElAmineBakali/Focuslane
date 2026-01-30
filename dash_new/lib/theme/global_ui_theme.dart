@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
@@ -501,8 +502,10 @@ class ModernTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
+  final String? suffix;
   final bool obscureText;
   final void Function(String)? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
 
   const ModernTextField({
     super.key,
@@ -514,8 +517,10 @@ class ModernTextField extends StatelessWidget {
     this.validator,
     this.prefixIcon,
     this.suffixIcon,
+    this.suffix,
     this.obscureText = false,
     this.onChanged,
+    this.inputFormatters,
   });
 
   @override
@@ -527,11 +532,13 @@ class ModernTextField extends StatelessWidget {
       validator: validator,
       obscureText: obscureText,
       onChanged: onChanged,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
+        suffixText: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         ),

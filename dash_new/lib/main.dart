@@ -26,6 +26,8 @@ import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
 import 'package:mi_dashboard_personal/screens/trading/live/trading_live_chart_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:mi_dashboard_personal/widgets/avoid_fab.dart';
+import 'package:mi_dashboard_personal/widgets/auth_gate.dart';
+import 'package:mi_dashboard_personal/screens/auth/login_screen.dart';
 import 'firebase_options.dart';
 import 'theme/theme.dart';
 import 'theme/prefs.dart';
@@ -52,14 +54,7 @@ import 'screens/study/timer/study_timer_screen.dart';
 import 'screens/study/analytics/study_analytics_screen.dart';
 import 'screens/study/study_home_screen.dart';
 import 'screens/food/services/food_firestore_service.dart';
-import 'screens/food/dashboard/food_home_screen_demo.dart';
-import 'screens/food/diary/food_diary_screen_v2.dart';
-import 'screens/food/foods/foods_list_screen_v2.dart';
-import 'screens/food/recipes/recipes_list_screen_v2.dart';
-import 'screens/food/planner/food_planner_screen_v2.dart';
-import 'screens/food/shopping/shopping_lists_screen_v2.dart';
-import 'screens/food/pantry/pantry_screen_v2.dart';
-import 'screens/food/history/food_history_screen_v2.dart';
+import 'screens/food/main/food_main_screen.dart';
 import 'screens/finance/finance_routes.dart';
 import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
@@ -94,12 +89,17 @@ Future<void> main() async {
     }
   });
   FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
-  if (kIsWeb) {
-    await fb_auth.FirebaseAuth.instance.setPersistence(
-      fb_auth.Persistence.LOCAL,
-    );
-  }
 
+  // Configure Firebase Auth persistence
+  try {
+    if (kIsWeb) {
+      await fb_auth.FirebaseAuth.instance.setPersistence(
+        fb_auth.Persistence.LOCAL,
+      );
+    }
+  } catch (_) {}
+
+  // Configure Firestore persistence
   try {
     if (kIsWeb) {
       FirebaseFirestore.instance.settings = const Settings(
@@ -111,14 +111,6 @@ Future<void> main() async {
       FirebaseFirestore.instance.settings = const Settings(
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
-    }
-  } catch (_) {}
-
-  // Ensure an authenticated user exists for modules that require it (e.g., Gym)
-  try {
-    final auth = fb_auth.FirebaseAuth.instance;
-    if (auth.currentUser == null) {
-      await auth.signInAnonymously();
     }
   } catch (_) {}
 
@@ -137,10 +129,9 @@ class _MyAppState extends State<MyApp> {
   BackgroundStyle _bgStyle = BackgroundStyle.none;
   bool _loaded = false;
 
-  final _foodSvc = FoodFirestoreService('local');
-
-  final _gymService = GymFirestoreService();
-  final _studySvc = StudyFirestoreService();
+  FoodFirestoreService? _foodSvc;
+  GymFirestoreService? _gymService;
+  StudyFirestoreService? _studySvc;
 
   StreamSubscription<String>? _notifSub;
 
@@ -227,12 +218,7 @@ class _MyAppState extends State<MyApp> {
     final light = _safe(AppTheme.getLight(_preset));
     final dark = _safe(AppTheme.getDark(_preset));
 
-    return StreamBuilder<fb_auth.User?>(
-      stream: fb_auth.FirebaseAuth.instance.authStateChanges(),
-      builder: (context, authSnap) {
-        final user = authSnap.data;
-
-        return MaterialApp(
+    return MaterialApp(
           navigatorKey: appNavigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Mi Dashboard Personal',
@@ -265,7 +251,8 @@ class _MyAppState extends State<MyApp> {
             );
           },
 
-            home: HomeScreen(
+          home: AuthGate(
+            authenticated: HomeScreen(
               toggleTheme: (isDark) {
                 setState(() => _themeMode = isDark ? ThemeMode.dark : ThemeMode.light);
                 ThemePrefs.save(
@@ -276,6 +263,8 @@ class _MyAppState extends State<MyApp> {
               },
               themeMode: _themeMode,
             ),
+            unauthenticated: const LoginScreen(),
+          ),
 
           routes: {
             '/settings':
@@ -345,26 +334,49 @@ class _MyAppState extends State<MyApp> {
               return HabitStatsScreen(habit: habit);
             },
 
-            '/gym': (_) => GymHomeScreen(svc: _gymService),
-            '/gym/routines': (_) => RoutinesListScreen(svc: _gymService),
-            '/gym/analytics': (_) => GymAnalyticsScreenV2(svc: _gymService),
-            '/gym/goals': (_) => GymGoalsScreen(svc: _gymService),
-            '/gym/body/weight': (_) => BodyweightScreen(svc: _gymService),
-            '/gym/body/measurements':
-                (_) => MeasurementsScreen(svc: _gymService),
+            '/gym': (_) {
+              _gymService ??= GymFirestoreService();
+              return GymHomeScreen(svc: _gymService!);
+            },
+            '/gym/routines': (_) {
+              _gymService ??= GymFirestoreService();
+              return RoutinesListScreen(svc: _gymService!);
+            },
+            '/gym/analytics': (_) {
+              _gymService ??= GymFirestoreService();
+              return GymAnalyticsScreenV2(svc: _gymService!);
+            },
+            '/gym/goals': (_) {
+              _gymService ??= GymFirestoreService();
+              return GymGoalsScreen(svc: _gymService!);
+            },
+            '/gym/body/weight': (_) {
+              _gymService ??= GymFirestoreService();
+              return BodyweightScreen(svc: _gymService!);
+            },
+            '/gym/body/measurements': (_) {
+              _gymService ??= GymFirestoreService();
+              return MeasurementsScreen(svc: _gymService!);
+            },
 
-            '/study': (_) => StudyHomeScreen(svc: _studySvc),
-            '/study/timer': (_) => StudyTimerScreen(svc: _studySvc),
-            '/study/analytics': (_) => StudyAnalyticsScreen(svc: _studySvc),
+            '/study': (_) {
+              _studySvc ??= StudyFirestoreService();
+              return StudyHomeScreen(svc: _studySvc!);
+            },
+            '/study/timer': (_) {
+              _studySvc ??= StudyFirestoreService();
+              return StudyTimerScreen(svc: _studySvc!);
+            },
+            '/study/analytics': (_) {
+              _studySvc ??= StudyFirestoreService();
+              return StudyAnalyticsScreen(svc: _studySvc!);
+            },
 
-            '/food': (_) => const FoodHomeDemoScreen(),
-            '/food/diary': (_) => FoodDiaryScreenV2(svc: _foodSvc),
-            '/food/foods': (_) => FoodsListScreenV2(svc: _foodSvc),
-            '/food/recipes': (_) => RecipesListScreenV2(svc: _foodSvc),
-            '/food/planner': (_) => FoodPlannerScreenV2(svc: _foodSvc),
-            '/food/shopping': (_) => ShoppingListsScreenV2(svc: _foodSvc),
-            '/food/pantry': (_) => PantryScreenV2(svc: _foodSvc),
-            '/food/history': (_) => FoodHistoryScreenV2(svc: _foodSvc),
+            '/food': (_) {
+              final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
+              _foodSvc ??= FoodFirestoreService(userId);
+              return FoodMainScreen(svc: _foodSvc!);
+            },
 
             ...financeRoutes,
             ...meditationRoutes,
@@ -387,150 +399,5 @@ class _MyAppState extends State<MyApp> {
           },
           onGenerateRoute: (settings) => null,
         );
-      },
-    );
-  }
-}
-
-class _AuthScreen extends StatefulWidget {
-  const _AuthScreen();
-  @override
-  State<_AuthScreen> createState() => _AuthScreenState();
-}
-
-class _AuthScreenState extends State<_AuthScreen> {
-  final _email = TextEditingController();
-  final _pass = TextEditingController();
-  bool _busy = false;
-  String? _err;
-
-  Future<void> _signin() async {
-    setState(() {
-      _busy = true;
-      _err = null;
-    });
-    try {
-      await fb_auth.FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email.text.trim(),
-        password: _pass.text,
-      );
-    } on fb_auth.FirebaseAuthException catch (e) {
-      setState(() => _err = e.message ?? e.code);
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _register() async {
-    setState(() {
-      _busy = true;
-      _err = null;
-    });
-    try {
-      await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _email.text.trim(),
-        password: _pass.text,
-      );
-    } on fb_auth.FirebaseAuthException catch (e) {
-      setState(() => _err = e.message ?? e.code);
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _google() async {
-    setState(() {
-      _busy = true;
-      _err = null;
-    });
-    try {
-      if (kIsWeb) {
-        await fb_auth.FirebaseAuth.instance.signInWithPopup(
-          fb_auth.GoogleAuthProvider(),
-        );
-      } else {
-        setState(
-          () =>
-              _err =
-                  'Google Sign-In nativo no configurado. Usa email/contraseña.',
-        );
-      }
-    } on fb_auth.FirebaseAuthException catch (e) {
-      setState(() => _err = e.message ?? e.code);
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Acceso')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _email,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _pass,
-                    decoration: const InputDecoration(labelText: 'Contraseña'),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: _busy ? null : _signin,
-                          child:
-                              _busy
-                                  ? const SizedBox(
-                                    height: 18,
-                                    width: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                  : const Text('Entrar'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _busy ? null : _register,
-                          child: const Text('Crear cuenta'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  if (kIsWeb)
-                    OutlinedButton.icon(
-                      onPressed: _busy ? null : _google,
-                      icon: const Icon(Icons.account_circle),
-                      label: const Text('Continuar con Google'),
-                    ),
-                  if (_err != null) ...[
-                    const SizedBox(height: 8),
-                    Text(_err!, style: TextStyle(color: cs.error)),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

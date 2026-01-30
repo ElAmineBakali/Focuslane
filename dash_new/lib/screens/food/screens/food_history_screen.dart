@@ -5,15 +5,15 @@ import '../../../widgets/global_ui_components.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
-class FoodHistoryScreenV2 extends StatefulWidget {
+class FoodHistoryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodHistoryScreenV2({super.key, required this.svc});
+  const FoodHistoryScreen({super.key, required this.svc});
 
   @override
-  State<FoodHistoryScreenV2> createState() => _FoodHistoryScreenV2State();
+  State<FoodHistoryScreen> createState() => _FoodHistoryScreenState();
 }
 
-class _FoodHistoryScreenV2State extends State<FoodHistoryScreenV2>
+class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _daysRange = 7;

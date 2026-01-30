@@ -8,6 +8,8 @@ class FoodTheme {
   static const Color taupe = Color(0xFFB5A89B); // Taupe
   static const Color tealSoft = Color(0xFF80AAA6); // Teal suave
   static const Color tealLight = Color(0xFFA0BFBD); // Teal claro
+  static const Color tealDark = Color(0xFF5A8A86); // Teal oscuro
+  static const Color paleGrey = Color(0xFFF5F5F5); // Gris pálido
   static const Color backgroundLight = Color(0xFFD2E2E0); // Fondo claro
   static const Color backgroundVeryLight = Color(0xFFE5EDEF); // Gris muy claro
 

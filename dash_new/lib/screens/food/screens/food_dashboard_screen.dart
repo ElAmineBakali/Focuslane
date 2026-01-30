@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
-import '../../../theme/food_theme.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
-import 'widgets/food_components.dart';
-import 'widgets/food_sections.dart';
-import '../diary/food_diary_screen_v2.dart';
-import '../recipes/recipes_list_screen_v2.dart';
-import '../planner/food_planner_screen_v2.dart';
-import '../shopping/shopping_lists_screen_v2.dart';
+import 'food_dashboard_widgets.dart';
+import 'food_diary_screen.dart';
+import 'recipes_list_screen.dart';
+import 'food_planner_screen.dart';
+import 'shopping_lists_screen.dart';
 
 /// FOOD HOME SCREEN - Rediseñado con estilo premium SaaS
 /// Dashboard principal del módulo Food con diseño moderno y profesional
 /// Paleta pastel: #D7CDC2, #B5A89B, #80AAA6, #A0BFBD, #D2E2E0, #E5EDEF
-class FoodHomeScreenV2 extends StatefulWidget {
+class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   
-  const FoodHomeScreenV2({super.key, required this.svc});
+  const FoodDashboardScreen({super.key, required this.svc});
 
   @override
-  State<FoodHomeScreenV2> createState() => _FoodHomeScreenV2State();
+  State<FoodDashboardScreen> createState() => _FoodDashboardScreenState();
 }
 
-class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
+class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
+  
+  String _getWeekId(DateTime date) {
+    final monday = date.subtract(Duration(days: date.weekday - 1));
+    return _dayId(monday);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +33,17 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1200;
     final isTablet = screenWidth >= 600 && screenWidth < 1200;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: FoodTheme.getScaffoldBackground(context),
+      backgroundColor: colorScheme.surface,
       body: Column(
         children: [
-          // Top Bar con padding
           Container(
-            color: FoodTheme.getCardBackground(context),
+            color: colorScheme.surfaceContainerHighest,
             padding: EdgeInsets.all(
-              isDesktop ? FoodTheme.spacing24 : FoodTheme.spacing16,
+              isDesktop ? 24.0 : 16.0,
             ),
             child: FoodTopBar(
               onNewRecipe: () => _navigateToRecipes(context),
@@ -52,69 +56,18 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             ),
           ),
           
-          // Contenido principal con scroll
           Expanded(
             child: ListView(
               padding: EdgeInsets.all(
-                isDesktop ? FoodTheme.spacing40 : FoodTheme.spacing16,
+                isDesktop ? 40.0 : 16.0,
               ),
               children: [
-                // Sección de métricas
                 _buildMetricsSection(context, todayId, isDesktop),
-                const SizedBox(height: FoodTheme.spacing30),
+                const SizedBox(height: 16.0),
                 
-                // Plan semanal
-                FoodWeeklyPlanCard(
-                  weekPlan: {
-                    '2026-01-27': {
-                      'Desayuno': 'Avena con Frutas',
-                      'Comida': 'Pollo al Horno',
-                      'Cena': 'Ensalada César',
-                    },
-                    '2026-01-28': {
-                      'Desayuno': 'Smoothie Proteico',
-                      'Comida': 'Pasta Carbonara',
-                      'Cena': 'Salmón a la Plancha',
-                    },
-                    '2026-01-29': {
-                      'Desayuno': 'Tostadas con Aguacate',
-                      'Comida': 'Arroz con Pollo',
-                      'Cena': 'Tacos de Pescado',
-                    },
-                    '2026-01-30': {
-                      'Desayuno': 'Yogurt con Granola',
-                      'Comida': 'Hamburguesa Fit',
-                      'Cena': 'Wrap de Pollo',
-                    },
-                    '2026-01-31': {
-                      'Desayuno': 'Pancakes Proteicos',
-                      'Comida': 'Sushi Bowl',
-                      'Cena': 'Pizza Casera',
-                    },
-                    '2026-02-01': {
-                      'Desayuno': 'Huevos Revueltos',
-                      'Comida': 'Pasta con Verduras',
-                      'Cena': 'Filete con Ensalada',
-                    },
-                    '2026-02-02': {
-                      'Desayuno': 'Batido Verde',
-                      'Comida': 'Burritos',
-                      'Cena': 'Sopa de Verduras',
-                    },
-                  },
-                  onGeneratePlan: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Generación automática próximamente'),
-                      ),
-                    );
-                  },
-                  onExportList: () => _navigateToShopping(context),
-                  onViewCalendar: () => _navigateToPlanner(context),
-                ),
-                const SizedBox(height: FoodTheme.spacing30),
+                _buildWeeklyPlanSection(context),
+                const SizedBox(height: 30.0),
                 
-                // Sección inferior: Recetas y Lista de compra
                 isDesktop || isTablet
                     ? _buildBottomSectionDesktop(context)
                     : _buildBottomSectionMobile(context),
@@ -181,7 +134,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         label: 'Calorías hoy',
                         value: '${kcal.toStringAsFixed(0)} kcal',
                         subtitle: 'de 2,000 objetivo',
-                        accentColor: FoodTheme.tealSoft,
                         onTap: () => _navigateToDiary(context),
                       ),
                       FoodMetricCard(
@@ -189,7 +141,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         label: 'Proteína hoy',
                         value: '${protein.toStringAsFixed(0)} g',
                         subtitle: 'de 150g objetivo',
-                        accentColor: FoodTheme.tealLight,
                         onTap: () => _navigateToDiary(context),
                       ),
                       FoodMetricCard(
@@ -197,7 +148,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         label: 'Recetas guardadas',
                         value: '$recipesCount',
                         subtitle: 'en tu biblioteca',
-                        accentColor: FoodTheme.taupe,
                         onTap: () => _navigateToRecipes(context),
                       ),
                       FoodMetricCard(
@@ -205,7 +155,6 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                         label: 'Lista de compra',
                         value: '$shoppingItems items',
                         subtitle: 'pendientes',
-                        accentColor: FoodTheme.beigeSoft,
                         onTap: () => _navigateToShopping(context),
                       ),
                     ];
@@ -217,7 +166,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                             .map(
                               (card) => Padding(
                                 padding: const EdgeInsets.only(
-                                  bottom: FoodTheme.spacing16,
+                                  bottom: 16.0,
                                 ),
                                 child: card,
                               ),
@@ -228,8 +177,8 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
                       // Desktop/Tablet: Grid
                       return GridView.count(
                         crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: FoodTheme.spacing16,
-                        mainAxisSpacing: FoodTheme.spacing16,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         childAspectRatio: 1.3,
@@ -246,6 +195,64 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     );
   }
 
+  /// Sección del plan semanal
+  Widget _buildWeeklyPlanSection(BuildContext context) {
+    final weekId = _getWeekId(DateTime.now());
+    
+    return StreamBuilder<WeekPlanner>(
+      stream: widget.svc.streamWeek(weekId),
+      builder: (context, snapshot) {
+        final weekPlan = snapshot.data;
+        final weekDays = weekPlan?.days ?? {};
+        
+        final Map<String, Map<String, String>> displayPlan = {};
+        
+        for (var entry in weekDays.entries) {
+          final dayId = entry.key;
+          final dayEntries = entry.value;
+          
+          final meals = <String, String>{};
+          for (var mealEntry in dayEntries) {
+            final slotName = _getMealSlotName(mealEntry.slot);
+            meals[slotName] = mealEntry.refId;
+          }
+          
+          if (meals.isNotEmpty) {
+            displayPlan[dayId] = meals;
+          }
+        }
+        
+        if (displayPlan.isEmpty) {
+          displayPlan['${DateTime.now().toIso8601String().substring(0, 10)}'] = {
+            'Info': 'No hay plan semanal configurado',
+          };
+        }
+        
+        return FoodWeeklyPlanCard(
+          weekPlan: displayPlan,
+          onGeneratePlan: () => _navigateToPlanner(context),
+          onExportList: () => _navigateToShopping(context),
+          onViewCalendar: () => _navigateToPlanner(context),
+        );
+      },
+    );
+  }
+  
+  String _getMealSlotName(MealSlot slot) {
+    switch (slot) {
+      case MealSlot.breakfast:
+        return 'Desayuno';
+      case MealSlot.snack:
+        return 'Snack';
+      case MealSlot.lunch:
+        return 'Comida';
+      case MealSlot.merienda:
+        return 'Merienda';
+      case MealSlot.dinner:
+        return 'Cena';
+    }
+  }
+
   /// Sección inferior para desktop (2 columnas)
   Widget _buildBottomSectionDesktop(BuildContext context) {
     return Row(
@@ -256,7 +263,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
           flex: 2,
           child: _buildRecipesSection(context),
         ),
-        const SizedBox(width: FoodTheme.spacing24),
+        const SizedBox(width: 24.0),
         // Columna derecha: Lista de compra
         Expanded(
           flex: 1,
@@ -271,7 +278,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     return Column(
       children: [
         _buildRecipesSection(context),
-        const SizedBox(height: FoodTheme.spacing24),
+        const SizedBox(height: 24.0),
         _buildShoppingSection(context),
       ],
     );
@@ -279,31 +286,23 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
 
   /// Sección de recetas recientes/recomendadas
   Widget _buildRecipesSection(BuildContext context) {
-    // DATOS DE EJEMPLO para visualizar el diseño
-    final exampleRecipes = [
-      {'name': 'Pollo al Horno con Verduras', 'tags': ['Cena', 'Alto en proteína'], 'kcal': 420.0, 'protein': 45.0},
-      {'name': 'Ensalada César con Pollo', 'tags': ['Almuerzo', 'Saludable'], 'kcal': 350.0, 'protein': 38.0},
-      {'name': 'Pasta Carbonara Light', 'tags': ['Cena', 'Italiana'], 'kcal': 480.0, 'protein': 28.0},
-      {'name': 'Salmón a la Plancha', 'tags': ['Cena', 'Omega-3'], 'kcal': 380.0, 'protein': 42.0},
-      {'name': 'Smoothie Bowl Proteico', 'tags': ['Desayuno', 'Post-entreno'], 'kcal': 320.0, 'protein': 25.0},
-      {'name': 'Tacos de Pescado', 'tags': ['Almuerzo', 'Mexicana'], 'kcal': 390.0, 'protein': 35.0},
-    ];
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return StreamBuilder<List<Recipe>>(
+      stream: widget.svc.streamRecipes(),
+      builder: (context, snapshot) {
+        final recipes = snapshot.data ?? [];
+        final recentRecipes = recipes.take(6).toList();
 
-    return Container(
-      padding: const EdgeInsets.all(FoodTheme.spacing24),
+        return Container(
+      padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[850] : Colors.white,
-        borderRadius: BorderRadius.circular(FoodTheme.radiusLarge),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12.0),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+          color: colorScheme.outline,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,44 +314,71 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
             actionLabel: 'Ver todas',
             onActionPressed: () => _navigateToRecipes(context),
           ),
-          const SizedBox(height: FoodTheme.spacing20),
-          ...exampleRecipes.map((recipe) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: FoodTheme.spacing12),
-              child: FoodRecipeCard(
-                name: recipe['name'] as String,
-                tags: recipe['tags'] as List<String>,
-                kcal: recipe['kcal'] as double,
-                protein: recipe['protein'] as double,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Abriendo: ${recipe['name']}')),
-                  );
-                },
+          const SizedBox(height: 20.0),
+          if (recentRecipes.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  children: [
+                    Icon(Icons.restaurant, size: 64, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      'No hay recetas guardadas',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    TextButton(
+                      onPressed: () => _navigateToRecipes(context),
+                      child: const Text('Añadir primera receta'),
+                    ),
+                  ],
+                ),
               ),
-            );
-          }).toList(),
+            )
+          else
+            ...recentRecipes.map((recipe) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: FoodRecipeCard(
+                  name: recipe.name,
+                  tags: _getRecipeTags(recipe),
+                  kcal: _calculateRecipeKcal(recipe) ?? 0,
+                  protein: _calculateRecipeProtein(recipe) ?? 0,
+                  onTap: () => _navigateToRecipes(context),
+                ),
+              );
+            }).toList(),
         ],
       ),
+    );
+      },
     );
   }
 
   /// Sección de lista de compra
   Widget _buildShoppingSection(BuildContext context) {
-    // DATOS DE EJEMPLO
-    final exampleItems = [
-      ShoppingItem(name: 'Pollo (1kg)', category: 'Proteínas', checked: false),
-      ShoppingItem(name: 'Arroz integral', category: 'Granos', checked: false),
-      ShoppingItem(name: 'Brócoli', category: 'Verduras', checked: true),
-      ShoppingItem(name: 'Tomates', category: 'Verduras', checked: false),
-      ShoppingItem(name: 'Aceite de oliva', category: 'Aceites', checked: false),
-      ShoppingItem(name: 'Huevos (12u)', category: 'Proteínas', checked: true),
-      ShoppingItem(name: 'Aguacate', category: 'Frutas', checked: false),
-      ShoppingItem(name: 'Yogurt griego', category: 'Lácteos', checked: false),
-    ];
+    return StreamBuilder<List<ShoppingList>>(
+      stream: widget.svc.streamShoppingLists(),
+      builder: (context, snapshot) {
+        final lists = snapshot.data ?? [];
+        final activeList = lists.where((l) => l.completedAt == null).firstOrNull;
+        
+        final items = activeList?.items.map((item) {
+          return ShoppingItem(
+            name: item.name,
+            category: _getCategoryLabel(item.unit.name),
+            checked: item.checked,
+          );
+        }).toList() ?? [];
 
-    return FoodShoppingListCard(
-      items: exampleItems,
+        return FoodShoppingListCard(
+          items: items.isEmpty ? _getPlaceholderShoppingItems() : items,
+          onNavigate: () => _navigateToShopping(context),
+        );
+      },
     );
   }
 
@@ -433,7 +459,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => FoodDiaryScreenV2(svc: widget.svc),
+        builder: (_) => FoodDiaryScreen(svc: widget.svc),
       ),
     );
   }
@@ -442,7 +468,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RecipesListScreenV2(svc: widget.svc),
+        builder: (_) => RecipesListScreen(svc: widget.svc),
       ),
     );
   }
@@ -451,7 +477,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => FoodPlannerScreenV2(svc: widget.svc),
+        builder: (_) => FoodPlannerScreen(svc: widget.svc),
       ),
     );
   }
@@ -460,7 +486,7 @@ class _FoodHomeScreenV2State extends State<FoodHomeScreenV2> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ShoppingListsScreenV2(svc: widget.svc),
+        builder: (_) => ShoppingListsScreen(svc: widget.svc),
       ),
     );
   }

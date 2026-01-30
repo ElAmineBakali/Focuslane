@@ -4,15 +4,15 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-class PantryScreenV2 extends StatefulWidget {
+class PantryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const PantryScreenV2({super.key, required this.svc});
+  const PantryScreen({super.key, required this.svc});
 
   @override
-  State<PantryScreenV2> createState() => _PantryScreenV2State();
+  State<PantryScreen> createState() => _PantryScreenState();
 }
 
-class _PantryScreenV2State extends State<PantryScreenV2> {
+class _PantryScreenState extends State<PantryScreen> {
   bool _isGridView = true;
   bool _showLowStockOnly = false;
 

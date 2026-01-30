@@ -7,15 +7,15 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-class FoodPlannerScreenV2 extends StatefulWidget {
+class FoodPlannerScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodPlannerScreenV2({super.key, required this.svc});
+  const FoodPlannerScreen({super.key, required this.svc});
 
   @override
-  State<FoodPlannerScreenV2> createState() => _FoodPlannerScreenV2State();
+  State<FoodPlannerScreen> createState() => _FoodPlannerScreenState();
 }
 
-class _FoodPlannerScreenV2State extends State<FoodPlannerScreenV2> {
+class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
   String _currentPlannerId = 'menu';
   ShoppingScope _scope = ShoppingScope.weekly;
   bool _showPlannersList = false;

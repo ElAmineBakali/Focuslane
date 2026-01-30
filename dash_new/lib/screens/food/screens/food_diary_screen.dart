@@ -5,15 +5,15 @@ import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'package:intl/intl.dart';
 
-class FoodDiaryScreenV2 extends StatefulWidget {
+class FoodDiaryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodDiaryScreenV2({super.key, required this.svc});
+  const FoodDiaryScreen({super.key, required this.svc});
 
   @override
-  State<FoodDiaryScreenV2> createState() => _FoodDiaryScreenV2State();
+  State<FoodDiaryScreen> createState() => _FoodDiaryScreenState();
 }
 
-class _FoodDiaryScreenV2State extends State<FoodDiaryScreenV2> {
+class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
   DateTime _date = DateTime.now();
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
 

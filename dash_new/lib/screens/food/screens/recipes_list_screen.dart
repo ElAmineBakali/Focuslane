@@ -3,17 +3,17 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
-import 'recipe_edit_screen_v2.dart';
+import 'recipe_edit_screen.dart';
 
-class RecipesListScreenV2 extends StatefulWidget {
+class RecipesListScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const RecipesListScreenV2({super.key, required this.svc});
+  const RecipesListScreen({super.key, required this.svc});
 
   @override
-  State<RecipesListScreenV2> createState() => _RecipesListScreenV2State();
+  State<RecipesListScreen> createState() => _RecipesListScreenState();
 }
 
-class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
+class _RecipesListScreenState extends State<RecipesListScreen> {
   String _searchQuery = '';
   bool _showGridView = true;
   final _searchController = TextEditingController();
@@ -37,7 +37,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                 () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => RecipeEditScreenV2(svc: widget.svc),
+                    builder: (_) => RecipeEditScreen(svc: widget.svc),
                   ),
                 ),
             tooltip: 'Añadir receta',
@@ -103,7 +103,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                               context,
                               MaterialPageRoute(
                                 builder:
-                                    (_) => RecipeEditScreenV2(svc: widget.svc),
+                                    (_) => RecipeEditScreen(svc: widget.svc),
                               ),
                             )
                             : null,
@@ -140,7 +140,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                     context,
                     MaterialPageRoute(
                       builder:
-                          (_) => RecipeEditScreenV2(
+                          (_) => RecipeEditScreen(
                             svc: widget.svc,
                             initial: recipe,
                           ),
@@ -167,7 +167,7 @@ class _RecipesListScreenV2State extends State<RecipesListScreenV2> {
                     context,
                     MaterialPageRoute(
                       builder:
-                          (_) => RecipeEditScreenV2(
+                          (_) => RecipeEditScreen(
                             svc: widget.svc,
                             initial: recipe,
                           ),

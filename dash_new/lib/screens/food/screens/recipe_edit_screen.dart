@@ -3,17 +3,17 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-class RecipeEditScreenV2 extends StatefulWidget {
+class RecipeEditScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   final Recipe? initial;
 
-  const RecipeEditScreenV2({super.key, required this.svc, this.initial});
+  const RecipeEditScreen({super.key, required this.svc, this.initial});
 
   @override
-  State<RecipeEditScreenV2> createState() => _RecipeEditScreenV2State();
+  State<RecipeEditScreen> createState() => _RecipeEditScreenState();
 }
 
-class _RecipeEditScreenV2State extends State<RecipeEditScreenV2>
+class _RecipeEditScreenState extends State<RecipeEditScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();

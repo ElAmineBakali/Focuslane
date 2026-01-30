@@ -12,6 +12,18 @@ enum ShoppingScope { weekly, biweekly, monthly, custom }
 
 enum EntryType { food, recipe }
 
+class ShoppingItem {
+  final String name;
+  final String category;
+  final bool checked;
+  
+  const ShoppingItem({
+    required this.name,
+    required this.category,
+    this.checked = false,
+  });
+}
+
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
   try {
@@ -59,6 +71,10 @@ class Food {
   });
 
   Color? get color => _hex(colorHex);
+  
+  double get servingSize => unitSize;
+  String get servingUnit => perUnit.name;
+  bool get isSupp => isSupplement;
 
   factory Food.fromMap(String id, Map<String, dynamic> m) {
     UnitKind u(dynamic v) {

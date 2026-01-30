@@ -4,23 +4,23 @@ import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 
-class ShoppingListDetailScreenV2 extends StatefulWidget {
+class ShoppingListDetailScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   final String listId;
 
-  const ShoppingListDetailScreenV2({
+  const ShoppingListDetailScreen({
     super.key,
     required this.svc,
     required this.listId,
   });
 
   @override
-  State<ShoppingListDetailScreenV2> createState() =>
-      _ShoppingListDetailScreenV2State();
+  State<ShoppingListDetailScreen> createState() =>
+      _ShoppingListDetailScreenState();
 }
 
-class _ShoppingListDetailScreenV2State
-    extends State<ShoppingListDetailScreenV2> {
+class _ShoppingListDetailScreenState
+    extends State<ShoppingListDetailScreen> {
   bool _hideCompleted = false;
 
   @override

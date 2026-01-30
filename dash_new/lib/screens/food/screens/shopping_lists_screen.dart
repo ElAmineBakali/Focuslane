@@ -5,17 +5,17 @@ import 'package:intl/intl.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
-import 'shopping_list_detail_screen_v2.dart';
+import 'shopping_list_detail_screen.dart';
 
-class ShoppingListsScreenV2 extends StatefulWidget {
+class ShoppingListsScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const ShoppingListsScreenV2({super.key, required this.svc});
+  const ShoppingListsScreen({super.key, required this.svc});
 
   @override
-  State<ShoppingListsScreenV2> createState() => _ShoppingListsScreenV2State();
+  State<ShoppingListsScreen> createState() => _ShoppingListsScreenState();
 }
 
-class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
+class _ShoppingListsScreenState extends State<ShoppingListsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isGridView = true;
@@ -372,7 +372,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
           MaterialPageRoute(
             builder:
                 (_) =>
-                    ShoppingListDetailScreenV2(svc: widget.svc, listId: listId),
+                    ShoppingListDetailScreen(svc: widget.svc, listId: listId),
           ),
         );
       }
@@ -384,7 +384,7 @@ class _ShoppingListsScreenV2State extends State<ShoppingListsScreenV2>
       context,
       MaterialPageRoute(
         builder:
-            (_) => ShoppingListDetailScreenV2(svc: widget.svc, listId: list.id),
+            (_) => ShoppingListDetailScreen(svc: widget.svc, listId: list.id),
       ),
     );
   }

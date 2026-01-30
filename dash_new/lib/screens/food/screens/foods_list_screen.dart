@@ -3,17 +3,17 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
-import 'food_edit_sheet_v2.dart';
+import 'food_edit_sheet.dart';
 
-class FoodsListScreenV2 extends StatefulWidget {
+class FoodsListScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodsListScreenV2({super.key, required this.svc});
+  const FoodsListScreen({super.key, required this.svc});
 
   @override
-  State<FoodsListScreenV2> createState() => _FoodsListScreenV2State();
+  State<FoodsListScreen> createState() => _FoodsListScreenState();
 }
 
-class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
+class _FoodsListScreenState extends State<FoodsListScreen> {
   String _searchQuery = '';
   bool _suppsOnly = false;
   bool _showGridView = true;
@@ -187,7 +187,7 @@ class _FoodsListScreenV2State extends State<FoodsListScreenV2> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => FoodEditSheet(svc: widget.svc, initial: food),
+      builder: (_) => FoodEditSheet(svc: widget.svc, food: food),
     );
   }
 
@@ -279,7 +279,7 @@ class _FoodGridCardState extends State<_FoodGridCard> {
     return StreamBuilder<List<Favorite>>(
       stream:
           context
-              .findAncestorStateOfType<_FoodsListScreenV2State>()
+              .findAncestorStateOfType<_FoodsListScreenState>()
               ?.widget
               .svc
               .streamFavorites(),
@@ -423,7 +423,7 @@ class _FoodListCardState extends State<_FoodListCard> {
     return StreamBuilder<List<Favorite>>(
       stream:
           context
-              .findAncestorStateOfType<_FoodsListScreenV2State>()
+              .findAncestorStateOfType<_FoodsListScreenState>()
               ?.widget
               .svc
               .streamFavorites(),
