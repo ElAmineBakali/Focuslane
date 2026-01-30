@@ -267,7 +267,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Theme.of(context).dividerColor.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -332,7 +332,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Theme.of(context).dividerColor.withOpacity(0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -477,15 +477,15 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color: Theme.of(context).dividerColor.withOpacity(0.2),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
                               child: Table(
-                                columnWidths: const {0: FixedColumnWidth(140)},
-                                defaultColumnWidth: const FixedColumnWidth(240),
+                                columnWidths: const {0: FixedColumnWidth(120)},
+                                defaultColumnWidth: const FixedColumnWidth(200),
                                 border: TableBorder.all(
                                   color: AppColors.borderLight,
                                   width: 1,
@@ -577,15 +577,16 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
   Widget _buildHeaderCell(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.md,
-        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.xs,
       ),
       alignment: Alignment.center,
       child: Text(
         text,
-        style: AppTypography.label(context).copyWith(
+        style: AppTypography.caption(context).copyWith(
           color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
+          fontSize: 13,
         ),
       ),
     );
@@ -595,20 +596,21 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.md,
-        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.xs,
       ),
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
-          Icon(icon, size: 18, color: colorScheme.primary),
-          const SizedBox(width: AppSpacing.xs),
+          Icon(icon, size: 16, color: colorScheme.primary),
+          const SizedBox(width: 6),
           Expanded(
             child: Text(
               text,
-              style: AppTypography.label(context).copyWith(
+              style: AppTypography.caption(context).copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
             ),
           ),
@@ -628,20 +630,20 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
     return GestureDetector(
       onTap: () => _openFoodSelector(planner, dayKey, slot, foodsMap),
       child: Container(
-        constraints: const BoxConstraints(minHeight: 80),
-        padding: const EdgeInsets.all(AppSpacing.sm),
+        constraints: const BoxConstraints(minHeight: 60),
+        padding: const EdgeInsets.all(6),
         child:
             entries.isEmpty
                 ? Center(
                   child: Icon(
                     Icons.add_circle_outline,
                     color: AppColors.textSecondary.withOpacity(0.5),
-                    size: 32,
+                    size: 24,
                   ),
                 )
                 : Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
+                  spacing: 4,
+                  runSpacing: 4,
                   children:
                       entries.asMap().entries.map((entry) {
                         final index = entry.key;
@@ -653,14 +655,12 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                               () => _deleteEntry(planner, dayKey, slot, index),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.xs,
+                              horizontal: 6,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.food.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMd,
-                              ),
+                              borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: AppColors.food.withOpacity(0.3),
                               ),
@@ -670,6 +670,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                               style: AppTypography.caption(context).copyWith(
                                 color: AppColors.food,
                                 fontWeight: FontWeight.w600,
+                                fontSize: 11,
                               ),
                             ),
                           ),
@@ -793,7 +794,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
             title: const Text('Nuevo Planner'),
             content: TextField(
               controller: controller,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Nombre del planner',
                 hintText: 'Ej: Definición, Volumen, Familiar',
               ),
@@ -1022,7 +1023,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         color: colorScheme.surfaceContainerHighest,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -1168,7 +1169,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                               trailing: IconButton(
                                 icon: const Icon(
                                   Icons.delete,
-                                  color: Colors.red,
+                                  color: AppColors.error,
                                 ),
                                 onPressed:
                                     () => _deleteEntry(
@@ -1197,7 +1198,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                               '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal • ${entry.servings}x porción',
                             ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(Icons.delete, color: AppColors.error),
                               onPressed:
                                   () => _deleteEntry(
                                     planner,
@@ -1416,9 +1417,10 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                       title: TextFormField(
                         initialValue: slot['name'],
                         decoration: InputDecoration(
-                          border: InputBorder.none,
                           hintText: 'Nombre de la comida',
                           enabled: slot['enabled'],
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                         style: AppTypography.body(context),
                         onChanged: (v) => slot['name'] = v,
@@ -1528,7 +1530,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                                 ),
                               ],
                             ),
-                            backgroundColor: Colors.green.shade600,
+                            backgroundColor: AppColors.success,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(

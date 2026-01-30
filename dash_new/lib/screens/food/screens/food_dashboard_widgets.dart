@@ -82,7 +82,7 @@ class FoodMetricCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             border: Border.all(color: colorScheme.outline),
             borderRadius: BorderRadius.circular(16),
@@ -94,29 +94,29 @@ class FoodMetricCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(icon, color: colorScheme.primary, size: 24),
+                    child: Icon(icon, color: colorScheme.primary, size: 20),
                   ),
                   const Spacer(),
-                  Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                  Icon(Icons.arrow_forward_ios, size: 14, color: colorScheme.onSurfaceVariant),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 label,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 value,
-                style: theme.textTheme.headlineMedium?.copyWith(
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -124,6 +124,7 @@ class FoodMetricCard extends StatelessWidget {
                 subtitle,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
+                  fontSize: 11,
                 ),
               ),
             ],
@@ -154,10 +155,10 @@ class FoodWeeklyPlanCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colorScheme.outline),
       ),
       child: Column(
@@ -165,30 +166,36 @@ class FoodWeeklyPlanCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_month, color: colorScheme.primary),
-              const SizedBox(width: 12),
+              Icon(Icons.calendar_month, color: colorScheme.primary, size: 20),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Plan Semanal',
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               TextButton.icon(
                 onPressed: onGeneratePlan,
-                icon: const Icon(Icons.auto_awesome, size: 18),
+                icon: const Icon(Icons.auto_awesome, size: 16),
                 label: const Text('Generar'),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               OutlinedButton.icon(
                 onPressed: onExportList,
-                icon: const Icon(Icons.shopping_cart, size: 18),
-                label: const Text('Exportar lista'),
+                icon: const Icon(Icons.shopping_cart, size: 16),
+                label: const Text('Lista'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -197,12 +204,12 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                 final meals = entry.value;
                 
                 return Container(
-                  width: 200,
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.all(16),
+                  width: 180,
+                  margin: const EdgeInsets.only(right: 10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: colorScheme.outline),
                   ),
                   child: Column(
@@ -212,12 +219,13 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                         _formatDate(date),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
+                          fontSize: 13,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       ...meals.entries.map((meal) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: 6),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -226,11 +234,12 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 11,
                                 ),
                               ),
                               Text(
                                 meal.value,
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodySmall,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -244,7 +253,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(

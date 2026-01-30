@@ -201,7 +201,7 @@ class _ModernDaySelector extends StatelessWidget {
       margin: const EdgeInsets.all(AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : AppColors.grey100,
+        color: isDark ? colorScheme.surface : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border:
             isDark
@@ -370,9 +370,9 @@ class _MacrosSummary extends StatelessWidget {
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: AppSpacing.md,
-            crossAxisSpacing: AppSpacing.md,
-            childAspectRatio: 1.5,
+            mainAxisSpacing: AppSpacing.sm,
+            crossAxisSpacing: AppSpacing.sm,
+            childAspectRatio: 1.6,
             children: [
               _MacroCard(
                 label: 'Proteínas',
@@ -449,19 +449,19 @@ class _MacroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
-                Icon(icon, color: color, size: 20),
+                Icon(icon, color: color, size: 18),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Text(
                     label,
-                    style: AppTypography.caption(context),
+                    style: AppTypography.caption(context).copyWith(fontSize: 11),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -473,19 +473,19 @@ class _MacroCard extends StatelessWidget {
               children: [
                 Text(
                   value.toStringAsFixed(0),
-                  style: AppTypography.heading2(context, color: color),
+                  style: AppTypography.heading3(context, color: color),
                 ),
                 if (target != null) ...[
                   Text(
                     '/${target!.toStringAsFixed(0)}',
-                    style: AppTypography.body(context),
+                    style: AppTypography.body(context).copyWith(fontSize: 13),
                   ),
                 ],
-                Text(unit, style: AppTypography.caption(context)),
+                Text(unit, style: AppTypography.caption(context).copyWith(fontSize: 11)),
               ],
             ),
             if (target != null)
-              ModernProgressBar(value: pct, color: color, height: 4),
+              ModernProgressBar(value: pct, color: color, height: 3),
           ],
         ),
       ),
@@ -1094,9 +1094,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.grey100,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: AppColors.grey300),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: DropdownButton<UnitKind>(
               value: _unit,

@@ -106,8 +106,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.grey100,
-                border: Border(top: BorderSide(color: AppColors.grey300)),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
               ),
               child: Row(
                 children: [

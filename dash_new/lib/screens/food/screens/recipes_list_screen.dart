@@ -47,7 +47,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
       body: Column(
         children: [
           Container(
-            color: AppColors.grey100,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: ModernTextField(
               label: 'Buscar recetas',

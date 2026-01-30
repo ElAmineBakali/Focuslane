@@ -93,7 +93,7 @@ class _PantryScreenState extends State<PantryScreen> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber.withOpacity(0.3),
+                        color: AppColors.warning.withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -159,7 +159,7 @@ class _PantryScreenState extends State<PantryScreen> {
         onPressed: () => _editItem(),
         icon: const Icon(Icons.add),
         label: const Text('Añadir'),
-        backgroundColor: Colors.brown,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -354,7 +354,7 @@ class _PantryScreenState extends State<PantryScreen> {
                                   ),
                                 }),
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.brown,
+                              backgroundColor: colorScheme.primary,
                             ),
                             child: Text(initial == null ? 'Añadir' : 'Guardar'),
                           ),
@@ -440,7 +440,7 @@ class _PantryScreenState extends State<PantryScreen> {
                       context,
                       double.tryParse(controller.text),
                     ),
-                style: FilledButton.styleFrom(backgroundColor: Colors.brown),
+                style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
                 child: const Text('Consumir'),
               ),
             ],
@@ -569,7 +569,7 @@ class _PantryScreenState extends State<PantryScreen> {
                             Text(
                               'Stock bajo',
                               style: AppTypography.caption(context).copyWith(
-                                color: Colors.amber,
+                                color: AppColors.warning,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -617,7 +617,7 @@ class _PantryScreenState extends State<PantryScreen> {
                         icon: const Icon(Icons.edit),
                         label: const Text('Editar'),
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.brown,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
@@ -672,7 +672,7 @@ class _PantryCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Theme.of(context).dividerColor.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -738,11 +738,11 @@ class _PantryCard extends StatelessWidget {
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete, size: 20, color: Colors.red),
+                                Icon(Icons.delete, size: 20, color: AppColors.error),
                                 SizedBox(width: AppSpacing.sm),
                                 Text(
                                   'Eliminar',
-                                  style: TextStyle(color: Colors.red),
+                                  style: TextStyle(color: AppColors.error),
                                 ),
                               ],
                             ),
@@ -776,7 +776,7 @@ class _PantryCard extends StatelessWidget {
                     Text(
                       'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
                       style: AppTypography.label(context).copyWith(
-                        color: Colors.brown,
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -839,7 +839,7 @@ class _PantryTile extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -911,9 +911,9 @@ class _PantryTile extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, size: 20, color: Colors.red),
+                      Icon(Icons.delete, size: 20, color: AppColors.error),
                       SizedBox(width: AppSpacing.sm),
-                      Text('Eliminar', style: TextStyle(color: Colors.red)),
+                      Text('Eliminar', style: TextStyle(color: AppColors.error)),
                     ],
                   ),
                 ),
@@ -958,7 +958,7 @@ class _DetailRow extends StatelessWidget {
           value,
           style: AppTypography.label(
             context,
-          ).copyWith(color: Colors.brown, fontWeight: FontWeight.bold),
+          ).copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
         ),
       ],
     );

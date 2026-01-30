@@ -81,7 +81,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
         onPressed: _createNewList,
         icon: const Icon(Icons.add),
         label: const Text('Nueva Lista'),
-        backgroundColor: Colors.orange,
+        backgroundColor: AppColors.food,
       ),
     );
   }
@@ -302,7 +302,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                                     ),
                               ),
                               ChoiceChip(
-                                label: const Text('Custom'),
+                                label: const Text('Personalizada'),
                                 selected: scope == ShoppingScope.custom,
                                 onSelected:
                                     (v) => setModalState(
@@ -321,7 +321,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                           (v) => setModalState(() => makeDefault = v ?? false),
                       title: const Text('Marcar como predeterminada'),
                       contentPadding: EdgeInsets.zero,
-                      activeColor: Colors.orange,
+                      activeColor: colorScheme.primary,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
@@ -342,7 +342,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                                   'makeDefault': makeDefault,
                                 }),
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: colorScheme.primary,
                             ),
                             child: const Text('Crear'),
                           ),
@@ -406,7 +406,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                 Text('Lista "${list.name}" restaurada'),
               ],
             ),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -419,7 +419,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al restaurar: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

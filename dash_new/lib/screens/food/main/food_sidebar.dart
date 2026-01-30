@@ -25,43 +25,48 @@ class FoodSidebar extends StatelessWidget {
       ),
       _SidebarItem(
         icon: Icons.restaurant_menu,
-        label: 'Diary',
+        label: 'Diario',
         index: 1,
       ),
       _SidebarItem(
         icon: Icons.restaurant,
-        label: 'Foods',
+        label: 'Alimentos',
         index: 2,
       ),
       _SidebarItem(
         icon: Icons.menu_book,
-        label: 'Recipes',
+        label: 'Recetas',
         index: 3,
       ),
       _SidebarItem(
         icon: Icons.calendar_today,
-        label: 'Planner',
+        label: 'Planificador',
         index: 4,
       ),
       _SidebarItem(
         icon: Icons.shopping_cart,
-        label: 'Shopping',
+        label: 'Compras',
         index: 5,
       ),
       _SidebarItem(
         icon: Icons.kitchen,
-        label: 'Pantry',
+        label: 'Despensa',
         index: 6,
       ),
       _SidebarItem(
         icon: Icons.analytics,
-        label: 'History/Stats',
+        label: 'Historial',
         index: 7,
       ),
       _SidebarItem(
-        icon: Icons.settings,
-        label: 'Settings',
+        icon: Icons.notifications,
+        label: 'Notificaciones',
         index: 8,
+      ),
+      _SidebarItem(
+        icon: Icons.settings,
+        label: 'Configuración',
+        index: 9,
       ),
     ];
 
@@ -90,7 +95,7 @@ class FoodSidebar extends StatelessWidget {
                   Icon(Icons.restaurant, color: colorScheme.onPrimary, size: 32),
                   const SizedBox(width: 12),
                   Text(
-                    'Food Module',
+                    'Módulo Food',
                     style: TextStyle(
                       color: colorScheme.onPrimary,
                       fontSize: 20,
@@ -116,7 +121,7 @@ class FoodSidebar extends StatelessWidget {
                   Icon(Icons.restaurant, color: colorScheme.onPrimary, size: 48),
                   const SizedBox(height: 12),
                   Text(
-                    'Food Module',
+                    'Módulo Food',
                     style: TextStyle(
                       color: colorScheme.onPrimary,
                       fontSize: 24,

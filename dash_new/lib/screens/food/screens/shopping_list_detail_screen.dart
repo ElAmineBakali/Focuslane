@@ -759,7 +759,7 @@ class _ShoppingListDetailScreenState
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.success),
                 child: const Text('Archivar'),
               ),
             ],
@@ -786,7 +786,7 @@ class _ShoppingListDetailScreenState
                   const Text('Lista archivada correctamente'),
                 ],
               ),
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -799,7 +799,7 @@ class _ShoppingListDetailScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error al archivar: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }

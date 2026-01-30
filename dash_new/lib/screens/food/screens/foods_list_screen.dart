@@ -42,7 +42,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
       body: Column(
         children: [
           Container(
-            color: AppColors.grey100,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               children: [
@@ -215,7 +215,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                 Text('${food.name} eliminado de favoritos'),
               ],
             ),
-            backgroundColor: AppColors.grey700,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -244,7 +244,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                 Text('${food.name} añadido a favoritos'),
               ],
             ),
-            backgroundColor: AppColors.grey700,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

@@ -8,6 +8,7 @@ import '../screens/food_planner_screen.dart';
 import '../screens/shopping_lists_screen.dart';
 import '../screens/pantry_screen.dart';
 import '../screens/food_history_screen.dart';
+import '../screens/food_notifications_screen.dart';
 import '../screens/food_settings_screen.dart';
 import 'food_sidebar.dart';
 
@@ -34,6 +35,7 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       ShoppingListsScreen(svc: widget.svc),
       PantryScreen(svc: widget.svc),
       FoodHistoryScreen(svc: widget.svc),
+      const FoodNotificationsScreen(),
       FoodSettingsScreen(svc: widget.svc),
     ];
   }
@@ -96,6 +98,7 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       'Listas de Compra',
       'Despensa',
       'Historial',
+      'Notificaciones',
       'Configuración',
     ];
     return titles[_selectedIndex];

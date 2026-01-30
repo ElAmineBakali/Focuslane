@@ -103,7 +103,7 @@ class FoodTheme {
   // Colores de fondo según tema
   static Color getCardBackground(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark ? darkCard : Colors.white;
+    return isDark ? darkCard : Theme.of(context).colorScheme.surface;
   }
 
   static Color getSurfaceBackground(BuildContext context) {

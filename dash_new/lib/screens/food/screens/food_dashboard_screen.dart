@@ -4,6 +4,7 @@ import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
 import 'food_diary_screen.dart';
 import 'recipes_list_screen.dart';
+import 'recipe_detail_screen.dart';
 import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
 
@@ -63,10 +64,10 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
               ),
               children: [
                 _buildMetricsSection(context, todayId, isDesktop),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 12.0),
                 
                 _buildWeeklyPlanSection(context),
-                const SizedBox(height: 30.0),
+                const SizedBox(height: 20.0),
                 
                 isDesktop || isTablet
                     ? _buildBottomSectionDesktop(context)
@@ -153,7 +154,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
                       FoodMetricCard(
                         icon: Icons.shopping_cart,
                         label: 'Lista de compra',
-                        value: '$shoppingItems items',
+                        value: '$shoppingItems productos',
                         subtitle: 'pendientes',
                         onTap: () => _navigateToShopping(context),
                       ),
@@ -347,7 +348,15 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
                   tags: _getRecipeTags(recipe),
                   kcal: _calculateRecipeKcal(recipe) ?? 0,
                   protein: _calculateRecipeProtein(recipe) ?? 0,
-                  onTap: () => _navigateToRecipes(context),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecipeDetailScreen(
+                        recipe: recipe,
+                        svc: widget.svc,
+                      ),
+                    ),
+                  ),
                 ),
               );
             }).toList(),

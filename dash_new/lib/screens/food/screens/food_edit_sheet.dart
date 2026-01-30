@@ -330,7 +330,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.food == null ? 'Alimento creado' : 'Alimento actualizado'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -339,7 +339,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
