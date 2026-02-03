@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
@@ -20,12 +22,34 @@ class FoodDashboardScreen extends StatefulWidget {
   State<FoodDashboardScreen> createState() => _FoodDashboardScreenState();
 }
 
-class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
+class _FoodDashboardScreenState extends State<FoodDashboardScreen>
+    with RouteAware {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
+  String _searchQuery = '';
   
   String _getWeekId(DateTime date) {
     final monday = date.subtract(Duration(days: date.weekday - 1));
     return _dayId(monday);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      appRouteObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
   }
 
   @override
@@ -54,6 +78,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
                   const SnackBar(content: Text('Filtros próximamente')),
                 );
               },
+              onSearchChanged: (value) => setState(() => _searchQuery = value),
             ),
           ),
           
@@ -198,42 +223,54 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
 
   /// Sección del plan semanal
   Widget _buildWeeklyPlanSection(BuildContext context) {
-    final weekId = _getWeekId(DateTime.now());
-    
-    return StreamBuilder<WeekPlanner>(
-      stream: widget.svc.streamWeek(weekId),
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: widget.svc.streamWeekPlannersRaw(),
       builder: (context, snapshot) {
-        final weekPlan = snapshot.data;
-        final weekDays = weekPlan?.days ?? {};
-        
-        final Map<String, Map<String, String>> displayPlan = {};
-        
-        for (var entry in weekDays.entries) {
-          final dayId = entry.key;
-          final dayEntries = entry.value;
-          
-          final meals = <String, String>{};
-          for (var mealEntry in dayEntries) {
-            final slotName = _getMealSlotName(mealEntry.slot);
-            meals[slotName] = mealEntry.refId;
-          }
-          
-          if (meals.isNotEmpty) {
-            displayPlan[dayId] = meals;
-          }
+        final plannersRaw = snapshot.data ?? [];
+        final selected = _pickActivePlanner(plannersRaw);
+        if (selected == null) {
+          return FoodWeeklyPlanCard(
+            weekPlan: const {},
+            onGeneratePlan: () => _navigateToPlanner(context),
+            onExportList: () => _navigateToShopping(context),
+            onViewCalendar: () => _navigateToPlanner(context),
+          );
         }
-        
-        if (displayPlan.isEmpty) {
-          displayPlan['${DateTime.now().toIso8601String().substring(0, 10)}'] = {
-            'Info': 'No hay plan semanal configurado',
-          };
-        }
-        
-        return FoodWeeklyPlanCard(
-          weekPlan: displayPlan,
-          onGeneratePlan: () => _navigateToPlanner(context),
-          onExportList: () => _navigateToShopping(context),
-          onViewCalendar: () => _navigateToPlanner(context),
+
+        final planner = WeekPlanner.fromMap(
+          selected['id'] as String,
+          Map<String, dynamic>.from(selected),
+        );
+
+        return StreamBuilder<List<Food>>(
+          stream: widget.svc.streamFoods(),
+          builder: (context, foodsSnap) {
+            final foods = foodsSnap.data ?? [];
+            final foodsMap = {for (final f in foods) f.id: f.name};
+
+            return StreamBuilder<List<Recipe>>(
+              stream: widget.svc.streamRecipes(),
+              builder: (context, recipesSnap) {
+                final recipes = recipesSnap.data ?? [];
+                final recipesMap = {
+                  for (final r in recipes) r.id: r.name,
+                };
+
+                final displayPlan = _buildDisplayPlan(
+                  planner,
+                  foodsMap: foodsMap,
+                  recipesMap: recipesMap,
+                );
+
+                return FoodWeeklyPlanCard(
+                  weekPlan: displayPlan,
+                  onGeneratePlan: () => _navigateToPlanner(context),
+                  onExportList: () => _navigateToShopping(context),
+                  onViewCalendar: () => _navigateToPlanner(context),
+                );
+              },
+            );
+          },
         );
       },
     );
@@ -376,18 +413,32 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
       stream: widget.svc.streamShoppingLists(),
       builder: (context, snapshot) {
         final lists = snapshot.data ?? [];
-        final activeList = lists.where((l) => l.completedAt == null).firstOrNull;
-        
-        final items = activeList?.items.map((item) {
-          return ShoppingItem(
-            name: item.name,
-            category: _getCategoryLabel(item.unit.name),
-            checked: item.checked,
-          );
-        }).toList() ?? [];
+        final activeLists = lists.where((l) => l.completedAt == null).toList();
+        ShoppingList? activeList;
+
+        if (activeLists.isNotEmpty) {
+          activeList =
+              activeLists.firstWhere(
+                (l) => l.isDefault,
+                orElse: () => activeLists.first,
+              );
+        }
 
         return FoodShoppingListCard(
-          items: items.isEmpty ? _getPlaceholderShoppingItems() : items,
+          listId: activeList?.id,
+          items: activeList?.items ?? const [],
+          onToggleItem: (index, checked) {
+            if (activeList == null) return;
+            widget.svc.toggleCheckedByIndex(activeList!.id, index, checked);
+          },
+          onMarkAll: () {
+            if (activeList == null) return;
+            widget.svc.setAllChecked(activeList!.id, true);
+          },
+          onClearCompleted: () {
+            if (activeList == null) return;
+            widget.svc.clearCompleted(activeList!.id);
+          },
           onNavigate: () => _navigateToShopping(context),
         );
       },
@@ -431,39 +482,61 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
     return 32.0;
   }
 
-  String _getCategoryLabel(String category) {
-    switch (category.toLowerCase()) {
-      case 'fruit':
-        return 'Fruta';
-      case 'protein':
-        return 'Proteína';
-      case 'dairy':
-        return 'Lácteos';
-      case 'vegetable':
-        return 'Verduras';
-      case 'grain':
-        return 'Granos';
-      default:
-        return 'Otros';
+  Map<String, Map<String, String>> _buildDisplayPlan(
+    WeekPlanner planner, {
+    required Map<String, String> foodsMap,
+    required Map<String, String> recipesMap,
+  }) {
+    final displayPlan = <String, Map<String, String>>{};
+
+    for (final entry in planner.days.entries) {
+      final dayId = entry.key;
+      final dayEntries = entry.value;
+
+      final meals = <String, String>{};
+      for (final mealEntry in dayEntries) {
+        final slotName = _getMealSlotName(mealEntry.slot);
+        final name = mealEntry.type == FavoriteType.food
+            ? foodsMap[mealEntry.refId]
+            : recipesMap[mealEntry.refId];
+        meals[slotName] = name ?? mealEntry.refId;
+      }
+
+      if (meals.isNotEmpty) {
+        displayPlan[dayId] = meals;
+      }
     }
+
+    return displayPlan;
   }
 
-  List<ShoppingItem> _getPlaceholderShoppingItems() {
-    // Placeholder para demo cuando no hay lista activa
-    return const [
-      ShoppingItem(name: 'Plátanos', category: 'Fruta', checked: false),
-      ShoppingItem(name: 'Pechuga de pollo', category: 'Proteína', checked: false),
-      ShoppingItem(name: 'Leche', category: 'Lácteos', checked: false),
-      ShoppingItem(name: 'Brócoli', category: 'Verduras', checked: true),
-      ShoppingItem(name: 'Avena', category: 'Granos', checked: false),
-      ShoppingItem(name: 'Huevos', category: 'Proteína', checked: false),
-      ShoppingItem(name: 'Manzanas', category: 'Fruta', checked: false),
-      ShoppingItem(name: 'Yogur griego', category: 'Lácteos', checked: false),
-      ShoppingItem(name: 'Espinacas', category: 'Verduras', checked: false),
-      ShoppingItem(name: 'Arroz integral', category: 'Granos', checked: true),
-      ShoppingItem(name: 'Salmón', category: 'Proteína', checked: false),
-      ShoppingItem(name: 'Aceite de oliva', category: 'Otros', checked: false),
-    ];
+  Map<String, dynamic>? _pickActivePlanner(List<Map<String, dynamic>> raw) {
+    if (raw.isEmpty) return null;
+
+    final flagged = raw.where((p) {
+      return p['isActive'] == true || p['isDefault'] == true;
+    }).toList();
+
+    if (flagged.isNotEmpty) {
+      return flagged.first;
+    }
+
+    raw.sort((a, b) {
+      final ad = _toDate(a['updatedAt']) ?? _toDate(a['createdAt']);
+      final bd = _toDate(b['updatedAt']) ?? _toDate(b['createdAt']);
+      return (bd ?? DateTime.fromMillisecondsSinceEpoch(0))
+          .compareTo(ad ?? DateTime.fromMillisecondsSinceEpoch(0));
+    });
+
+    return raw.first;
+  }
+
+  DateTime? _toDate(dynamic v) {
+    if (v == null) return null;
+    if (v is DateTime) return v;
+    if (v is Timestamp) return v.toDate();
+    if (v is String) return DateTime.tryParse(v);
+    return null;
   }
 
   // Navegación
@@ -491,7 +564,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
       MaterialPageRoute(
         builder: (_) => FoodPlannerScreen(svc: widget.svc),
       ),
-    );
+    ).then((_) => setState(() {}));
   }
 
   void _navigateToShopping(BuildContext context) {

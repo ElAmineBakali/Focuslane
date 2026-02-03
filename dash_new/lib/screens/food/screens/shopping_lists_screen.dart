@@ -34,43 +34,41 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 40),
-        child: Column(
-          children: [
-            ModernGradientAppBar(
-              title: 'Listas de Compra',
-              useThemeColors: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  tooltip: 'Nueva lista',
-                  onPressed: _createNewList,
-                ),
+      appBar: AppBar(
+        title: const Text('Listas de Compra'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Nueva lista',
+            onPressed: _createNewList,
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: Container(
+            color: colorScheme.surfaceContainerHighest,
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: colorScheme.primary,
+              labelColor: colorScheme.onSurface,
+              unselectedLabelColor: colorScheme.onSurfaceVariant,
+              tabs: const [
+                Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
+                Tab(icon: Icon(Icons.history), text: 'Historial'),
               ],
             ),
-            Container(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: TabBar(
-                controller: _tabController,
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                labelColor: Theme.of(context).colorScheme.onSurface,
-                unselectedLabelColor: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant,
-                tabs: const [
-                  Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
-                  Tab(icon: Icon(Icons.history), text: 'Historial'),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildActiveListsTab(), _buildHistoryTab()],
+      body: SafeArea(
+        top: false,
+        child: TabBarView(
+          controller: _tabController,
+          children: [_buildActiveListsTab(), _buildHistoryTab()],
+        ),
       ),
       floatingActionButton: Theme(
         data: Theme.of(context).copyWith(

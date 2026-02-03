@@ -6,57 +6,79 @@ class FoodTopBar extends StatelessWidget {
   final VoidCallback onNewRecipe;
   final VoidCallback onWeeklyPlan;
   final VoidCallback onFilter;
+  final ValueChanged<String> onSearchChanged;
 
   const FoodTopBar({
     super.key,
     required this.onNewRecipe,
     required this.onWeeklyPlan,
     required this.onFilter,
+    required this.onSearchChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Salir',
+        Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Food',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Resumen diario y planificación semanal',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.filter_list),
+              onPressed: onFilter,
+              tooltip: 'Filtros',
+            ),
+            const SizedBox(width: 6),
+            OutlinedButton.icon(
+              onPressed: onWeeklyPlan,
+              icon: const Icon(Icons.calendar_today, size: 18),
+              label: const Text('Plan semanal'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                minimumSize: const Size(0, 36),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton.icon(
+              onPressed: onNewRecipe,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Nueva receta'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                minimumSize: const Size(0, 36),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          ],
         ),
-        Text(
-          'Dashboard',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.filter_list),
-          onPressed: onFilter,
-          tooltip: 'Filtros',
-        ),
-        OutlinedButton.icon(
-          onPressed: onWeeklyPlan,
-          icon: const Icon(Icons.calendar_today, size: 18),
-          label: const Text('Plan Semanal'),
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            minimumSize: const Size(0, 36),
-            visualDensity: VisualDensity.compact,
-          ),
-        ),
-        ElevatedButton.icon(
-          onPressed: onNewRecipe,
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('Nueva Receta'),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            minimumSize: const Size(0, 36),
-            visualDensity: VisualDensity.compact,
-          ),
+        const SizedBox(height: 10),
+        FoodCompactTextField(
+          label: 'Buscar',
+          hint: 'Busca alimentos, recetas o planes',
+          prefixIcon: Icons.search,
+          onChanged: onSearchChanged,
         ),
       ],
     );
@@ -169,6 +191,43 @@ class FoodWeeklyPlanCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    if (weekPlan.isEmpty) {
+      return FoodCompactCard(
+        maxHeight: 200,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.calendar_month, color: colorScheme.primary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Plan Semanal',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Aún no tienes un plan semanal activo.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: onGeneratePlan,
+              style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+              child: const Text('Crear plan'),
+            ),
+          ],
+        ),
+      );
+    }
+
     return FoodCompactCard(
       maxHeight: 260,
       padding: const EdgeInsets.all(12),
@@ -209,7 +268,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: weekPlan.entries.map((entry) {
-                final date = DateTime.parse(entry.key);
+                final label = _formatDayLabel(entry.key);
                 final meals = entry.value;
 
                 return Container(
@@ -225,7 +284,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _formatDate(date),
+                        label,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -278,9 +337,30 @@ class FoodWeeklyPlanCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    return '${weekdays[date.weekday - 1]} ${date.day}';
+  String _formatDayLabel(String key) {
+    final parsed = DateTime.tryParse(key);
+    if (parsed != null) {
+      final weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      return '${weekdays[parsed.weekday - 1]} ${parsed.day}';
+    }
+    switch (key) {
+      case 'Mon':
+        return 'Lun';
+      case 'Tue':
+        return 'Mar';
+      case 'Wed':
+        return 'Mié';
+      case 'Thu':
+        return 'Jue';
+      case 'Fri':
+        return 'Vie';
+      case 'Sat':
+        return 'Sáb';
+      case 'Sun':
+        return 'Dom';
+      default:
+        return key;
+    }
   }
 }
 
@@ -447,12 +527,20 @@ class FoodRecipeCard extends StatelessWidget {
 }
 
 class FoodShoppingListCard extends StatefulWidget {
-  final List<ShoppingItem> items;
+  final String? listId;
+  final List<ShoppingListItem> items;
+  final void Function(int index, bool checked)? onToggleItem;
+  final VoidCallback? onMarkAll;
+  final VoidCallback? onClearCompleted;
   final VoidCallback? onNavigate;
 
   const FoodShoppingListCard({
     super.key,
+    required this.listId,
     required this.items,
+    this.onToggleItem,
+    this.onMarkAll,
+    this.onClearCompleted,
     this.onNavigate,
   });
 
@@ -467,6 +555,44 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
     final colorScheme = theme.colorScheme;
     final pendingItems = widget.items.where((item) => !item.checked).toList();
     final completedCount = widget.items.where((item) => item.checked).length;
+
+    if (widget.items.isEmpty) {
+      return FoodCompactCard(
+        maxHeight: 200,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.shopping_cart, color: colorScheme.primary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Lista de Compra',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'No hay una lista activa con productos.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (widget.onNavigate != null)
+              FilledButton(
+                onPressed: widget.onNavigate,
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+                child: const Text('Abrir listas'),
+              ),
+          ],
+        ),
+      );
+    }
 
     return FoodCompactCard(
       maxHeight: 260,
@@ -493,34 +619,84 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
               ),
             ],
           ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              TextButton(
+                onPressed: widget.onMarkAll,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 32),
+                ),
+                child: const Text('Marcar todo'),
+              ),
+              const SizedBox(width: 6),
+              OutlinedButton(
+                onPressed: widget.onClearCompleted,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 32),
+                ),
+                child: const Text('Limpiar completados'),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
-          ...pendingItems.take(5).map((item) {
-            return CheckboxListTile(
-              value: item.checked,
-              onChanged: (value) {},
-              title: Text(
-                item.name,
-                style: TextStyle(
-                  decoration: item.checked ? TextDecoration.lineThrough : null,
-                ),
+          ...pendingItems.take(6).toList().asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            final qtyText =
+                '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${item.unit.name}';
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: item.checked,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      widget.onToggleItem?.call(
+                        widget.items.indexOf(item),
+                        value,
+                      );
+                    },
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    activeColor: colorScheme.primary,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            decoration:
+                                item.checked
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                          ),
+                        ),
+                        Text(
+                          item.total != null
+                              ? '$qtyText • €${item.total!.toStringAsFixed(2)}'
+                              : qtyText,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              subtitle: Text(
-                item.category,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 11,
-                ),
-              ),
-              dense: true,
-              visualDensity: VisualDensity.compact,
-              contentPadding: EdgeInsets.zero,
             );
           }).toList(),
-          if (pendingItems.length > 5)
+          if (pendingItems.length > 6)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '+ ${pendingItems.length - 5} items más',
+                '+ ${pendingItems.length - 6} items más',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,

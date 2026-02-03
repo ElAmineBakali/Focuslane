@@ -60,6 +60,7 @@ import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
+import 'navigation/app_route_observer.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -212,19 +213,21 @@ class _MyAppState extends State<MyApp> {
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           scrollbars: false,
         ),
+        navigatorObservers: [appRouteObserver],
       );
     }
 
     final light = _safe(AppTheme.getLight(_preset));
     final dark = _safe(AppTheme.getDark(_preset));
 
-    return MaterialApp(
+        return MaterialApp(
           navigatorKey: appNavigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Mi Dashboard Personal',
           theme: light,
           darkTheme: dark,
           themeMode: _themeMode,
+          navigatorObservers: [appRouteObserver],
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

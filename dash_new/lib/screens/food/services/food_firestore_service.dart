@@ -339,8 +339,11 @@ class FoodFirestoreService {
     });
   }
 
+  CollectionReference<Map<String, dynamic>> get _weekPlannersRef =>
+      FirebaseFirestore.instance.collection('weekPlanners');
+
   DocumentReference<Map<String, dynamic>> _plannerRef(String weekId) =>
-      _root.collection('planner').doc(weekId);
+      _weekPlannersRef.doc(weekId);
 
   Future<WeekPlanner> getWeek(String weekId) async {
     final snap = await _plannerRef(weekId).get();
@@ -386,11 +389,28 @@ class FoodFirestoreService {
   }
 
   Future<void> saveWeek(WeekPlanner w) async {
-    await _plannerRef(w.id).set(w.toMap(), SetOptions(merge: true));
+    await _plannerRef(w.id).set({
+      ...w.toMap(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'createdAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   Stream<List<dynamic>> streamPlanners() {
     return Stream.value([]);
+  }
+
+  Stream<List<Map<String, dynamic>>> streamWeekPlannersRaw() {
+    return _weekPlannersRef.snapshots().map((snap) {
+      return snap.docs
+          .map(
+            (d) => {
+              'id': d.id,
+              ...d.data(),
+            },
+          )
+          .toList();
+    });
   }
 
   Future<String> createPlanner(String name) async {
@@ -588,6 +608,36 @@ class FoodFirestoreService {
             .toList();
     if (index < 0 || index >= items.length) return;
     items[index]['checked'] = checked;
+    await ref.set({
+      'items': items,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> setAllChecked(String listId, bool checked) async {
+    final ref = _root.collection('shoppingLists').doc(listId);
+    final snap = await ref.get();
+    final items =
+        ((snap.data()?['items'] as List?) ?? const [])
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+    for (final item in items) {
+      item['checked'] = checked;
+    }
+    await ref.set({
+      'items': items,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> clearCompleted(String listId) async {
+    final ref = _root.collection('shoppingLists').doc(listId);
+    final snap = await ref.get();
+    final items =
+        ((snap.data()?['items'] as List?) ?? const [])
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+    items.removeWhere((item) => item['checked'] == true);
     await ref.set({
       'items': items,
       'updatedAt': FieldValue.serverTimestamp(),

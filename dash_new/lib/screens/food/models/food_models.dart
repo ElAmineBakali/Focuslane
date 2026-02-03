@@ -306,6 +306,7 @@ class IntakeEntry {
   final UnitKind unit;
   final String nameSnapshot;
   final Map<String, double> macrosSnapshot;
+  final MealSlot meal;
 
   const IntakeEntry({
     required this.id,
@@ -315,6 +316,7 @@ class IntakeEntry {
     required this.unit,
     required this.nameSnapshot,
     required this.macrosSnapshot,
+    required this.meal,
   });
 
   factory IntakeEntry.fromMap(String id, Map<String, dynamic> m) {
@@ -328,6 +330,21 @@ class IntakeEntry {
           return UnitKind.ml;
         default:
           return UnitKind.unit;
+      }
+    }
+    MealSlot meal(dynamic v) {
+      switch ('$v') {
+        case 'breakfast':
+          return MealSlot.breakfast;
+        case 'lunch':
+          return MealSlot.lunch;
+        case 'merienda':
+          return MealSlot.merienda;
+        case 'dinner':
+          return MealSlot.dinner;
+        case 'snack':
+        default:
+          return MealSlot.snack;
       }
     }
 
@@ -344,6 +361,7 @@ class IntakeEntry {
             ) ??
             const {},
       ),
+      meal: meal(m['meal']),
     );
   }
 
@@ -354,6 +372,7 @@ class IntakeEntry {
     'unit': unit.name,
     'nameSnapshot': nameSnapshot,
     'macrosSnapshot': macrosSnapshot,
+    'meal': meal.name,
   };
 }
 

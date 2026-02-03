@@ -62,54 +62,64 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
               }
               mergedTargets['water'] ??= globalTargets['water'];
 
-              return CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _ModernDaySelector(
-                      date: _date,
-                      onPrev:
-                          () => setState(
-                            () =>
-                                _date = _date.subtract(const Duration(days: 1)),
-                          ),
-                      onNext:
-                          () => setState(
-                            () => _date = _date.add(const Duration(days: 1)),
-                          ),
-                      onToday: () => setState(() => _date = DateTime.now()),
-                    ).animate().slideY(begin: -0.2, duration: 300.ms),
-                  ),
-                  SliverToBoxAdapter(
-                    child: _MacrosSummary(day: d, mergedTargets: mergedTargets)
-                        .animate()
-                        .fadeIn(delay: 100.ms)
-                        .slideY(begin: 0.2, duration: 300.ms),
-                  ),
-                  SliverToBoxAdapter(
-                    child: _ModernWaterCard(
-                          water: d.waterMl,
-                          waterTarget: (mergedTargets['water'] ?? 2000).toInt(),
-                          onAdd: (ml) => widget.svc.incrementWater(dayId, ml),
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 1100;
+
+                  final mainContent = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ModernDaySelector(
+                        date: _date,
+                        onPrev:
+                            () => setState(
+                              () =>
+                                  _date = _date.subtract(
+                                    const Duration(days: 1),
+                                  ),
+                            ),
+                        onNext:
+                            () => setState(
+                              () =>
+                                  _date = _date.add(const Duration(days: 1)),
+                            ),
+                        onToday: () => setState(() => _date = DateTime.now()),
+                      ).animate().slideY(begin: -0.2, duration: 300.ms),
+                      const SizedBox(height: AppSpacing.md),
+                      _KpiRow(day: d, targets: mergedTargets),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildMealSections(d.entries, dayId),
+                    ],
+                  );
+
+                  final sidePanel = _SidePanel(
+                    day: d,
+                    targets: mergedTargets,
+                    onAddWater: (ml) => widget.svc.incrementWater(dayId, ml),
+                    onEditGoals: () => _showGoalsSheet(context),
+                  );
+
+                  return ListView(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    children: [
+                      if (isWide)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: mainContent),
+                            const SizedBox(width: AppSpacing.md),
+                            SizedBox(width: 320, child: sidePanel),
+                          ],
                         )
-                        .animate()
-                        .fadeIn(delay: 200.ms)
-                        .slideY(begin: 0.2, duration: 300.ms),
-                  ),
-                  if (d.entries.isEmpty)
-                    SliverFillRemaining(
-                      child: ModernEmptyState(
-                        icon: Icons.restaurant_outlined,
-                        message: 'No hay entradas para este día',
-                        subtitle:
-                            'Toca el botón + para añadir tu primera comida',
-                        actionLabel: 'Añadir entrada',
-                        onAction: () => _showAddEntrySheet(context, dayId),
-                      ),
-                    )
-                  else
-                    ..._buildMealSections(d.entries, dayId),
-                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                ],
+                      else ...[
+                        mainContent,
+                        const SizedBox(height: AppSpacing.md),
+                        sidePanel,
+                      ],
+                      const SizedBox(height: 100),
+                    ],
+                  );
+                },
               );
             },
           );
@@ -118,37 +128,77 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
     );
   }
 
-  List<Widget> _buildMealSections(List<IntakeEntry> entries, String dayId) {
-    return [
-      SliverPadding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        sliver: SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-            final entry = entries[index];
-            return _EntryCard(
-                  entry: entry,
-                  onDuplicate:
-                      () => widget.svc.addEntry(
-                        dayId,
-                        IntakeEntry(
-                          id: '',
-                          type: entry.type,
-                          refId: entry.refId,
-                          qty: entry.qty,
-                          unit: entry.unit,
-                          nameSnapshot: entry.nameSnapshot,
-                          macrosSnapshot: entry.macrosSnapshot,
-                        ),
-                      ),
-                  onDelete: () => widget.svc.deleteEntry(dayId, index),
-                )
-                .animate()
-                .fadeIn(delay: (300 + index * 50).ms)
-                .slideX(begin: -0.2, duration: 300.ms);
-          }, childCount: entries.length),
-        ),
+  Widget _buildMealSections(List<IntakeEntry> entries, String dayId) {
+    if (entries.isEmpty) {
+      return ModernEmptyState(
+        icon: Icons.restaurant_outlined,
+        message: 'No hay entradas para este día',
+        subtitle: 'Toca el botón + para añadir tu primera comida',
+        actionLabel: 'Añadir entrada',
+        onAction: () => _showAddEntrySheet(context, dayId),
+      );
+    }
+
+    final grouped = _groupByMeal(entries);
+    final sections = [
+      _MealSectionData(
+        title: 'Desayuno',
+        entries: grouped[MealSlot.breakfast] ?? const [],
+      ),
+      _MealSectionData(
+        title: 'Comida',
+        entries: grouped[MealSlot.lunch] ?? const [],
+      ),
+      _MealSectionData(
+        title: 'Cena',
+        entries: grouped[MealSlot.dinner] ?? const [],
+      ),
+      _MealSectionData(
+        title: 'Snacks',
+        entries: [
+          ...(grouped[MealSlot.snack] ?? const []),
+          ...(grouped[MealSlot.merienda] ?? const []),
+        ],
       ),
     ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sections.map((section) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: _MealSection(
+            title: section.title,
+            entries: section.entries,
+            onDuplicate: (entry) => widget.svc.addEntry(
+              dayId,
+              IntakeEntry(
+                id: '',
+                type: entry.type,
+                refId: entry.refId,
+                qty: entry.qty,
+                unit: entry.unit,
+                nameSnapshot: entry.nameSnapshot,
+                macrosSnapshot: entry.macrosSnapshot,
+                meal: entry.meal,
+              ),
+            ),
+            onDelete: (entry) {
+              final index = entries.indexOf(entry);
+              if (index >= 0) widget.svc.deleteEntry(dayId, index);
+            },
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Map<MealSlot, List<IntakeEntry>> _groupByMeal(List<IntakeEntry> entries) {
+    final grouped = <MealSlot, List<IntakeEntry>>{};
+    for (final entry in entries) {
+      grouped.putIfAbsent(entry.meal, () => []).add(entry);
+    }
+    return grouped;
   }
 
   void _showGoalsSheet(BuildContext context) {
@@ -257,6 +307,361 @@ class _ModernDaySelector extends StatelessWidget {
         date.month == now.month &&
         date.day == now.day;
   }
+}
+
+class _KpiRow extends StatelessWidget {
+  final DailyIntakeDoc day;
+  final Map<String, double?> targets;
+
+  const _KpiRow({required this.day, required this.targets});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = day.totals;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 720;
+        final cards = [
+          _KpiCard(
+            label: 'Calorías',
+            value: (t['kcal'] ?? 0).toStringAsFixed(0),
+            unit: 'kcal',
+            target: targets['kcal'],
+            icon: Icons.local_fire_department,
+          ),
+          _KpiCard(
+            label: 'Proteína',
+            value: (t['protein'] ?? 0).toStringAsFixed(0),
+            unit: 'g',
+            target: targets['protein'],
+            icon: Icons.fitness_center,
+          ),
+          _KpiCard(
+            label: 'Carbs',
+            value: (t['carbs'] ?? 0).toStringAsFixed(0),
+            unit: 'g',
+            target: targets['carbs'],
+            icon: Icons.bakery_dining,
+          ),
+          _KpiCard(
+            label: 'Grasas',
+            value: (t['fat'] ?? 0).toStringAsFixed(0),
+            unit: 'g',
+            target: targets['fat'],
+            icon: Icons.water_drop,
+          ),
+        ];
+
+        if (isWide) {
+          return Row(
+            children: [
+              for (int i = 0; i < cards.length; i++) ...[
+                Expanded(child: cards[i]),
+                if (i != cards.length - 1)
+                  const SizedBox(width: AppSpacing.sm),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: cards
+              .map(
+                (card) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: card,
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
+class _KpiCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final String unit;
+  final double? target;
+  final IconData icon;
+
+  const _KpiCard({
+    required this.label,
+    required this.value,
+    required this.unit,
+    required this.target,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final targetText =
+        target != null ? ' / ${target!.toStringAsFixed(0)} $unit' : '';
+
+    return FoodCompactCard(
+      maxHeight: 72,
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: colorScheme.primary),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  '$value $unit$targetText',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MealSectionData {
+  final String title;
+  final List<IntakeEntry> entries;
+
+  const _MealSectionData({required this.title, required this.entries});
+}
+
+class _MealSection extends StatelessWidget {
+  final String title;
+  final List<IntakeEntry> entries;
+  final ValueChanged<IntakeEntry> onDuplicate;
+  final ValueChanged<IntakeEntry> onDelete;
+
+  const _MealSection({
+    required this.title,
+    required this.entries,
+    required this.onDuplicate,
+    required this.onDelete,
+  });
+
+  double _kcalTotal() {
+    return entries.fold<double>(
+      0,
+      (sum, e) => sum + (e.macrosSnapshot['kcal'] ?? 0),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return FoodCompactCard(
+      maxHeight: 240,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: AppTypography.heading4(context),
+              ),
+              Text(
+                '${_kcalTotal().toStringAsFixed(0)} kcal',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          if (entries.isEmpty)
+            Text(
+              'Sin entradas',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            )
+          else
+            ...entries.take(4).map((entry) {
+              return _EntryCard(
+                entry: entry,
+                onDuplicate: () => onDuplicate(entry),
+                onDelete: () => onDelete(entry),
+              );
+            }).toList(),
+          if (entries.length > 4)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '+ ${entries.length - 4} más',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SidePanel extends StatelessWidget {
+  final DailyIntakeDoc day;
+  final Map<String, double?> targets;
+  final ValueChanged<int> onAddWater;
+  final VoidCallback onEditGoals;
+
+  const _SidePanel({
+    required this.day,
+    required this.targets,
+    required this.onAddWater,
+    required this.onEditGoals,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final waterTarget = (targets['water'] ?? 2000).toInt();
+    final summary = [
+      _GoalRow(label: 'Calorías', value: targets['kcal'], unit: 'kcal'),
+      _GoalRow(label: 'Proteína', value: targets['protein'], unit: 'g'),
+      _GoalRow(label: 'Carbs', value: targets['carbs'], unit: 'g'),
+      _GoalRow(label: 'Grasas', value: targets['fat'], unit: 'g'),
+      _GoalRow(label: 'Fibra', value: targets['fiber'], unit: 'g'),
+    ];
+
+    return Column(
+      children: [
+        _ModernWaterCard(
+          water: day.waterMl,
+          waterTarget: waterTarget,
+          onAdd: onAddWater,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        FoodCompactCard(
+          maxHeight: 220,
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Objetivos del día', style: AppTypography.heading4(context)),
+                  TextButton(
+                    onPressed: onEditGoals,
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 32),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    child: const Text('Editar'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              ...summary.map((row) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(row.label, style: AppTypography.bodySmall(context)),
+                      Text(
+                        row.value != null
+                            ? '${row.value!.toStringAsFixed(0)} ${row.unit}'
+                            : 'Sin objetivo',
+                        style: AppTypography.bodySmall(context).copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GoalRow {
+  final String label;
+  final double? value;
+  final String unit;
+
+  const _GoalRow({required this.label, required this.value, required this.unit});
+}
+
+class _MealSelector extends StatelessWidget {
+  final MealSlot value;
+  final ValueChanged<MealSlot> onChanged;
+
+  const _MealSelector({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final options = const [
+      _MealOption(MealSlot.breakfast, 'Desayuno'),
+      _MealOption(MealSlot.lunch, 'Comida'),
+      _MealOption(MealSlot.dinner, 'Cena'),
+      _MealOption(MealSlot.snack, 'Snacks'),
+    ];
+
+    return Wrap(
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xs,
+      children: options.map((option) {
+        final selected = option.slot == value;
+        return ChoiceChip(
+          label: Text(option.label),
+          selected: selected,
+          onSelected: (_) => onChanged(option.slot),
+          labelStyle: theme.textTheme.bodySmall?.copyWith(
+            color: selected
+                ? colorScheme.onPrimaryContainer
+                : colorScheme.onSurfaceVariant,
+          ),
+          selectedColor: colorScheme.primaryContainer,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _MealOption {
+  final MealSlot slot;
+  final String label;
+
+  const _MealOption(this.slot, this.label);
 }
 
 class _MacrosSummary extends StatelessWidget {
@@ -709,6 +1114,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
   final _searchController = TextEditingController();
   String _searchQuery = '';
   UnitKind _unit = UnitKind.g;
+  MealSlot _meal = MealSlot.lunch;
 
   @override
   void initState() {
@@ -766,6 +1172,16 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: _MealSelector(
+                value: _meal,
+                onChanged: (m) => setState(() => _meal = m),
               ),
             ),
 
@@ -1027,6 +1443,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           'fiber': 0.0,
           'sodium': 0.0,
         },
+        meal: _meal,
       ),
     );
 
@@ -1067,6 +1484,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           unit: unit,
           nameSnapshot: f.alias ?? food.name,
           macrosSnapshot: mac,
+          meal: _meal,
         ),
       );
     } else {
@@ -1093,6 +1511,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           unit: UnitKind.unit,
           nameSnapshot: r.name,
           macrosSnapshot: mac,
+          meal: _meal,
         ),
       );
     }
@@ -1115,6 +1534,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
         unit: unit,
         nameSnapshot: f.name,
         macrosSnapshot: mac,
+        meal: _meal,
       ),
     );
 
@@ -1136,6 +1556,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
         unit: UnitKind.unit,
         nameSnapshot: r.name,
         macrosSnapshot: mac,
+        meal: _meal,
       ),
     );
 
