@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
+import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'recipe_edit_screen.dart';
@@ -15,7 +16,6 @@ class RecipesListScreen extends StatefulWidget {
 
 class _RecipesListScreenState extends State<RecipesListScreen> {
   String _searchQuery = '';
-  bool _showGridView = true;
   final _searchController = TextEditingController();
 
   @override
@@ -26,11 +26,6 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
         icon: Icons.menu_book,
         useThemeColors: true,
         actions: [
-          IconButton(
-            icon: Icon(_showGridView ? Icons.view_list : Icons.grid_view),
-            onPressed: () => setState(() => _showGridView = !_showGridView),
-            tooltip: _showGridView ? 'Vista de lista' : 'Vista de cuadrícula',
-          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed:
@@ -48,8 +43,8 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
         children: [
           Container(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: ModernTextField(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: FoodCompactTextField(
               label: 'Buscar recetas',
               hint: 'Nombre, ingredientes...',
               controller: _searchController,
@@ -110,9 +105,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
                   );
                 }
 
-                return _showGridView
-                    ? _buildGridView(list)
-                    : _buildListView(list);
+                return _buildListView(list);
               },
             ),
           ),
@@ -121,42 +114,9 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
     );
   }
 
-  Widget _buildGridView(List<Recipe> recipes) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: AppSpacing.md,
-        mainAxisSpacing: AppSpacing.md,
-      ),
-      itemCount: recipes.length,
-      itemBuilder: (context, index) {
-        final recipe = recipes[index];
-        return _RecipeGridCard(
-              recipe: recipe,
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) => RecipeEditScreen(
-                            svc: widget.svc,
-                            initial: recipe,
-                          ),
-                    ),
-                  ),
-            )
-            .animate()
-            .fadeIn(delay: (100 + index * 50).ms)
-            .scale(duration: 200.ms);
-      },
-    );
-  }
-
   Widget _buildListView(List<Recipe> recipes) {
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       itemCount: recipes.length,
       itemBuilder: (context, index) {
         final recipe = recipes[index];
@@ -182,116 +142,6 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   }
 }
 
-class _RecipeGridCard extends StatelessWidget {
-  final Recipe recipe;
-  final VoidCallback onTap;
-
-  const _RecipeGridCard({required this.recipe, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasNutrition = recipe.kcal != null;
-
-    return Card(
-      elevation: AppSpacing.elevationMd,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.purple, Colors.purpleAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.radiusLg),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Icon(
-                      Icons.menu_book,
-                      size: 48,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                  if (hasNutrition)
-                    Positioned(
-                      top: AppSpacing.sm,
-                      right: AppSpacing.sm,
-                      child: ModernBadge(
-                        label: 'AUTO',
-                        color: AppColors.success,
-                        textColor: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recipe.name,
-                      style: AppTypography.heading4(context),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${recipe.servings} raciones',
-                      style: AppTypography.caption(context),
-                    ),
-                    const Spacer(),
-                    if (hasNutrition) ...[
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.local_fire_department,
-                            size: 16,
-                            color: Colors.purple,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${recipe.kcal!.toStringAsFixed(0)} kcal',
-                            style: AppTypography.caption(
-                              context,
-                              color: Colors.purple,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text('totales', style: AppTypography.caption(context)),
-                    ] else ...[
-                      ModernBadge(
-                        label: 'Sin macros',
-                        color: AppColors.grey500,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _RecipeListCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
@@ -300,100 +150,35 @@ class _RecipeListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final hasNutrition = recipe.kcal != null;
+    final subtitle =
+        '${recipe.servings} raciones${hasNutrition ? ' • ${recipe.kcal!.toStringAsFixed(0)} kcal' : ''}';
 
-    return Card(
-      elevation: AppSpacing.elevationSm,
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: FoodCompactTile(
+        height: 52,
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.purple, Colors.purpleAccent],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-                child: Icon(
-                  Icons.menu_book,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 32,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.lg),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            recipe.name,
-                            style: AppTypography.heading4(context),
-                          ),
-                        ),
-                        if (hasNutrition)
-                          ModernBadge(
-                            label: 'MACROS',
-                            color: AppColors.success,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${recipe.servings} raciones',
-                      style: AppTypography.body(context),
-                    ),
-                    if (recipe.description != null) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        recipe.description!,
-                        style: AppTypography.caption(context),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                    if (hasNutrition) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.local_fire_department,
-                            size: 16,
-                            color: Colors.purple,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${recipe.kcal!.toStringAsFixed(0)} kcal totales',
-                            style: AppTypography.caption(
-                              context,
-                              color: Colors.purple,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.grey400),
-            ],
+        leading: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
           ),
+          child: Icon(
+            Icons.menu_book,
+            color: colorScheme.onPrimaryContainer,
+            size: 18,
+          ),
+        ),
+        title: recipe.name,
+        subtitle: subtitle,
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: colorScheme.outline,
         ),
       ),
     );

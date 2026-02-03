@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 
 class FoodTopBar extends StatelessWidget {
@@ -16,20 +17,20 @@ class FoodTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    return Row(
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: [
         IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
           tooltip: 'Salir',
         ),
-        Expanded(
-          child: Text(
-            'Dashboard',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          'Dashboard',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
         ),
         IconButton(
@@ -37,17 +38,25 @@ class FoodTopBar extends StatelessWidget {
           onPressed: onFilter,
           tooltip: 'Filtros',
         ),
-        const SizedBox(width: 8),
         OutlinedButton.icon(
           onPressed: onWeeklyPlan,
           icon: const Icon(Icons.calendar_today, size: 18),
           label: const Text('Plan Semanal'),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(0, 36),
+            visualDensity: VisualDensity.compact,
+          ),
         ),
-        const SizedBox(width: 8),
         ElevatedButton.icon(
           onPressed: onNewRecipe,
           icon: const Icon(Icons.add, size: 18),
           label: const Text('Nueva Receta'),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(0, 36),
+            visualDensity: VisualDensity.compact,
+          ),
         ),
       ],
     );
@@ -74,60 +83,66 @@ class FoodMetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Material(
-      color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(color: colorScheme.outline),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 110),
+      child: Material(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(icon, color: colorScheme.primary, size: 16),
                     ),
-                    child: Icon(icon, color: colorScheme.primary, size: 20),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 12,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ],
+                ),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
-                  const Spacer(),
-                  Icon(Icons.arrow_forward_ios, size: 14, color: colorScheme.onSurfaceVariant),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+                Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 11,
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -153,79 +168,72 @@ class FoodWeeklyPlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline),
-      ),
+
+    return FoodCompactCard(
+      maxHeight: 260,
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_month, color: colorScheme.primary, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Plan Semanal',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              Icon(Icons.calendar_month, color: colorScheme.primary, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Plan Semanal',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton.icon(
+              const SizedBox(width: 8),
+              TextButton(
                 onPressed: onGeneratePlan,
-                icon: const Icon(Icons.auto_awesome, size: 16),
-                label: const Text('Generar'),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 32),
                 ),
+                child: const Text('Generar'),
               ),
-              const SizedBox(width: 6),
-              OutlinedButton.icon(
+              OutlinedButton(
                 onPressed: onExportList,
-                icon: const Icon(Icons.shopping_cart, size: 16),
-                label: const Text('Lista'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 32),
                 ),
+                child: const Text('Lista'),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: weekPlan.entries.map((entry) {
                 final date = DateTime.parse(entry.key);
                 final meals = entry.value;
-                
+
                 return Container(
-                  width: 180,
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.all(14),
+                  width: 140,
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: colorScheme.outline),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         _formatDate(date),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 6),
                       ...meals.entries.map((meal) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.only(bottom: 4),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -240,7 +248,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                               Text(
                                 meal.value,
                                 style: theme.textTheme.bodySmall,
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -253,13 +261,16 @@ class FoodWeeklyPlanCard extends StatelessWidget {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton.icon(
+            child: TextButton(
               onPressed: onViewCalendar,
-              icon: const Icon(Icons.visibility, size: 18),
-              label: const Text('Ver calendario completo'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(0, 32),
+              ),
+              child: const Text('Ver calendario completo'),
             ),
           ),
         ],
@@ -293,32 +304,39 @@ class FoodSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(icon, color: colorScheme.primary, size: 28),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+        Row(
+          children: [
+            Icon(icon, color: colorScheme.primary, size: 20),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
         TextButton(
           onPressed: onActionPressed,
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(0, 32),
+          ),
           child: Text(actionLabel),
         ),
       ],
@@ -346,82 +364,83 @@ class FoodRecipeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Material(
-      color: colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+
+    return FoodCompactCard(
+      maxHeight: 96,
+      padding: const EdgeInsets.all(12),
+      onTap: onTap,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.restaurant, color: colorScheme.primary),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 140,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                child: Icon(Icons.restaurant, color: colorScheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: tags.take(2).map((tag) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Wrap(
-                      spacing: 8,
-                      children: tags.map((tag) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            tag,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSecondaryContainer,
-                              fontSize: 11,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        tag,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSecondaryContainer,
+                          fontSize: 10,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${kcal.toStringAsFixed(0)} kcal',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${kcal.toStringAsFixed(0)} kcal',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    '${protein.toStringAsFixed(0)}g prot',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+              Text(
+                '${protein.toStringAsFixed(0)}g proteína',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 11,
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -448,44 +467,34 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
     final colorScheme = theme.colorScheme;
     final pendingItems = widget.items.where((item) => !item.checked).toList();
     final completedCount = widget.items.where((item) => item.checked).length;
-    
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outline),
-      ),
+
+    return FoodCompactCard(
+      maxHeight: 260,
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.shopping_cart, color: colorScheme.primary, size: 28),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Lista de Compra',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '$completedCount de ${widget.items.length} completados',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+              Icon(Icons.shopping_cart, color: colorScheme.primary, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Lista de Compra',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$completedCount/${widget.items.length}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          ...pendingItems.take(8).map((item) {
+          const SizedBox(height: 8),
+          ...pendingItems.take(5).map((item) {
             return CheckboxListTile(
               value: item.checked,
               onChanged: (value) {},
@@ -499,18 +508,19 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                 item.category,
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
+                  fontSize: 11,
                 ),
               ),
               dense: true,
+              visualDensity: VisualDensity.compact,
               contentPadding: EdgeInsets.zero,
             );
           }).toList(),
-          if (pendingItems.length > 8)
+          if (pendingItems.length > 5)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '+ ${pendingItems.length - 8} items más',
+                '+ ${pendingItems.length - 5} items más',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -519,10 +529,15 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
             ),
           if (widget.onNavigate != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Center(
+              padding: const EdgeInsets.only(top: 8),
+              child: Align(
+                alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: widget.onNavigate,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 32),
+                  ),
                   child: const Text('Ver lista completa'),
                 ),
               ),

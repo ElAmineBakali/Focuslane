@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
+import '../widgets/food_compact_widgets.dart';
 
-/// FoodEditSheet - Modal para añadir/editar alimentos
 class FoodEditSheet extends StatefulWidget {
   final FoodFirestoreService svc;
   final Food? food;
@@ -38,15 +38,19 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
   void initState() {
     super.initState();
     final f = widget.food;
-    
+
     _nameController = TextEditingController(text: f?.name ?? '');
     _brandController = TextEditingController(text: f?.brand ?? '');
     _kcalController = TextEditingController(text: f?.kcal?.toString() ?? '');
-    _proteinController = TextEditingController(text: f?.protein?.toString() ?? '');
+    _proteinController = TextEditingController(
+      text: f?.protein?.toString() ?? '',
+    );
     _carbsController = TextEditingController(text: f?.carbs?.toString() ?? '');
     _fatController = TextEditingController(text: f?.fat?.toString() ?? '');
     _fiberController = TextEditingController(text: f?.fiber?.toString() ?? '');
-    _servingSizeController = TextEditingController(text: f?.servingSize?.toString() ?? '100');
+    _servingSizeController = TextEditingController(
+      text: f?.servingSize?.toString() ?? '100',
+    );
     _servingUnitController = TextEditingController(text: f?.servingUnit ?? 'g');
     _isSupp = f?.isSupp ?? false;
   }
@@ -68,38 +72,36 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.food != null;
-    
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
-          // Header
           Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                ),
+                bottom: BorderSide(color: Theme.of(context).dividerColor),
               ),
             ),
             child: Row(
               children: [
                 Icon(
                   isEditing ? Icons.edit : Icons.add_circle,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.primary,
+                  size: 20,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     isEditing ? 'Editar Alimento' : 'Nuevo Alimento',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -111,15 +113,13 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
               ],
             ),
           ),
-          
-          // Form
           Expanded(
             child: Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 children: [
-                  ModernTextField(
+                  FoodCompactTextField(
                     label: 'Nombre del alimento',
                     controller: _nameController,
                     prefixIcon: Icons.restaurant,
@@ -130,31 +130,31 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
-                  ModernTextField(
+                  const SizedBox(height: AppSpacing.md),
+                  FoodCompactTextField(
                     label: 'Marca (opcional)',
                     controller: _brandController,
                     prefixIcon: Icons.business,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Tamaño porción',
                           controller: _servingSizeController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.scale,
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}'),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Unidad',
                           controller: _servingUnitController,
                           prefixIcon: Icons.label,
@@ -162,111 +162,117 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-                  
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     'Información Nutricional',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Calorías',
                           controller: _kcalController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.local_fire_department,
                           suffix: 'kcal',
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}'),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Proteína',
                           controller: _proteinController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.fitness_center,
                           suffix: 'g',
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}'),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Carbohidratos',
                           controller: _carbsController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.grain,
                           suffix: 'g',
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}'),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: ModernTextField(
+                        child: FoodCompactTextField(
                           label: 'Grasas',
                           controller: _fatController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.water_drop,
                           suffix: 'g',
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}'),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
-                  ModernTextField(
+                  const SizedBox(height: AppSpacing.md),
+                  FoodCompactTextField(
                     label: 'Fibra (opcional)',
                     controller: _fiberController,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.eco,
                     suffix: 'g',
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
+                  const SizedBox(height: AppSpacing.md),
                   SwitchListTile(
                     value: _isSupp,
                     onChanged: (value) => setState(() => _isSupp = value),
                     title: const Text('Es suplemento'),
-                    subtitle: const Text('Marca si es proteína en polvo, creatina, etc.'),
-                    activeColor: Theme.of(context).colorScheme.primary,
+                    subtitle: const Text(
+                      'Marca si es proteína en polvo, creatina, etc.',
+                    ),
+                    activeColor: colorScheme.primary,
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
                   ),
                 ],
               ),
             ),
           ),
-          
-          // Actions
           Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               border: Border(
-                top: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                ),
+                top: BorderSide(color: Theme.of(context).dividerColor),
               ),
             ),
             child: Row(
@@ -274,17 +280,23 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: _isSaving ? null : () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 40),
+                    ),
                     child: const Text('Cancelar'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: _isSaving ? null : _saveFood,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, 40),
+                    ),
                     child: _isSaving
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
+                            height: 18,
+                            width: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(isEditing ? 'Guardar' : 'Crear'),
@@ -300,14 +312,17 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
 
   Future<void> _saveFood() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isSaving = true);
-    
+
     try {
       final food = Food(
         id: widget.food?.id ?? '',
         name: _nameController.text.trim(),
-        brand: _brandController.text.trim().isEmpty ? null : _brandController.text.trim(),
+        brand:
+            _brandController.text.trim().isEmpty
+                ? null
+                : _brandController.text.trim(),
         perUnit: UnitKind.g,
         unitSize: double.tryParse(_servingSizeController.text) ?? 100,
         kcal: double.tryParse(_kcalController.text) ?? 0,
@@ -318,19 +333,23 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
         sodium: 0,
         isSupplement: _isSupp,
       );
-      
+
       if (widget.food == null) {
         await widget.svc.createFood(food);
       } else {
         await widget.svc.updateFood(food.id, food.toMap());
       }
-      
+
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.food == null ? 'Alimento creado' : 'Alimento actualizado'),
-            backgroundColor: AppColors.success,
+            content: Text(
+              widget.food == null ? 'Alimento creado' : 'Alimento actualizado',
+            ),
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -339,7 +358,9 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

@@ -65,7 +65,8 @@ class _FoodNotificationsScreenState extends State<FoodNotificationsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Configuración guardada'),
-            backgroundColor: AppColors.success,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -75,7 +76,8 @@ class _FoodNotificationsScreenState extends State<FoodNotificationsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al guardar: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -363,7 +365,11 @@ class _FoodNotificationsScreenState extends State<FoodNotificationsScreen> {
               onPressed: () => _editCustomReminder(index, reminder),
             ),
             IconButton(
-              icon: const Icon(Icons.delete, size: 20, color: AppColors.error),
+              icon: Icon(
+                Icons.delete,
+                size: 20,
+                color: Theme.of(context).colorScheme.error,
+              ),
               onPressed: () {
                 setState(() => _customReminders.removeAt(index));
               },

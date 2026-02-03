@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
+import '../widgets/food_compact_widgets.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'package:intl/intl.dart';
@@ -55,10 +56,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
               }
 
               final d = snap.data!;
-
-              Map<String, double?> mergedTargets = Map<String, double?>.from(
-                d.targets,
-              );
+              final mergedTargets = Map<String, double?>.from(d.targets);
               for (final k in ['kcal', 'protein', 'carbs', 'fat', 'fiber']) {
                 mergedTargets[k] ??= globalTargets[k];
               }
@@ -81,14 +79,12 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                       onToday: () => setState(() => _date = DateTime.now()),
                     ).animate().slideY(begin: -0.2, duration: 300.ms),
                   ),
-
                   SliverToBoxAdapter(
                     child: _MacrosSummary(day: d, mergedTargets: mergedTargets)
                         .animate()
                         .fadeIn(delay: 100.ms)
                         .slideY(begin: 0.2, duration: 300.ms),
                   ),
-
                   SliverToBoxAdapter(
                     child: _ModernWaterCard(
                           water: d.waterMl,
@@ -99,7 +95,6 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                         .fadeIn(delay: 200.ms)
                         .slideY(begin: 0.2, duration: 300.ms),
                   ),
-
                   if (d.entries.isEmpty)
                     SliverFillRemaining(
                       child: ModernEmptyState(
@@ -113,7 +108,6 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                     )
                   else
                     ..._buildMealSections(d.entries, dayId),
-
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               );
@@ -127,7 +121,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
   List<Widget> _buildMealSections(List<IntakeEntry> entries, String dayId) {
     return [
       SliverPadding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.md),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
             final entry = entries[index];
@@ -276,91 +270,63 @@ class _MacrosSummary extends StatelessWidget {
     final t = day.totals;
     final g = mergedTargets;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Nutrición del Día', style: AppTypography.heading3(context)),
           const SizedBox(height: AppSpacing.md),
 
-          Card(
-            elevation: AppSpacing.elevationMd,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.foodGradient,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              ),
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Calorías',
-                        style: AppTypography.heading3(
-                          context,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
-                      Icon(
-                        Icons.local_fire_department,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        size: 32,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        (t['kcal'] ?? 0).toStringAsFixed(0),
-                        style: AppTypography.heading1(
-                          context,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ).copyWith(fontSize: 48),
-                      ),
-                      if (g['kcal'] != null) ...[
-                        Text(
-                          ' / ${g['kcal']!.toStringAsFixed(0)}',
-                          style: AppTypography.heading3(
-                            context,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onPrimary.withOpacity(0.7),
-                          ),
-                        ),
-                      ],
-                      Text(
-                        ' kcal',
-                        style: AppTypography.body(
-                          context,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimary.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  if (g['kcal'] != null)
-                    ModernProgressBar(
-                      value: _pct(t['kcal'] ?? 0, g['kcal']),
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.onPrimary.withOpacity(0.3),
-                      height: 8,
+          FoodCompactCard(
+            maxHeight: 120,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Calorías', style: AppTypography.heading4(context)),
+                    Icon(
+                      Icons.local_fire_department,
+                      color: colorScheme.primary,
+                      size: 20,
                     ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      (t['kcal'] ?? 0).toStringAsFixed(0),
+                      style: AppTypography.heading2(context),
+                    ),
+                    if (g['kcal'] != null) ...[
+                      Text(
+                        ' / ${g['kcal']!.toStringAsFixed(0)}',
+                        style: AppTypography.bodySmall(context),
+                      ),
+                    ],
+                    Text(
+                      ' kcal',
+                      style: AppTypography.bodySmall(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                if (g['kcal'] != null)
+                  ModernProgressBar(
+                    value: _pct(t['kcal'] ?? 0, g['kcal']),
+                    color: colorScheme.primary,
+                    backgroundColor: colorScheme.outlineVariant,
+                    height: 6,
+                  ),
+              ],
             ),
           ),
 
@@ -372,14 +338,14 @@ class _MacrosSummary extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: AppSpacing.sm,
             crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 1.6,
+            childAspectRatio: 2.2,
             children: [
               _MacroCard(
                 label: 'Proteínas',
                 value: t['protein'] ?? 0,
                 target: g['protein'],
                 unit: 'g',
-                color: AppColors.error,
+                color: colorScheme.primary,
                 icon: Icons.fitness_center,
               ),
               _MacroCard(
@@ -387,7 +353,7 @@ class _MacrosSummary extends StatelessWidget {
                 value: t['carbs'] ?? 0,
                 target: g['carbs'],
                 unit: 'g',
-                color: AppColors.warning,
+                color: colorScheme.secondary,
                 icon: Icons.bakery_dining,
               ),
               _MacroCard(
@@ -395,7 +361,7 @@ class _MacrosSummary extends StatelessWidget {
                 value: t['fat'] ?? 0,
                 target: g['fat'],
                 unit: 'g',
-                color: AppColors.gym,
+                color: colorScheme.tertiary,
                 icon: Icons.water_drop,
               ),
               _MacroCard(
@@ -403,7 +369,7 @@ class _MacrosSummary extends StatelessWidget {
                 value: t['fiber'] ?? 0,
                 target: g['fiber'],
                 unit: 'g',
-                color: AppColors.success,
+                color: colorScheme.primary,
                 icon: Icons.eco,
               ),
             ],
@@ -443,51 +409,48 @@ class _MacroCard extends StatelessWidget {
             ? (value / target!).clamp(0.0, 1.0).toDouble()
             : 0.0;
 
-    return Card(
-      elevation: AppSpacing.elevationSm,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 18),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: AppTypography.caption(context).copyWith(fontSize: 11),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+    return FoodCompactCard(
+      maxHeight: 96,
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: AppSpacing.xs),
+              SizedBox(
+                width: 90,
+                child: Text(
+                  label,
+                  style: AppTypography.caption(context).copyWith(fontSize: 11),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
+              ),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                value.toStringAsFixed(0),
+                style: AppTypography.heading4(context, color: color),
+              ),
+              if (target != null) ...[
                 Text(
-                  value.toStringAsFixed(0),
-                  style: AppTypography.heading3(context, color: color),
+                  '/${target!.toStringAsFixed(0)}',
+                  style: AppTypography.bodySmall(context),
                 ),
-                if (target != null) ...[
-                  Text(
-                    '/${target!.toStringAsFixed(0)}',
-                    style: AppTypography.body(context).copyWith(fontSize: 13),
-                  ),
-                ],
-                Text(unit, style: AppTypography.caption(context).copyWith(fontSize: 11)),
               ],
-            ),
-            if (target != null)
-              ModernProgressBar(value: pct, color: color, height: 3),
-          ],
-        ),
+              const SizedBox(width: 2),
+              Text(unit, style: AppTypography.caption(context)),
+            ],
+          ),
+          if (target != null)
+            ModernProgressBar(value: pct, color: color, height: 3),
+        ],
       ),
     );
   }
@@ -514,109 +477,91 @@ class _ModernWaterCard extends StatelessWidget {
     final remaining = waterTarget - water;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      child: Card(
-        elevation: AppSpacing.elevationMd,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    ),
-                    child: const Icon(
-                      Icons.water_drop,
-                      color: AppColors.info,
-                      size: 24,
-                    ),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: FoodCompactCard(
+        maxHeight: 160,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hidratación',
-                          style: AppTypography.heading4(context),
-                        ),
-                        Text(
-                          '$water / $waterTarget ml',
-                          style: AppTypography.body(context),
-                        ),
-                        if (remaining > 0)
-                          Text(
-                            'Faltan ${remaining}ml',
-                            style: AppTypography.caption(
-                              context,
-                              color: AppColors.warning,
-                            ),
-                          ),
-                      ],
-                    ),
+                  child: Icon(
+                    Icons.water_drop,
+                    color:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    size: 18,
                   ),
-                  Text(
-                    '${(_pct() * 100).toStringAsFixed(0)}%',
-                    style: AppTypography.heading3(
-                      context,
-                      color: AppColors.info,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Hidratación', style: AppTypography.heading4(context)),
+                    Text(
+                      '$water / $waterTarget ml',
+                      style: AppTypography.bodySmall(context),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ModernProgressBar(
-                value: _pct(),
-                color: AppColors.info,
-                height: 8,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => onAdd(250),
-                      icon: const Icon(Icons.add),
-                      label: const Text('250ml'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.info,
-                        side: const BorderSide(color: AppColors.info),
+                    if (remaining > 0)
+                      Text(
+                        'Faltan ${remaining}ml',
+                        style: AppTypography.caption(context),
                       ),
-                    ),
+                  ],
+                ),
+                const Spacer(),
+                Text(
+                  '${(_pct() * 100).toStringAsFixed(0)}%',
+                  style: AppTypography.heading4(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            ModernProgressBar(
+              value: _pct(),
+              color: Theme.of(context).colorScheme.primary,
+              height: 6,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                OutlinedButton(
+                  onPressed: () => onAdd(250),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 36),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => onAdd(500),
-                      icon: const Icon(Icons.add),
-                      label: const Text('500ml'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.info,
-                        side: const BorderSide(color: AppColors.info),
-                      ),
-                    ),
+                  child: const Text('250ml'),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                OutlinedButton(
+                  onPressed: () => onAdd(500),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 36),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  ElevatedButton(
+                  child: const Text('500ml'),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                SizedBox(
+                  height: 36,
+                  child: FilledButton(
                     onPressed: () => _showCustomWaterDialog(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.info,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    child: const Icon(Icons.edit),
+                    child: const Icon(Icons.edit, size: 16),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -632,7 +577,7 @@ class _ModernWaterCard extends StatelessWidget {
               'Añadir agua personalizada',
               style: AppTypography.heading3(ctx),
             ),
-            content: ModernTextField(
+            content: FoodCompactTextField(
               label: 'Cantidad (ml)',
               hint: 'Ej: 750',
               controller: controller,
@@ -677,143 +622,69 @@ class _EntryCard extends StatelessWidget {
     final protein = entry.macrosSnapshot['protein'] ?? 0;
     final carbs = entry.macrosSnapshot['carbs'] ?? 0;
     final fat = entry.macrosSnapshot['fat'] ?? 0;
+    final colorScheme = Theme.of(context).colorScheme;
+    final subtitle =
+        '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} • ${kcal.toStringAsFixed(0)} kcal • P ${protein.toStringAsFixed(0)}g • C ${carbs.toStringAsFixed(0)}g • G ${fat.toStringAsFixed(0)}g';
 
-    return Card(
-      elevation: AppSpacing.elevationSm,
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    decoration: BoxDecoration(
-                      color: AppColors.food.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    ),
-                    child: Icon(
-                      entry.type == FavoriteType.food
-                          ? Icons.restaurant
-                          : Icons.menu_book,
-                      color: AppColors.food,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.nameSnapshot,
-                          style: AppTypography.heading4(context),
-                        ),
-                        Text(
-                          '${entry.qty.toStringAsFixed(0)} ${entry.unit.name}',
-                          style: AppTypography.caption(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                  PopupMenuButton<String>(
-                    onSelected: (v) {
-                      if (v == 'dup') onDuplicate();
-                      if (v == 'del') onDelete();
-                    },
-                    itemBuilder:
-                        (_) => [
-                          const PopupMenuItem(
-                            value: 'dup',
-                            child: Row(
-                              children: [
-                                Icon(Icons.copy),
-                                SizedBox(width: 8),
-                                Text('Duplicar'),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'del',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, color: AppColors.error),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Eliminar',
-                                  style: TextStyle(color: AppColors.error),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const Divider(),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _MacroChip(
-                    label: '${kcal.toStringAsFixed(0)} kcal',
-                    icon: Icons.local_fire_department,
-                    color: AppColors.food,
-                  ),
-                  _MacroChip(
-                    label: '${protein.toStringAsFixed(0)}g P',
-                    icon: Icons.fitness_center,
-                    color: AppColors.error,
-                  ),
-                  _MacroChip(
-                    label: '${carbs.toStringAsFixed(0)}g C',
-                    icon: Icons.bakery_dining,
-                    color: AppColors.warning,
-                  ),
-                  _MacroChip(
-                    label: '${fat.toStringAsFixed(0)}g G',
-                    icon: Icons.water_drop,
-                    color: AppColors.info,
-                  ),
-                ],
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: FoodCompactTile(
+        height: 52,
+        leading: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            entry.type == FavoriteType.food
+                ? Icons.restaurant
+                : Icons.menu_book,
+            color: colorScheme.onPrimaryContainer,
+            size: 18,
           ),
         ),
+        title: entry.nameSnapshot,
+        subtitle: subtitle,
+        trailing: PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          onSelected: (v) {
+            if (v == 'dup') onDuplicate();
+            if (v == 'del') onDelete();
+          },
+          itemBuilder:
+              (_) => [
+                const PopupMenuItem(
+                  value: 'dup',
+                  child: Row(
+                    children: [
+                      Icon(Icons.copy, size: 20),
+                      SizedBox(width: AppSpacing.sm),
+                      Text('Duplicar'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'del',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        size: 20,
+                        color: colorScheme.error,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Eliminar',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+        ),
       ),
-    );
-  }
-}
-
-class _MacroChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _MacroChip({
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: color),
-        const SizedBox(width: 4),
-        Text(label, style: AppTypography.caption(context)),
-      ],
     );
   }
 }
@@ -873,13 +744,13 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
                 color:
                     isDark
                         ? colorScheme.onSurface.withOpacity(0.3)
-                        : AppColors.grey300,
+                        : colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Row(
                 children: [
                   Icon(Icons.add_circle, color: colorScheme.primary, size: 28),
@@ -903,10 +774,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
             TabBar(
               controller: _tabController,
               labelColor: colorScheme.primary,
-              unselectedLabelColor:
-                  isDark
-                      ? colorScheme.onSurface.withOpacity(0.6)
-                      : AppColors.grey600,
+              unselectedLabelColor: colorScheme.onSurfaceVariant,
               indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
@@ -917,7 +785,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
             ),
 
             SizedBox(
-              height: 500,
+              height: 420,
               child: TabBarView(
                 controller: _tabController,
                 children: [
@@ -936,7 +804,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
 
   Widget _buildQuickAddTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -944,9 +812,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
             'Añade calorías rápidamente',
             style: AppTypography.body(context),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.md),
 
-          ModernTextField(
+          FoodCompactTextField(
             label: 'Nombre',
             hint: 'Ej: Snack casero',
             controller: _nameController,
@@ -957,7 +825,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           Row(
             children: [
               Expanded(
-                child: ModernTextField(
+                child: FoodCompactTextField(
                   label: 'Calorías*',
                   hint: '250',
                   controller: _kcalController,
@@ -968,7 +836,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: ModernTextField(
+                child: FoodCompactTextField(
                   label: 'Proteínas (g)',
                   hint: '20',
                   controller: _proteinController,
@@ -979,7 +847,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
             ],
           ),
 
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.md),
 
           ModernPrimaryButton(
             label: 'Añadir Quick Entry',
@@ -997,8 +865,8 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ModernTextField(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: FoodCompactTextField(
             label: 'Buscar favoritos',
             hint: 'Busca por nombre...',
             controller: _searchController,
@@ -1007,7 +875,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: _buildQuantityRow(),
         ),
         Expanded(
@@ -1025,8 +893,8 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ModernTextField(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: FoodCompactTextField(
             label: 'Buscar alimentos',
             hint: 'Busca en tu catálogo...',
             controller: _searchController,
@@ -1035,7 +903,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: _buildQuantityRow(),
         ),
         Expanded(
@@ -1053,8 +921,8 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ModernTextField(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: FoodCompactTextField(
             label: 'Buscar recetas',
             hint: 'Busca tus recetas...',
             controller: _searchController,
@@ -1063,7 +931,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: _buildQuantityRow(isRecipe: true),
         ),
         Expanded(
@@ -1082,7 +950,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
       children: [
         Expanded(
           flex: 2,
-          child: ModernTextField(
+          child: FoodCompactTextField(
             label: isRecipe ? 'Raciones' : 'Cantidad',
             controller: _qtyController,
             keyboardType: TextInputType.number,
@@ -1091,16 +959,29 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
         ),
         if (!isRecipe) ...[
           const SizedBox(width: AppSpacing.md),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: Theme.of(context).dividerColor),
-            ),
-            child: DropdownButton<UnitKind>(
+          SizedBox(
+            height: 44,
+            child: DropdownButtonFormField<UnitKind>(
               value: _unit,
-              underline: const SizedBox(),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+              ),
               items: const [
                 DropdownMenuItem(value: UnitKind.g, child: Text('g')),
                 DropdownMenuItem(value: UnitKind.ml, child: Text('ml')),
@@ -1323,7 +1204,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                     color:
                         isDark
                             ? colorScheme.onSurface.withOpacity(0.3)
-                            : AppColors.grey300,
+                            : colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                 ),
@@ -1348,9 +1229,9 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 style: AppTypography.body(context),
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.md),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Calorías objetivo (kcal)',
                 hint: '2000',
                 controller: _kcalController,
@@ -1360,7 +1241,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Proteínas (g)',
                 hint: '150',
                 controller: _proteinController,
@@ -1370,7 +1251,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Carbohidratos (g)',
                 hint: '250',
                 controller: _carbsController,
@@ -1380,7 +1261,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Grasas (g)',
                 hint: '65',
                 controller: _fatController,
@@ -1390,7 +1271,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Fibra (g)',
                 hint: '30',
                 controller: _fiberController,
@@ -1400,7 +1281,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              ModernTextField(
+              FoodCompactTextField(
                 label: 'Agua (ml)',
                 hint: '2000',
                 controller: _waterController,
@@ -1504,6 +1385,7 @@ class _FavList extends StatelessWidget {
           itemCount: list.length,
           itemBuilder: (_, i) {
             final f = list[i];
+            final colorScheme = Theme.of(context).colorScheme;
             return ModernListCard(
               title: f.alias ?? '${f.type.name} • ${f.refId}',
               subtitle:
@@ -1512,8 +1394,12 @@ class _FavList extends StatelessWidget {
                   f.type == FavoriteType.food
                       ? Icons.restaurant
                       : Icons.menu_book,
-              leadingColor: AppColors.food,
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              leadingColor: colorScheme.primary,
+              trailing: Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
               onTap: () => onPick(f),
             );
           },
@@ -1561,13 +1447,14 @@ class _FoodList extends StatelessWidget {
           itemCount: list.length,
           itemBuilder: (_, i) {
             final f = list[i];
+            final colorScheme = Theme.of(context).colorScheme;
             return ModernListCard(
               title: f.name,
               subtitle:
                   '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
               leadingIcon: Icons.restaurant,
-              leadingColor: f.color ?? AppColors.food,
-              trailing: const Icon(Icons.add, color: AppColors.food),
+              leadingColor: colorScheme.primary,
+              trailing: Icon(Icons.add, color: colorScheme.primary),
               onTap: () => onPick(f),
             );
           },
@@ -1623,13 +1510,14 @@ class _RecipeList extends StatelessWidget {
                 r.kcal != null
                     ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
                     : '${r.servings} raciones';
+            final colorScheme = Theme.of(context).colorScheme;
 
             return ModernListCard(
               title: r.name,
               subtitle: macrosText,
               leadingIcon: Icons.menu_book,
-              leadingColor: AppColors.gym,
-              trailing: const Icon(Icons.add, color: AppColors.food),
+              leadingColor: colorScheme.primary,
+              trailing: Icon(Icons.add, color: colorScheme.primary),
               onTap: () => onPick(r),
             );
           },

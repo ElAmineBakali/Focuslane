@@ -44,7 +44,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
           Container(
             color: colorScheme.surfaceContainerHighest,
             padding: EdgeInsets.all(
-              isDesktop ? 24.0 : 16.0,
+              isDesktop ? 16.0 : 12.0,
             ),
             child: FoodTopBar(
               onNewRecipe: () => _navigateToRecipes(context),
@@ -60,14 +60,14 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
           Expanded(
             child: ListView(
               padding: EdgeInsets.all(
-                isDesktop ? 40.0 : 16.0,
+                isDesktop ? 16.0 : 12.0,
               ),
               children: [
                 _buildMetricsSection(context, todayId, isDesktop),
-                const SizedBox(height: 12.0),
+                const SizedBox(height: 8.0),
                 
                 _buildWeeklyPlanSection(context),
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 12.0),
                 
                 isDesktop || isTablet
                     ? _buildBottomSectionDesktop(context)
@@ -178,11 +178,11 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
                       // Desktop/Tablet: Grid
                       return GridView.count(
                         crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
+                        crossAxisSpacing: 12.0,
+                        mainAxisSpacing: 12.0,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        childAspectRatio: 1.3,
+                        childAspectRatio: 1.6,
                         children: cards,
                       );
                     }
@@ -264,7 +264,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
           flex: 2,
           child: _buildRecipesSection(context),
         ),
-        const SizedBox(width: 24.0),
+        const SizedBox(width: 12.0),
         // Columna derecha: Lista de compra
         Expanded(
           flex: 1,
@@ -279,7 +279,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
     return Column(
       children: [
         _buildRecipesSection(context),
-        const SizedBox(height: 24.0),
+        const SizedBox(height: 12.0),
         _buildShoppingSection(context),
       ],
     );
@@ -297,72 +297,75 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen> {
         final recentRecipes = recipes.take(6).toList();
 
         return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(
-          color: colorScheme.outline,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FoodSectionHeader(
-            title: 'Recetas Recientes',
-            subtitle: 'Tus favoritas',
-            icon: Icons.restaurant,
-            actionLabel: 'Ver todas',
-            onActionPressed: () => _navigateToRecipes(context),
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: colorScheme.outlineVariant,
+            ),
           ),
-          const SizedBox(height: 20.0),
-          if (recentRecipes.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(
-                  children: [
-                    Icon(Icons.restaurant, size: 64, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'No hay recetas guardadas',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    TextButton(
-                      onPressed: () => _navigateToRecipes(context),
-                      child: const Text('Añadir primera receta'),
-                    ),
-                  ],
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FoodSectionHeader(
+                title: 'Recetas Recientes',
+                subtitle: 'Tus favoritas',
+                icon: Icons.restaurant,
+                actionLabel: 'Ver todas',
+                onActionPressed: () => _navigateToRecipes(context),
               ),
-            )
-          else
-            ...recentRecipes.map((recipe) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: FoodRecipeCard(
-                  name: recipe.name,
-                  tags: _getRecipeTags(recipe),
-                  kcal: _calculateRecipeKcal(recipe) ?? 0,
-                  protein: _calculateRecipeProtein(recipe) ?? 0,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => RecipeDetailScreen(
-                        recipe: recipe,
-                        svc: widget.svc,
-                      ),
+              const SizedBox(height: 8.0),
+              if (recentRecipes.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.restaurant,
+                          size: 32,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          'No hay recetas guardadas',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => _navigateToRecipes(context),
+                          child: const Text('Añadir primera receta'),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              );
-            }).toList(),
-        ],
-      ),
-    );
+                )
+              else
+                ...recentRecipes.map((recipe) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: FoodRecipeCard(
+                      name: recipe.name,
+                      tags: _getRecipeTags(recipe),
+                      kcal: _calculateRecipeKcal(recipe) ?? 0,
+                      protein: _calculateRecipeProtein(recipe) ?? 0,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RecipeDetailScreen(
+                            recipe: recipe,
+                            svc: widget.svc,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+            ],
+          ),
+        );
       },
     );
   }

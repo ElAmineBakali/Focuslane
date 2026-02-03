@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
+import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'recipe_edit_screen.dart';
@@ -28,47 +29,56 @@ class RecipeDetailScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RecipeEditScreen(
-                    svc: svc,
-                    initial: recipe,
-                  ),
-                ),
-              );
-            },
-            tooltip: 'Editar',
+            tooltip: 'Editar receta',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RecipeEditScreen(svc: svc, initial: recipe),
+              ),
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (recipe.description != null) ...[
-              Card(
-                elevation: AppSpacing.elevationSm,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            if ((recipe.description ?? '').trim().isNotEmpty) ...[
+              FoodCompactCard(
+                maxHeight: 180,
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.notes,
+                          color: colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Descripción',
+                          style: AppTypography.heading4(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      recipe.description!.trim(),
+                      style: AppTypography.body(context),
+                    ),
+                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Text(
-                    recipe.description!,
-                    style: AppTypography.body(context),
-                  ),
-                ),
-              ).animate().fadeIn(duration: 300.ms),
-              const SizedBox(height: AppSpacing.lg),
+              ).animate().fadeIn(delay: 50.ms, duration: 300.ms),
+              const SizedBox(height: AppSpacing.md),
             ],
-            
             if (recipe.tags.isNotEmpty) ...[
               Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
                 children: recipe.tags.map((tag) {
                   return Chip(
                     label: Text(tag),
@@ -76,171 +86,160 @@ class RecipeDetailScreen extends StatelessWidget {
                     labelStyle: TextStyle(
                       color: colorScheme.onSecondaryContainer,
                     ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
                   );
                 }).toList(),
               ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.md),
             ],
-            
             if (hasNutrition) ...[
-              Card(
-                elevation: AppSpacing.elevationMd,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.analytics_outlined,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            'Información Nutricional',
-                            style: AppTypography.heading3(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        'Totales (${recipe.servings} raciones)',
-                        style: AppTypography.caption(context),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      _NutrientRow(
-                        label: 'Calorías',
-                        value: '${recipe.kcal!.toStringAsFixed(0)} kcal',
-                        icon: Icons.local_fire_department,
-                        color: AppColors.food,
-                      ),
-                      _NutrientRow(
-                        label: 'Proteínas',
-                        value: '${recipe.protein!.toStringAsFixed(1)} g',
-                        icon: Icons.fitness_center,
-                        color: AppColors.error,
-                      ),
-                      _NutrientRow(
-                        label: 'Carbohidratos',
-                        value: '${recipe.carbs!.toStringAsFixed(1)} g',
-                        icon: Icons.bakery_dining,
-                        color: AppColors.warning,
-                      ),
-                      _NutrientRow(
-                        label: 'Grasas',
-                        value: '${recipe.fat!.toStringAsFixed(1)} g',
-                        icon: Icons.water_drop,
-                        color: AppColors.info,
-                      ),
-                      if (recipe.fiber != null)
-                        _NutrientRow(
-                          label: 'Fibra',
-                          value: '${recipe.fiber!.toStringAsFixed(1)} g',
-                          icon: Icons.eco,
-                          color: AppColors.success,
-                        ),
-                    ],
-                  ),
-                ),
-              ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
-              const SizedBox(height: AppSpacing.lg),
-            ],
-            
-            Card(
-              elevation: AppSpacing.elevationSm,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+              FoodCompactCard(
+                maxHeight: 220,
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         Icon(
-                          Icons.shopping_basket,
+                          Icons.analytics_outlined,
                           color: colorScheme.primary,
+                          size: 18,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Ingredientes',
-                          style: AppTypography.heading3(context),
+                          'Información Nutricional',
+                          style: AppTypography.heading4(context),
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    ...recipe.ingredients.asMap().entries.map((entry) {
-                      final ingredient = entry.value;
-                      final displayName = ingredient.freeName ?? ingredient.foodId ?? '';
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: colorScheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Text(
-                                '$displayName - ${ingredient.qty.toStringAsFixed(0)} ${ingredient.unit.name}',
-                                style: AppTypography.body(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Totales (${recipe.servings} raciones)',
+                      style: AppTypography.caption(context),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _NutrientRow(
+                      label: 'Calorías',
+                      value: '${recipe.kcal!.toStringAsFixed(0)} kcal',
+                      icon: Icons.local_fire_department,
+                      color: colorScheme.primary,
+                    ),
+                    _NutrientRow(
+                      label: 'Proteínas',
+                      value: '${recipe.protein!.toStringAsFixed(1)} g',
+                      icon: Icons.fitness_center,
+                      color: colorScheme.secondary,
+                    ),
+                    _NutrientRow(
+                      label: 'Carbohidratos',
+                      value: '${recipe.carbs!.toStringAsFixed(1)} g',
+                      icon: Icons.bakery_dining,
+                      color: colorScheme.tertiary,
+                    ),
+                    _NutrientRow(
+                      label: 'Grasas',
+                      value: '${recipe.fat!.toStringAsFixed(1)} g',
+                      icon: Icons.water_drop,
+                      color: colorScheme.primary,
+                    ),
+                    if (recipe.fiber != null)
+                      _NutrientRow(
+                        label: 'Fibra',
+                        value: '${recipe.fiber!.toStringAsFixed(1)} g',
+                        icon: Icons.eco,
+                        color: colorScheme.secondary,
+                      ),
                   ],
                 ),
-              ),
-            ).animate().fadeIn(delay: 300.ms, duration: 300.ms),
-            
-            if (recipe.steps.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Card(
-                elevation: AppSpacing.elevationSm,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ).animate().fadeIn(delay: 150.ms, duration: 300.ms),
+              const SizedBox(height: AppSpacing.md),
+            ],
+            FoodCompactCard(
+              maxHeight: 220,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.format_list_numbered,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            'Preparación',
-                            style: AppTypography.heading3(context),
-                          ),
-                        ],
+                      Icon(
+                        Icons.shopping_basket,
+                        color: colorScheme.primary,
+                        size: 18,
                       ),
-                      const SizedBox(height: AppSpacing.md),
+                      const SizedBox(width: AppSpacing.sm),
                       Text(
-                        recipe.steps,
-                        style: AppTypography.body(context),
+                        'Ingredientes',
+                        style: AppTypography.heading4(context),
                       ),
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...recipe.ingredients.asMap().entries.map((entry) {
+                    final ingredient = entry.value;
+                    final displayName =
+                        ingredient.freeName ?? ingredient.foodId ?? '';
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          SizedBox(
+                            width: 240,
+                            child: Text(
+                              '$displayName - ${ingredient.qty.toStringAsFixed(0)} ${ingredient.unit.name}',
+                              style: AppTypography.body(context),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
+            if (recipe.steps.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              FoodCompactCard(
+                maxHeight: 220,
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.format_list_numbered,
+                          color: colorScheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Preparación',
+                          style: AppTypography.heading4(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      recipe.steps,
+                      style: AppTypography.body(context),
+                    ),
+                  ],
                 ),
-              ).animate().fadeIn(delay: 400.ms, duration: 300.ms),
+              ).animate().fadeIn(delay: 250.ms, duration: 300.ms),
             ],
-            
             const SizedBox(height: 100),
           ],
         ),
@@ -270,17 +269,19 @@ class _NutrientRow extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: color),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(
+          SizedBox(
+            width: 140,
             child: Text(
               label,
               style: AppTypography.body(context),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const Spacer(),
           Text(
             value,
             style: AppTypography.body(context).copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

@@ -457,7 +457,10 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                       style: AppTypography.caption(
                                         context,
                                       ).copyWith(
-                                        color: AppColors.textSecondary,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -487,7 +490,10 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                 columnWidths: const {0: FixedColumnWidth(120)},
                                 defaultColumnWidth: const FixedColumnWidth(200),
                                 border: TableBorder.all(
-                                  color: AppColors.borderLight,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.outlineVariant,
                                   width: 1,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusLg,
@@ -496,7 +502,16 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                 children: [
                                   TableRow(
                                     decoration: BoxDecoration(
-                                      gradient: AppColors.foodGradient,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.primaryContainer,
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.secondaryContainer,
+                                        ],
+                                      ),
                                       borderRadius: const BorderRadius.only(
                                         topLeft: Radius.circular(
                                           AppSpacing.radiusLg,
@@ -746,13 +761,14 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
               children: [
                 Icon(
                   Icons.check_circle,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text('Lista de compras generada (${_getScopeLabel(_scope)})'),
               ],
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -762,7 +778,8 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
           ),
         );
