@@ -21,13 +21,12 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernGradientAppBar(
-        title: 'Catálogo de Recetas',
-        icon: Icons.menu_book,
-        useThemeColors: true,
+      appBar: FoodCompactAppBar(
+        title: 'Recetas',
+        subtitle: 'Catálogo',
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 18),
             onPressed:
                 () => Navigator.push(
                   context,
@@ -43,7 +42,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
         children: [
           Container(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: FoodCompactTextField(
               label: 'Buscar recetas',
               hint: 'Nombre, ingredientes...',
@@ -158,11 +157,11 @@ class _RecipeListCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: FoodCompactTile(
-        height: 52,
+        height: 46,
         onTap: onTap,
         leading: Container(
-          width: 32,
-          height: 32,
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
@@ -170,14 +169,14 @@ class _RecipeListCard extends StatelessWidget {
           child: Icon(
             Icons.menu_book,
             color: colorScheme.onPrimaryContainer,
-            size: 18,
+            size: 16,
           ),
         ),
         title: recipe.name,
         subtitle: subtitle,
         trailing: Icon(
           Icons.arrow_forward_ios,
-          size: 14,
+          size: 12,
           color: colorScheme.outline,
         ),
       ),

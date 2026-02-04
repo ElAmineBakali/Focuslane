@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -66,56 +67,47 @@ class _ShoppingListDetailScreenState
             .fold<double>(0, (sum, item) => sum + (item.total ?? 0));
 
         return Scaffold(
-          appBar: ModernGradientAppBar(
+          appBar: FoodCompactAppBar(
             title: list.name,
-            useThemeColors: true,
             actions: [
               IconButton(
                 icon: Icon(
                   _hideCompleted ? Icons.visibility : Icons.visibility_off,
+                  size: 18,
                 ),
                 tooltip: _hideCompleted ? 'Mostrar todos' : 'Ocultar comprados',
                 onPressed:
                     () => setState(() => _hideCompleted = !_hideCompleted),
               ),
               IconButton(
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.add, size: 18),
                 tooltip: 'Añadir producto',
                 onPressed: () => _addItemDialog(list),
               ),
               PopupMenuButton<String>(
                 onSelected: (value) {
+                  if (value == 'markAll') _markAll(list);
                   if (value == 'clear') _clearPurchased(list);
                   if (value == 'pantry') _sendToPantry(list);
                   if (value == 'complete') _completeList(list);
                 },
                 itemBuilder:
                     (context) => [
-                      if (progress >= 1.0 && list.completedAt == null)
-                        PopupMenuItem(
-                          value: 'complete',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.archive,
-                                size: 20,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              SizedBox(width: AppSpacing.sm),
-                              Text(
-                                'Archivar al historial',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                          ),
+                      const PopupMenuItem(
+                        value: 'markAll',
+                        child: Row(
+                          children: [
+                            Icon(Icons.check_circle, size: 18),
+                            SizedBox(width: AppSpacing.sm),
+                            Text('Marcar todo'),
+                          ],
                         ),
+                      ),
                       const PopupMenuItem(
                         value: 'clear',
                         child: Row(
                           children: [
-                            Icon(Icons.clear_all, size: 20),
+                            Icon(Icons.clear_all, size: 18),
                             SizedBox(width: AppSpacing.sm),
                             Text('Limpiar comprados'),
                           ],
@@ -125,12 +117,32 @@ class _ShoppingListDetailScreenState
                         value: 'pantry',
                         child: Row(
                           children: [
-                            Icon(Icons.kitchen, size: 20),
+                            Icon(Icons.kitchen, size: 18),
                             SizedBox(width: AppSpacing.sm),
                             Text('Enviar a despensa'),
                           ],
                         ),
                       ),
+                      if (progress >= 1.0 && list.completedAt == null)
+                        PopupMenuItem(
+                          value: 'complete',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.archive,
+                                size: 18,
+                                color: FocuslaneUI.accent(context),
+                              ),
+                              SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Archivar al historial',
+                                style: TextStyle(
+                                  color: FocuslaneUI.accent(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
               ),
             ],
@@ -141,16 +153,16 @@ class _ShoppingListDetailScreenState
                 builder: (context) {
                   final colorScheme = Theme.of(context).colorScheme;
                   return Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     child: FoodCompactCard(
-                      maxHeight: 140,
-                      padding: const EdgeInsets.all(12),
+                      maxHeight: 120,
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Wrap(
-                            spacing: 12,
-                            runSpacing: 8,
+                            spacing: 10,
+                            runSpacing: 6,
                             children: [
                               _SummaryItem(
                                 icon: Icons.shopping_basket,
@@ -308,7 +320,7 @@ class _ShoppingListDetailScreenState
                           color:
                               isDark
                                   ? colorScheme.onSurface.withOpacity(0.3)
-                                  : colorScheme.outlineVariant,
+                                  : FocuslaneUI.borderColor(context),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -343,24 +355,27 @@ class _ShoppingListDetailScreenState
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                filled: true,
-                                fillColor:
-                                    colorScheme.surfaceContainerHighest,
                                 contentPadding:
                                     const EdgeInsets.symmetric(
                                       vertical: 10,
                                       horizontal: 12,
                                     ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                               ),
@@ -483,7 +498,7 @@ class _ShoppingListDetailScreenState
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: colorScheme.outlineVariant,
+                          color: FocuslaneUI.borderColor(context),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -517,24 +532,27 @@ class _ShoppingListDetailScreenState
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                filled: true,
-                                fillColor:
-                                    colorScheme.surfaceContainerHighest,
                                 contentPadding:
                                     const EdgeInsets.symmetric(
                                       vertical: 10,
                                       horizontal: 12,
                                     ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                               ),
@@ -584,7 +602,7 @@ class _ShoppingListDetailScreenState
                                   ),
                                 }),
                             style: FilledButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
+                              backgroundColor: FocuslaneUI.accent(context),
                             ),
                             child: const Text('Guardar'),
                           ),
@@ -689,29 +707,22 @@ class _ShoppingListDetailScreenState
         }
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Productos comprados eliminados'),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        FoodFeedback.showSuccess(context, 'Comprados eliminados');
       }
+    }
+  }
+
+  Future<void> _markAll(ShoppingList list) async {
+    await widget.svc.setAllChecked(list.id, true);
+    if (mounted) {
+      FoodFeedback.showSuccess(context, 'Todos marcados');
     }
   }
 
   Future<void> _sendToPantry(ShoppingList list) async {
     final purchased = list.items.where((i) => i.checked).toList();
     if (purchased.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('No hay productos comprados para enviar'),
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      FoodFeedback.showInfo(context, 'No hay comprados para enviar');
       return;
     }
 
@@ -727,13 +738,9 @@ class _ShoppingListDetailScreenState
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${purchased.length} productos enviados a la despensa'),
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest,
-          behavior: SnackBarBehavior.floating,
-        ),
+      FoodFeedback.showSuccess(
+        context,
+        '${purchased.length} enviados a la despensa',
       );
     }
   }
@@ -757,7 +764,7 @@ class _ShoppingListDetailScreenState
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: FocuslaneUI.accent(context),
                 ),
                 child: const Text('Archivar'),
               ),
@@ -773,36 +780,11 @@ class _ShoppingListDetailScreenState
 
         if (mounted) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    Icons.archive,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  const Text('Lista archivada correctamente'),
-                ],
-              ),
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-            ),
-          );
+          FoodFeedback.showSuccess(context, 'Lista archivada');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al archivar: $e'),
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-          );
+          FoodFeedback.showError(context, 'Error al archivar: $e');
         }
       }
     }
@@ -880,7 +862,7 @@ class _ShoppingItemCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: FoodCompactTile(
-        height: 50,
+        height: 44,
         leading: Checkbox(
           value: item.checked,
           onChanged: (_) => onToggle(),

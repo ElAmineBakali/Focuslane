@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
+import '../widgets/food_compact_widgets.dart';
 
 class RecipeEditScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -62,14 +64,13 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
     final isEdit = widget.initial != null;
 
     return Scaffold(
-      appBar: ModernGradientAppBar(
-        title: isEdit ? 'Editar Receta' : 'Nueva Receta',
-        icon: Icons.menu_book,
-        useThemeColors: true,
+      appBar: FoodCompactAppBar(
+        title: isEdit ? 'Editar receta' : 'Nueva receta',
+        subtitle: 'Editor de recetas',
         actions: [
           if (_ingredients.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.calculate),
+              icon: const Icon(Icons.calculate, size: 18),
               onPressed: _calculateMacros,
               tooltip: 'Calcular macros',
             ),
@@ -81,12 +82,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           children: [
             TabBar(
               controller: _tabController,
-              labelColor: Colors.purple,
-              unselectedLabelColor: AppColors.grey600,
-              indicatorColor: Colors.purple,
+              labelColor: FocuslaneUI.accent(context),
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              indicatorColor: FocuslaneUI.accent(context),
               isScrollable: true,
               tabs: const [
-                Tab(icon: Icon(Icons.info), text: 'Info'),
+                Tab(icon: Icon(Icons.info), text: 'Información'),
                 Tab(icon: Icon(Icons.restaurant), text: 'Ingredientes'),
                 Tab(icon: Icon(Icons.list_alt), text: 'Pasos'),
                 Tab(icon: Icon(Icons.analytics), text: 'Nutrición'),
@@ -104,10 +105,15 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+                border: Border(
+                  top: BorderSide(
+                    color: FocuslaneUI.dividerColor(context),
+                    width: FocuslaneUI.dividerW,
+                  ),
+                ),
               ),
               child: Row(
                 children: [
@@ -116,9 +122,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                       onPressed:
                           _isSaving ? null : () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.lg,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                       ),
                       child: const Text('Cancelar'),
                     ),
@@ -130,7 +134,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                       label: isEdit ? 'Guardar Cambios' : 'Crear Receta',
                       icon: Icons.check,
                       fullWidth: true,
-                      color: Colors.purple,
+                      color: FocuslaneUI.accent(context),
                       isLoading: _isSaving,
                       onPressed: _saveRecipe,
                     ),
@@ -146,7 +150,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
   Widget _buildInfoTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -159,7 +163,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                 (v) => v == null || v.isEmpty ? 'Nombre requerido' : null,
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
 
           ModernTextField(
             label: 'Descripción',
@@ -169,7 +173,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
             maxLines: 3,
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
 
           ModernTextField(
             label: 'Número de raciones*',
@@ -180,7 +184,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
             validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
           ),
 
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.md),
 
           Text('Etiquetas', style: AppTypography.label(context)),
           const SizedBox(height: AppSpacing.sm),
@@ -196,7 +200,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               ModernChip(
                 label: '+ Añadir',
                 icon: Icons.add,
-                color: Colors.purple,
+                color: FocuslaneUI.accent(context),
                 onTap: _addTag,
               ),
             ],
@@ -223,7 +227,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
         else
           Expanded(
             child: ReorderableListView.builder(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: _ingredients.length,
               onReorder: (oldIndex, newIndex) {
                 setState(() {
@@ -245,12 +249,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           ),
 
         Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: ModernPrimaryButton(
             label: 'Añadir Ingrediente',
             icon: Icons.add,
             fullWidth: true,
-            color: Colors.purple,
+            color: FocuslaneUI.accent(context),
             onPressed: _addIngredient,
           ),
         ),
@@ -274,7 +278,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
         else
           Expanded(
             child: ReorderableListView.builder(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: _steps.length,
               onReorder: (oldIndex, newIndex) {
                 setState(() {
@@ -296,12 +300,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           ),
 
         Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: ModernPrimaryButton(
             label: 'Añadir Paso',
             icon: Icons.add,
             fullWidth: true,
-            color: Colors.purple,
+            color: FocuslaneUI.accent(context),
             onPressed: _addStep,
           ),
         ),
@@ -311,34 +315,41 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
   Widget _buildNutritionTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_calculatedMacros == null) ...[
             Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.info.withOpacity(0.1),
+                color: FocuslaneUI.accentSurface(context, opacity: 0.12),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(color: AppColors.info.withOpacity(0.3)),
+                border: Border.all(
+                  color: FocuslaneUI.borderColor(context),
+                  width: FocuslaneUI.borderW,
+                ),
               ),
               child: Column(
                 children: [
-                  Icon(Icons.info, color: AppColors.info, size: 48),
-                  const SizedBox(height: AppSpacing.md),
+                  Icon(
+                    Icons.info,
+                    color: FocuslaneUI.accent(context),
+                    size: 48,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Auto-cálculo de Macros',
                     style: AppTypography.heading3(context),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Añade ingredientes con cantidades y presiona el botón de calcular para obtener automáticamente los valores nutricionales',
                     style: AppTypography.body(context),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.md),
                   ModernPrimaryButton(
                     label:
                         _ingredients.isEmpty
@@ -346,7 +357,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                             : 'Calcular Macros Ahora',
                     icon: Icons.calculate,
                     fullWidth: true,
-                    color: AppColors.info,
+                    color: FocuslaneUI.accent(context),
                     isLoading: _isCalculating,
                     onPressed: _ingredients.isEmpty ? null : _calculateMacros,
                   ),
@@ -361,7 +372,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                   'Información Nutricional Total',
                   style: AppTypography.heading3(context),
                 ),
-                ModernBadge(label: 'AUTO-CALCULADO', color: AppColors.success),
+                ModernBadge(
+                  label: 'AUTO-CALCULADO',
+                  color: FocuslaneUI.accent2(context),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -370,14 +384,14 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               style: AppTypography.caption(context),
             ),
 
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.md),
 
             _NutritionSummaryCard(
               macros: _calculatedMacros!,
               servings: int.tryParse(_servingsController.text) ?? 1,
             ),
 
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.md),
 
             Center(
               child: OutlinedButton.icon(
@@ -385,8 +399,11 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                 icon: const Icon(Icons.refresh),
                 label: const Text('Recalcular'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.purple,
-                  side: const BorderSide(color: Colors.purple),
+                  foregroundColor: FocuslaneUI.accent(context),
+                  side: BorderSide(
+                    color: FocuslaneUI.borderColor(context),
+                    width: FocuslaneUI.borderW,
+                  ),
                 ),
               ),
             ),
@@ -428,10 +445,9 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
   }
 
   Future<void> _addIngredient() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de añadir ingrediente próximamente'),
-      ),
+    FoodFeedback.showInfo(
+      context,
+      'Añadir ingrediente estará disponible pronto',
     );
   }
 
@@ -519,13 +535,9 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
         };
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Macros calculated successfully')),
-      );
+      FoodFeedback.showSuccess(context, 'Macros calculadas');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error calculating macros: $e')));
+      FoodFeedback.showError(context, 'Error al calcular macros: $e');
     } finally {
       setState(() => _isCalculating = false);
     }
@@ -564,21 +576,16 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.initial == null
-                  ? 'Recipe created successfully'
-                  : 'Recipe updated successfully',
-            ),
-          ),
+        FoodFeedback.showSuccess(
+          context,
+          widget.initial == null
+              ? 'Receta creada correctamente'
+              : 'Receta actualizada correctamente',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        FoodFeedback.showError(context, 'Error: $e');
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -603,6 +610,13 @@ class _IngredientCard extends StatelessWidget {
     final name = ingredient.freeName ?? ingredient.foodId ?? 'Ingrediente';
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+        side: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
+      ),
       child: ListTile(
         leading: const Icon(Icons.drag_handle),
         title: Text(name),
@@ -640,12 +654,19 @@ class _StepCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+        side: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
+      ),
       child: ListTile(
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.purple,
+            color: FocuslaneUI.accent(context),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -687,11 +708,7 @@ class _NutritionSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.purple, Colors.purpleAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: FocuslaneUI.primaryGradient(context),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
       child: Column(
@@ -710,7 +727,7 @@ class _NutritionSummaryCard extends StatelessWidget {
               ModernBadge(
                 label: '1/$servings',
                 color: Theme.of(context).colorScheme.onPrimary,
-                textColor: Colors.purple,
+                textColor: FocuslaneUI.accent(context),
               ),
             ],
           ),
@@ -742,7 +759,7 @@ class _NutritionSummaryCard extends StatelessWidget {
                 unit: 'g',
               ),
               _MacroDisplay(
-                label: 'Carbos',
+                label: 'Carbohidratos',
                 value: perServing['carbs']!.toStringAsFixed(1),
                 unit: 'g',
               ),

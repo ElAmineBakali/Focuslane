@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import 'package:flutter/services.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../models/food_models.dart';
@@ -87,7 +88,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               border: Border(
-                bottom: BorderSide(color: Theme.of(context).dividerColor),
+                bottom: BorderSide(
+                  color: FocuslaneUI.dividerColor(context),
+                  width: FocuslaneUI.dividerW,
+                ),
               ),
             ),
             child: Row(
@@ -272,7 +276,10 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               border: Border(
-                top: BorderSide(color: Theme.of(context).dividerColor),
+                top: BorderSide(
+                  color: FocuslaneUI.dividerColor(context),
+                  width: FocuslaneUI.dividerW,
+                ),
               ),
             ),
             child: Row(
@@ -342,27 +349,14 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.food == null ? 'Alimento creado' : 'Alimento actualizado',
-            ),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
+        FoodFeedback.showSuccess(
+          context,
+          widget.food == null ? 'Alimento creado' : 'Alimento actualizado',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        FoodFeedback.showError(context, 'Error: $e');
       }
     } finally {
       if (mounted) {

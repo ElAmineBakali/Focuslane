@@ -413,6 +413,15 @@ class FoodFirestoreService {
     });
   }
 
+  Future<void> setActiveWeekPlanner(String id) async {
+    final all = await _weekPlannersRef.get();
+    final batch = FirebaseFirestore.instance.batch();
+    for (final d in all.docs) {
+      batch.update(d.reference, {'isActive': d.id == id});
+    }
+    await batch.commit();
+  }
+
   Future<String> createPlanner(String name) async {
     final doc = _root.collection('mealPlanners').doc();
     await doc.set({

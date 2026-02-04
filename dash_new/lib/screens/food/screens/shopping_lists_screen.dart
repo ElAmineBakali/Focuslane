@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../../../theme/global_ui_theme.dart';
-import '../widgets/food_compact_widgets.dart';
+import '../../../shared/ui/app_section_tabs.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'shopping_list_detail_screen.dart';
+import '../widgets/food_compact_widgets.dart';
 
 class ShoppingListsScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -34,41 +36,37 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Listas de Compra'),
+      appBar: FoodCompactAppBar(
+        title: 'Listas de compra',
+        subtitle: 'Activas e historial',
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 18),
             tooltip: 'Nueva lista',
             onPressed: _createNewList,
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: Container(
-            color: colorScheme.surfaceContainerHighest,
-            child: TabBar(
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: AppSectionTabs(
               controller: _tabController,
-              indicatorColor: colorScheme.primary,
-              labelColor: colorScheme.onSurface,
-              unselectedLabelColor: colorScheme.onSurfaceVariant,
               tabs: const [
                 Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
                 Tab(icon: Icon(Icons.history), text: 'Historial'),
               ],
             ),
           ),
-        ),
-      ),
-      body: SafeArea(
-        top: false,
-        child: TabBarView(
-          controller: _tabController,
-          children: [_buildActiveListsTab(), _buildHistoryTab()],
-        ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [_buildActiveListsTab(), _buildHistoryTab()],
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Theme(
         data: Theme.of(context).copyWith(
@@ -79,8 +77,8 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
         child: FloatingActionButton.extended(
           onPressed: _createNewList,
           icon: const Icon(Icons.add),
-          label: const Text('Nueva Lista'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          label: const Text('Nueva lista'),
+          backgroundColor: FocuslaneUI.accent(context),
         ),
       ),
     );
@@ -212,7 +210,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                           color:
                               isDark
                                   ? colorScheme.onSurface.withOpacity(0.3)
-                                  : AppColors.borderLight,
+                                  : FocuslaneUI.borderColor(context),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -236,7 +234,8 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                           color:
                               isDark
                                   ? colorScheme.outline
-                                  : AppColors.borderLight,
+                                  : FocuslaneUI.borderColor(context),
+                          width: FocuslaneUI.borderW,
                         ),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                         color: colorScheme.surfaceContainerHighest,
@@ -332,7 +331,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
                                   'makeDefault': makeDefault,
                                 }),
                             style: FilledButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
+                              backgroundColor: FocuslaneUI.accent(context),
                             ),
                             child: const Text('Crear'),
                           ),
@@ -384,36 +383,14 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
       await widget.svc.updateShoppingList(list.id, {'completedAt': null});
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.restore,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text('Lista "${list.name}" restaurada'),
-              ],
-            ),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
-          ),
+        FoodFeedback.showSuccess(
+          context,
+          'Lista "${list.name}" restaurada',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al restaurar: $e'),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-          ),
-        );
+        FoodFeedback.showError(context, 'Error al restaurar: $e');
       }
     }
   }
@@ -444,14 +421,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
     if (confirmed == true) {
       await widget.svc.deleteShoppingList(list.id);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('"${list.name}" eliminada'),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        FoodFeedback.showSuccess(context, '"${list.name}" eliminada');
       }
     }
   }
@@ -459,14 +429,9 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
   Future<void> _toggleDefault(ShoppingList list) async {
     await widget.svc.setDefaultList(list.id);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('"${list.name}" marcada como predeterminada'),
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 1),
-        ),
+      FoodFeedback.showSuccess(
+        context,
+        '"${list.name}" marcada como predeterminada',
       );
     }
   }
@@ -500,11 +465,11 @@ class _ShoppingListTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: FoodCompactTile(
-        height: 50,
+        height: 46,
         onTap: onTap,
         leading: Container(
-          width: 32,
-          height: 32,
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
@@ -512,7 +477,7 @@ class _ShoppingListTile extends StatelessWidget {
           child: Icon(
             list.isDefault ? Icons.star : Icons.shopping_cart,
             color: colorScheme.onPrimaryContainer,
-            size: 18,
+            size: 16,
           ),
         ),
         title: list.name,
@@ -574,7 +539,7 @@ class _ShoppingListTile extends StatelessWidget {
       case ShoppingScope.monthly:
         return 'Mensual';
       case ShoppingScope.custom:
-        return 'Custom';
+        return 'Personalizada';
     }
   }
 }

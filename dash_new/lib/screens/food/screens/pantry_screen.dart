@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -19,20 +20,21 @@ class _PantryScreenState extends State<PantryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernGradientAppBar(
+      appBar: FoodCompactAppBar(
         title: 'Despensa',
-        useThemeColors: true,
+        subtitle: _showLowStockOnly ? 'Solo stock bajo' : 'Inventario',
         actions: [
           IconButton(
             icon: Icon(
               _showLowStockOnly ? Icons.warning_amber : Icons.inventory_2,
+              size: 18,
             ),
             tooltip: _showLowStockOnly ? 'Mostrar todo' : 'Solo stock bajo',
             onPressed:
                 () => setState(() => _showLowStockOnly = !_showLowStockOnly),
           ),
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 18),
             tooltip: 'Añadir producto',
             onPressed: () => _editItem(),
           ),
@@ -79,7 +81,7 @@ class _PantryScreenState extends State<PantryScreen> {
             children: [
               if (lowStockCount > 0 && !_showLowStockOnly)
                 Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   child: FoodInlineBanner(
                     icon: Icons.warning_amber,
                     title: 'Stock bajo',
@@ -103,7 +105,7 @@ class _PantryScreenState extends State<PantryScreen> {
           onPressed: () => _editItem(),
           icon: const Icon(Icons.add),
           label: const Text('Añadir'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: FocuslaneUI.accent(context),
         ),
       ),
     );
@@ -177,7 +179,7 @@ class _PantryScreenState extends State<PantryScreen> {
                           color:
                               isDark
                                   ? colorScheme.onSurface.withOpacity(0.3)
-                                  : AppColors.borderLight,
+                                  : FocuslaneUI.borderColor(context),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -212,24 +214,27 @@ class _PantryScreenState extends State<PantryScreen> {
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                filled: true,
-                                fillColor:
-                                    colorScheme.surfaceContainerHighest,
                                 contentPadding:
                                     const EdgeInsets.symmetric(
                                       vertical: 10,
                                       horizontal: 12,
                                     ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(
+                                    FocuslaneUI.radius,
+                                  ),
                                   borderSide: BorderSide(
-                                    color: colorScheme.outlineVariant,
+                                    color: FocuslaneUI.borderColor(context),
+                                    width: FocuslaneUI.borderW,
                                   ),
                                 ),
                               ),
@@ -287,7 +292,7 @@ class _PantryScreenState extends State<PantryScreen> {
                                   ),
                                 }),
                             style: FilledButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
+                              backgroundColor: FocuslaneUI.accent(context),
                             ),
                             child: Text(initial == null ? 'Añadir' : 'Guardar'),
                           ),
@@ -326,15 +331,9 @@ class _PantryScreenState extends State<PantryScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              id == null ? 'Producto añadido' : 'Producto actualizado',
-            ),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
+        FoodFeedback.showSuccess(
+          context,
+          id == null ? 'Producto añadido' : 'Producto actualizado',
         );
       }
     }
@@ -374,7 +373,9 @@ class _PantryScreenState extends State<PantryScreen> {
                       context,
                       double.tryParse(controller.text),
                     ),
-                style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
+                style: FilledButton.styleFrom(
+                  backgroundColor: FocuslaneUI.accent(context),
+                ),
                 child: const Text('Consumir'),
               ),
             ],
@@ -385,15 +386,9 @@ class _PantryScreenState extends State<PantryScreen> {
       await widget.svc.consumePantry(item.id, qty);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)} consumidos',
-            ),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
+        FoodFeedback.showSuccess(
+          context,
+          '${qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)} consumidos',
         );
       }
     }
@@ -424,14 +419,7 @@ class _PantryScreenState extends State<PantryScreen> {
       await widget.svc.deletePantry(item.id);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('"${item.name}" eliminado'),
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        FoodFeedback.showSuccess(context, '"${item.name}" eliminado');
       }
     }
   }
@@ -460,7 +448,7 @@ class _PantryScreenState extends State<PantryScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.borderLight,
+                      color: FocuslaneUI.borderColor(context),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -503,7 +491,7 @@ class _PantryScreenState extends State<PantryScreen> {
                             Text(
                               'Stock bajo',
                               style: AppTypography.caption(context).copyWith(
-                                color: AppColors.warning,
+                                color: FocuslaneUI.accent(context),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -551,7 +539,7 @@ class _PantryScreenState extends State<PantryScreen> {
                         icon: const Icon(Icons.edit),
                         label: const Text('Editar'),
                         style: FilledButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor: FocuslaneUI.accent(context),
                         ),
                       ),
                     ),

@@ -1,89 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../shared/ui/app_card.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
-
-class FoodTopBar extends StatelessWidget {
-  final VoidCallback onNewRecipe;
-  final VoidCallback onWeeklyPlan;
-  final VoidCallback onFilter;
-  final ValueChanged<String> onSearchChanged;
-
-  const FoodTopBar({
-    super.key,
-    required this.onNewRecipe,
-    required this.onWeeklyPlan,
-    required this.onFilter,
-    required this.onSearchChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Food',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Resumen diario y planificación semanal',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: onFilter,
-              tooltip: 'Filtros',
-            ),
-            const SizedBox(width: 6),
-            OutlinedButton.icon(
-              onPressed: onWeeklyPlan,
-              icon: const Icon(Icons.calendar_today, size: 18),
-              label: const Text('Plan semanal'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                minimumSize: const Size(0, 36),
-                visualDensity: VisualDensity.compact,
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton.icon(
-              onPressed: onNewRecipe,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Nueva receta'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                minimumSize: const Size(0, 36),
-                visualDensity: VisualDensity.compact,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        FoodCompactTextField(
-          label: 'Buscar',
-          hint: 'Busca alimentos, recetas o planes',
-          prefixIcon: Icons.search,
-          onChanged: onSearchChanged,
-        ),
-      ],
-    );
-  }
-}
+import '../../../theme/focuslane_ui.dart';
 
 class FoodMetricCard extends StatelessWidget {
   final IconData icon;
@@ -105,68 +24,56 @@ class FoodMetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final accent = FocuslaneUI.accent(context);
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 110),
-      child: Material(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: colorScheme.outlineVariant),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(icon, color: colorScheme.primary, size: 16),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ],
+    return AppCard(
+      maxHeight: 96,
+      padding: const EdgeInsets.all(10),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: FocuslaneUI.accentSurface(context, opacity: 0.16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
+                child: Icon(icon, color: accent, size: 14),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 10,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
+          Text(
+            value,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 10,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -193,8 +100,8 @@ class FoodWeeklyPlanCard extends StatelessWidget {
 
     if (weekPlan.isEmpty) {
       return FoodCompactCard(
-        maxHeight: 200,
-        padding: const EdgeInsets.all(12),
+        maxHeight: 160,
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -217,10 +124,13 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             FilledButton(
               onPressed: onGeneratePlan,
-              style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 32),
+                backgroundColor: FocuslaneUI.accent(context),
+              ),
               child: const Text('Crear plan'),
             ),
           ],
@@ -229,14 +139,18 @@ class FoodWeeklyPlanCard extends StatelessWidget {
     }
 
     return FoodCompactCard(
-      maxHeight: 260,
-      padding: const EdgeInsets.all(12),
+      maxHeight: 220,
+      padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_month, color: colorScheme.primary, size: 18),
+                Icon(
+                  Icons.calendar_month,
+                  color: FocuslaneUI.accent(context),
+                  size: 18,
+                ),
               const SizedBox(width: 8),
               Text(
                 'Plan Semanal',
@@ -248,37 +162,47 @@ class FoodWeeklyPlanCard extends StatelessWidget {
               TextButton(
                 onPressed: onGeneratePlan,
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
+                    foregroundColor: FocuslaneUI.accent(context),
                 ),
                 child: const Text('Generar'),
               ),
               OutlinedButton(
                 onPressed: onExportList,
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
+                    side: BorderSide(
+                      color: FocuslaneUI.borderColor(context),
+                      width: FocuslaneUI.borderW,
+                    ),
                 ),
                 child: const Text('Lista'),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: weekPlan.entries.map((entry) {
                 final label = _formatDayLabel(entry.key);
                 final meals = entry.value;
+                final visibleMeals = meals.entries.take(3).toList();
+                final remaining = meals.length - visibleMeals.length;
 
                 return Container(
-                  width: 140,
+                  width: 180,
                   margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colorScheme.outlineVariant),
+                    border: Border.all(
+                      color: FocuslaneUI.borderColor(context),
+                      width: FocuslaneUI.borderW,
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,10 +213,10 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      ...meals.entries.map((meal) {
+                      const SizedBox(height: 4),
+                      ...visibleMeals.map((meal) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.only(bottom: 3),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -301,7 +225,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 11,
+                                  fontSize: 10,
                                 ),
                               ),
                               Text(
@@ -314,20 +238,28 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                           ),
                         );
                       }).toList(),
+                      if (remaining > 0)
+                        Text(
+                          '+$remaining más',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 10,
+                          ),
+                        ),
                     ],
                   ),
                 );
               }).toList(),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onViewCalendar,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: const Size(0, 32),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                minimumSize: const Size(0, 28),
               ),
               child: const Text('Ver calendario completo'),
             ),
@@ -384,21 +316,22 @@ class FoodSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final accent = FocuslaneUI.accent(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Icon(icon, color: colorScheme.primary, size: 20),
-            const SizedBox(width: 8),
+            Icon(icon, color: accent, size: 18),
+            const SizedBox(width: 6),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
@@ -414,8 +347,8 @@ class FoodSectionHeader extends StatelessWidget {
         TextButton(
           onPressed: onActionPressed,
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            minimumSize: const Size(0, 32),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            minimumSize: const Size(0, 28),
           ),
           child: Text(actionLabel),
         ),
@@ -444,26 +377,27 @@ class FoodRecipeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final accent = FocuslaneUI.accent(context);
 
     return FoodCompactCard(
-      maxHeight: 96,
-      padding: const EdgeInsets.all(12),
+      maxHeight: 88,
+      padding: const EdgeInsets.all(10),
       onTap: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: FocuslaneUI.accentSurface(context, opacity: 0.16),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.restaurant, color: colorScheme.primary),
+            child: Icon(Icons.restaurant, color: accent, size: 16),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           SizedBox(
-            width: 140,
+            width: 120,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -475,24 +409,31 @@ class FoodRecipeCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
+                  spacing: 4,
+                  runSpacing: 3,
                   children: tags.take(2).map((tag) {
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                        horizontal: 5,
+                        vertical: 1,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
+                        color: FocuslaneUI.accentSurface(
+                          context,
+                          opacity: 0.14,
+                        ),
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: FocuslaneUI.borderColor(context),
+                          width: FocuslaneUI.borderW,
+                        ),
                       ),
                       child: Text(
                         tag,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSecondaryContainer,
+                          color: FocuslaneUI.accent(context),
                           fontSize: 10,
                         ),
                       ),
@@ -558,8 +499,8 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
 
     if (widget.items.isEmpty) {
       return FoodCompactCard(
-        maxHeight: 200,
-        padding: const EdgeInsets.all(12),
+        maxHeight: 160,
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -582,11 +523,11 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             if (widget.onNavigate != null)
               FilledButton(
                 onPressed: widget.onNavigate,
-                style: FilledButton.styleFrom(minimumSize: const Size(0, 36)),
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 32)),
                 child: const Text('Abrir listas'),
               ),
           ],
@@ -595,8 +536,8 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
     }
 
     return FoodCompactCard(
-      maxHeight: 260,
-      padding: const EdgeInsets.all(12),
+      maxHeight: 220,
+      padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -625,17 +566,17 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
               TextButton(
                 onPressed: widget.onMarkAll,
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
                 ),
                 child: const Text('Marcar todo'),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               OutlinedButton(
                 onPressed: widget.onClearCompleted,
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
                 ),
                 child: const Text('Limpiar completados'),
               ),
@@ -696,7 +637,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '+ ${pendingItems.length - 6} items más',
+                '+ ${pendingItems.length - 6} productos más',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -711,8 +652,8 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                 child: TextButton(
                   onPressed: widget.onNavigate,
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(0, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    minimumSize: const Size(0, 28),
                   ),
                   child: const Text('Ver lista completa'),
                 ),

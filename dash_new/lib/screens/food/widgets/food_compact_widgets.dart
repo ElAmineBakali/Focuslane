@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../shared/ui/app_card.dart';
+import '../../../shared/ui/app_module_header.dart';
+import '../../../shared/ui/app_text_field.dart';
+import '../../../shared/ui/app_feedback.dart';
+import '../../../theme/focuslane_ui.dart';
 
 class FoodCompactCard extends StatelessWidget {
   final Widget child;
@@ -13,43 +18,40 @@ class FoodCompactCard extends StatelessWidget {
   const FoodCompactCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(12),
+    this.padding = FocuslaneUI.cardPaddingCompact,
     this.onTap,
-    this.maxHeight = 180,
+    this.maxHeight = 150,
     this.maxWidth,
     this.background,
-    this.borderRadius = const BorderRadius.all(Radius.circular(12)),
+    this.borderRadius = const BorderRadius.all(
+      Radius.circular(FocuslaneUI.radius),
+    ),
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final card = Material(
-      color: background ?? colorScheme.surface,
+    final surface = AppSurface(
+      padding: padding,
+      onTap: onTap,
+      backgroundColor: background,
       borderRadius: borderRadius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: borderRadius as BorderRadius?,
-        child: Padding(
-          padding: padding,
-          child: child,
-        ),
+      borderSide: BorderSide(
+        color: FocuslaneUI.borderColor(context),
+        width: FocuslaneUI.borderW,
       ),
+      child: child,
     );
+
+    if (maxHeight == null && maxWidth == null) {
+      return surface;
+    }
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: maxHeight,
+        maxHeight: maxHeight ?? double.infinity,
         maxWidth: maxWidth ?? double.infinity,
       ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: borderRadius,
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: card,
-      ),
+      child: surface,
     );
   }
 }
@@ -71,7 +73,7 @@ class FoodCompactTile extends StatelessWidget {
     this.leading,
     this.trailing,
     this.onTap,
-    this.height = 48,
+    this.height = 44,
     this.titleStyle,
     this.subtitleStyle,
   });
@@ -101,12 +103,12 @@ class FoodCompactTile extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints.tightFor(height: height),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
                 if (leading != null) ...[
                   leading!,
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                 ],
                 Expanded(
                   child: Column(
@@ -130,7 +132,7 @@ class FoodCompactTile extends StatelessWidget {
                   ),
                 ),
                 if (trailing != null) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   trailing!,
                 ],
               ],
@@ -174,51 +176,20 @@ class FoodCompactTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final field = TextFormField(
+    return AppTextField(
+      label: label,
+      hint: hint,
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
       validator: validator,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      suffix: suffix,
       obscureText: obscureText,
       onChanged: onChanged,
       inputFormatters: inputFormatters,
-      style: theme.textTheme.bodyMedium,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        isDense: true,
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 12,
-        ),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 18) : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-        suffixIcon: suffixIcon,
-        suffixText: suffix,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colorScheme.outlineVariant),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colorScheme.outlineVariant),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colorScheme.primary),
-        ),
-      ),
     );
-
-    if (maxLines == 1) {
-      return SizedBox(height: 44, child: field);
-    }
-
-    return field;
   }
 }
 
@@ -244,18 +215,21 @@ class FoodInlineBanner extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 56),
+      constraints: const BoxConstraints(maxHeight: 52),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
+          color: FocuslaneUI.accentSurface(context, opacity: 0.12),
+          borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+          border: Border.all(
+            color: FocuslaneUI.borderColor(context),
+            width: FocuslaneUI.borderW,
+          ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: colorScheme.primary),
-            const SizedBox(width: 8),
+            Icon(icon, size: 18, color: FocuslaneUI.accent(context)),
+            const SizedBox(width: 6),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -285,8 +259,8 @@ class FoodInlineBanner extends StatelessWidget {
               TextButton(
                 onPressed: onAction,
                 style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 32),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 28),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(actionLabel!),
@@ -295,5 +269,179 @@ class FoodInlineBanner extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class FoodModuleTheme extends StatelessWidget {
+  final Widget child;
+  const FoodModuleTheme({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = Theme.of(context);
+    final cs = base.colorScheme;
+    final input = base.inputDecorationTheme.copyWith(
+      filled: true,
+      isDense: true,
+      fillColor: cs.surfaceContainerHighest,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+        borderSide: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+        borderSide: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+        borderSide: BorderSide(
+          color: FocuslaneUI.accent(context),
+          width: FocuslaneUI.borderW,
+        ),
+      ),
+      hintStyle: base.textTheme.bodySmall?.copyWith(
+        color: cs.onSurfaceVariant,
+      ),
+      labelStyle: base.textTheme.bodySmall?.copyWith(
+        color: cs.onSurfaceVariant,
+      ),
+    );
+
+    return Theme(
+      data: base.copyWith(
+        dividerColor: FocuslaneUI.dividerColor(context),
+        dividerTheme: DividerThemeData(
+          color: FocuslaneUI.dividerColor(context),
+          thickness: FocuslaneUI.dividerW,
+          space: FocuslaneUI.dividerW,
+        ),
+        appBarTheme: base.appBarTheme.copyWith(
+          backgroundColor: cs.surface,
+          foregroundColor: FocuslaneUI.accent(context),
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: FocuslaneUI.accent(context).withOpacity(0.25),
+          iconTheme: IconThemeData(color: FocuslaneUI.accent(context)),
+          titleTextStyle: base.textTheme.titleMedium?.copyWith(
+            color: FocuslaneUI.accent(context),
+            fontWeight: FontWeight.w700,
+          ),
+          shape: Border(
+            bottom: BorderSide(
+              color: FocuslaneUI.dividerColor(context),
+              width: FocuslaneUI.dividerW,
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(
+              color: FocuslaneUI.borderColor(context),
+              width: FocuslaneUI.borderW,
+            ),
+            foregroundColor: FocuslaneUI.accent(context),
+          ),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: FocuslaneUI.accent(context),
+            foregroundColor: cs.onPrimary,
+          ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: FocuslaneUI.accent(context),
+          foregroundColor: cs.onPrimary,
+        ),
+        chipTheme: base.chipTheme.copyWith(
+          backgroundColor: FocuslaneUI.accentSurface(
+            context,
+            opacity: 0.14,
+          ),
+          selectedColor: FocuslaneUI.accentSurface(
+            context,
+            opacity: 0.18,
+          ),
+          side: BorderSide(
+            color: FocuslaneUI.borderColor(context),
+            width: FocuslaneUI.borderW,
+          ),
+          labelStyle: base.textTheme.bodySmall?.copyWith(
+            color: FocuslaneUI.accent(context),
+          ),
+        ),
+        inputDecorationTheme: input,
+        visualDensity: VisualDensity.compact,
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: cs.surfaceContainerHighest,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+          ),
+          contentTextStyle: base.textTheme.bodySmall?.copyWith(
+            color: cs.onSurface,
+          ),
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final String? subtitle;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final bool centerTitle;
+  final bool showExit;
+  final VoidCallback? onExit;
+
+  const FoodCompactAppBar({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.actions,
+    this.leading,
+    this.centerTitle = false,
+    this.showExit = true,
+    this.onExit,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(48);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppModuleHeader(
+      title: title,
+      subtitle: subtitle,
+      actions: actions,
+      leading: leading,
+      centerTitle: centerTitle,
+      showExit: showExit,
+      onExit: onExit,
+      useSoftGradient: true,
+    );
+  }
+}
+
+class FoodFeedback {
+  static void showSuccess(BuildContext context, String message) {
+    AppFeedback.showSuccess(context, message);
+  }
+
+  static void showError(BuildContext context, String message) {
+    AppFeedback.showError(context, message);
+  }
+
+  static void showInfo(BuildContext context, String message) {
+    AppFeedback.showInfo(context, message);
   }
 }

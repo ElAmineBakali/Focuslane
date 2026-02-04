@@ -4,15 +4,15 @@ import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
+import '../../../shared/ui/app_card.dart';
 import 'food_diary_screen.dart';
 import 'recipes_list_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
+import '../widgets/food_compact_widgets.dart';
+import '../../../theme/focuslane_ui.dart';
 
-/// FOOD HOME SCREEN - Rediseñado con estilo premium SaaS
-/// Dashboard principal del módulo Food con diseño moderno y profesional
-/// Paleta pastel: #D7CDC2, #B5A89B, #80AAA6, #A0BFBD, #D2E2E0, #E5EDEF
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   
@@ -25,7 +25,6 @@ class FoodDashboardScreen extends StatefulWidget {
 class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     with RouteAware {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
-  String _searchQuery = '';
   
   String _getWeekId(DateTime date) {
     final monday = date.subtract(Duration(days: date.weekday - 1));
@@ -63,49 +62,39 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: Column(
+      appBar: FoodCompactAppBar(
+        title: 'Alimentación',
+        subtitle: 'Resumen diario y plan semanal',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today, size: 18),
+            tooltip: 'Plan semanal',
+            onPressed: () => _navigateToPlanner(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add, size: 18),
+            tooltip: 'Nueva receta',
+            onPressed: () => _navigateToRecipes(context),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: isDesktop
+            ? const EdgeInsets.all(20)
+            : FocuslaneUI.pagePaddingCompact,
         children: [
-          Container(
-            color: colorScheme.surfaceContainerHighest,
-            padding: EdgeInsets.all(
-              isDesktop ? 16.0 : 12.0,
-            ),
-            child: FoodTopBar(
-              onNewRecipe: () => _navigateToRecipes(context),
-              onWeeklyPlan: () => _navigateToPlanner(context),
-              onFilter: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Filtros próximamente')),
-                );
-              },
-              onSearchChanged: (value) => setState(() => _searchQuery = value),
-            ),
-          ),
-          
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(
-                isDesktop ? 16.0 : 12.0,
-              ),
-              children: [
-                _buildMetricsSection(context, todayId, isDesktop),
-                const SizedBox(height: 8.0),
-                
-                _buildWeeklyPlanSection(context),
-                const SizedBox(height: 12.0),
-                
-                isDesktop || isTablet
-                    ? _buildBottomSectionDesktop(context)
-                    : _buildBottomSectionMobile(context),
-              ],
-            ),
-          ),
+          _buildMetricsSection(context, todayId, isDesktop),
+          const SizedBox(height: 8.0),
+          _buildWeeklyPlanSection(context),
+          const SizedBox(height: 10.0),
+          isDesktop || isTablet
+              ? _buildBottomSectionDesktop(context)
+              : _buildBottomSectionMobile(context),
         ],
       ),
     );
   }
 
-  /// Sección de métricas (4 tarjetas)
   Widget _buildMetricsSection(
     BuildContext context,
     String todayId,
@@ -114,7 +103,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     return StreamBuilder<DailyIntakeDoc>(
       stream: widget.svc.streamDay(todayId),
       builder: (context, daySnap) {
-        // Si hay error, usar valores por defecto sin mostrar snackbar durante build
         final day = daySnap.data ??
             DailyIntakeDoc(
               id: todayId,
@@ -135,19 +123,16 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         return StreamBuilder<List<Recipe>>(
           stream: widget.svc.streamRecipes(),
           builder: (context, recipesSnap) {
-            // Si hay error, usar valor por defecto
             final recipesCount = recipesSnap.data?.length ?? 0;
 
             return StreamBuilder<List<ShoppingList>>(
               stream: widget.svc.streamShoppingLists(),
               builder: (context, shoppingSnap) {
-                // Si hay error, usar valor por defecto
                 final shoppingItems =
                     shoppingSnap.data?.expand((list) => list.items).length ?? 0;
 
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    // Responsive: 4 columnas en desktop, 2 en tablet, 1 en mobile
                     final crossAxisCount = constraints.maxWidth >= 1200
                         ? 4
                         : constraints.maxWidth >= 600
@@ -186,13 +171,12 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                     ];
 
                     if (crossAxisCount == 1) {
-                      // Mobile: columna simple
                       return Column(
                         children: cards
                             .map(
                               (card) => Padding(
                                 padding: const EdgeInsets.only(
-                                  bottom: 16.0,
+                                  bottom: 10.0,
                                 ),
                                 child: card,
                               ),
@@ -200,14 +184,13 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                             .toList(),
                       );
                     } else {
-                      // Desktop/Tablet: Grid
                       return GridView.count(
                         crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 12.0,
-                        mainAxisSpacing: 12.0,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        childAspectRatio: 1.6,
+                        childAspectRatio: 1.8,
                         children: cards,
                       );
                     }
@@ -221,7 +204,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     );
   }
 
-  /// Sección del plan semanal
   Widget _buildWeeklyPlanSection(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: widget.svc.streamWeekPlannersRaw(),
@@ -281,7 +263,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       case MealSlot.breakfast:
         return 'Desayuno';
       case MealSlot.snack:
-        return 'Snack';
+        return 'Aperitivo';
       case MealSlot.lunch:
         return 'Comida';
       case MealSlot.merienda:
@@ -291,18 +273,15 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     }
   }
 
-  /// Sección inferior para desktop (2 columnas)
   Widget _buildBottomSectionDesktop(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Columna izquierda: Recetas recientes
         Expanded(
           flex: 2,
           child: _buildRecipesSection(context),
         ),
-        const SizedBox(width: 12.0),
-        // Columna derecha: Lista de compra
+        const SizedBox(width: 10.0),
         Expanded(
           flex: 1,
           child: _buildShoppingSection(context),
@@ -311,18 +290,16 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     );
   }
 
-  /// Sección inferior para mobile (columnas apiladas)
   Widget _buildBottomSectionMobile(BuildContext context) {
     return Column(
       children: [
         _buildRecipesSection(context),
-        const SizedBox(height: 12.0),
+        const SizedBox(height: 10.0),
         _buildShoppingSection(context),
       ],
     );
   }
 
-  /// Sección de recetas recientes/recomendadas
   Widget _buildRecipesSection(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -333,38 +310,31 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         final recipes = snapshot.data ?? [];
         final recentRecipes = recipes.take(6).toList();
 
-        return Container(
-          padding: const EdgeInsets.all(12.0),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12.0),
-            border: Border.all(
-              color: colorScheme.outlineVariant,
-            ),
-          ),
+        return AppSurface(
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FoodSectionHeader(
-                title: 'Recetas Recientes',
-                subtitle: 'Tus favoritas',
+                title: 'Recetas recientes',
+                subtitle: 'Favoritas y últimas',
                 icon: Icons.restaurant,
                 actionLabel: 'Ver todas',
                 onActionPressed: () => _navigateToRecipes(context),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 6.0),
               if (recentRecipes.isEmpty)
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: Column(
                       children: [
                         Icon(
                           Icons.restaurant,
-                          size: 32,
+                          size: 28,
                           color: colorScheme.onSurfaceVariant,
                         ),
-                        const SizedBox(height: 8.0),
+                        const SizedBox(height: 6.0),
                         Text(
                           'No hay recetas guardadas',
                           style: theme.textTheme.bodyMedium?.copyWith(
@@ -382,7 +352,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
               else
                 ...recentRecipes.map((recipe) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                    padding: const EdgeInsets.only(bottom: 6.0),
                     child: FoodRecipeCard(
                       name: recipe.name,
                       tags: _getRecipeTags(recipe),
@@ -407,7 +377,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     );
   }
 
-  /// Sección de lista de compra
   Widget _buildShoppingSection(BuildContext context) {
     return StreamBuilder<List<ShoppingList>>(
       stream: widget.svc.streamShoppingLists(),
@@ -445,25 +414,22 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     );
   }
 
-  /// Helpers para obtener datos de recetas (placeholders por ahora)
   List<String> _getRecipeTags(Recipe recipe) {
-    // TODO: Implementar lógica real de tags
     final tags = <String>[];
     
     if (recipe.name.toLowerCase().contains('pollo') ||
         recipe.name.toLowerCase().contains('pavo')) {
-      tags.add('High protein');
+      tags.add('Alto en proteína');
     }
     if (recipe.name.toLowerCase().contains('ensalada') ||
         recipe.name.toLowerCase().contains('vegetal')) {
-      tags.add('Low carb');
+      tags.add('Bajo en carbohidratos');
     }
     if (recipe.name.toLowerCase().contains('vegano') ||
         recipe.name.toLowerCase().contains('vegan')) {
-      tags.add('Vegan');
+      tags.add('Vegano');
     }
     
-    // Tags por defecto si no hay coincidencias
     if (tags.isEmpty) {
       tags.add('Casera');
     }
@@ -472,13 +438,10 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
   }
 
   double? _calculateRecipeKcal(Recipe recipe) {
-    // TODO: Calcular calorías reales desde ingredientes
-    // Por ahora retornar un valor placeholder
     return 450.0;
   }
 
   double? _calculateRecipeProtein(Recipe recipe) {
-    // TODO: Calcular proteína real desde ingredientes
     return 32.0;
   }
 
@@ -539,7 +502,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     return null;
   }
 
-  // Navegación
   void _navigateToDiary(BuildContext context) {
     Navigator.push(
       context,

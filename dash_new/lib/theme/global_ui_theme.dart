@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'focuslane_ui.dart';
 
 class AppColors {
   static const Color food = Color(0xFFFF6B35);
@@ -670,6 +671,10 @@ class ModernListCard extends StatelessWidget {
       elevation: AppSpacing.elevationSm,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
       ),
       child: ListTile(
         onTap: onTap,

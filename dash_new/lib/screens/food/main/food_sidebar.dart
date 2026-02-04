@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 
 class FoodSidebar extends StatelessWidget {
   final int selectedIndex;
@@ -20,7 +21,7 @@ class FoodSidebar extends StatelessWidget {
     final items = [
       _SidebarItem(
         icon: Icons.dashboard,
-        label: 'Dashboard',
+        label: 'Panel',
         index: 0,
       ),
       _SidebarItem(
@@ -63,11 +64,6 @@ class FoodSidebar extends StatelessWidget {
         label: 'Notificaciones',
         index: 8,
       ),
-      _SidebarItem(
-        icon: Icons.settings,
-        label: 'Configuración',
-        index: 9,
-      ),
     ];
 
     return Container(
@@ -75,7 +71,12 @@ class FoodSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: isDesktop
-            ? Border(right: BorderSide(color: colorScheme.outline.withOpacity(0.2)))
+            ? Border(
+                right: BorderSide(
+                  color: FocuslaneUI.borderColor(context),
+                  width: FocuslaneUI.borderW,
+                ),
+              )
             : null,
       ),
       child: Column(
@@ -84,15 +85,15 @@ class FoodSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorScheme.primary, colorScheme.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: FocuslaneUI.primaryGradient(context),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.restaurant, color: colorScheme.onPrimary, size: 32),
+                  Icon(
+                    Icons.restaurant,
+                    color: colorScheme.onPrimary,
+                    size: 32,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Módulo Food',
@@ -108,11 +109,7 @@ class FoodSidebar extends StatelessWidget {
           if (!isDesktop)
             DrawerHeader(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorScheme.primary, colorScheme.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: FocuslaneUI.primaryGradient(context),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,14 +138,22 @@ class FoodSidebar extends StatelessWidget {
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  child: Material(
-                    color: isSelected
-                        ? colorScheme.primaryContainer
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? FocuslaneUI.accentSurface(context, opacity: 0.16)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+                      border: Border.all(
+                        color: isSelected
+                            ? FocuslaneUI.accent(context)
+                            : FocuslaneUI.borderColor(context),
+                        width: FocuslaneUI.borderW,
+                      ),
+                    ),
                     child: InkWell(
                       onTap: () => onItemSelected(item.index),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(FocuslaneUI.radius),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -159,7 +164,7 @@ class FoodSidebar extends StatelessWidget {
                             Icon(
                               item.icon,
                               color: isSelected
-                                  ? colorScheme.primary
+                                  ? FocuslaneUI.accent(context)
                                   : colorScheme.onSurface.withOpacity(0.7),
                               size: 24,
                             ),
@@ -168,7 +173,7 @@ class FoodSidebar extends StatelessWidget {
                               item.label,
                               style: TextStyle(
                                 color: isSelected
-                                    ? colorScheme.primary
+                                    ? FocuslaneUI.accent(context)
                                     : colorScheme.onSurface.withOpacity(0.8),
                                 fontWeight: isSelected
                                     ? FontWeight.bold

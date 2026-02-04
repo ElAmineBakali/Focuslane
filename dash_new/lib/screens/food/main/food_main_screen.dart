@@ -8,9 +8,9 @@ import '../screens/food_planner_screen.dart';
 import '../screens/shopping_lists_screen.dart';
 import '../screens/pantry_screen.dart';
 import '../screens/food_history_screen.dart';
-import '../screens/food_notifications_screen.dart';
-import '../screens/food_settings_screen.dart';
+import '../screens/food_settings_notifications_screen.dart';
 import 'food_sidebar.dart';
+import '../widgets/food_compact_widgets.dart';
 
 class FoodMainScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -35,8 +35,10 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       ShoppingListsScreen(svc: widget.svc),
       PantryScreen(svc: widget.svc),
       FoodHistoryScreen(svc: widget.svc),
-      const FoodNotificationsScreen(),
-      FoodSettingsScreen(svc: widget.svc),
+      FoodSettingsNotificationsScreen(
+        svc: widget.svc,
+        initialSection: FoodSettingsSection.notificaciones,
+      ),
     ];
   }
 
@@ -45,52 +47,53 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: !isDesktop
-          ? Drawer(
-              child: FoodSidebar(
+    return FoodModuleTheme(
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: !isDesktop
+            ? Drawer(
+                child: FoodSidebar(
+                  selectedIndex: _selectedIndex,
+                  onItemSelected: (index) {
+                    setState(() => _selectedIndex = index);
+                    Navigator.pop(context);
+                  },
+                ),
+              )
+            : null,
+        appBar: !isDesktop
+            ? FoodCompactAppBar(
+                title: _getTitle(),
+                leading: IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
+              )
+            : null,
+        body: Row(
+          children: [
+            if (isDesktop)
+              FoodSidebar(
                 selectedIndex: _selectedIndex,
                 onItemSelected: (index) {
                   setState(() => _selectedIndex = index);
-                  Navigator.pop(context);
                 },
               ),
-            )
-          : null,
-      appBar: !isDesktop
-          ? AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: _getScreens(),
               ),
-              title: Text(_getTitle()),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            )
-          : null,
-      body: Row(
-        children: [
-          if (isDesktop)
-            FoodSidebar(
-              selectedIndex: _selectedIndex,
-              onItemSelected: (index) {
-                setState(() => _selectedIndex = index);
-              },
             ),
-          Expanded(
-            child: IndexedStack(
-              index: _selectedIndex,
-              children: _getScreens(),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   String _getTitle() {
     final titles = [
-      'Dashboard',
+      'Panel',
       'Diario',
       'Alimentos',
       'Recetas',
@@ -98,8 +101,7 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       'Listas de Compra',
       'Despensa',
       'Historial',
-      'Notificaciones',
-      'Configuración',
+      'Notificaciones y recordatorios',
     ];
     return titles[_selectedIndex];
   }

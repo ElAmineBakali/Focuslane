@@ -22,13 +22,12 @@ class RecipeDetailScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: ModernGradientAppBar(
+      appBar: FoodCompactAppBar(
         title: recipe.name,
-        icon: Icons.menu_book,
-        useThemeColors: true,
+        subtitle: 'Detalle de receta',
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.edit, size: 18),
             tooltip: 'Editar receta',
             onPressed: () => Navigator.push(
               context,
@@ -40,14 +39,14 @@ class RecipeDetailScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if ((recipe.description ?? '').trim().isNotEmpty) ...[
               FoodCompactCard(
-                maxHeight: 180,
-                padding: const EdgeInsets.all(12),
+                maxHeight: 140,
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -73,7 +72,7 @@ class RecipeDetailScreen extends StatelessWidget {
                   ],
                 ),
               ).animate().fadeIn(delay: 50.ms, duration: 300.ms),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
             ],
             if (recipe.tags.isNotEmpty) ...[
               Wrap(
@@ -91,12 +90,12 @@ class RecipeDetailScreen extends StatelessWidget {
                   );
                 }).toList(),
               ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
             ],
             if (hasNutrition) ...[
               FoodCompactCard(
-                maxHeight: 220,
-                padding: const EdgeInsets.all(12),
+                maxHeight: 180,
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,7 +118,7 @@ class RecipeDetailScreen extends StatelessWidget {
                       'Totales (${recipe.servings} raciones)',
                       style: AppTypography.caption(context),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: AppSpacing.xs),
                     _NutrientRow(
                       label: 'Calorías',
                       value: '${recipe.kcal!.toStringAsFixed(0)} kcal',
@@ -154,11 +153,11 @@ class RecipeDetailScreen extends StatelessWidget {
                   ],
                 ),
               ).animate().fadeIn(delay: 150.ms, duration: 300.ms),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
             ],
             FoodCompactCard(
-              maxHeight: 220,
-              padding: const EdgeInsets.all(12),
+              maxHeight: 180,
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -176,13 +175,13 @@ class RecipeDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.xs),
                   ...recipe.ingredients.asMap().entries.map((entry) {
                     final ingredient = entry.value;
                     final displayName =
                         ingredient.freeName ?? ingredient.foodId ?? '';
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                       child: Row(
                         children: [
                           Container(
@@ -194,8 +193,7 @@ class RecipeDetailScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
-                          SizedBox(
-                            width: 240,
+                          Expanded(
                             child: Text(
                               '$displayName - ${ingredient.qty.toStringAsFixed(0)} ${ingredient.unit.name}',
                               style: AppTypography.body(context),

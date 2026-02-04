@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -23,17 +24,13 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
     final dayId = _dayId(_date);
 
     return Scaffold(
-      appBar: ModernGradientAppBar(
-        title: 'Diario de Alimentación',
-        icon: Icons.restaurant_menu,
-        useThemeColors: true,
+      appBar: FoodCompactAppBar(
+        title: 'Diario',
+        subtitle: 'Registro diario',
         actions: [
           IconButton(
-            tooltip: 'Objetivos Nutricionales',
-            icon: Icon(
-              Icons.flag_outlined,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
+            tooltip: 'Objetivos nutricionales',
+            icon: const Icon(Icons.flag_outlined, size: 18),
             onPressed: () => _showGoalsSheet(context),
           ),
         ],
@@ -154,7 +151,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
         entries: grouped[MealSlot.dinner] ?? const [],
       ),
       _MealSectionData(
-        title: 'Snacks',
+        title: 'Aperitivos',
         entries: [
           ...(grouped[MealSlot.snack] ?? const []),
           ...(grouped[MealSlot.merienda] ?? const []),
@@ -242,14 +239,17 @@ class _ModernDaySelector extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.lg),
-      padding: const EdgeInsets.all(AppSpacing.md),
+      margin: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         color: isDark ? colorScheme.surface : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border:
             isDark
-                ? Border.all(color: colorScheme.outline.withOpacity(0.2))
+                ? Border.all(
+                    color: FocuslaneUI.borderColor(context),
+                    width: FocuslaneUI.borderW,
+                  )
                 : null,
       ),
       child: Column(
@@ -273,7 +273,10 @@ class _ModernDaySelector extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       if (isToday)
-                        ModernBadge(label: 'HOY', color: colorScheme.primary),
+                        ModernBadge(
+                          label: 'HOY',
+                          color: FocuslaneUI.accent(context),
+                        ),
                     ],
                   ),
                 ),
@@ -288,12 +291,12 @@ class _ModernDaySelector extends StatelessWidget {
             ],
           ),
           if (!isToday) ...[
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
             ModernPrimaryButton(
               label: 'Ir a hoy',
               icon: Icons.today,
               onPressed: onToday,
-              color: colorScheme.primary,
+              color: FocuslaneUI.accent(context),
             ),
           ],
         ],
@@ -337,7 +340,7 @@ class _KpiRow extends StatelessWidget {
             icon: Icons.fitness_center,
           ),
           _KpiCard(
-            label: 'Carbs',
+            label: 'Carbohidratos',
             value: (t['carbs'] ?? 0).toStringAsFixed(0),
             unit: 'g',
             target: targets['carbs'],
@@ -410,10 +413,10 @@ class _KpiCard extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: FocuslaneUI.accentSurface(context, opacity: 0.16),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 16, color: colorScheme.primary),
+            child: Icon(icon, size: 16, color: FocuslaneUI.accent(context)),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -548,7 +551,7 @@ class _SidePanel extends StatelessWidget {
     final summary = [
       _GoalRow(label: 'Calorías', value: targets['kcal'], unit: 'kcal'),
       _GoalRow(label: 'Proteína', value: targets['protein'], unit: 'g'),
-      _GoalRow(label: 'Carbs', value: targets['carbs'], unit: 'g'),
+      _GoalRow(label: 'Carbohidratos', value: targets['carbs'], unit: 'g'),
       _GoalRow(label: 'Grasas', value: targets['fat'], unit: 'g'),
       _GoalRow(label: 'Fibra', value: targets['fiber'], unit: 'g'),
     ];
@@ -631,7 +634,7 @@ class _MealSelector extends StatelessWidget {
       _MealOption(MealSlot.breakfast, 'Desayuno'),
       _MealOption(MealSlot.lunch, 'Comida'),
       _MealOption(MealSlot.dinner, 'Cena'),
-      _MealOption(MealSlot.snack, 'Snacks'),
+      _MealOption(MealSlot.snack, 'Aperitivo'),
     ];
 
     return Wrap(
@@ -645,10 +648,10 @@ class _MealSelector extends StatelessWidget {
           onSelected: (_) => onChanged(option.slot),
           labelStyle: theme.textTheme.bodySmall?.copyWith(
             color: selected
-                ? colorScheme.onPrimaryContainer
+                ? FocuslaneUI.accent(context)
                 : colorScheme.onSurfaceVariant,
           ),
-          selectedColor: colorScheme.primaryContainer,
+          selectedColor: FocuslaneUI.accentSurface(context, opacity: 0.16),
           visualDensity: VisualDensity.compact,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         );
@@ -1159,7 +1162,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Row(
                 children: [
-                  Icon(Icons.add_circle, color: colorScheme.primary, size: 28),
+                  Icon(
+                    Icons.add_circle,
+                    color: FocuslaneUI.accent(context),
+                    size: 28,
+                  ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
@@ -1189,11 +1196,11 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
 
             TabBar(
               controller: _tabController,
-              labelColor: colorScheme.primary,
+              labelColor: FocuslaneUI.accent(context),
               unselectedLabelColor: colorScheme.onSurfaceVariant,
-              indicatorColor: colorScheme.primary,
+              indicatorColor: FocuslaneUI.accent(context),
               tabs: const [
-                Tab(icon: Icon(Icons.flash_on), text: 'Quick'),
+                Tab(icon: Icon(Icons.flash_on), text: 'Rápido'),
                 Tab(icon: Icon(Icons.star), text: 'Favoritos'),
                 Tab(icon: Icon(Icons.restaurant), text: 'Alimentos'),
                 Tab(icon: Icon(Icons.menu_book), text: 'Recetas'),
@@ -1266,10 +1273,10 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           const SizedBox(height: AppSpacing.md),
 
           ModernPrimaryButton(
-            label: 'Añadir Quick Entry',
+            label: 'Añadir entrada rápida',
             icon: Icons.check,
             fullWidth: true,
-            color: Theme.of(context).colorScheme.primary,
+            color: FocuslaneUI.accent(context),
             onPressed: _addQuickEntry,
           ),
         ],
@@ -1386,15 +1393,17 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(FocuslaneUI.radius),
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    color: FocuslaneUI.borderColor(context),
+                    width: FocuslaneUI.borderW,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(FocuslaneUI.radius),
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    color: FocuslaneUI.borderColor(context),
+                    width: FocuslaneUI.borderW,
                   ),
                 ),
               ),
@@ -1413,16 +1422,14 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
 
   Future<void> _addQuickEntry() async {
     final name =
-        _nameController.text.trim().isEmpty
-            ? 'Quick add'
-            : _nameController.text.trim();
+      _nameController.text.trim().isEmpty
+        ? 'Entrada rápida'
+        : _nameController.text.trim();
     final kcal = double.tryParse(_kcalController.text) ?? 0;
     final protein = double.tryParse(_proteinController.text) ?? 0;
 
     if (kcal <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las calorías son requeridas')),
-      );
+      FoodFeedback.showError(context, 'Las calorías son requeridas');
       return;
     }
 
@@ -1633,7 +1640,11 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               Row(
                 children: [
-                  Icon(Icons.flag, color: colorScheme.primary, size: 28),
+                  Icon(
+                    Icons.flag,
+                    color: FocuslaneUI.accent(context),
+                    size: 28,
+                  ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
@@ -1716,7 +1727,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                 label: 'Guardar Objetivos',
                 icon: Icons.check,
                 fullWidth: true,
-                color: colorScheme.primary,
+                color: FocuslaneUI.accent(context),
                 onPressed: _saveGoals,
               ),
             ],
@@ -1756,9 +1767,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
     if (mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Objetivos guardados correctamente')),
-      );
+      FoodFeedback.showSuccess(context, 'Objetivos guardados');
     }
   }
 }
@@ -1815,7 +1824,7 @@ class _FavList extends StatelessWidget {
                   f.type == FavoriteType.food
                       ? Icons.restaurant
                       : Icons.menu_book,
-              leadingColor: colorScheme.primary,
+              leadingColor: FocuslaneUI.accent(context),
               trailing: Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
@@ -1874,8 +1883,8 @@ class _FoodList extends StatelessWidget {
               subtitle:
                   '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
               leadingIcon: Icons.restaurant,
-              leadingColor: colorScheme.primary,
-              trailing: Icon(Icons.add, color: colorScheme.primary),
+              leadingColor: FocuslaneUI.accent(context),
+              trailing: Icon(Icons.add, color: FocuslaneUI.accent(context)),
               onTap: () => onPick(f),
             );
           },
@@ -1937,8 +1946,8 @@ class _RecipeList extends StatelessWidget {
               title: r.name,
               subtitle: macrosText,
               leadingIcon: Icons.menu_book,
-              leadingColor: colorScheme.primary,
-              trailing: Icon(Icons.add, color: colorScheme.primary),
+              leadingColor: FocuslaneUI.accent(context),
+              trailing: Icon(Icons.add, color: FocuslaneUI.accent(context)),
               onTap: () => onPick(r),
             );
           },

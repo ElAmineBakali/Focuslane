@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../widgets/global_ui_components.dart';
+import '../../../theme/focuslane_ui.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
@@ -33,12 +34,16 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 48,
         title: const Text('Historial'),
         bottom: TabBar(
           controller: _tabController,
+          labelStyle: Theme.of(context).textTheme.bodySmall,
+          unselectedLabelStyle: Theme.of(context).textTheme.bodySmall,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 8),
           tabs: const [
-            Tab(text: 'Tendencias', icon: Icon(Icons.trending_up)),
-            Tab(text: 'Compras', icon: Icon(Icons.shopping_bag)),
+            Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 18)),
+            Tab(text: 'Compras', icon: Icon(Icons.shopping_bag, size: 18)),
           ],
         ),
       ),
@@ -51,7 +56,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
 
   Widget _buildTrendsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(FocusSpacing.lg),
+      padding: const EdgeInsets.all(FocusSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -64,19 +69,19 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
             ],
           ),
 
-          const SizedBox(height: FocusSpacing.xl),
+            const SizedBox(height: FocusSpacing.md),
 
           _buildCaloriesChart(),
 
-          const SizedBox(height: FocusSpacing.xl),
+            const SizedBox(height: FocusSpacing.md),
 
           _buildProteinChart(),
 
-          const SizedBox(height: FocusSpacing.xl),
+            const SizedBox(height: FocusSpacing.md),
 
           _buildWaterChart(),
 
-          const SizedBox(height: FocusSpacing.xl),
+            const SizedBox(height: FocusSpacing.md),
 
           _buildSummaryStats(),
         ],
@@ -122,9 +127,13 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+            side: BorderSide(
+              color: FocuslaneUI.borderColor(context),
+              width: FocuslaneUI.borderW,
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.lg),
+            padding: const EdgeInsets.all(FocusSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -142,9 +151,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                     Text('Calorías', style: FocusTypography.heading3(context)),
                   ],
                 ),
-                const SizedBox(height: FocusSpacing.lg),
+                  const SizedBox(height: FocusSpacing.md),
                 SizedBox(
-                  height: 200,
+                  height: 140,
                   child: LineChart(
                     _buildLineChartData(
                       days,
@@ -172,9 +181,13 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+            side: BorderSide(
+              color: FocuslaneUI.borderColor(context),
+              width: FocuslaneUI.borderW,
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.lg),
+            padding: const EdgeInsets.all(FocusSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -192,9 +205,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                     Text('Proteínas', style: FocusTypography.heading3(context)),
                   ],
                 ),
-                const SizedBox(height: FocusSpacing.lg),
+                  const SizedBox(height: FocusSpacing.md),
                 SizedBox(
-                  height: 200,
+                  height: 140,
                   child: LineChart(
                     _buildLineChartData(
                       days,
@@ -222,9 +235,13 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+            side: BorderSide(
+              color: FocuslaneUI.borderColor(context),
+              width: FocuslaneUI.borderW,
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.lg),
+            padding: const EdgeInsets.all(FocusSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -245,9 +262,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: FocusSpacing.lg),
+                  const SizedBox(height: FocusSpacing.md),
                 SizedBox(
-                  height: 200,
+                  height: 140,
                   child: BarChart(
                     _buildBarChartData(
                       days,
@@ -581,6 +598,10 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
       margin: const EdgeInsets.only(bottom: FocusSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
+        side: BorderSide(
+          color: FocuslaneUI.borderColor(context),
+          width: FocuslaneUI.borderW,
+        ),
       ),
       child: ExpansionTile(
         leading: CircleAvatar(

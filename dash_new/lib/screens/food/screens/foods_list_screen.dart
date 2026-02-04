@@ -22,13 +22,12 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModernGradientAppBar(
-        title: 'Catálogo de Alimentos',
-        icon: Icons.restaurant,
-        useThemeColors: true,
+      appBar: FoodCompactAppBar(
+        title: 'Alimentos',
+        subtitle: 'Catálogo',
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 18),
             onPressed: () => _showAddFoodSheet(context),
             tooltip: 'Añadir alimento',
           ),
@@ -38,7 +37,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         children: [
           Container(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Column(
               children: [
                 FoodCompactTextField(
@@ -58,7 +57,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                           )
                           : null,
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
                     Expanded(
@@ -178,25 +177,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         await widget.svc.removeFavorite(fav.id);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.star_border,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-                const SizedBox(width: 8),
-                Text('${food.name} eliminado de favoritos'),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
-          ),
-        );
+        FoodFeedback.showInfo(context, '${food.name} eliminado de favoritos');
       }
     } else {
       await widget.svc.addFavorite(
@@ -210,25 +191,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         ),
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.star,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text('${food.name} añadido a favoritos'),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
-          ),
-        );
+        FoodFeedback.showSuccess(context, '${food.name} añadido a favoritos');
       }
     }
   }
@@ -279,11 +242,11 @@ class _FoodListCardState extends State<_FoodListCard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: FoodCompactTile(
-        height: 52,
+        height: 46,
         onTap: widget.onTap,
         leading: Container(
-          width: 32,
-          height: 32,
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
@@ -291,7 +254,7 @@ class _FoodListCardState extends State<_FoodListCard> {
           child: Icon(
             widget.food.isSupplement ? Icons.medication : Icons.restaurant,
             color: colorScheme.onPrimaryContainer,
-            size: 18,
+            size: 16,
           ),
         ),
         title: widget.food.name,
