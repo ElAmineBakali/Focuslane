@@ -139,7 +139,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
     }
 
     return FoodCompactCard(
-      maxHeight: 220,
+      maxHeight: 300,
       padding: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,13 +189,13 @@ class FoodWeeklyPlanCard extends StatelessWidget {
               children: weekPlan.entries.map((entry) {
                 final label = _formatDayLabel(entry.key);
                 final meals = entry.value;
-                final visibleMeals = meals.entries.take(3).toList();
+                final visibleMeals = meals.entries.take(4).toList();
                 final remaining = meals.length - visibleMeals.length;
 
                 return Container(
-                  width: 180,
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(8),
+                  width: 220,
+                  margin: const EdgeInsets.only(right: 10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),

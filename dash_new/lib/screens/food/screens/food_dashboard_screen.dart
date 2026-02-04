@@ -80,7 +80,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       ),
       body: ListView(
         padding: isDesktop
-            ? const EdgeInsets.all(20)
+            ? const EdgeInsets.all(40)
             : FocuslaneUI.pagePaddingCompact,
         children: [
           _buildMetricsSection(context, todayId, isDesktop),
