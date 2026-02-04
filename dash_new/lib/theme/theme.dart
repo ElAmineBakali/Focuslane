@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../ui/tokens/focuslane_tokens.dart';
 
 enum ThemePreset { ocean, forest, sunset, orchid, tealCarbon, graphite }
 
@@ -72,8 +73,25 @@ class AppTheme {
         filled: true,
         fillColor: scheme.surfaceContainerHighest,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: scheme.primary,
+            width: FocuslaneTokens.borderW,
+          ),
         ),
         hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
       ),
@@ -119,8 +137,25 @@ class AppTheme {
         filled: true,
         fillColor: scheme.surfaceContainerHighest,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderSide: BorderSide(
+            color: scheme.primary,
+            width: FocuslaneTokens.borderW,
+          ),
         ),
         hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
       ),

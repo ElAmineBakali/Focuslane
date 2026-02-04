@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../shared/ui/app_card.dart';
-import '../../../shared/ui/app_module_header.dart';
-import '../../../shared/ui/app_text_field.dart';
-import '../../../shared/ui/app_feedback.dart';
-import '../../../theme/focuslane_ui.dart';
+import '../../../ui/components/focus_card.dart';
+import '../../../ui/components/focus_header.dart';
+import '../../../ui/components/focus_text_field.dart';
+import '../../../ui/feedback/focus_feedback.dart';
+import '../../../ui/tokens/focuslane_tokens.dart';
 
 class FoodCompactCard extends StatelessWidget {
   final Widget child;
@@ -18,40 +18,26 @@ class FoodCompactCard extends StatelessWidget {
   const FoodCompactCard({
     super.key,
     required this.child,
-    this.padding = FocuslaneUI.cardPaddingCompact,
+    this.padding = FocuslaneTokens.cardPaddingCompact,
     this.onTap,
     this.maxHeight = 150,
     this.maxWidth,
     this.background,
     this.borderRadius = const BorderRadius.all(
-      Radius.circular(FocuslaneUI.radius),
+      Radius.circular(FocuslaneTokens.radius16),
     ),
   });
 
   @override
   Widget build(BuildContext context) {
-    final surface = AppSurface(
+    return FocusCard(
       padding: padding,
       onTap: onTap,
       backgroundColor: background,
       borderRadius: borderRadius,
-      borderSide: BorderSide(
-        color: FocuslaneUI.borderColor(context),
-        width: FocuslaneUI.borderW,
-      ),
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
       child: child,
-    );
-
-    if (maxHeight == null && maxWidth == null) {
-      return surface;
-    }
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: maxHeight ?? double.infinity,
-        maxWidth: maxWidth ?? double.infinity,
-      ),
-      child: surface,
     );
   }
 }
@@ -96,10 +82,10 @@ class FoodCompactTile extends StatelessWidget {
 
     return Material(
       color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(FocuslaneTokens.radius12),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(FocuslaneTokens.radius12),
         child: ConstrainedBox(
           constraints: BoxConstraints.tightFor(height: height),
           child: Padding(
@@ -176,7 +162,7 @@ class FoodCompactTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppTextField(
+    return FocusTextField(
       label: label,
       hint: hint,
       controller: controller,
@@ -219,16 +205,16 @@ class FoodInlineBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: FocuslaneUI.accentSurface(context, opacity: 0.12),
-          borderRadius: BorderRadius.circular(FocuslaneUI.radius),
+          color: FocuslaneTokens.accentSurface(context, opacity: 0.12),
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
           border: Border.all(
-            color: FocuslaneUI.borderColor(context),
-            width: FocuslaneUI.borderW,
+            color: FocuslaneTokens.borderColor(context),
+            width: FocuslaneTokens.borderW,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: FocuslaneUI.accent(context)),
+            Icon(icon, size: 18, color: FocuslaneTokens.accent(context)),
             const SizedBox(width: 6),
             Expanded(
               child: Column(
@@ -272,128 +258,6 @@ class FoodInlineBanner extends StatelessWidget {
   }
 }
 
-class FoodModuleTheme extends StatelessWidget {
-  final Widget child;
-  const FoodModuleTheme({super.key, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final base = Theme.of(context);
-    final cs = base.colorScheme;
-    final input = base.inputDecorationTheme.copyWith(
-      filled: true,
-      isDense: true,
-      fillColor: cs.surfaceContainerHighest,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
-        borderSide: BorderSide(
-          color: FocuslaneUI.borderColor(context),
-          width: FocuslaneUI.borderW,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
-        borderSide: BorderSide(
-          color: FocuslaneUI.borderColor(context),
-          width: FocuslaneUI.borderW,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(FocuslaneUI.radius),
-        borderSide: BorderSide(
-          color: FocuslaneUI.accent(context),
-          width: FocuslaneUI.borderW,
-        ),
-      ),
-      hintStyle: base.textTheme.bodySmall?.copyWith(
-        color: cs.onSurfaceVariant,
-      ),
-      labelStyle: base.textTheme.bodySmall?.copyWith(
-        color: cs.onSurfaceVariant,
-      ),
-    );
-
-    return Theme(
-      data: base.copyWith(
-        dividerColor: FocuslaneUI.dividerColor(context),
-        dividerTheme: DividerThemeData(
-          color: FocuslaneUI.dividerColor(context),
-          thickness: FocuslaneUI.dividerW,
-          space: FocuslaneUI.dividerW,
-        ),
-        appBarTheme: base.appBarTheme.copyWith(
-          backgroundColor: cs.surface,
-          foregroundColor: FocuslaneUI.accent(context),
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: FocuslaneUI.accent(context).withOpacity(0.25),
-          iconTheme: IconThemeData(color: FocuslaneUI.accent(context)),
-          titleTextStyle: base.textTheme.titleMedium?.copyWith(
-            color: FocuslaneUI.accent(context),
-            fontWeight: FontWeight.w700,
-          ),
-          shape: Border(
-            bottom: BorderSide(
-              color: FocuslaneUI.dividerColor(context),
-              width: FocuslaneUI.dividerW,
-            ),
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: FocuslaneUI.borderColor(context),
-              width: FocuslaneUI.borderW,
-            ),
-            foregroundColor: FocuslaneUI.accent(context),
-          ),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            backgroundColor: FocuslaneUI.accent(context),
-            foregroundColor: cs.onPrimary,
-          ),
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: FocuslaneUI.accent(context),
-          foregroundColor: cs.onPrimary,
-        ),
-        chipTheme: base.chipTheme.copyWith(
-          backgroundColor: FocuslaneUI.accentSurface(
-            context,
-            opacity: 0.14,
-          ),
-          selectedColor: FocuslaneUI.accentSurface(
-            context,
-            opacity: 0.18,
-          ),
-          side: BorderSide(
-            color: FocuslaneUI.borderColor(context),
-            width: FocuslaneUI.borderW,
-          ),
-          labelStyle: base.textTheme.bodySmall?.copyWith(
-            color: FocuslaneUI.accent(context),
-          ),
-        ),
-        inputDecorationTheme: input,
-        visualDensity: VisualDensity.compact,
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: cs.surfaceContainerHighest,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(FocuslaneUI.radius),
-          ),
-          contentTextStyle: base.textTheme.bodySmall?.copyWith(
-            color: cs.onSurface,
-          ),
-        ),
-      ),
-      child: child,
-    );
-  }
-}
-
 class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
@@ -419,7 +283,7 @@ class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppModuleHeader(
+    return FocusHeader(
       title: title,
       subtitle: subtitle,
       actions: actions,
@@ -434,14 +298,14 @@ class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class FoodFeedback {
   static void showSuccess(BuildContext context, String message) {
-    AppFeedback.showSuccess(context, message);
+    FocusFeedback.showSuccess(context, message);
   }
 
   static void showError(BuildContext context, String message) {
-    AppFeedback.showError(context, message);
+    FocusFeedback.showError(context, message);
   }
 
   static void showInfo(BuildContext context, String message) {
-    AppFeedback.showInfo(context, message);
+    FocusFeedback.showInfo(context, message);
   }
 }

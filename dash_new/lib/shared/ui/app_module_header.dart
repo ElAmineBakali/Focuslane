@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../ui/components/focus_header.dart';
 
 class AppModuleHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -27,63 +28,15 @@ class AppModuleHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final exitAction = IconButton(
-      icon: const Icon(Icons.logout, size: 18),
-      tooltip: 'Salir del módulo',
-      onPressed: onExit ?? () => Navigator.of(context).popUntil((r) => r.isFirst),
-    );
-
-    final mergedActions = <Widget>[
-      ...?actions,
-      if (showExit) exitAction,
-    ];
-
-    return AppBar(
-      toolbarHeight: 48,
-      titleSpacing: 12,
-      centerTitle: centerTitle,
+    return FocusHeader(
+      title: title,
+      subtitle: subtitle,
+      actions: actions,
       leading: leading,
-      flexibleSpace: useSoftGradient
-          ? Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    cs.primaryContainer.withOpacity(0.6),
-                    cs.secondaryContainer.withOpacity(0.6),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            )
-          : null,
-      title: Column(
-        crossAxisAlignment:
-            centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (subtitle != null)
-            Text(
-              subtitle!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-        ],
-      ),
-      actions: mergedActions.isEmpty ? null : mergedActions,
+      centerTitle: centerTitle,
+      showExit: showExit,
+      onExit: onExit,
+      useSoftGradient: useSoftGradient,
     );
   }
 }

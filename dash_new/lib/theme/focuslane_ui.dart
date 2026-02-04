@@ -1,52 +1,31 @@
 import 'package:flutter/material.dart';
+import '../ui/tokens/focuslane_tokens.dart';
 
 class FocuslaneUI {
-  static const double borderW = 2.0;
-  static const double dividerW = 1.2;
-  static const double radius = 16;
-  static const EdgeInsets pagePaddingCompact = EdgeInsets.all(16);
-  static const EdgeInsets cardPaddingCompact = EdgeInsets.all(12);
+  static const double borderW = FocuslaneTokens.borderW;
+  static const double dividerW = FocuslaneTokens.dividerW;
+  static const double radius = FocuslaneTokens.radius16;
+  static const EdgeInsets pagePaddingCompact =
+      FocuslaneTokens.pagePaddingCompact;
+  static const EdgeInsets cardPaddingCompact =
+      FocuslaneTokens.cardPaddingCompact;
 
-  static bool isDark(BuildContext c) {
-    return Theme.of(c).brightness == Brightness.dark;
-  }
+  static bool isDark(BuildContext c) => FocuslaneTokens.isDark(c);
+  static Color borderColor(BuildContext c) => FocuslaneTokens.borderColor(c);
+  static Color dividerColor(BuildContext c) => FocuslaneTokens.dividerColor(c);
 
-  static Color borderColor(BuildContext c) {
-    // Bordes gris clarito en ambos modos
-    return isDark(c) ? Colors.grey.shade600 : Colors.grey.shade400;
-  }
+  static const Color pastelTeal = FocuslaneTokens.pastelTeal;
+  static const Color pastelTealClaro = FocuslaneTokens.pastelTealClaro;
+  static const Color pastelTealSuavizado = FocuslaneTokens.pastelTealSuavizado;
+  static const Color pastelTealClaroSuavizado =
+      FocuslaneTokens.pastelTealClaroSuavizado;
 
-  static Color dividerColor(BuildContext c) {
-    return Theme.of(c)
-        .dividerColor
-        .withOpacity(isDark(c) ? 0.55 : 0.35);
-  }
+  static Color accent(BuildContext c) => FocuslaneTokens.accent(c);
+  static Color accent2(BuildContext c) => FocuslaneTokens.accent2(c);
 
-  static const Color pastelTeal = Color(0xFF7FBEB7);
-  static const Color pastelTealClaro = Color(0xFF9FD0CB);
-  static const Color pastelTealSuavizado = Color(0xFF6CA9A1);
-  static const Color pastelTealClaroSuavizado = Color(0xFF86BEB8);
+  static LinearGradient primaryGradient(BuildContext c) =>
+      FocuslaneTokens.primaryGradient(c);
 
-  static Color accent(BuildContext c) {
-    return isDark(c) ? pastelTealSuavizado : pastelTeal;
-  }
-
-  static Color accent2(BuildContext c) {
-    return isDark(c) ? pastelTealClaroSuavizado : pastelTealClaro;
-  }
-
-  static LinearGradient primaryGradient(BuildContext c) {
-    return LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        accent(c).withOpacity(0.9),
-        accent2(c).withOpacity(0.8),
-      ],
-    );
-  }
-
-  static Color accentSurface(BuildContext c, {double opacity = 0.14}) {
-    return accent(c).withOpacity(opacity);
-  }
+  static Color accentSurface(BuildContext c, {double opacity = 0.14}) =>
+      FocuslaneTokens.accentSurface(c, opacity: opacity);
 }

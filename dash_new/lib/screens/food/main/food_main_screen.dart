@@ -9,8 +9,8 @@ import '../screens/shopping_lists_screen.dart';
 import '../screens/pantry_screen.dart';
 import '../screens/food_history_screen.dart';
 import '../screens/food_settings_notifications_screen.dart';
-import 'food_sidebar.dart';
-import '../widgets/food_compact_widgets.dart';
+import '../../../ui/layouts/module_shell.dart';
+import '../../../ui/layouts/module_sidebar.dart';
 
 class FoodMainScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -23,7 +23,6 @@ class FoodMainScreen extends StatefulWidget {
 
 class _FoodMainScreenState extends State<FoodMainScreen> {
   int _selectedIndex = 0;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _getScreens() {
     return [
@@ -44,65 +43,31 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 1024;
-
-    return FoodModuleTheme(
-      child: Scaffold(
-        key: _scaffoldKey,
-        drawer: !isDesktop
-            ? Drawer(
-                child: FoodSidebar(
-                  selectedIndex: _selectedIndex,
-                  onItemSelected: (index) {
-                    setState(() => _selectedIndex = index);
-                    Navigator.pop(context);
-                  },
-                ),
-              )
-            : null,
-        appBar: !isDesktop
-            ? FoodCompactAppBar(
-                title: _getTitle(),
-                leading: IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-              )
-            : null,
-        body: Row(
-          children: [
-            if (isDesktop)
-              FoodSidebar(
-                selectedIndex: _selectedIndex,
-                onItemSelected: (index) {
-                  setState(() => _selectedIndex = index);
-                },
-              ),
-            Expanded(
-              child: IndexedStack(
-                index: _selectedIndex,
-                children: _getScreens(),
-              ),
-            ),
-          ],
-        ),
+    final items = [
+      const ModuleSidebarItem(icon: Icons.dashboard, label: 'Panel'),
+      const ModuleSidebarItem(icon: Icons.restaurant_menu, label: 'Diario'),
+      const ModuleSidebarItem(icon: Icons.restaurant, label: 'Alimentos'),
+      const ModuleSidebarItem(icon: Icons.menu_book, label: 'Recetas'),
+      const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
+      const ModuleSidebarItem(icon: Icons.list_alt, label: 'Listas de Compra'),
+      const ModuleSidebarItem(icon: Icons.kitchen, label: 'Despensa'),
+      const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
+      const ModuleSidebarItem(
+        icon: Icons.notifications,
+        label: 'Notificaciones y recordatorios',
       ),
-    );
-  }
-
-  String _getTitle() {
-    final titles = [
-      'Panel',
-      'Diario',
-      'Alimentos',
-      'Recetas',
-      'Planificador',
-      'Listas de Compra',
-      'Despensa',
-      'Historial',
-      'Notificaciones y recordatorios',
     ];
-    return titles[_selectedIndex];
+
+    return ModuleShell(
+      items: items,
+      selectedIndex: _selectedIndex,
+      onItemSelected: (index) => setState(() => _selectedIndex = index),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _getScreens(),
+      ),
+      moduleTitle: 'Módulo Food',
+      moduleIcon: Icons.restaurant,
+    );
   }
 }

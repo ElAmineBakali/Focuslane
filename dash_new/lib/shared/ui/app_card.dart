@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../theme/focuslane_ui.dart';
+import '../../ui/components/focus_card.dart';
+import '../../ui/tokens/focuslane_tokens.dart';
 
 class AppCardStyle {
-  static double radius = FocuslaneUI.radius;
-  static double borderWidth = FocuslaneUI.borderW;
+  static double radius = FocuslaneTokens.radius16;
+  static double borderWidth = FocuslaneTokens.borderW;
 
   static BorderSide borderSide(BuildContext context) {
-    final color = FocuslaneUI.borderColor(context);
+    final color = FocuslaneTokens.borderColor(context);
     return BorderSide(color: color, width: borderWidth);
   }
 
@@ -35,29 +36,13 @@ class AppSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final br = borderRadius ?? AppCardStyle.borderRadius();
-    final side = borderSide ?? AppCardStyle.borderSide(context);
-    final bg = backgroundColor ?? Theme.of(context).colorScheme.surface;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: br,
-        border: Border.fromBorderSide(side),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: br,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: br as BorderRadius?,
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
-        ),
-      ),
+    return FocusCard(
+      padding: padding,
+      onTap: onTap,
+      backgroundColor: backgroundColor,
+      borderRadius: borderRadius,
+      borderSide: borderSide,
+      child: child,
     );
   }
 }
@@ -84,24 +69,14 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = AppSurface(
+    return FocusCard(
       padding: padding,
       onTap: onTap,
       backgroundColor: backgroundColor,
       borderRadius: borderRadius,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
       child: child,
-    );
-
-    if (maxHeight == null && maxWidth == null) {
-      return surface;
-    }
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: maxHeight ?? double.infinity,
-        maxWidth: maxWidth ?? double.infinity,
-      ),
-      child: surface,
     );
   }
 }

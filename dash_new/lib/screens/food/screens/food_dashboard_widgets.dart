@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../shared/ui/app_card.dart';
+import '../../../ui/components/focus_metric_card.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
-import '../../../theme/focuslane_ui.dart';
+import '../../../ui/tokens/focuslane_tokens.dart';
 
 class FoodMetricCard extends StatelessWidget {
   final IconData icon;
@@ -22,59 +22,12 @@ class FoodMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final accent = FocuslaneUI.accent(context);
-
-    return AppCard(
-      maxHeight: 96,
-      padding: const EdgeInsets.all(10),
+    return FocusMetricCard(
+      icon: icon,
+      label: label,
+      value: value,
+      subtitle: subtitle,
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: FocuslaneUI.accentSurface(context, opacity: 0.16),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: accent, size: 14),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 10,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            value,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          Text(
-            subtitle,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 10,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -129,7 +82,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
               onPressed: onGeneratePlan,
               style: FilledButton.styleFrom(
                 minimumSize: const Size(0, 32),
-                backgroundColor: FocuslaneUI.accent(context),
+                backgroundColor: FocuslaneTokens.accent(context),
               ),
               child: const Text('Crear plan'),
             ),
@@ -148,7 +101,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
             children: [
                 Icon(
                   Icons.calendar_month,
-                  color: FocuslaneUI.accent(context),
+                  color: FocuslaneTokens.accent(context),
                   size: 18,
                 ),
               const SizedBox(width: 8),
@@ -164,7 +117,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   minimumSize: const Size(0, 28),
-                    foregroundColor: FocuslaneUI.accent(context),
+                    foregroundColor: FocuslaneTokens.accent(context),
                 ),
                 child: const Text('Generar'),
               ),
@@ -174,8 +127,8 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   minimumSize: const Size(0, 28),
                     side: BorderSide(
-                      color: FocuslaneUI.borderColor(context),
-                      width: FocuslaneUI.borderW,
+                      color: FocuslaneTokens.borderColor(context),
+                      width: FocuslaneTokens.borderW,
                     ),
                 ),
                 child: const Text('Lista'),
@@ -200,8 +153,8 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                     color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: FocuslaneUI.borderColor(context),
-                      width: FocuslaneUI.borderW,
+                      color: FocuslaneTokens.borderColor(context),
+                      width: FocuslaneTokens.borderW,
                     ),
                   ),
                   child: Column(
@@ -316,7 +269,7 @@ class FoodSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final accent = FocuslaneUI.accent(context);
+    final accent = FocuslaneTokens.accent(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -377,7 +330,7 @@ class FoodRecipeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final accent = FocuslaneUI.accent(context);
+    final accent = FocuslaneTokens.accent(context);
 
     return FoodCompactCard(
       maxHeight: 88,
@@ -390,7 +343,7 @@ class FoodRecipeCard extends StatelessWidget {
             width: 30,
             height: 30,
             decoration: BoxDecoration(
-              color: FocuslaneUI.accentSurface(context, opacity: 0.16),
+              color: FocuslaneTokens.accentSurface(context, opacity: 0.16),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(Icons.restaurant, color: accent, size: 16),
@@ -420,20 +373,20 @@ class FoodRecipeCard extends StatelessWidget {
                         vertical: 1,
                       ),
                       decoration: BoxDecoration(
-                        color: FocuslaneUI.accentSurface(
+                        color: FocuslaneTokens.accentSurface(
                           context,
                           opacity: 0.14,
                         ),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: FocuslaneUI.borderColor(context),
-                          width: FocuslaneUI.borderW,
+                          color: FocuslaneTokens.borderColor(context),
+                          width: FocuslaneTokens.borderW,
                         ),
                       ),
                       child: Text(
                         tag,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: FocuslaneUI.accent(context),
+                          color: FocuslaneTokens.accent(context),
                           fontSize: 10,
                         ),
                       ),

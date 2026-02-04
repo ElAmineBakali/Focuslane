@@ -42,7 +42,7 @@ import 'screens/habits/habit_create_screen.dart';
 import 'screens/habits/habit_detail_screen.dart';
 import 'screens/habits/habit_stats_screen.dart';
 import 'screens/habits/habit_model.dart';
-import 'screens/gym/gym_home_screen.dart';
+import 'screens/gym/main/gym_main_screen.dart';
 import 'screens/gym/services/gym_firestore_service.dart';
 import 'screens/gym/routines/routines_list_screen.dart';
 import 'screens/gym/analytics/gym_analytics_screen_v2.dart';
@@ -52,7 +52,7 @@ import 'screens/gym/body/measurements_screen.dart';
 import 'screens/study/services/study_firestore_service.dart';
 import 'screens/study/timer/study_timer_screen.dart';
 import 'screens/study/analytics/study_analytics_screen.dart';
-import 'screens/study/study_home_screen.dart';
+import 'screens/study/main/study_main_screen.dart';
 import 'screens/food/services/food_firestore_service.dart';
 import 'screens/food/main/food_main_screen.dart';
 import 'screens/finance/finance_routes.dart';
@@ -339,7 +339,7 @@ class _MyAppState extends State<MyApp> {
 
             '/gym': (_) {
               _gymService ??= GymFirestoreService();
-              return GymHomeScreen(svc: _gymService!);
+              return GymMainScreen(svc: _gymService!);
             },
             '/gym/routines': (_) {
               _gymService ??= GymFirestoreService();
@@ -364,7 +364,7 @@ class _MyAppState extends State<MyApp> {
 
             '/study': (_) {
               _studySvc ??= StudyFirestoreService();
-              return StudyHomeScreen(svc: _studySvc!);
+              return StudyMainScreen(svc: _studySvc!);
             },
             '/study/timer': (_) {
               _studySvc ??= StudyFirestoreService();

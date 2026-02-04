@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_card.dart';
+import '../../ui/components/focus_tab_bar.dart';
 
 class AppSectionTabs extends StatelessWidget {
   final TabController controller;
@@ -15,20 +15,10 @@ class AppSectionTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return AppSurface(
+    return FocusTabBar(
+      controller: controller,
+      tabs: tabs,
       padding: padding,
-      child: TabBar(
-        controller: controller,
-        indicatorColor: cs.primary,
-        labelColor: cs.onSurface,
-        unselectedLabelColor: cs.onSurfaceVariant,
-        labelStyle: Theme.of(context).textTheme.bodySmall,
-        unselectedLabelStyle: Theme.of(context).textTheme.bodySmall,
-        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-        indicatorSize: TabBarIndicatorSize.label,
-        tabs: tabs,
-      ),
     );
   }
 }
