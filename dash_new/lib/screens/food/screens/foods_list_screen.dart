@@ -130,19 +130,35 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
   }
 
   Widget _buildListView(List<Food> foods) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: foods.length,
-      itemBuilder: (context, index) {
-        final food = foods[index];
-        return _FoodListCard(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // En PC: 6 columnas, tablet: 4, móvil: 2
+        final crossAxisCount = constraints.maxWidth >= 1200
+            ? 6
+            : constraints.maxWidth >= 900
+                ? 5
+                : constraints.maxWidth >= 600
+                    ? 4
+                    : 2;
+        
+        return GridView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: foods.length,
+          itemBuilder: (context, index) {
+            final food = foods[index];
+            return _FoodGridCard(
               food: food,
               onTap: () => _showEditFoodSheet(context, food),
               onToggleFavorite: () => _toggleFavorite(food),
-            )
-            .animate()
-            .fadeIn(delay: (100 + index * 50).ms)
-            .slideX(begin: -0.2, duration: 300.ms);
+            ).animate().fadeIn(delay: (50 + index * 30).ms).scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
+          },
+        );
       },
     );
   }
@@ -194,6 +210,112 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         FoodFeedback.showSuccess(context, '${food.name} añadido a favoritos');
       }
     }
+  }
+}
+
+class _FoodGridCard extends StatefulWidget {
+  final Food food;
+  final VoidCallback onTap;
+  final VoidCallback onToggleFavorite;
+
+  const _FoodGridCard({
+    required this.food,
+    required this.onTap,
+    required this.onToggleFavorite,
+  });
+
+  @override
+  State<_FoodGridCard> createState() => _FoodGridCardState();
+}
+
+class _FoodGridCardState extends State<_FoodGridCard> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Favorite>>(
+      stream:
+          context
+              .findAncestorStateOfType<_FoodsListScreenState>()
+              ?.widget
+              .svc
+              .streamFavorites(),
+      builder: (context, favSnap) {
+        final isFavorite =
+            favSnap.data?.any(
+              (f) => f.type == FavoriteType.food && f.refId == widget.food.id,
+            ) ??
+            false;
+
+        return _buildCard(context, isFavorite);
+      },
+    );
+  }
+
+  Widget _buildCard(BuildContext context, bool isFavorite) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
+    return FoodCompactCard(
+      onTap: widget.onTap,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  widget.food.isSupplement ? Icons.medication : Icons.restaurant,
+                  color: colorScheme.onPrimaryContainer,
+                  size: 18,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: widget.onToggleFavorite,
+                child: Icon(
+                  isFavorite ? Icons.star : Icons.star_border,
+                  size: 20,
+                  color: isFavorite ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(
+            widget.food.name,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${widget.food.kcal.toStringAsFixed(0)} kcal',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (widget.food.brand != null)
+            Text(
+              widget.food.brand!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 10,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
   }
 }
 

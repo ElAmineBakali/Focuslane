@@ -112,24 +112,40 @@ class _PantryScreenState extends State<PantryScreen> {
   }
 
   Widget _buildListView(List<PantryItem> items) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        final isLowStock = item.minQty != null && item.qty <= item.minQty!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // En PC: 6 columnas, tablet: 4, móvil: 2
+        final crossAxisCount = constraints.maxWidth >= 1200
+            ? 6
+            : constraints.maxWidth >= 900
+                ? 5
+                : constraints.maxWidth >= 600
+                    ? 4
+                    : 2;
+        
+        return GridView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final isLowStock = item.minQty != null && item.qty <= item.minQty!;
 
-        return _PantryTile(
+            return _PantryGridCard(
               item: item,
               isLowStock: isLowStock,
               onTap: () => _showItemDetails(item),
               onConsume: () => _consumeItem(item),
               onEdit: () => _editItem(initial: item, id: item.id),
               onDelete: () => _deleteItem(item),
-            )
-            .animate()
-            .fadeIn(delay: Duration(milliseconds: index * 30))
-            .slideX(begin: -0.2);
+            ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).scale(begin: const Offset(0.95, 0.95), duration: const Duration(milliseconds: 200));
+          },
+        );
       },
     );
   }
@@ -560,6 +576,139 @@ class _PantryScreenState extends State<PantryScreen> {
       case UnitKind.ml:
         return 'ml';
     }
+  }
+}
+
+class _PantryGridCard extends StatelessWidget {
+  final PantryItem item;
+  final bool isLowStock;
+  final VoidCallback onTap;
+  final VoidCallback onConsume;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _PantryGridCard({
+    required this.item,
+    required this.isLowStock,
+    required this.onTap,
+    required this.onConsume,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  String _getUnitLabel(UnitKind unit) {
+    switch (unit) {
+      case UnitKind.unit:
+        return 'u';
+      case UnitKind.g:
+        return 'g';
+      case UnitKind.ml:
+        return 'ml';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
+    return FoodCompactCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: isLowStock
+                      ? colorScheme.errorContainer
+                      : colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  isLowStock ? Icons.warning_amber : Icons.kitchen,
+                  color: isLowStock
+                      ? colorScheme.error
+                      : colorScheme.onPrimaryContainer,
+                  size: 18,
+                ),
+              ),
+              const Spacer(),
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                iconSize: 18,
+                onSelected: (value) {
+                  if (value == 'consume') onConsume();
+                  if (value == 'edit') onEdit();
+                  if (value == 'delete') onDelete();
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 'consume',
+                    child: Row(
+                      children: [
+                        Icon(Icons.remove_circle_outline, size: 18),
+                        SizedBox(width: 8),
+                        Text('Consumir'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, size: 18),
+                        SizedBox(width: 8),
+                        Text('Editar'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 18, color: AppColors.error),
+                        SizedBox(width: 8),
+                        Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(
+            item.name,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: isLowStock ? colorScheme.error : colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (item.minQty != null)
+            Text(
+              'Mín: ${item.minQty!.toStringAsFixed(0)}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 10,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

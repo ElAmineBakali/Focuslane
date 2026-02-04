@@ -12,8 +12,8 @@ class FocuslaneUI {
   }
 
   static Color borderColor(BuildContext c) {
-    // Bordes bien visibles: blanco puro en dark, gris en light
-    return isDark(c) ? Colors.white : Colors.grey.shade400;
+    // Bordes gris clarito en ambos modos
+    return isDark(c) ? Colors.grey.shade600 : Colors.grey.shade400;
   }
 
   static Color dividerColor(BuildContext c) {

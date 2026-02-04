@@ -114,71 +114,113 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   }
 
   Widget _buildListView(List<Recipe> recipes) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: recipes.length,
-      itemBuilder: (context, index) {
-        final recipe = recipes[index];
-        return _RecipeListCard(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // En PC: 6 columnas, tablet: 4, móvil: 2
+        final crossAxisCount = constraints.maxWidth >= 1200
+            ? 6
+            : constraints.maxWidth >= 900
+                ? 5
+                : constraints.maxWidth >= 600
+                    ? 4
+                    : 2;
+        
+        return GridView.builder(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: recipes.length,
+          itemBuilder: (context, index) {
+            final recipe = recipes[index];
+            return _RecipeGridCard(
               recipe: recipe,
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) => RecipeEditScreen(
-                            svc: widget.svc,
-                            initial: recipe,
-                          ),
-                    ),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RecipeEditScreen(
+                    svc: widget.svc,
+                    initial: recipe,
                   ),
-            )
-            .animate()
-            .fadeIn(delay: (100 + index * 50).ms)
-            .slideX(begin: -0.2, duration: 300.ms);
+                ),
+              ),
+            ).animate().fadeIn(delay: (50 + index * 30).ms).scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
+          },
+        );
       },
     );
   }
 }
 
-class _RecipeListCard extends StatelessWidget {
+class _RecipeGridCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onTap;
 
-  const _RecipeListCard({required this.recipe, required this.onTap});
+  const _RecipeGridCard({required this.recipe, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
     final hasNutrition = recipe.kcal != null;
-    final subtitle =
-        '${recipe.servings} raciones${hasNutrition ? ' • ${recipe.kcal!.toStringAsFixed(0)} kcal' : ''}';
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: FoodCompactTile(
-        height: 46,
-        onTap: onTap,
-        leading: Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
+    return FoodCompactCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.menu_book,
+                  color: colorScheme.onPrimaryContainer,
+                  size: 18,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 12,
+                color: colorScheme.outline,
+              ),
+            ],
           ),
-          child: Icon(
-            Icons.menu_book,
-            color: colorScheme.onPrimaryContainer,
-            size: 16,
+          const Spacer(),
+          Text(
+            recipe.name,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        title: recipe.name,
-        subtitle: subtitle,
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 12,
-          color: colorScheme.outline,
-        ),
+          const SizedBox(height: 4),
+          Text(
+            '${recipe.servings} raciones',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (hasNutrition)
+            Text(
+              '${recipe.kcal!.toStringAsFixed(0)} kcal',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
       ),
     );
   }
