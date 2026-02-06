@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -201,6 +203,12 @@ class _CourseDetailEditableScreenState
           SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
+                leading: FocusModuleHeader.buildLeading(
+                  context,
+                  mode: FocusModuleLeadingMode.backToModuleDashboard,
+                  backRouteName: AppRoutes.studyDashboard,
+                ),
+                leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 widget.course.name,

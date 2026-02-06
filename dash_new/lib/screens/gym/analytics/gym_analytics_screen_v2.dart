@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,6 +8,7 @@ import '../models/gym_models.dart';
 import '../session/session_history_screen.dart';
 import 'exercise_progress_screen.dart';
 import 'package:intl/intl.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class GymAnalyticsScreenV2 extends StatefulWidget {
   final GymFirestoreService svc;
@@ -50,6 +52,12 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
             expandedHeight: 160,
             pinned: true,
             backgroundColor: colorScheme.primaryContainer,
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.gymDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 60),
               title: Text(

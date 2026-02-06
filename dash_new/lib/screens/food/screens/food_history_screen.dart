@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../../widgets/global_ui_components.dart';
 import '../../../theme/focuslane_ui.dart';
+import '../../../ui/components/focus_module_header.dart';
+import '../../../ui/tokens/focuslane_tokens.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
@@ -33,20 +36,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 48,
-        title: const Text('Historial'),
-        bottom: TabBar(
-          controller: _tabController,
-          labelStyle: Theme.of(context).textTheme.bodySmall,
-          unselectedLabelStyle: Theme.of(context).textTheme.bodySmall,
-          labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-          tabs: const [
-            Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 18)),
-            Tab(text: 'Compras', icon: Icon(Icons.shopping_bag, size: 18)),
-          ],
-        ),
-      ),
+      appBar: _FoodHistoryAppBar(controller: _tabController),
       body: TabBarView(
         controller: _tabController,
         children: [_buildTrendsTab(), _buildShoppingHistoryTab()],
@@ -678,5 +668,50 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class _FoodHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final TabController controller;
+
+  const _FoodHistoryAppBar({required this.controller});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(48 + kTextTabBarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const FocusModuleHeader(
+          title: 'Historial',
+          leadingMode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.foodDashboard,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: FocuslaneTokens.dividerColor(context),
+                width: FocuslaneTokens.dividerW,
+              ),
+            ),
+          ),
+          child: TabBar(
+            controller: controller,
+            labelStyle: theme.textTheme.bodySmall,
+            unselectedLabelStyle: theme.textTheme.bodySmall,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+            tabs: const [
+              Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 18)),
+              Tab(text: 'Compras', icon: Icon(Icons.shopping_bag, size: 18)),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

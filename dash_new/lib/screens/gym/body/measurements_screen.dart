@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 SnackBar _niceBar(String text, {IconData? icon}) {
   return SnackBar(
@@ -44,7 +46,15 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
     final svc = widget.svc;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Medidas (cm)')),
+      appBar: AppBar(
+        title: const Text('Medidas (cm)'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.gymDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: Column(
         children: [
           Padding(

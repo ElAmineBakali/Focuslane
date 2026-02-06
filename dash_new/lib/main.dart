@@ -61,6 +61,7 @@ import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
 import 'navigation/app_route_observer.dart';
+import 'navigation/app_routes.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -337,7 +338,7 @@ class _MyAppState extends State<MyApp> {
               return HabitStatsScreen(habit: habit);
             },
 
-            '/gym': (_) {
+            AppRoutes.gymDashboard: (_) {
               _gymService ??= GymFirestoreService();
               return GymMainScreen(svc: _gymService!);
             },
@@ -362,7 +363,7 @@ class _MyAppState extends State<MyApp> {
               return MeasurementsScreen(svc: _gymService!);
             },
 
-            '/study': (_) {
+            AppRoutes.studyDashboard: (_) {
               _studySvc ??= StudyFirestoreService();
               return StudyMainScreen(svc: _studySvc!);
             },
@@ -375,7 +376,7 @@ class _MyAppState extends State<MyApp> {
               return StudyAnalyticsScreen(svc: _studySvc!);
             },
 
-            '/food': (_) {
+            AppRoutes.foodDashboard: (_) {
               final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
               _foodSvc ??= FoodFirestoreService(userId);
               return FoodMainScreen(svc: _foodSvc!);

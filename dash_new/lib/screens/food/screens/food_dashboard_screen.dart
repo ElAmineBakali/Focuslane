@@ -12,6 +12,7 @@ import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../theme/focuslane_ui.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -63,8 +64,9 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: FoodCompactAppBar(
-        title: 'Alimentación',
-        subtitle: 'Resumen diario y plan semanal',
+        title: 'Food',
+        subtitle: 'Planificación, recetas y seguimiento',
+        leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today, size: 18),

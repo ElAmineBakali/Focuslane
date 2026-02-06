@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../services/study_notifications.dart';
 import 'schedule_widgets.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class ScheduleScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -15,7 +17,15 @@ class ScheduleScreen extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Horario académico')),
+      appBar: AppBar(
+        title: const Text('Horario académico'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await showModalBottomSheet(

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:intl/intl.dart';
 import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../study/models/study_models.dart';
 import '../../study/services/study_firestore_service.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -43,6 +45,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               SliverAppBar.large(
                 backgroundColor: Colors.transparent,
                 foregroundColor: cs.onSurface,
+                leading: FocusModuleHeader.buildLeading(
+                  context,
+                  mode: FocusModuleLeadingMode.backToModuleDashboard,
+                  backRouteName: AppRoutes.studyDashboard,
+                ),
+                leadingWidth: 96,
                 flexibleSpace: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

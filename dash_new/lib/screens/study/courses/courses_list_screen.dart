@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/study_firestore_service.dart';
@@ -7,6 +8,7 @@ import 'course_edit_sheet.dart';
 import 'course_detail_editable_screen.dart';
 import 'external_links_sheet.dart';
 import '../settings/study_settings_sheet.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class CoursesListScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -22,6 +24,12 @@ class CoursesListScreen extends StatelessWidget {
           'Cursos',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
         elevation: 0,
         backgroundColor: colorScheme.surface,
         actions: [
@@ -437,7 +445,15 @@ class _ArchivedCoursesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cursos archivados')),
+      appBar: AppBar(
+        title: const Text('Cursos archivados'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: StreamBuilder<List<Course>>(
         stream: svc.streamCourses(includeArchived: true),
         builder: (context, snap) {

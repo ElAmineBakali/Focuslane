@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class ExportDataScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -111,6 +113,12 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
           'Exportar Datos',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.gymDashboard,
+        ),
+        leadingWidth: 96,
         backgroundColor: colorScheme.primaryContainer,
       ),
       body: SingleChildScrollView(

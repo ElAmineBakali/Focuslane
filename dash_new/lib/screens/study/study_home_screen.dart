@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/global_ui_components.dart';
@@ -12,6 +13,7 @@ import 'services/study_firestore_service.dart';
 import 'services/study_notifications.dart';
 import 'models/study_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../ui/components/focus_module_header.dart';
 
 /// 📚 STUDY HOME SCREEN - Rediseñado
 /// Dashboard principal del módulo de estudio con diseño moderno
@@ -95,6 +97,12 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
             pinned: true,
             stretch: true,
             backgroundColor: colorScheme.primaryContainer,
+                leading: FocusModuleHeader.buildLeading(
+                  context,
+                  mode: FocusModuleLeadingMode.backToModuleDashboard,
+                  backRouteName: AppRoutes.studyDashboard,
+                ),
+                leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Estudio',
@@ -419,7 +427,15 @@ class _AttendanceOverviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Asistencia')),
+      appBar: AppBar(
+        title: const Text('Asistencia'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: StreamBuilder<List<Course>>(
         stream: svc.streamCourses(),
         builder: (context, courseSnap) {

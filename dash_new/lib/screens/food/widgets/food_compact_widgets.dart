@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter/services.dart';
 import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_header.dart';
+import '../../../ui/components/focus_module_header.dart';
 import '../../../ui/components/focus_text_field.dart';
 import '../../../ui/feedback/focus_feedback.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
@@ -262,20 +263,20 @@ class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
   final List<Widget>? actions;
-  final Widget? leading;
-  final bool centerTitle;
-  final bool showExit;
+  final FocusModuleLeadingMode leadingMode;
   final VoidCallback? onExit;
+  final VoidCallback? onBack;
+  final String? backRouteName;
 
   const FoodCompactAppBar({
     super.key,
     required this.title,
     this.subtitle,
     this.actions,
-    this.leading,
-    this.centerTitle = false,
-    this.showExit = true,
+    this.leadingMode = FocusModuleLeadingMode.backToModuleDashboard,
     this.onExit,
+    this.onBack,
+    this.backRouteName = AppRoutes.foodDashboard,
   });
 
   @override
@@ -283,15 +284,14 @@ class FoodCompactAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FocusHeader(
+    return FocusModuleHeader(
       title: title,
       subtitle: subtitle,
       actions: actions,
-      leading: leading,
-      centerTitle: centerTitle,
-      showExit: showExit,
+      leadingMode: leadingMode,
       onExit: onExit,
-      useSoftGradient: true,
+      onBack: onBack,
+      backRouteName: backRouteName,
     );
   }
 }

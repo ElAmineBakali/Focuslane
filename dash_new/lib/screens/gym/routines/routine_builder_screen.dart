@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../widgets/exercise_picker_sheet.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class RoutineBuilderScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -87,6 +89,12 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editor de rutina'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.gymDashboard,
+        ),
+        leadingWidth: 96,
         actions: [
           IconButton(
             tooltip: 'Guardar cambios',

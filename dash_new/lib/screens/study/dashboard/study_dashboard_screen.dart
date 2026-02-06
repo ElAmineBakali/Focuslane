@@ -12,6 +12,7 @@ import '../../../ui/components/focus_section_title.dart';
 import '../../../ui/components/focus_empty_state.dart';
 import '../../../ui/components/focus_list_tile_compact.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class StudyDashboardScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -25,11 +26,18 @@ class StudyDashboardScreen extends StatelessWidget {
         .subtract(const Duration(days: 6));
     final dateLabel = DateFormat('d MMM', 'es').format(now);
 
-    return SingleChildScrollView(
-      padding: FocuslaneTokens.pagePaddingCompact,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: const FocusModuleHeader(
+        title: 'Study',
+        subtitle: 'Sesiones, hábitos y productividad',
+        leadingMode: FocusModuleLeadingMode.exitModule,
+      ),
+      body: SingleChildScrollView(
+        padding: FocuslaneTokens.pagePaddingCompact,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           FocusSectionTitle(
             title: 'Resumen del día',
             subtitle: 'Actualizado $dateLabel',
@@ -379,7 +387,8 @@ class StudyDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

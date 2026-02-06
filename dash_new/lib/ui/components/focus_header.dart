@@ -6,6 +6,7 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
   final String? subtitle;
   final List<Widget>? actions;
   final Widget? leading;
+  final double? leadingWidth;
   final bool centerTitle;
   final bool showExit;
   final VoidCallback? onExit;
@@ -17,6 +18,7 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
     this.subtitle,
     this.actions,
     this.leading,
+    this.leadingWidth,
     this.centerTitle = false,
     this.showExit = false,
     this.onExit,
@@ -46,6 +48,7 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 12,
       centerTitle: centerTitle,
       leading: leading,
+      leadingWidth: leadingWidth,
       flexibleSpace: useSoftGradient
           ? Container(
               decoration: BoxDecoration(

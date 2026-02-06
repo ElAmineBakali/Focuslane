@@ -32,7 +32,7 @@ class _ShoppingListDetailScreenState
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Cargando...')),
+            appBar: const FoodCompactAppBar(title: 'Lista de compra'),
             body: const Center(child: CircularProgressIndicator()),
           );
         }

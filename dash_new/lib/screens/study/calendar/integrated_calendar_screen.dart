@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class IntegratedCalendarScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -20,7 +22,15 @@ class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
   Widget build(BuildContext context) {
     final svc = widget.svc;
     return Scaffold(
-      appBar: AppBar(title: const Text('Calendario académico')),
+      appBar: AppBar(
+        title: const Text('Calendario académico'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: Column(
         children: [
           Card(

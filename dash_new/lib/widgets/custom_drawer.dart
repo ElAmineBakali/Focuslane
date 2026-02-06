@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 
 class CustomDrawer extends StatelessWidget {
   final Function(bool) toggleTheme;
@@ -53,13 +54,13 @@ class CustomDrawer extends StatelessWidget {
                       context,
                       Icons.backpack,
                       'Estudio',
-                      '/study',
+                      AppRoutes.studyDashboard,
                     ),
                     _buildDrawerTile(
                       context,
                       Icons.fitness_center,
                       'Gimnasio',
-                      '/gym',
+                      AppRoutes.gymDashboard,
                     ),
                     _buildDrawerTile(
                       context,
@@ -71,7 +72,7 @@ class CustomDrawer extends StatelessWidget {
                       context,
                       Icons.restaurant,
                       'Alimentación',
-                      '/food',
+                      AppRoutes.foodDashboard,
                     ),
                     _buildDrawerTile(
                       context,

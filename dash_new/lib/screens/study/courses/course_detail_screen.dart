@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../tasks/study_tasks_screen.dart';
@@ -6,6 +7,7 @@ import '../timer/study_timer_screen.dart';
 import '../analytics/study_analytics_screen.dart';
 import 'course_edit_sheet.dart';
 import '../attendance/attendance_screen.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -22,6 +24,12 @@ class CourseDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(course.name),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
         actions: [
           IconButton(
             tooltip: 'Editar',

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../session/live_session_screen.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class RoutineDayPickerScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -30,7 +32,15 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
   Widget build(BuildContext context) {
     final svc = widget.svc;
     return Scaffold(
-      appBar: AppBar(title: Text(widget.routine.name)),
+      appBar: AppBar(
+        title: Text(widget.routine.name),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.gymDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final ok = await showDialog<bool>(

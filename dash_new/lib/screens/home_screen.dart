@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mi_dashboard_personal/widgets/focuslane_title.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -46,13 +47,13 @@ const List<_Module> _defaultModules = [
   ),
   _Module(
     'Estudio',
-    '/study',
+    AppRoutes.studyDashboard,
     Icons.school_outlined,
     'assets/home/estudio.jpg',
   ),
   _Module(
     'Gimnasio',
-    '/gym',
+    AppRoutes.gymDashboard,
     Icons.fitness_center_outlined,
     'assets/home/gimnasio.jpg',
   ),
@@ -64,7 +65,7 @@ const List<_Module> _defaultModules = [
   ),
   _Module(
     'Food',
-    '/food',
+    AppRoutes.foodDashboard,
     Icons.restaurant_outlined,
     'assets/home/alimentacion.jpg',
   ),

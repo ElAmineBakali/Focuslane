@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 
 class ModulesScreen extends StatefulWidget {
   const ModulesScreen({super.key});
@@ -44,10 +45,10 @@ class _ModulesScreenState extends State<ModulesScreen> {
       ('/tasks', 'Tareas', Icons.check_circle_outlined),
       ('/notes', 'Notas', Icons.notes_outlined),
       ('/habits', 'Hábitos', Icons.checklist_outlined),
-      ('/study', 'Estudio', Icons.school_outlined),
-      ('/gym', 'Gimnasio', Icons.fitness_center_outlined),
+      (AppRoutes.studyDashboard, 'Estudio', Icons.school_outlined),
+      (AppRoutes.gymDashboard, 'Gimnasio', Icons.fitness_center_outlined),
       ('/meditation', 'Meditación', Icons.self_improvement_outlined),
-      ('/food', 'Food', Icons.restaurant_outlined),
+      (AppRoutes.foodDashboard, 'Food', Icons.restaurant_outlined),
       ('/finance', 'Finanzas', Icons.account_balance_wallet_outlined),
       ('/trading', 'Trading', Icons.candlestick_chart),
       ('/culture', 'Cultura', Icons.smart_display),

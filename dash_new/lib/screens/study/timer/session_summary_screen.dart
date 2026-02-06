@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../models/study_models.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class SessionSummaryScreen extends StatelessWidget {
   final StudySession session;
@@ -8,7 +10,15 @@ class SessionSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Resumen de estudio')),
+      appBar: AppBar(
+        title: const Text('Resumen de estudio'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

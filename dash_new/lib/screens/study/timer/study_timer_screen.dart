@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
@@ -13,6 +14,7 @@ import 'presets_sheet.dart';
 import 'session_summary_screen.dart';
 import 'circular_timer_widget.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class StudyTimerScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -369,6 +371,12 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               SliverAppBar.large(
                 backgroundColor: Colors.transparent,
                 foregroundColor: cs.onSurface,
+                leading: FocusModuleHeader.buildLeading(
+                  context,
+                  mode: FocusModuleLeadingMode.backToModuleDashboard,
+                  backRouteName: AppRoutes.studyDashboard,
+                ),
+                leadingWidth: 96,
                 flexibleSpace: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

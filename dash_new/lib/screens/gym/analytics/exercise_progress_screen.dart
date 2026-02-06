@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class ExerciseProgressScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -75,6 +77,12 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
             pinned: true,
             stretch: true,
             backgroundColor: colorScheme.primaryContainer.withOpacity(0.8),
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.gymDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 widget.exerciseName,

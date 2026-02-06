@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +7,7 @@ import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'task_edit_sheet.dart';
 import '../timer/study_timer_screen.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class StudyTasksScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -38,6 +40,12 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
           'Tareas y Exámenes',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
         elevation: 0,
         backgroundColor: colorScheme.surface,
         actions: [

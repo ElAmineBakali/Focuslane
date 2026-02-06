@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
@@ -7,6 +8,7 @@ import '../services/gym_notification_service.dart';
 import '../models/gym_models.dart';
 import 'session_summary_screen.dart';
 import 'package:mi_dashboard_personal/services/notification_service.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class LiveSessionScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -324,6 +326,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
             floating: false,
             pinned: true,
             expandedHeight: 160,
+                leading: FocusModuleHeader.buildLeading(
+                  context,
+                  mode: FocusModuleLeadingMode.backToModuleDashboard,
+                  backRouteName: AppRoutes.gymDashboard,
+                ),
+                leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(
                 left: 16,

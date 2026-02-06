@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class GradesScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -10,7 +12,15 @@ class GradesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calificaciones')),
+      appBar: AppBar(
+        title: const Text('Calificaciones'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await showDialog(

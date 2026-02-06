@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 SnackBar _niceBar(String text, {IconData? icon}) {
   return SnackBar(
@@ -27,7 +29,15 @@ class GymGoalsScreen extends StatelessWidget {
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Objetivos')),
+      appBar: AppBar(
+        title: const Text('Objetivos'),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.gymDashboard,
+        ),
+        leadingWidth: 96,
+      ),
       body: StreamBuilder<GymGoals>(
         stream: svc.streamGoals(),
         builder: (context, snap) {

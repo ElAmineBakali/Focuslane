@@ -1,9 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class StudyAnalyticsScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -20,6 +22,12 @@ class StudyAnalyticsScreen extends StatelessWidget {
           'Analíticas',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
+        leading: FocusModuleHeader.buildLeading(
+          context,
+          mode: FocusModuleLeadingMode.backToModuleDashboard,
+          backRouteName: AppRoutes.studyDashboard,
+        ),
+        leadingWidth: 96,
         elevation: 0,
         backgroundColor: colorScheme.surface,
       ),

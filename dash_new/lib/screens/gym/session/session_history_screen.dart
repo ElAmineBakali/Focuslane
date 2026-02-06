@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../session/session_summary_screen.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class SessionHistoryScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -31,6 +33,12 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
             pinned: true,
             expandedHeight: 160,
             backgroundColor: colorScheme.primaryContainer,
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.gymDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Historial',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,7 @@ import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../session/live_session_screen.dart';
 import '../analytics/gym_analytics_screen_v2.dart';
+import '../../../ui/components/focus_module_header.dart';
 
 class RoutineDetailScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -28,6 +30,12 @@ class RoutineDetailScreen extends StatelessWidget {
             floating: false,
             pinned: true,
             expandedHeight: 200,
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.gymDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 routine.name,
