@@ -55,7 +55,7 @@ import 'screens/study/analytics/study_analytics_screen.dart';
 import 'screens/study/main/study_main_screen.dart';
 import 'screens/food/services/food_firestore_service.dart';
 import 'screens/food/main/food_main_screen.dart';
-import 'screens/finance/finance_routes.dart';
+import 'screens/finance/main/finance_routes.dart';
 import 'screens/meditation/meditation_routes.dart';
 import 'screens/trading/trading_routes.dart';
 import 'screens/settings/settings_screen.dart';
