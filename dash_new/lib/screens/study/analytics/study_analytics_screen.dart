@@ -210,13 +210,14 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
     return StreamBuilder<List<StudySession>>(
       stream: svc.streamSessions(limit: 1000),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Card(
             child: SizedBox(
               height: 130,
               child: Center(child: CircularProgressIndicator()),
             ),
           );
+        }
         final map = <String, Set<DateTime>>{};
         for (final s in snap.data!) {
           final d = DateTime(s.date.year, s.date.month, s.date.day);
@@ -262,13 +263,14 @@ class _StreakCard extends StatelessWidget {
     return StreamBuilder<List<StudySession>>(
       stream: svc.streamSessions(courseId: courseId, limit: 365),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Card(
             child: SizedBox(
               height: 120,
               child: Center(child: CircularProgressIndicator()),
             ),
           );
+        }
         final list = snap.data!;
         final days =
             list
@@ -308,13 +310,14 @@ class _MinutesBarCard extends StatelessWidget {
     return StreamBuilder<List<StudySession>>(
       stream: svc.streamSessions(courseId: courseId, limit: 500),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Card(
             child: SizedBox(
               height: 220,
               child: Center(child: CircularProgressIndicator()),
             ),
           );
+        }
         final list = snap.data!;
         final now = DateTime.now();
         final map = <int, int>{};
@@ -373,13 +376,14 @@ class _MethodDistributionCard extends StatelessWidget {
     return StreamBuilder<List<StudySession>>(
       stream: svc.streamSessions(courseId: courseId, limit: 500),
       builder: (context, snap) {
-        if (!snap.hasData)
+        if (!snap.hasData) {
           return const Card(
             child: SizedBox(
               height: 180,
               child: Center(child: CircularProgressIndicator()),
             ),
           );
+        }
         final list = snap.data!;
         final totals = <StudyMethod, int>{};
         for (final s in list) {

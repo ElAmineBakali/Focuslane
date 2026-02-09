@@ -73,33 +73,50 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         icon: const Icon(Icons.check),
         label: const Text('Guardar'),
       ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: FocusCard(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNameField(),
-                const SizedBox(height: 16),
-                _buildAmountField(),
-                const SizedBox(height: 16),
-                _buildFrequencyField(),
-                const SizedBox(height: 16),
-                _buildNextPaymentField(),
-                const SizedBox(height: 16),
-                _buildActiveSwitch(),
-                const SizedBox(height: 16),
-                _buildReminderSection(),
-                const SizedBox(height: 16),
-                _buildAutoMarkSwitch(),
-                const SizedBox(height: 16),
-                _buildNotesField(),
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth >= 1024 ? 16.0 : 12.0;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: FocusCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildNameField(),
+                        const SizedBox(height: 16),
+                        _buildAmountField(),
+                        const SizedBox(height: 16),
+                        _buildFrequencyField(),
+                        const SizedBox(height: 16),
+                        _buildNextPaymentField(),
+                        const SizedBox(height: 16),
+                        _buildActiveSwitch(),
+                        const SizedBox(height: 16),
+                        _buildReminderSection(),
+                        const SizedBox(height: 16),
+                        _buildAutoMarkSwitch(),
+                        const SizedBox(height: 16),
+                        _buildNotesField(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -142,7 +159,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
 
   Widget _buildFrequencyField() {
     return DropdownButtonFormField<String>(
-      value: _frequency,
+      initialValue: _frequency,
       decoration: InputDecoration(
         labelText: 'Frecuencia *',
         prefixIcon: const Icon(Icons.repeat),
@@ -290,7 +307,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         }
       }
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         FocusFeedback.showSuccess(
           context,
           widget.subscription == null

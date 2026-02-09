@@ -9,18 +9,24 @@ class SubscriptionService {
 
   final _col = FirebaseFirestore.instance.collection('finance_subscriptions');
 
-  String get _uid => fb_auth.FirebaseAuth.instance.currentUser!.uid;
+  String? get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid;
 
   Stream<List<Subscription>> watchAll({bool activeOnly = false}) {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) {
+      return const Stream<List<Subscription>>.empty();
+    }
     Query<Map<String, dynamic>> q = _col
-        .where('userId', isEqualTo: _uid)
+        .where('userId', isEqualTo: uid)
         .orderBy('nextDue');
     if (activeOnly) q = q.where('active', isEqualTo: true);
     return q.snapshots().map((s) => s.docs.map(Subscription.fromDoc).toList());
   }
 
   Future<void> upsert(Subscription s) async {
-    final data = s.toMap();
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    final data = s.toMap()..['userId'] = uid;
     if (s.id.isEmpty) {
       await _col.add(data);
     } else {
@@ -32,14 +38,18 @@ class SubscriptionService {
   }
 
   Future<void> create(Subscription s) async {
-    await _col.add(s.toMap());
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.add(s.toMap()..['userId'] = uid);
     if (s.reminderDays > 0 && s.reminderEnabled) {
       await _scheduleReminder(s);
     }
   }
 
   Future<void> update(Subscription s) async {
-    await _col.doc(s.id).set(s.toMap(), SetOptions(merge: true));
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.doc(s.id).set(s.toMap()..['userId'] = uid, SetOptions(merge: true));
     if (s.reminderDays > 0 && s.reminderEnabled) {
       await _scheduleReminder(s);
     }
@@ -73,8 +83,12 @@ class SubscriptionService {
   Stream<List<Subscription>> upcomingPayments({int daysAhead = 7}) {
     final now = DateTime.now();
     final future = now.add(Duration(days: daysAhead));
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) {
+      return const Stream<List<Subscription>>.empty();
+    }
     return _col
-        .where('userId', isEqualTo: _uid)
+        .where('userId', isEqualTo: uid)
         .where('active', isEqualTo: true)
         .where('nextDue', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
         .where('nextDue', isLessThanOrEqualTo: Timestamp.fromDate(future))

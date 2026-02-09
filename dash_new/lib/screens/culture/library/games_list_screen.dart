@@ -57,8 +57,9 @@ class _GamesListScreenState extends State<GamesListScreen> {
         stream: svc.watchGames(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
           if (data.isEmpty) return const Center(child: Text('Sin juegos'));
           return ListView.separated(
             itemCount: data.length,

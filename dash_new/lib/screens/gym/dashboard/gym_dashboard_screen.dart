@@ -76,7 +76,7 @@ class GymDashboardScreen extends StatelessWidget {
                   return FutureBuilder(
                     future: svc.root.get(),
                     builder: (context, rootSnap) {
-                      final rootData = rootSnap.data?.data() as Map<String, dynamic>?;
+                      final rootData = rootSnap.data?.data();
                       final target = (rootData?['bodyWeightTarget'] as num?)?.toDouble();
                       final weightText = weight == null
                           ? '—'

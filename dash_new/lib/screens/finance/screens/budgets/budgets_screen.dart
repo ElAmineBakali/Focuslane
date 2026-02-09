@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
 
 import '../../../../ui/components/focus_card.dart';
@@ -43,6 +42,12 @@ class BudgetsScreen extends StatelessWidget {
                 child: StreamBuilder<List<BudgetWithProgress>>(
                   stream: BudgetService.I.watchAllWithProgress(),
                   builder: (context, snap) {
+                    if (snap.hasError) {
+                      return Center(child: Text('Error: ${snap.error}'));
+                    }
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final budgets = snap.data ?? const [];
                     if (budgets.isEmpty) {
                       return const Center(child: Text('Sin presupuestos'));

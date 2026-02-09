@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:mi_dashboard_personal/screens/gym/models/gym_models.dart';
 import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
 import 'routines/routines_list_screen.dart';
 import 'routines/routine_detail_screen.dart';

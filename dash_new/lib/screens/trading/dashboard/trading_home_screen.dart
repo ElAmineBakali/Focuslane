@@ -53,8 +53,9 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
               );
-              if (d != null)
+              if (d != null) {
                 setState(() => _month = DateTime(d.year, d.month, 1));
+              }
             },
           ),
         ],
@@ -129,8 +130,9 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
               stream: svc.watchTrades(),
               builder: (_, s) {
                 final data = (s.data ?? []).take(5).toList();
-                if (data.isEmpty)
+                if (data.isEmpty) {
                   return const ListTile(title: Text('Aún no hay trades'));
+                }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

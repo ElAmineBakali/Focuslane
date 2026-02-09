@@ -48,8 +48,9 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (s == null)
+    if (s == null) {
       return const Scaffold(body: Center(child: Text('Sin estrategia')));
+    }
     final svc = TradingFirestoreService.I;
 
     return Scaffold(
@@ -156,8 +157,9 @@ class _StrategyDetailScreenState extends State<StrategyDetailScreen> {
               stream: svc.watchTrades(strategyId: s!.id),
               builder: (_, ss) {
                 final data = ss.data ?? [];
-                if (data.isEmpty)
+                if (data.isEmpty) {
                   return const ListTile(title: Text('Sin trades'));
+                }
                 return Column(
                   children:
                       data

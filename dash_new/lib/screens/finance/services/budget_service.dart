@@ -10,18 +10,24 @@ class BudgetService {
 
   final _col = FirebaseFirestore.instance.collection('finance_budgets');
 
-  String get _uid => fb_auth.FirebaseAuth.instance.currentUser!.uid;
+  String? get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid;
 
   Stream<List<Budget>> watchAll() {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) {
+      return const Stream<List<Budget>>.empty();
+    }
     return _col
-        .where('userId', isEqualTo: _uid)
+        .where('userId', isEqualTo: uid)
         .orderBy('startDate', descending: true)
         .snapshots()
         .map((s) => s.docs.map(Budget.fromDoc).toList());
   }
 
   Future<void> upsert(Budget b) async {
-    final data = b.toMap();
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    final data = b.toMap()..['userId'] = uid;
     if (b.id.isEmpty) {
       await _col.add(data);
     } else {
@@ -30,11 +36,15 @@ class BudgetService {
   }
 
   Future<void> create(Budget b) async {
-    await _col.add(b.toMap());
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.add(b.toMap()..['userId'] = uid);
   }
 
   Future<void> update(Budget b) async {
-    await _col.doc(b.id).set(b.toMap(), SetOptions(merge: true));
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.doc(b.id).set(b.toMap()..['userId'] = uid, SetOptions(merge: true));
   }
 
   Future<void> delete(String id) async {

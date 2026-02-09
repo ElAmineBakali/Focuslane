@@ -514,7 +514,7 @@ class _MealSection extends StatelessWidget {
                 onDuplicate: () => onDuplicate(entry),
                 onDelete: () => onDelete(entry),
               );
-            }).toList(),
+            }),
           if (entries.length > 4)
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -603,7 +603,7 @@ class _SidePanel extends StatelessWidget {
                     ],
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
         ),
@@ -1385,7 +1385,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           SizedBox(
             height: 44,
             child: DropdownButtonFormField<UnitKind>(
-              value: _unit,
+              initialValue: _unit,
               decoration: InputDecoration(
                 isDense: true,
                 filled: true,

@@ -410,8 +410,9 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null)
+                          if (picked != null) {
                             setState(() => _remindDate = picked);
+                          }
                         },
                         icon: const Icon(Icons.event),
                         label: const Text('Fecha recordatorio'),
@@ -434,8 +435,9 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                             context: context,
                             initialTime: _remindTime ?? TimeOfDay.now(),
                           );
-                          if (picked != null)
+                          if (picked != null) {
                             setState(() => _remindTime = picked);
+                          }
                         },
                         icon: const Icon(Icons.alarm),
                         label: const Text('Hora recordatorio'),

@@ -1408,7 +1408,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                       leading: Switch(
                         value: slot['enabled'],
                         onChanged: (v) => setState(() => slot['enabled'] = v),
-                        activeColor: colorScheme.primary,
+                        activeThumbColor: colorScheme.primary,
                       ),
                       title: TextFormField(
                         initialValue: slot['name'],

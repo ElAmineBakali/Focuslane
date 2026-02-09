@@ -29,8 +29,9 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (series == null)
+    if (series == null) {
       return const Scaffold(body: Center(child: Text('Sin serie')));
+    }
 
     final x = series!;
     return Scaffold(
@@ -129,11 +130,12 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                     stream: svc.watchEpisodes(x.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (s.connectionState == ConnectionState.waiting)
+                      if (s.connectionState == ConnectionState.waiting) {
                         return const Padding(
                           padding: EdgeInsets.all(24),
                           child: Center(child: CircularProgressIndicator()),
                         );
+                      }
                       if (data.isEmpty) return const Text('Sin episodios aún');
                       return Column(
                         children:

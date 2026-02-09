@@ -203,7 +203,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ).animate().fadeIn(delay: 200.ms, duration: 300.ms),

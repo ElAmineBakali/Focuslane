@@ -202,7 +202,7 @@ class StudyDashboardScreen extends StatelessWidget {
                               subtitle: subtitle,
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   );

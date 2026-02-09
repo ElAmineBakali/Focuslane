@@ -104,8 +104,9 @@ class _TradesListScreenState extends State<TradesListScreen> {
                 if (s.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                if (data.isEmpty)
+                if (data.isEmpty) {
                   return const Center(child: Text('Sin trades'));
+                }
                 return ListView.separated(
                   itemCount: data.length,
                   separatorBuilder: (_, __) => const Divider(height: 1),

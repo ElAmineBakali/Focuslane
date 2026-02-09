@@ -28,8 +28,9 @@ class _TradingAnalyticsScreenState extends State<TradingAnalyticsScreen> {
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
               );
-              if (d != null)
+              if (d != null) {
                 setState(() => _month = DateTime(d.year, d.month, 1));
+              }
             },
           ),
         ],

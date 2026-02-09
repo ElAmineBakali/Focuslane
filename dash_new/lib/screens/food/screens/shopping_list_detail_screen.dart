@@ -351,7 +351,7 @@ class _ShoppingListDetailScreenState
                           child: SizedBox(
                             height: 44,
                             child: DropdownButtonFormField<UnitKind>(
-                              value: unit,
+                              initialValue: unit,
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
@@ -528,7 +528,7 @@ class _ShoppingListDetailScreenState
                           child: SizedBox(
                             height: 44,
                             child: DropdownButtonFormField<UnitKind>(
-                              value: unit,
+                              initialValue: unit,
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,

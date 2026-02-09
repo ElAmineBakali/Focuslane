@@ -68,35 +68,52 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
         icon: const Icon(Icons.check),
         label: const Text('Guardar'),
       ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: FocusCard(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNameField(),
-                const SizedBox(height: 16),
-                _buildCreditorField(),
-                const SizedBox(height: 16),
-                _buildOriginalAmountField(),
-                const SizedBox(height: 16),
-                _buildInterestRateField(),
-                const SizedBox(height: 16),
-                _buildStartDateField(),
-                const SizedBox(height: 16),
-                _buildDueDateField(),
-                const SizedBox(height: 16),
-                _buildNotesField(),
-                if (widget.debt != null) ...[
-                  const SizedBox(height: 24),
-                  _buildPaymentSection(),
-                ],
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth >= 1024 ? 16.0 : 12.0;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: FocusCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildNameField(),
+                        const SizedBox(height: 16),
+                        _buildCreditorField(),
+                        const SizedBox(height: 16),
+                        _buildOriginalAmountField(),
+                        const SizedBox(height: 16),
+                        _buildInterestRateField(),
+                        const SizedBox(height: 16),
+                        _buildStartDateField(),
+                        const SizedBox(height: 16),
+                        _buildDueDateField(),
+                        const SizedBox(height: 16),
+                        _buildNotesField(),
+                        if (widget.debt != null) ...[
+                          const SizedBox(height: 24),
+                          _buildPaymentSection(),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -415,7 +432,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
         await DebtService.I.update(debt);
       }
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         FocusFeedback.showSuccess(
           context,
           widget.debt == null ? 'Deuda creada' : 'Deuda actualizada',

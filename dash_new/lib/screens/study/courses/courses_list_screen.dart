@@ -457,12 +457,14 @@ class _ArchivedCoursesScreen extends StatelessWidget {
       body: StreamBuilder<List<Course>>(
         stream: svc.streamCourses(includeArchived: true),
         builder: (context, snap) {
-          if (!snap.hasData)
+          if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final all = snap.data!;
           final archived = all.where((c) => c.isArchived).toList();
-          if (archived.isEmpty)
+          if (archived.isEmpty) {
             return const Center(child: Text('No hay cursos archivados'));
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: archived.length,

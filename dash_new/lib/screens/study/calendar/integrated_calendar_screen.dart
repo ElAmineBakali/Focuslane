@@ -142,8 +142,9 @@ class _DayEventsList extends StatelessWidget {
                     ),
                   );
                 }
-                if (items.isEmpty)
+                if (items.isEmpty) {
                   return const Center(child: Text('Sin eventos en este día'));
+                }
                 return ListView(
                   padding: const EdgeInsets.all(12),
                   children: items,

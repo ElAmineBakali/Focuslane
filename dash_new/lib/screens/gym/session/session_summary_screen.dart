@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/gym_models.dart';
 import '../services/gym_firestore_service.dart';
 import '../../../ui/components/focus_module_header.dart';
 

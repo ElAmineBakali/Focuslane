@@ -295,7 +295,7 @@ class _FoodSettingsNotificationsScreenState
                     onToggle: (v) => _toggleReminder(index, v),
                     onChangeTime: () => _changeReminderTime(index),
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),

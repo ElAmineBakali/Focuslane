@@ -226,7 +226,7 @@ class _PantryScreenState extends State<PantryScreen> {
                           child: SizedBox(
                             height: 44,
                             child: DropdownButtonFormField<UnitKind>(
-                              value: unit,
+                              initialValue: unit,
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,

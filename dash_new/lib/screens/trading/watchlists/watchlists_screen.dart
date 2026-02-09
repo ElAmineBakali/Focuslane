@@ -26,10 +26,12 @@ class WatchlistsScreen extends StatelessWidget {
         stream: svc.watchWatchlists(),
         builder: (_, s) {
           final lists = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (lists.isEmpty)
+          }
+          if (lists.isEmpty) {
             return const Center(child: Text('Crea tu primera watchlist'));
+          }
           return ListView.separated(
             itemCount: lists.length,
             separatorBuilder: (_, __) => const Divider(height: 1),

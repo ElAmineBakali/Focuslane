@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../../../theme/global_ui_theme.dart';
 import '../../../shared/ui/app_section_tabs.dart';

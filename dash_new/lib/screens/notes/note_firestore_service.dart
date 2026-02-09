@@ -32,10 +32,12 @@ class NoteFirestoreService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return null;
     final data = note.toMap();
-    if (!data.containsKey('createdAt'))
+    if (!data.containsKey('createdAt')) {
       data['createdAt'] = Timestamp.fromDate(DateTime.now());
-    if (!data.containsKey('updatedAt'))
+    }
+    if (!data.containsKey('updatedAt')) {
       data['updatedAt'] = Timestamp.fromDate(DateTime.now());
+    }
     final ref = await _col(uid).add(data);
     try {
       await ref.update({'id': ref.id});

@@ -23,8 +23,9 @@ class _ProjectBoardScreenState extends State<ProjectBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (skill == null)
+    if (skill == null) {
       return const Scaffold(body: Center(child: Text('Sin habilidad')));
+    }
     final svc = SkillsFirestoreService.I;
     final s = skill!;
 

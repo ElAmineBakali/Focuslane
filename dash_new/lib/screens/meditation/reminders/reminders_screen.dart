@@ -46,8 +46,9 @@ class RemindersScreen extends StatelessWidget {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty)
+          if (data.isEmpty) {
             return const Center(child: Text('Sin recordatorios'));
+          }
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),

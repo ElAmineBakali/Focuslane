@@ -26,8 +26,9 @@ class _TagsScreenState extends State<TagsScreen> {
               stream: MeditationFirestoreService.I.watchTags(),
               builder: (context, s) {
                 final data = s.data ?? [];
-                if (s.connectionState == ConnectionState.waiting)
+                if (s.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
+                }
                 if (data.isEmpty) return const Center(child: Text('Sin tags'));
                 return ListView.separated(
                   padding: EdgeInsets.fromLTRB(

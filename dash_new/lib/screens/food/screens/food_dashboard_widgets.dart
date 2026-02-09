@@ -190,7 +190,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                       if (remaining > 0)
                         Text(
                           '+$remaining más',
@@ -585,7 +585,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                 ],
               ),
             );
-          }).toList(),
+          }),
           if (pendingItems.length > 6)
             Padding(
               padding: const EdgeInsets.only(top: 6),

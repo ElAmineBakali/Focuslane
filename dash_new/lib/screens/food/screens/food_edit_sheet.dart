@@ -42,15 +42,15 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
 
     _nameController = TextEditingController(text: f?.name ?? '');
     _brandController = TextEditingController(text: f?.brand ?? '');
-    _kcalController = TextEditingController(text: f?.kcal?.toString() ?? '');
+    _kcalController = TextEditingController(text: f?.kcal.toString() ?? '');
     _proteinController = TextEditingController(
-      text: f?.protein?.toString() ?? '',
+      text: f?.protein.toString() ?? '',
     );
-    _carbsController = TextEditingController(text: f?.carbs?.toString() ?? '');
-    _fatController = TextEditingController(text: f?.fat?.toString() ?? '');
-    _fiberController = TextEditingController(text: f?.fiber?.toString() ?? '');
+    _carbsController = TextEditingController(text: f?.carbs.toString() ?? '');
+    _fatController = TextEditingController(text: f?.fat.toString() ?? '');
+    _fiberController = TextEditingController(text: f?.fiber.toString() ?? '');
     _servingSizeController = TextEditingController(
-      text: f?.servingSize?.toString() ?? '100',
+      text: f?.servingSize.toString() ?? '100',
     );
     _servingUnitController = TextEditingController(text: f?.servingUnit ?? 'g');
     _isSupp = f?.isSupp ?? false;
@@ -262,7 +262,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                     subtitle: const Text(
                       'Marca si es proteína en polvo, creatina, etc.',
                     ),
-                    activeColor: colorScheme.primary,
+                    activeThumbColor: colorScheme.primary,
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,

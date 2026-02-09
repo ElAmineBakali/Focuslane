@@ -44,8 +44,9 @@ class ScheduleScreen extends StatelessWidget {
           return StreamBuilder<List<StudyClassBlock>>(
             stream: svc.streamSchedule(),
             builder: (context, snap) {
-              if (!snap.hasData)
+              if (!snap.hasData) {
                 return const Center(child: CircularProgressIndicator());
+              }
               final blocks = snap.data!;
 
               if (isMobile) {
@@ -664,7 +665,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                       decoration: BoxDecoration(
                         color: Theme.of(
                           context,
-                        ).colorScheme.surfaceVariant.withOpacity(0.5),
+                        ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -704,7 +705,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                     !isSelected
                                         ? Theme.of(context)
                                             .colorScheme
-                                            .surfaceVariant
+                                            .surfaceContainerHighest
                                             .withOpacity(0.5)
                                         : null,
                                 borderRadius: BorderRadius.circular(12),
@@ -804,7 +805,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                             !sel
                                 ? Theme.of(
                                   context,
-                                ).colorScheme.surfaceVariant.withOpacity(0.5)
+                                ).colorScheme.surfaceContainerHighest.withOpacity(0.5)
                                 : null,
                         borderRadius: BorderRadius.circular(12),
                         border:
@@ -888,7 +889,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   filled: true,
                   fillColor: Theme.of(
                     context,
-                  ).colorScheme.surfaceVariant.withOpacity(0.5),
+                  ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -1158,7 +1159,7 @@ class _TimePickerButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.primary.withOpacity(0.3),

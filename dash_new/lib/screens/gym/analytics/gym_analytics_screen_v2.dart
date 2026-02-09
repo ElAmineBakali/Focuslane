@@ -881,8 +881,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
-                    if (index < 0 || index >= sorted.length)
+                    if (index < 0 || index >= sorted.length) {
                       return const SizedBox();
+                    }
                     return Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
@@ -1117,8 +1118,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
               interval: (weights.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= weights.length)
+                if (index < 0 || index >= weights.length) {
                   return const SizedBox();
+                }
                 final date = weights[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -1384,8 +1386,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                           (s ?? '').replaceAll(',', '.'),
                         );
                         if (v == null) return 'Introduce un número válido';
-                        if (v <= 0 || v > 300)
+                        if (v <= 0 || v > 300) {
                           return 'Peso no válido (1-300 kg)';
+                        }
                         return null;
                       },
                     ),
@@ -1661,8 +1664,9 @@ class _GymAnalyticsScreenV2State extends State<GymAnalyticsScreenV2>
                           (s ?? '').replaceAll(',', '.'),
                         );
                         if (v == null) return 'Introduce un número válido';
-                        if (v <= 0 || v > 200)
+                        if (v <= 0 || v > 200) {
                           return 'Medida no válida (1-200 cm)';
+                        }
                         return null;
                       },
                     ),

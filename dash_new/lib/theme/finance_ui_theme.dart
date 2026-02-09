@@ -375,7 +375,7 @@ class FinanceUI {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final effectiveColor = color ?? colorScheme.primary;
-    final effectiveBackgroundColor = backgroundColor ?? colorScheme.surfaceVariant;
+    final effectiveBackgroundColor = backgroundColor ?? colorScheme.surfaceContainerHighest;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -438,7 +438,7 @@ class FinanceFormTheme extends StatelessWidget {
     final cs = base.colorScheme;
     final input = base.inputDecorationTheme.copyWith(
       filled: true,
-      fillColor: cs.surfaceVariant.withOpacity(0.35),
+      fillColor: cs.surfaceContainerHighest.withOpacity(0.35),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: cs.outlineVariant),
@@ -678,7 +678,7 @@ class FinanceChip extends StatelessWidget {
       selected: selected,
       onSelected: (_) => onTap?.call(),
       selectedColor: base.withOpacity(0.18),
-      backgroundColor: cs.surfaceVariant.withOpacity(0.4),
+      backgroundColor: cs.surfaceContainerHighest.withOpacity(0.4),
       labelStyle: TextStyle(color: selected ? base : cs.onSurfaceVariant),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );

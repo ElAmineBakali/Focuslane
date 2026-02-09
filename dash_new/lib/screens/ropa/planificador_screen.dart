@@ -421,8 +421,9 @@ class PlanificadorScreen extends StatelessWidget {
                                         ],
                                       ),
                                 );
-                                if (ok == true)
+                                if (ok == true) {
                                   await planSvc.deletePlan(uid, plan.id);
+                                }
                               }
                             },
                             itemBuilder:

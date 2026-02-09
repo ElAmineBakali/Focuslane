@@ -88,10 +88,12 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   }
 
   Widget _valueContent(Habit habit, dynamic value, ThemeData theme) {
-    if (value == '✔️')
+    if (value == '✔️') {
       return Icon(Icons.check_rounded, color: habit.color, size: 22);
-    if (value == '❌')
+    }
+    if (value == '❌') {
       return Icon(Icons.close_rounded, color: habit.color, size: 22);
+    }
     final s = value?.toString();
     final isNum = s != null && int.tryParse(s) != null;
     if (habit.isQuantitative && isNum) {
@@ -463,10 +465,12 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         child: StreamBuilder<List<Habit>>(
           stream: stream,
           builder: (context, snap) {
-            if (snap.hasError)
+            if (snap.hasError) {
               return Center(child: Text('Error: ${snap.error}'));
-            if (!snap.hasData)
+            }
+            if (!snap.hasData) {
               return const Center(child: CircularProgressIndicator());
+            }
 
             final habits = [
               ...snap.data!..sort((a, b) => a.order.compareTo(b.order)),

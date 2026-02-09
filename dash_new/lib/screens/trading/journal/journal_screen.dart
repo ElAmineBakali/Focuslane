@@ -28,10 +28,12 @@ class JournalScreen extends StatelessWidget {
         stream: svc.watchJournal(),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (data.isEmpty)
+          }
+          if (data.isEmpty) {
             return const Center(child: Text('Sin entradas de diario'));
+          }
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),

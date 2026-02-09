@@ -89,8 +89,9 @@ class GymGoalsScreen extends StatelessWidget {
                             const SizedBox(width: 8),
                             FilledButton.icon(
                               onPressed: () async {
-                                if (formKey.currentState?.validate() != true)
+                                if (formKey.currentState?.validate() != true) {
                                   return;
+                                }
                                 final v = double.parse(
                                   ctrl.text.replaceAll(',', '.'),
                                 );

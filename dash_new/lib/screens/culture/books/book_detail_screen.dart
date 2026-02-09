@@ -167,8 +167,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (book == null)
+    if (book == null) {
       return const Scaffold(body: Center(child: Text('Sin libro')));
+    }
     final b = book!;
 
     return Scaffold(
@@ -447,8 +448,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     stream: CultureFirestoreService.I.watchBookSessions(b.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty)
+                      if (data.isEmpty) {
                         return const Text('Sin sesiones todavía');
+                      }
                       return Column(
                         children:
                             data
@@ -541,8 +543,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     stream: CultureFirestoreService.I.watchBookQuotes(b.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty)
+                      if (data.isEmpty) {
                         return const Text('Sin citas guardadas');
+                      }
                       return Column(
                         children:
                             data

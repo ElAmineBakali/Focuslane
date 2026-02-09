@@ -546,8 +546,9 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               interval: (_e1rmHistory.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= _e1rmHistory.length)
+                if (index < 0 || index >= _e1rmHistory.length) {
                   return const SizedBox();
+                }
                 final date = _e1rmHistory[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -670,8 +671,9 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               interval: (_volumeHistory.length / 6).ceil().toDouble(),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= _volumeHistory.length)
+                if (index < 0 || index >= _volumeHistory.length) {
                   return const SizedBox();
+                }
                 final date = _volumeHistory[index].date;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),

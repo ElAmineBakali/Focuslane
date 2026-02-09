@@ -12,8 +12,9 @@ class MovieDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
-    if (arg is! Movie)
+    if (arg is! Movie) {
       return const Scaffold(body: Center(child: Text('Sin película')));
+    }
     final m = arg;
 
     return Scaffold(

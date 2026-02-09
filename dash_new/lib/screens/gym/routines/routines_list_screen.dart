@@ -577,7 +577,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _split,
+                initialValue: _split,
                 items: const [
                   DropdownMenuItem(
                     value: 'PPL',

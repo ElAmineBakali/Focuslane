@@ -12,8 +12,9 @@ class AlbumDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
-    if (arg is! Album)
+    if (arg is! Album) {
       return const Scaffold(body: Center(child: Text('Sin álbum')));
+    }
     final a = arg;
 
     return Scaffold(

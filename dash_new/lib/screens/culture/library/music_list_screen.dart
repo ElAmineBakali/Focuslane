@@ -52,8 +52,9 @@ class _MusicListScreenState extends State<MusicListScreen> {
         stream: svc.watchAlbums(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
           if (data.isEmpty) return const Center(child: Text('Sin álbumes'));
           return ListView.separated(
             itemCount: data.length,

@@ -43,6 +43,12 @@ class AssetsScreen extends StatelessWidget {
                 child: StreamBuilder<List<Asset>>(
                   stream: AssetService.I.watchAll(),
                   builder: (context, snap) {
+                    if (snap.hasError) {
+                      return Center(child: Text('Error: ${snap.error}'));
+                    }
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final assets = snap.data ?? const [];
                     if (assets.isEmpty) {
                       return const Center(child: Text('Sin activos'));

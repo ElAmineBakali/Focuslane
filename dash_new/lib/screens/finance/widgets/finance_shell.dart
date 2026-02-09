@@ -58,11 +58,8 @@ class FinanceShell extends StatelessWidget {
       moduleIcon: Icons.account_balance_wallet,
       actions: actions,
       floatingActionButton: floatingActionButton,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (isDesktop)
-            FocusModuleHeader(
+      appBarOverride: isDesktop
+          ? FocusModuleHeader(
               title: title,
               subtitle: subtitle,
               leadingMode: showExit
@@ -71,14 +68,11 @@ class FinanceShell extends StatelessWidget {
               onExit: () => _exitModule(context),
               onBack: () => _onSelect(context, 0),
               actions: actions,
-            ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(isDesktop ? 24 : 12),
-              child: child,
-            ),
-          ),
-        ],
+            )
+          : null,
+      body: Padding(
+        padding: EdgeInsets.all(isDesktop ? 24 : 12),
+        child: child,
       ),
     );
   }

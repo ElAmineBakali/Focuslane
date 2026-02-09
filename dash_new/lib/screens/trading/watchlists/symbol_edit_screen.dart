@@ -34,8 +34,9 @@ class _SymbolEditScreenState extends State<SymbolEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (wl == null)
+    if (wl == null) {
       return const Scaffold(body: Center(child: Text('Sin lista')));
+    }
     final svc = TradingFirestoreService.I;
     return Scaffold(
       appBar: AppBar(

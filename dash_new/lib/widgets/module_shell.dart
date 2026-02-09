@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/global_ui_theme.dart';
 import 'global_ui_components.dart';
 
 /// Shared shell for module home screens to avoid duplicating the SliverAppBar + scaffold layout.

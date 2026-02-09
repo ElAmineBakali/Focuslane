@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import '../services/gym_firestore_service.dart';
-import '../models/gym_models.dart';
 import '../session/session_summary_screen.dart';
 import '../../../ui/components/focus_module_header.dart';
 

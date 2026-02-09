@@ -55,8 +55,9 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
         stream: svc.watchMovies(status: _status),
         builder: (_, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
           if (data.isEmpty) return const Center(child: Text('Sin películas'));
           return ListView.separated(
             itemCount: data.length,

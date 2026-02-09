@@ -82,31 +82,48 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
         icon: const Icon(Icons.check),
         label: const Text('Guardar'),
       ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: FocusCard(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNameField(),
-                const SizedBox(height: 16),
-                _buildLimitField(),
-                const SizedBox(height: 16),
-                _buildCategoryField(),
-                const SizedBox(height: 16),
-                _buildPeriodField(),
-                const SizedBox(height: 16),
-                _buildDateFields(),
-                const SizedBox(height: 16),
-                _buildAlertThresholdField(),
-                const SizedBox(height: 16),
-                _buildInfoCard(),
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth >= 1024 ? 16.0 : 12.0;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: FocusCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildNameField(),
+                        const SizedBox(height: 16),
+                        _buildLimitField(),
+                        const SizedBox(height: 16),
+                        _buildCategoryField(),
+                        const SizedBox(height: 16),
+                        _buildPeriodField(),
+                        const SizedBox(height: 16),
+                        _buildDateFields(),
+                        const SizedBox(height: 16),
+                        _buildAlertThresholdField(),
+                        const SizedBox(height: 16),
+                        _buildInfoCard(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -149,7 +166,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
 
   Widget _buildCategoryField() {
     return DropdownButtonFormField<String>(
-      value: _category,
+      initialValue: _category,
       decoration: InputDecoration(
         labelText: 'Categoria',
         prefixIcon: const Icon(Icons.category),
@@ -165,7 +182,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
 
   Widget _buildPeriodField() {
     return DropdownButtonFormField<String>(
-      value: _period,
+      initialValue: _period,
       decoration: InputDecoration(
         labelText: 'Periodo *',
         prefixIcon: const Icon(Icons.calendar_month),
@@ -328,7 +345,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
         await BudgetService.I.update(budget);
       }
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         FocusFeedback.showSuccess(
           context,
           widget.budget == null

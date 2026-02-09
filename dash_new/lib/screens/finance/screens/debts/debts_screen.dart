@@ -43,6 +43,12 @@ class DebtsScreen extends StatelessWidget {
                 child: StreamBuilder<List<Debt>>(
                   stream: DebtService.I.watchAll(),
                   builder: (context, snap) {
+                    if (snap.hasError) {
+                      return Center(child: Text('Error: ${snap.error}'));
+                    }
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final debts = snap.data ?? const [];
                     if (debts.isEmpty) {
                       return const Center(child: Text('Sin deudas'));

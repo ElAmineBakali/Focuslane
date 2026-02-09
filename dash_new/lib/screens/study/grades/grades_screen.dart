@@ -33,8 +33,9 @@ class GradesScreen extends StatelessWidget {
       body: StreamBuilder<List<GradeEntry>>(
         stream: svc.streamGrades(courseId: courseId),
         builder: (context, snap) {
-          if (!snap.hasData)
+          if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final grades = snap.data!;
           final avg =
               grades.isEmpty

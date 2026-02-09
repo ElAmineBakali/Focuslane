@@ -83,8 +83,9 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
       body: StreamBuilder<List<RoutineDay>>(
         stream: svc.streamDays(widget.routine.id),
         builder: (context, snap) {
-          if (!snap.hasData)
+          if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final days = snap.data!;
           if (days.isEmpty) {
             return const Center(child: Text('Añade tus días con el botón +'));
@@ -147,8 +148,9 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
                               ],
                             ),
                       );
-                      if (ok == true)
+                      if (ok == true) {
                         await svc.deleteDayCascade(widget.routine.id, d.id);
+                      }
                     },
                   ),
                   onTap:
@@ -206,8 +208,9 @@ class _LastDoneMini extends StatelessWidget {
     return StreamBuilder<DocumentSnapshot>(
       stream: ref.snapshots(),
       builder: (context, snap) {
-        if (!snap.hasData || !snap.data!.exists)
+        if (!snap.hasData || !snap.data!.exists) {
           return const Text('Sin sesiones aún');
+        }
         final data = snap.data!.data() as Map<String, dynamic>;
         final dt =
             _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);

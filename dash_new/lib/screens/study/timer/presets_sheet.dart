@@ -163,7 +163,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.surfaceVariant.withOpacity(0.3),
+                              ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: Theme.of(
@@ -758,7 +758,7 @@ class _ParamsEditorState extends State<_ParamsEditor> {
                   filled: true,
                   fillColor: Theme.of(
                     context,
-                  ).colorScheme.surfaceVariant.withOpacity(0.3),
+                  ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,

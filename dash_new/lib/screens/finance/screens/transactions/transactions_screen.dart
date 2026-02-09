@@ -44,6 +44,12 @@ class TransactionsScreen extends StatelessWidget {
                 child: StreamBuilder<List<FinanceTransaction>>(
                   stream: TransactionService.I.watch(),
                   builder: (context, snap) {
+                    if (snap.hasError) {
+                      return Center(child: Text('Error: ${snap.error}'));
+                    }
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final txs = snap.data ?? const [];
                     if (txs.isEmpty) {
                       return const Center(child: Text('Sin transacciones'));

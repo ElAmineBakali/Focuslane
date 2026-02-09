@@ -44,6 +44,12 @@ class SubscriptionsScreen extends StatelessWidget {
                 child: StreamBuilder<List<Subscription>>(
                   stream: SubscriptionService.I.watchAll(),
                   builder: (context, snap) {
+                    if (snap.hasError) {
+                      return Center(child: Text('Error: ${snap.error}'));
+                    }
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
                     final subs = snap.data ?? const [];
                     if (subs.isEmpty) {
                       return const Center(child: Text('Sin suscripciones'));

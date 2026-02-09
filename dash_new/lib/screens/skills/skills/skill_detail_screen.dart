@@ -36,8 +36,9 @@ class _SkillDetailScreenState extends State<SkillDetailScreen>
   @override
   Widget build(BuildContext context) {
     final svc = SkillsFirestoreService.I;
-    if (skill == null)
+    if (skill == null) {
       return const Scaffold(body: Center(child: Text('Sin habilidad')));
+    }
     final s = skill!;
 
     return Scaffold(
@@ -149,8 +150,9 @@ class _SkillDetailScreenState extends State<SkillDetailScreen>
               if (snap.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (data.isEmpty)
+              if (data.isEmpty) {
                 return const Center(child: Text('Aún no hay sesiones'));
+              }
               return ListView.separated(
                 padding: const EdgeInsets.all(12),
                 itemCount: data.length,
@@ -338,8 +340,9 @@ class _ResourcesView extends StatelessWidget {
             stream: svc.watchResources(skill.id),
             builder: (_, snap) {
               final items = (snap.data ?? []);
-              if (items.isEmpty)
+              if (items.isEmpty) {
                 return const Center(child: Text('Sin recursos aún'));
+              }
               return ListView.separated(
                 itemCount: items.length,
                 separatorBuilder: (_, __) => const Divider(height: 1),
@@ -385,8 +388,9 @@ class _ResourcesView extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () async {
                       if (titleCtl.text.trim().isEmpty ||
-                          urlCtl.text.trim().isEmpty)
+                          urlCtl.text.trim().isEmpty) {
                         return;
+                      }
                       await svc.addResource(
                         skill.id,
                         ResourceLink(

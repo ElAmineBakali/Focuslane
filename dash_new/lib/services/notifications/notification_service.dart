@@ -259,8 +259,9 @@ class NotificationService {
         _buildPayload(id: 'default_show_$id', payload: payload),
       ),
     );
-    if (kDebugMode)
+    if (kDebugMode) {
       print('[NotificationService] showNow id=$id title="$title"');
+    }
   }
 
   Future<void> scheduleDailyReminder({
@@ -317,8 +318,9 @@ class NotificationService {
       payload: jsonEncode(_buildPayload(id: id, payload: payload)),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-    if (kDebugMode)
+    if (kDebugMode) {
       print('[NotificationService] scheduleOneTime id=$id @ $scheduledTime');
+    }
   }
 
   Future<void> scheduleWeeklyReminder({
@@ -349,10 +351,11 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
       );
-      if (kDebugMode)
+      if (kDebugMode) {
         print(
           '[NotificationService] scheduleWeekly id=$composedId (base=$id) weekday=$weekday @ ${schedule.toLocal()}',
         );
+      }
     }
   }
 
@@ -384,10 +387,11 @@ class NotificationService {
         final data = jsonDecode(p.payload!) as Map<String, dynamic>;
         if (data['groupId'] == groupId) {
           await _plugin.cancel(p.id);
-          if (kDebugMode)
+          if (kDebugMode) {
             print(
               '[NotificationService] cancel by groupId=$groupId -> canceled ${p.id}',
             );
+          }
         }
       } catch (_) {}
     }
@@ -401,10 +405,11 @@ class NotificationService {
         final data = jsonDecode(p.payload!) as Map<String, dynamic>;
         if (data['module'] == moduleKey) {
           await _plugin.cancel(p.id);
-          if (kDebugMode)
+          if (kDebugMode) {
             print(
               '[NotificationService] cancel by module=$moduleKey -> canceled ${p.id}',
             );
+          }
         }
       } catch (_) {}
     }
@@ -494,8 +499,9 @@ class NotificationService {
       payload: payload,
       androidScheduleMode: mode,
     );
-    if (kDebugMode)
+    if (kDebugMode) {
       print('[NotificationService] scheduleOnce legacy id=$id @ $whenLocal');
+    }
   }
 
   Future<void> scheduleDaily({
@@ -542,10 +548,11 @@ class NotificationService {
       androidScheduleMode: mode,
       matchDateTimeComponents: DateTimeComponents.time,
     );
-    if (kDebugMode)
+    if (kDebugMode) {
       print(
         '[NotificationService] scheduleDaily legacy id=$id @ ${next.toLocal()}',
       );
+    }
   }
 
   Future<void> debugStatus() async {

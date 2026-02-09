@@ -371,7 +371,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                       ),
                     ),
                   );
-                }).toList(),
+                }),
             ],
           ),
         );
@@ -400,15 +400,15 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           items: activeList?.items ?? const [],
           onToggleItem: (index, checked) {
             if (activeList == null) return;
-            widget.svc.toggleCheckedByIndex(activeList!.id, index, checked);
+            widget.svc.toggleCheckedByIndex(activeList.id, index, checked);
           },
           onMarkAll: () {
             if (activeList == null) return;
-            widget.svc.setAllChecked(activeList!.id, true);
+            widget.svc.setAllChecked(activeList.id, true);
           },
           onClearCompleted: () {
             if (activeList == null) return;
-            widget.svc.clearCompleted(activeList!.id);
+            widget.svc.clearCompleted(activeList.id);
           },
           onNavigate: () => _navigateToShopping(context),
         );

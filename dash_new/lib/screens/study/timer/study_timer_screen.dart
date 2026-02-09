@@ -9,7 +9,6 @@ import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../analytics/study_analytics_screen.dart';
-import '../../study/tasks/study_tasks_screen.dart';
 import 'presets_sheet.dart';
 import 'session_summary_screen.dart';
 import 'circular_timer_widget.dart';

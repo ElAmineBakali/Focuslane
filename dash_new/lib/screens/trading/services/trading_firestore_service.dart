@@ -35,17 +35,21 @@ class TradingFirestoreService {
     Outcome? outcome,
   }) {
     Query q = _tradesCol.orderBy('entryDate', descending: true);
-    if (from != null)
+    if (from != null) {
       q = q.where(
         'entryDate',
         isGreaterThanOrEqualTo: Timestamp.fromDate(from),
       );
-    if (to != null)
+    }
+    if (to != null) {
       q = q.where('entryDate', isLessThanOrEqualTo: Timestamp.fromDate(to));
-    if (symbol != null && symbol.isNotEmpty)
+    }
+    if (symbol != null && symbol.isNotEmpty) {
       q = q.where('symbol', isEqualTo: symbol);
-    if (strategyId != null && strategyId.isNotEmpty)
+    }
+    if (strategyId != null && strategyId.isNotEmpty) {
       q = q.where('strategyId', isEqualTo: strategyId);
+    }
     if (outcome != null) q = q.where('outcome', isEqualTo: outcome.name);
     return q.snapshots().map((s) => s.docs.map(Trade.fromSnap).toList());
   }

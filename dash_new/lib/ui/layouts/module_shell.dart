@@ -10,6 +10,7 @@ class ModuleShell extends StatelessWidget {
   final Widget body;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
+  final PreferredSizeWidget? appBarOverride;
   final String moduleTitle;
   final IconData moduleIcon;
 
@@ -21,6 +22,7 @@ class ModuleShell extends StatelessWidget {
     required this.body,
     this.actions,
     this.floatingActionButton,
+    this.appBarOverride,
     required this.moduleTitle,
     required this.moduleIcon,
   });
@@ -49,17 +51,18 @@ class ModuleShell extends StatelessWidget {
                 ),
               )
             : null,
-        appBar: !isDesktop
-            ? FocusHeader(
-                title: title,
-                leading: IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => scaffoldKey.currentState?.openDrawer(),
-                ),
-                actions: actions,
-                useSoftGradient: true,
-              )
-            : null,
+        appBar: appBarOverride ??
+            (!isDesktop
+                ? FocusHeader(
+                    title: title,
+                    leading: IconButton(
+                      icon: const Icon(Icons.menu),
+                      onPressed: () => scaffoldKey.currentState?.openDrawer(),
+                    ),
+                    actions: actions,
+                    useSoftGradient: true,
+                  )
+                : null),
         body: Row(
           children: [
             if (isDesktop)

@@ -28,8 +28,9 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
-    if (game == null)
+    if (game == null) {
       return const Scaffold(body: Center(child: Text('Sin juego')));
+    }
     final g = game!;
 
     return Scaffold(
@@ -139,8 +140,9 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     stream: svc.watchGameSessions(g.id),
                     builder: (_, s) {
                       final data = s.data ?? [];
-                      if (data.isEmpty)
+                      if (data.isEmpty) {
                         return const Text('Sin sesiones registradas');
+                      }
                       return Column(
                         children:
                             data

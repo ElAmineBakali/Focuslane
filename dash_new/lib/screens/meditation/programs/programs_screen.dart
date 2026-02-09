@@ -16,8 +16,9 @@ class ProgramsScreen extends StatelessWidget {
         stream: MeditationFirestoreService.I.watchPrograms(),
         builder: (context, s) {
           final data = s.data ?? [];
-          if (s.connectionState == ConnectionState.waiting)
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
           if (data.isEmpty) return const Center(child: Text('Sin programas'));
           return ListView.separated(
             itemCount: data.length,

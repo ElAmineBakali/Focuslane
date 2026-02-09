@@ -8,23 +8,31 @@ class DebtService {
 
   final _col = FirebaseFirestore.instance.collection('finance_loans');
 
-  String get _uid => fb_auth.FirebaseAuth.instance.currentUser!.uid;
+  String? get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid;
 
   Stream<List<Debt>> watchAll() {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) {
+      return const Stream<List<Debt>>.empty();
+    }
     return _col
-        .where('userId', isEqualTo: _uid)
+        .where('userId', isEqualTo: uid)
         .orderBy('balance', descending: true)
         .snapshots()
         .map((s) => s.docs.map(Debt.fromDoc).toList());
   }
 
   Future<void> create(Debt debt) async {
-    final data = debt.toMap();
-    await _col.add(data..['userId'] = _uid);
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    final data = debt.toMap()..['userId'] = uid;
+    await _col.add(data);
   }
 
   Future<void> update(Debt debt) async {
-    await _col.doc(debt.id).set(debt.toMap(), SetOptions(merge: true));
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.doc(debt.id).set(debt.toMap()..['userId'] = uid, SetOptions(merge: true));
   }
 
   Future<void> delete(String id) async {

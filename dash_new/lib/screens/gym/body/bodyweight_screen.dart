@@ -95,8 +95,9 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                       final v = double.tryParse(
                                         (s ?? '').replaceAll(',', '.'),
                                       );
-                                      if (v == null)
+                                      if (v == null) {
                                         return 'Introduce un número válido';
+                                      }
                                       if (v <= 0) return 'Debe ser mayor que 0';
                                       return null;
                                     },
@@ -106,8 +107,9 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                 FilledButton.icon(
                                   onPressed: () async {
                                     if (_formKey.currentState?.validate() !=
-                                        true)
+                                        true) {
                                       return;
+                                    }
                                     final v = double.parse(
                                       _ctrl.text.replaceAll(',', '.'),
                                     );

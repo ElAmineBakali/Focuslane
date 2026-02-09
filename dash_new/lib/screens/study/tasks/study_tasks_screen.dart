@@ -136,8 +136,9 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     highPriorityOnly: _onlyHigh,
                   ),
                   builder: (context, snap) {
-                    if (!snap.hasData)
+                    if (!snap.hasData) {
                       return const Center(child: CircularProgressIndicator());
+                    }
 
                     final courseMap = <String, String>{};
                     if (coursesSnap.hasData) {
@@ -147,7 +148,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                     }
 
                     final tasks = snap.data!;
-                    if (tasks.isEmpty)
+                    if (tasks.isEmpty) {
                       return Center(
                         child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -213,6 +214,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                             .fadeIn(duration: 600.ms)
                             .scale(begin: const Offset(0.8, 0.8)),
                       );
+                    }
 
                     final Map<String, List<StudyTask>> groups = {};
                     if (_groupBy == 'course') {
@@ -783,7 +785,7 @@ class _FiltersBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(
               context,
-            ).colorScheme.surfaceVariant.withOpacity(0.3),
+            ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
             border: Border(
               bottom: BorderSide(
                 color: Theme.of(context).colorScheme.outlineVariant,

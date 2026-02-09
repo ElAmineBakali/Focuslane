@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/preset_routines_data.dart';
-import '../models/gym_models.dart';
 import '../../../ui/components/focus_module_header.dart';
 
 class PresetRoutinesScreen extends StatefulWidget {

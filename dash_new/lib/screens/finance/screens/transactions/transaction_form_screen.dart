@@ -120,49 +120,66 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         icon: const Icon(Icons.check),
         label: const Text('Guardar'),
       ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTypeSelector(),
-              const SizedBox(height: 16),
-              FocusCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTitleField(),
-                    const SizedBox(height: 16),
-                    _buildAmountField(),
-                    const SizedBox(height: 16),
-                    _buildDateField(),
-                    const SizedBox(height: 16),
-                    _buildCategoryField(),
-                    if (_category != null &&
-                        _subCategories.containsKey(_category)) ...[
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth >= 1024 ? 16.0 : 12.0;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildTypeSelector(),
                       const SizedBox(height: 16),
-                      _buildSubCategoryField(),
+                      FocusCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildTitleField(),
+                            const SizedBox(height: 16),
+                            _buildAmountField(),
+                            const SizedBox(height: 16),
+                            _buildDateField(),
+                            const SizedBox(height: 16),
+                            _buildCategoryField(),
+                            if (_category != null &&
+                                _subCategories.containsKey(_category)) ...[
+                              const SizedBox(height: 16),
+                              _buildSubCategoryField(),
+                            ],
+                            const SizedBox(height: 16),
+                            _buildAccountField(),
+                            const SizedBox(height: 16),
+                            _buildDivisaField(),
+                            const SizedBox(height: 16),
+                            _buildRecurrenceField(),
+                            const SizedBox(height: 16),
+                            _buildEnvelopeField(),
+                            const SizedBox(height: 16),
+                            _buildTagsField(),
+                            const SizedBox(height: 16),
+                            _buildNotesField(),
+                          ],
+                        ),
+                      ),
                     ],
-                    const SizedBox(height: 16),
-                    _buildAccountField(),
-                    const SizedBox(height: 16),
-                    _buildDivisaField(),
-                    const SizedBox(height: 16),
-                    _buildRecurrenceField(),
-                    const SizedBox(height: 16),
-                    _buildEnvelopeField(),
-                    const SizedBox(height: 16),
-                    _buildTagsField(),
-                    const SizedBox(height: 16),
-                    _buildNotesField(),
-                  ],
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -281,7 +298,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: DropdownButtonFormField<String>(
-            value: _divisa,
+            initialValue: _divisa,
             decoration: InputDecoration(
               labelText: 'Divisa',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -353,7 +370,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   Widget _buildCategoryField() {
     return DropdownButtonFormField<String>(
-      value: _category,
+      initialValue: _category,
       decoration: InputDecoration(
         labelText: 'Categoria *',
         prefixIcon: const Icon(Icons.category),
@@ -375,7 +392,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     final subs = _subCategories[_category] ?? [];
     if (subs.isEmpty) return const SizedBox.shrink();
     return DropdownButtonFormField<String>(
-      value: _subCategory,
+      initialValue: _subCategory,
       decoration: InputDecoration(
         labelText: 'Subcategoria',
         prefixIcon: const Icon(Icons.subdirectory_arrow_right),
@@ -404,7 +421,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   Widget _buildRecurrenceField() {
     return DropdownButtonFormField<String>(
-      value: _recurrence,
+      initialValue: _recurrence,
       decoration: InputDecoration(
         labelText: 'Recurrencia',
         prefixIcon: const Icon(Icons.repeat),
@@ -508,7 +525,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         await TransactionService.I.update(tx);
       }
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         FocusFeedback.showSuccess(
           context,
           widget.transaction == null

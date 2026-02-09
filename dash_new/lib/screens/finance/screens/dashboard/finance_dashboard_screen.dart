@@ -41,6 +41,12 @@ class FinanceDashboardScreen extends StatelessWidget {
       body: StreamBuilder<List<FinanceTransaction>>(
         stream: TransactionService.I.watch(from: monthStart),
         builder: (context, snap) {
+          if (snap.hasError) {
+            return Center(child: Text('Error: ${snap.error}'));
+          }
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
           final txs = snap.data ?? const [];
           double income = 0;
           double expense = 0;
@@ -344,6 +350,12 @@ class _BudgetsCard extends StatelessWidget {
           StreamBuilder<List<Budget>>(
             stream: BudgetService.I.watchAll(),
             builder: (context, snap) {
+              if (snap.hasError) {
+                return Text('Error: ${snap.error}');
+              }
+              if (snap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
               final budgets = snap.data ?? const [];
               if (budgets.isEmpty) return const Text('Sin presupuestos');
               return Column(
@@ -398,6 +410,12 @@ class _SubsCard extends StatelessWidget {
           StreamBuilder<List<Subscription>>(
             stream: SubscriptionService.I.watchAll(),
             builder: (context, snap) {
+              if (snap.hasError) {
+                return Text('Error: ${snap.error}');
+              }
+              if (snap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
               final subs = snap.data ?? const [];
               if (subs.isEmpty) return const Text('Sin suscripciones');
               return Column(

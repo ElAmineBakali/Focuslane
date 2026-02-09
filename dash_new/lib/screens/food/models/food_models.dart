@@ -760,17 +760,17 @@ class DayMenu {
   });
 
   factory DayMenu.fromMap(Map<String, dynamic> m) {
-    List<PlannedMeal> _list(String key) {
+    List<PlannedMeal> list(String key) {
       return ((m[key] as List?) ?? const [])
           .map((e) => PlannedMeal.fromMap(Map<String, dynamic>.from(e as Map)))
           .toList();
     }
 
     return DayMenu(
-      breakfast: _list('breakfast'),
-      lunch: _list('lunch'),
-      dinner: _list('dinner'),
-      snack: _list('snack'),
+      breakfast: list('breakfast'),
+      lunch: list('lunch'),
+      dinner: list('dinner'),
+      snack: list('snack'),
     );
   }
 

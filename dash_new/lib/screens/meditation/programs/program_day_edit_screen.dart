@@ -44,8 +44,9 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (program == null)
+    if (program == null) {
       return const Scaffold(body: Center(child: Text('Sin programa')));
+    }
     final svc = MeditationFirestoreService.I;
     return Scaffold(
       appBar: AppBar(title: Text(editing == null ? 'Nuevo día' : 'Editar día')),

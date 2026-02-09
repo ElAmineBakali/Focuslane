@@ -9,7 +9,7 @@ class TransactionService {
 
   final _col = FirebaseFirestore.instance.collection('finance_transactions');
 
-  String get _uid => fb_auth.FirebaseAuth.instance.currentUser!.uid;
+  String? get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid;
 
   Stream<List<FinanceTransaction>> watch({
     DateTime? from,
@@ -20,20 +20,29 @@ class TransactionService {
     String? envelopeId,
     String? query,
   }) {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) {
+      return const Stream<List<FinanceTransaction>>.empty();
+    }
     Query<Map<String, dynamic>> q = _col
-        .where('userId', isEqualTo: _uid)
+        .where('userId', isEqualTo: uid)
         .orderBy('date', descending: true);
-    if (from != null)
+    if (from != null) {
       q = q.where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(from));
-    if (to != null)
+    }
+    if (to != null) {
       q = q.where('date', isLessThanOrEqualTo: Timestamp.fromDate(to));
+    }
     if (type != null) q = q.where('type', isEqualTo: type.name);
-    if (category != null && category.isNotEmpty)
+    if (category != null && category.isNotEmpty) {
       q = q.where('category', isEqualTo: category);
-    if (accountId != null && accountId.isNotEmpty)
+    }
+    if (accountId != null && accountId.isNotEmpty) {
       q = q.where('accountId', isEqualTo: accountId);
-    if (envelopeId != null && envelopeId.isNotEmpty)
+    }
+    if (envelopeId != null && envelopeId.isNotEmpty) {
       q = q.where('envelopeId', isEqualTo: envelopeId);
+    }
 
     final base = q.snapshots().map(
       (s) => s.docs.map(FinanceTransaction.fromDoc).toList(),
@@ -54,7 +63,9 @@ class TransactionService {
   }
 
   Future<void> upsert(FinanceTransaction tx) async {
-    final data = tx.toMap();
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    final data = tx.toMap()..['userId'] = uid;
     if (tx.id.isEmpty) {
       await _col.add(data);
     } else {
@@ -63,11 +74,15 @@ class TransactionService {
   }
 
   Future<void> create(FinanceTransaction tx) async {
-    await _col.add(tx.toMap());
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.add(tx.toMap()..['userId'] = uid);
   }
 
   Future<void> update(FinanceTransaction tx) async {
-    await _col.doc(tx.id).set(tx.toMap(), SetOptions(merge: true));
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+    await _col.doc(tx.id).set(tx.toMap()..['userId'] = uid, SetOptions(merge: true));
   }
 
   Future<void> delete(String id) async {

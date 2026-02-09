@@ -74,38 +74,55 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
         icon: const Icon(Icons.check),
         label: const Text('Guardar'),
       ),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildPhotoSection(),
-              const SizedBox(height: 16),
-              FocusCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildNameField(),
-                    const SizedBox(height: 16),
-                    _buildTypeField(),
-                    const SizedBox(height: 16),
-                    _buildPurchaseValueField(),
-                    const SizedBox(height: 16),
-                    _buildCurrentValueField(),
-                    const SizedBox(height: 16),
-                    _buildPurchaseDateField(),
-                    const SizedBox(height: 16),
-                    _buildLocationField(),
-                    const SizedBox(height: 16),
-                    _buildNotesField(),
-                  ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth >= 1024 ? 16.0 : 12.0;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  32,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildPhotoSection(),
+                      const SizedBox(height: 16),
+                      FocusCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildNameField(),
+                            const SizedBox(height: 16),
+                            _buildTypeField(),
+                            const SizedBox(height: 16),
+                            _buildPurchaseValueField(),
+                            const SizedBox(height: 16),
+                            _buildCurrentValueField(),
+                            const SizedBox(height: 16),
+                            _buildPurchaseDateField(),
+                            const SizedBox(height: 16),
+                            _buildLocationField(),
+                            const SizedBox(height: 16),
+                            _buildNotesField(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -216,7 +233,7 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
 
   Widget _buildTypeField() {
     return DropdownButtonFormField<String>(
-      value: _type,
+      initialValue: _type,
       decoration: InputDecoration(
         labelText: 'Tipo *',
         prefixIcon: const Icon(Icons.category),
@@ -351,7 +368,7 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
         await AssetService.I.update(asset);
       }
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         FocusFeedback.showSuccess(
           context,
           widget.asset == null ? 'Activo creado' : 'Activo actualizado',

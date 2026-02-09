@@ -129,8 +129,9 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                         ),
                         validator: (s) {
                           if ((s ?? '').trim().isEmpty) return 'Pon un nombre';
-                          if ((s ?? '').trim().length < 3)
+                          if ((s ?? '').trim().length < 3) {
                             return 'Mínimo 3 caracteres';
+                          }
                           return null;
                         },
                       ),
