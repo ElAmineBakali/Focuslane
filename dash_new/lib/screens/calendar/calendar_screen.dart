@@ -4,6 +4,7 @@ import 'package:mi_dashboard_personal/services/notification_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'package:mi_dashboard_personal/services/calendar_aggregator_service.dart';
+import 'package:mi_dashboard_personal/core/constants/core_routes.dart';
 
 import '../../models/calendar_models.dart';
 import '../../services/calendar_service.dart';
@@ -87,6 +88,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         appBar: AppBar(
           title: const Text('Calendario'),
           actions: [
+            IconButton(
+              tooltip: 'Abrir Hub',
+              icon: const Icon(Icons.hub_outlined),
+              onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+            ),
             IconButton(
               tooltip: 'Hoy',
               icon: const Icon(Icons.today),

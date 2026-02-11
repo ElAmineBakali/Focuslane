@@ -13,6 +13,7 @@ import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../theme/focuslane_ui.dart';
 import '../../../ui/components/focus_module_header.dart';
+import '../../../core/constants/core_routes.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -68,6 +69,11 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         subtitle: 'Planificación, recetas y seguimiento',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.hub_outlined, size: 18),
+            tooltip: 'Abrir Hub',
+            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+          ),
           IconButton(
             icon: const Icon(Icons.calendar_today, size: 18),
             tooltip: 'Plan semanal',

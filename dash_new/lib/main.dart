@@ -62,6 +62,8 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
 import 'navigation/app_route_observer.dart';
 import 'navigation/app_routes.dart';
+import 'core/debug/core_debug_screen.dart';
+import 'core/screens/core_hub_screen.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -381,6 +383,10 @@ class _MyAppState extends State<MyApp> {
               _foodSvc ??= FoodFirestoreService(userId);
               return FoodMainScreen(svc: _foodSvc!);
             },
+
+            AppRoutes.coreHub: (_) => const CoreHubScreen(),
+
+            '/core/debug': (_) => const CoreDebugScreen(),
 
             ...financeRoutes,
             ...meditationRoutes,

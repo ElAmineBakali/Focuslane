@@ -13,6 +13,7 @@ class CalendarEvent {
   final DateTime? end;
   final bool allDay;
   final String? notes;
+  final String? relatedActionId;
 
   final bool? completed;
 
@@ -25,6 +26,7 @@ class CalendarEvent {
     this.end,
     this.allDay = false,
     this.notes,
+    this.relatedActionId,
     this.completed,
   });
 
@@ -36,6 +38,7 @@ class CalendarEvent {
     if (end != null) 'end': Timestamp.fromDate(end!),
     'allDay': allDay,
     if (notes != null && notes!.trim().isNotEmpty) 'notes': notes,
+    if (relatedActionId != null) 'relatedActionId': relatedActionId,
     if (completed != null) 'completed': completed,
   };
 
@@ -54,6 +57,7 @@ class CalendarEvent {
       end: (m['end'] as Timestamp?)?.toDate(),
       allDay: (m['allDay'] ?? false) as bool,
       notes: m['notes'] as String?,
+      relatedActionId: m['relatedActionId'] as String?,
       completed: m['completed'] as bool?,
     );
   }

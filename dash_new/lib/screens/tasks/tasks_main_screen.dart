@@ -5,6 +5,7 @@ import 'task_helpers.dart';
 import 'package:mi_dashboard_personal/services/reminder_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mi_dashboard_personal/core/constants/core_routes.dart';
 
 class TasksMainScreen extends StatefulWidget {
   const TasksMainScreen({super.key, this.startWithChecklist = true});
@@ -60,11 +61,21 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
             _tab == 0
                 ? [
                   IconButton(
+                    tooltip: 'Abrir Hub',
+                    icon: const Icon(Icons.hub_outlined),
+                    onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+                  ),
+                  IconButton(
                     icon: Icon(Icons.filter_alt, color: theme.iconTheme.color),
                     onPressed: () => _showFilterDialog(context),
                   ),
                 ]
                 : [
+                  IconButton(
+                    tooltip: 'Abrir Hub',
+                    icon: const Icon(Icons.hub_outlined),
+                    onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+                  ),
                   IconButton(
                     tooltip: 'Marcar todo',
                     icon: const Icon(Icons.done_all),

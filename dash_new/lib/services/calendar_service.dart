@@ -116,6 +116,8 @@ class CalendarService {
         end: DateTime(e.start.year, e.start.month, e.start.day, 23, 59),
         allDay: true,
         notes: e.notes,
+        relatedActionId: e.relatedActionId,
+        completed: e.completed,
       );
     } else {
       return CalendarEvent(
@@ -127,6 +129,8 @@ class CalendarService {
         end: e.start.add(const Duration(hours: 1)),
         allDay: false,
         notes: e.notes,
+        relatedActionId: e.relatedActionId,
+        completed: e.completed,
       );
     }
   }

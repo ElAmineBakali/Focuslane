@@ -2,8 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
+import '../core/models/core_entity_ref.dart';
+import '../core/models/core_recommendation.dart';
+import '../core/utils/date_utils.dart';
 import '../models/calendar_models.dart';
 import 'calendar_service.dart';
+import '../screens/finance/models/transaction_model.dart';
+import '../screens/finance/services/transaction_service.dart';
 
 class CalendarAggregatorService {
   CalendarAggregatorService._();
@@ -116,6 +121,71 @@ class CalendarAggregatorService {
       });
     });
   }
+
+  Future<String?> addEventFromCoreAction(
+    CoreAction action, {
+    required String actionId,
+    CoreEntityRef? ref,
+  }) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return null;
+    final payload = Map<String, dynamic>.from(action.payload);
+    final start =
+      _dateFromPayload(payload['start'] ?? payload['date'] ?? payload['dayId']) ??
+        DateTime.now();
+    DateTime? end = _dateFromPayload(payload['end']);
+    final allDay = payload['allDay'] == true;
+    end ??= allDay ? null : start.add(const Duration(hours: 1));
+
+    final calType = _mapType(payload['type'] ?? payload['module']);
+    final existing = await _calendarCol(uid)
+        .where('relatedActionId', isEqualTo: actionId)
+        .limit(1)
+        .get();
+    if (existing.docs.isNotEmpty) {
+      return existing.docs.first.id;
+    }
+
+    final event = CalendarEvent(
+      id: '',
+      title: (payload['title'] ?? ref?.title ?? 'Evento').toString(),
+      type: calType,
+      priority: CalendarPriority.normal,
+      start: start,
+      end: allDay ? null : end,
+      allDay: allDay,
+      notes: (payload['note'] ?? ref?.subtitle)?.toString(),
+      relatedActionId: actionId,
+    );
+    final eventId = await CalendarService.I.addEvent(event);
+
+    switch (calType) {
+      case CalendarType.food:
+        await _persistFoodPlan(uid, start, payload, actionId);
+        break;
+      case CalendarType.gym:
+        await _persistGymPlan(uid, start, payload, actionId);
+        break;
+      case CalendarType.study:
+        await _persistStudyPlan(uid, start, payload, actionId);
+        break;
+      case CalendarType.finance:
+        await _persistFinancePlan(uid, start, payload, actionId);
+        break;
+      case CalendarType.task:
+      case CalendarType.other:
+        break;
+    }
+
+    return eventId;
+  }
+
+  CollectionReference<Map<String, dynamic>> _calendarCol(String uid) => _db
+      .collection('users')
+      .doc(uid)
+      .collection('planner')
+      .doc('data')
+      .collection('calendar');
 
   CalendarPriority _mapPriority(Object? raw) {
     final v = (raw ?? '').toString().toLowerCase();
@@ -390,6 +460,166 @@ class CalendarAggregatorService {
     final days = d.difference(first).inDays + first.weekday;
     final wk = (days / 7).ceil();
     return 'week-${d.year}-W${wk.toString().padLeft(2, '0')}';
+  }
+
+  CalendarType _mapType(Object? raw) {
+    if (raw is CalendarType) return raw;
+    final v = (raw ?? '').toString();
+    return CalendarType.values.firstWhere(
+      (t) => t.name == v,
+      orElse: () => CalendarType.other,
+    );
+  }
+
+  DateTime? _dateFromPayload(Object? raw) {
+    if (raw == null) return null;
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is DateTime) return raw;
+    return DateTime.tryParse(raw.toString());
+  }
+
+  String _dayKey(DateTime date) {
+    const keys = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return keys[(date.weekday - 1).clamp(0, 6)];
+  }
+
+  Future<void> _persistFoodPlan(
+    String uid,
+    DateTime date,
+    Map<String, dynamic> payload,
+    String actionId,
+  ) async {
+    final weekId = _weekId(date);
+    final dayKey = _dayKey(date);
+    final doc = _db.collection('weekPlanners').doc(weekId);
+
+    await _db.runTransaction((tx) async {
+      final snap = await tx.get(doc);
+      final data = Map<String, dynamic>.from(snap.data() ?? {});
+      final days = Map<String, dynamic>.from(data['days'] ?? {});
+      final current = List<Map<String, dynamic>>.from(
+        (days[dayKey] as List?)?.map((e) => Map<String, dynamic>.from(e as Map)) ?? const [],
+      );
+      final refId = (payload['recipeId'] ?? payload['foodId'] ?? '').toString();
+      final slot = (payload['slot'] ?? 'dinner').toString();
+      final already = current.any((e) =>
+          (e['relatedActionId']?.toString() == actionId) ||
+          (e['refId']?.toString() == refId && e['slot']?.toString() == slot));
+      if (already) return;
+      current.add({
+        'slot': slot,
+        'type': (payload['type'] ?? 'recipe').toString(),
+        'refId': refId,
+        'servings': (payload['servings'] as num?)?.toDouble() ?? 1,
+        'relatedActionId': actionId,
+      });
+      days[dayKey] = current;
+      tx.set(
+        doc,
+        {
+          'scope': data['scope'] ?? 'weekly',
+          'days': days,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'createdAt': data['createdAt'] ?? FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    });
+  }
+
+  Future<void> _persistGymPlan(
+    String uid,
+    DateTime start,
+    Map<String, dynamic> payload,
+    String actionId,
+  ) async {
+    final col = _db
+        .collection('users')
+        .doc(uid)
+        .collection('gym')
+        .doc('root')
+        .collection('sessions');
+    final dayName = _dayKey(start);
+    final duration =
+        (payload['duration'] as num?)?.toInt() ?? (payload['minutes'] as num?)?.toInt() ?? 60;
+    final dup = await col.where('relatedActionId', isEqualTo: actionId).limit(1).get();
+    if (dup.docs.isNotEmpty) return;
+    await col.add({
+      'routineId': payload['routineId'] ?? 'core-plan',
+      'routineName': payload['title'] ?? 'Entrenamiento',
+      'dayId': dayName,
+      'dayName': dayName,
+      'date': start.toIso8601String(),
+      'durationMin': duration,
+      'volumeKg': (payload['volume'] as num?)?.toDouble() ?? 0,
+      'notes': payload['note'],
+      'prList': const <String>[],
+      'exercises': const <Map<String, dynamic>>[],
+      'relatedActionId': actionId,
+    });
+  }
+
+  Future<void> _persistStudyPlan(
+    String uid,
+    DateTime start,
+    Map<String, dynamic> payload,
+    String actionId,
+  ) async {
+    final col = _db
+        .collection('users')
+        .doc(uid)
+        .collection('study')
+        .doc('root')
+        .collection('sessions');
+    final minutes =
+        (payload['minutes'] as num?)?.toInt() ?? (payload['duration'] as num?)?.toInt() ?? 45;
+    final dup = await col.where('relatedActionId', isEqualTo: actionId).limit(1).get();
+    if (dup.docs.isNotEmpty) return;
+    await col.add({
+      'courseId': payload['courseId'] ?? '',
+      if (payload['taskId'] != null) 'taskId': payload['taskId'],
+      'method': (payload['method'] ?? 'pomodoro').toString(),
+      'minutes': minutes,
+      'configSnapshot': {'origin': 'coreAction'},
+      if (payload['note'] != null) 'notes': payload['note'].toString(),
+      'date': start.toIso8601String(),
+      'relatedActionId': actionId,
+    });
+  }
+
+  Future<void> _persistFinancePlan(
+    String uid,
+    DateTime date,
+    Map<String, dynamic> payload,
+    String actionId,
+  ) async {
+    final existing = await _db
+        .collection('finance_transactions')
+        .where('userId', isEqualTo: uid)
+        .where('relatedTxId', isEqualTo: actionId)
+        .limit(1)
+        .get();
+    if (existing.docs.isNotEmpty) return;
+    final typeRaw = (payload['type'] ?? 'expense').toString();
+    final tx = FinanceTransaction(
+      id: '',
+      userId: uid,
+      date: date,
+      type: typeRaw == 'income' ? TxType.income : TxType.expense,
+      title: payload['title']?.toString() ?? 'Movimiento planificado',
+      amount: (payload['amount'] as num?)?.toDouble() ?? 0,
+      category: (payload['category'] ?? 'plan').toString(),
+      subCategory: null,
+      accountId: null,
+      notes: payload['note']?.toString(),
+      tags: const [],
+      originalCurrency: null,
+      fxRate: null,
+      recurrence: null,
+      envelopeId: null,
+      relatedTxId: actionId,
+    );
+    await TransactionService.I.create(tx);
   }
 
   DateTime? _dateOfWeekKey(String key, String weekId) {

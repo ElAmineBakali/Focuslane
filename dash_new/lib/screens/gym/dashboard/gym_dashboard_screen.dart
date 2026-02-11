@@ -13,6 +13,7 @@ import '../../../ui/components/focus_empty_state.dart';
 import '../../../ui/components/focus_list_tile_compact.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
 import '../../../ui/components/focus_module_header.dart';
+import '../../../core/constants/core_routes.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -28,10 +29,17 @@ class GymDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: const FocusModuleHeader(
+      appBar: FocusModuleHeader(
         title: 'Gym',
         subtitle: 'Rutinas, progreso y objetivos',
         leadingMode: FocusModuleLeadingMode.exitModule,
+        actions: [
+          TextButton.icon(
+            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+            icon: const Icon(Icons.hub_outlined, size: 18),
+            label: const Text('Abrir Hub'),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: FocuslaneTokens.pagePaddingCompact,

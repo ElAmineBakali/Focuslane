@@ -5,6 +5,7 @@ import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.d
 import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/subscription_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
+import 'package:mi_dashboard_personal/core/constants/core_routes.dart';
 
 import '../../../../ui/components/focus_card.dart';
 import '../../../../ui/components/focus_metric_card.dart';
@@ -30,6 +31,11 @@ class FinanceDashboardScreen extends StatelessWidget {
         subtitle: 'Patrimonio, gastos y análisis',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.hub_outlined),
+            tooltip: 'Abrir Hub',
+            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Nueva transacción',
