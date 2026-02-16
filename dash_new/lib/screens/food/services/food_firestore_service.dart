@@ -15,6 +15,13 @@ class FoodFirestoreService {
   DocumentReference<Map<String, dynamic>> get _targetsRef =>
       _root.collection('config').doc('targets');
 
+  DocumentReference<Map<String, dynamic>> get _flagsRef =>
+      _root.collection('config').doc('flags');
+
+  Stream<Map<String, dynamic>> streamFlags() {
+    return _flagsRef.snapshots().map((d) => Map<String, dynamic>.from(d.data() ?? const {}));
+  }
+
   Stream<Map<String, double?>> streamGlobalTargets() {
     return _targetsRef.snapshots().map((d) {
       final m = Map<String, dynamic>.from(d.data() ?? const {});

@@ -16,6 +16,4 @@ class CoreRoutes {
   static const tasks = '/tasks';
   static const financeDashboard = '/finance';
   static const financeTransactions = '/finance/transactions';
-
-  static const coreHub = '/core/hub';
 }

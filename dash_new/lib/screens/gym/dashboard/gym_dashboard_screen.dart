@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../gym/services/gym_firestore_service.dart';
@@ -13,12 +15,82 @@ import '../../../ui/components/focus_empty_state.dart';
 import '../../../ui/components/focus_list_tile_compact.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
 import '../../../ui/components/focus_module_header.dart';
-import '../../../core/constants/core_routes.dart';
+import '../../../core/models/core_daily_stats.dart';
+import '../../../core/services/core_aggregation_service.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
 
   const GymDashboardScreen({super.key, required this.svc});
+
+  Widget _buildAlerts(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isEmpty) return const SizedBox.shrink();
+    final dayId = DateTime.now().toIso8601String().substring(0, 10);
+    final stats$ = CoreAggregationService.I.watchDay(uid, dayId);
+    final alerts$ = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('gym')
+        .doc('root')
+        .collection('config')
+        .doc('alerts')
+        .snapshots();
+
+    return StreamBuilder<CoreDailyStats>(
+      stream: stats$,
+      builder: (context, statsSnap) {
+        final stats = statsSnap.data ?? CoreDailyStats(dayId: dayId);
+        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: alerts$,
+          builder: (context, alertSnap) {
+            final alert = alertSnap.data?.data() ?? const {};
+            final intake = stats.kcal;
+            final expected = 1800 + stats.workoutMinutes * 8;
+            final deficit = intake - expected;
+            final strongWorkout = stats.workoutMinutes >= 50 || stats.workoutVolumeKg > 5000;
+            final showDeficit = strongWorkout && deficit < -400;
+            final subSoon = alert['subscriptionDueSoon'] == true;
+            if (!showDeficit && !subSoon) return const SizedBox.shrink();
+            final cards = <Widget>[];
+            if (showDeficit) {
+              cards.add(
+                _GymAlertCard(
+                  icon: Icons.local_fire_department,
+                  title: 'Déficit alto con entrenamiento fuerte',
+                  message: 'Revisa la ingesta de hoy para evitar fatiga (déficit ${deficit.toStringAsFixed(0)} kcal).',
+                ),
+              );
+            }
+            if (subSoon) {
+              final due = alert['subscriptionDueAt'];
+              String dueLabel = 'pronto';
+              if (due is Timestamp) {
+                final date = due.toDate();
+                dueLabel = DateFormat('d MMM').format(date);
+              }
+              cards.add(
+                _GymAlertCard(
+                  icon: Icons.event_available,
+                  title: 'Suscripción de gym próxima',
+                  message: 'Pago estimado el $dueLabel.',
+                ),
+              );
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: cards
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.only(bottom: FocuslaneTokens.spacing12),
+                        child: c,
+                      ))
+                  .toList(),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +105,14 @@ class GymDashboardScreen extends StatelessWidget {
         title: 'Gym',
         subtitle: 'Rutinas, progreso y objetivos',
         leadingMode: FocusModuleLeadingMode.exitModule,
-        actions: [
-          TextButton.icon(
-            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
-            icon: const Icon(Icons.hub_outlined, size: 18),
-            label: const Text('Abrir Hub'),
-          ),
-        ],
+        actions: const [],
       ),
       body: SingleChildScrollView(
         padding: FocuslaneTokens.pagePaddingCompact,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+          _buildAlerts(context),
           FocusSectionTitle(
             title: 'Resumen del día',
             subtitle: 'Actualizado $dateLabel',
@@ -405,6 +472,43 @@ class GymDashboardScreen extends StatelessWidget {
               );
             },
           ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GymAlertCard extends StatelessWidget {
+  const _GymAlertCard({required this.icon, required this.title, required this.message});
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      color: cs.errorContainer.withOpacity(.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: cs.error),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 4),
+                  Text(message, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ),
+            ),
           ],
         ),
       ),

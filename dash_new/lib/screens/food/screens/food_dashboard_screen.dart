@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
@@ -13,7 +14,8 @@ import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../theme/focuslane_ui.dart';
 import '../../../ui/components/focus_module_header.dart';
-import '../../../core/constants/core_routes.dart';
+import '../../../core/models/core_daily_stats.dart';
+import '../../../core/services/core_aggregation_service.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -70,11 +72,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
-            icon: const Icon(Icons.hub_outlined, size: 18),
-            tooltip: 'Abrir Hub',
-            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
-          ),
-          IconButton(
             icon: const Icon(Icons.calendar_today, size: 18),
             tooltip: 'Plan semanal',
             onPressed: () => _navigateToPlanner(context),
@@ -128,6 +125,8 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         final kcal = day.totals['kcal'] ?? 0.0;
         final protein = day.totals['protein'] ?? 0.0;
         
+        final alerts = _buildAlerts(context, todayId, day);
+
         return StreamBuilder<List<Recipe>>(
           stream: widget.svc.streamRecipes(),
           builder: (context, recipesSnap) {
@@ -139,72 +138,127 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                 final shoppingItems =
                     shoppingSnap.data?.expand((list) => list.items).length ?? 0;
 
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    final crossAxisCount = constraints.maxWidth >= 1200
-                        ? 4
-                        : constraints.maxWidth >= 600
-                            ? 2
-                            : 1;
-                    
-                    final cards = [
-                      FoodMetricCard(
-                        icon: Icons.local_fire_department,
-                        label: 'Calorías hoy',
-                        value: '${kcal.toStringAsFixed(0)} kcal',
-                        subtitle: 'de 2,000 objetivo',
-                        onTap: () => _navigateToDiary(context),
-                      ),
-                      FoodMetricCard(
-                        icon: Icons.fitness_center,
-                        label: 'Proteína hoy',
-                        value: '${protein.toStringAsFixed(0)} g',
-                        subtitle: 'de 150g objetivo',
-                        onTap: () => _navigateToDiary(context),
-                      ),
-                      FoodMetricCard(
-                        icon: Icons.restaurant_menu,
-                        label: 'Recetas guardadas',
-                        value: '$recipesCount',
-                        subtitle: 'en tu biblioteca',
-                        onTap: () => _navigateToRecipes(context),
-                      ),
-                      FoodMetricCard(
-                        icon: Icons.shopping_cart,
-                        label: 'Lista de compra',
-                        value: '$shoppingItems productos',
-                        subtitle: 'pendientes',
-                        onTap: () => _navigateToShopping(context),
-                      ),
-                    ];
+                return Column(
+                  children: [
+                    alerts,
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossAxisCount = constraints.maxWidth >= 1200
+                            ? 4
+                            : constraints.maxWidth >= 600
+                                ? 2
+                                : 1;
+                        
+                        final cards = [
+                          FoodMetricCard(
+                            icon: Icons.local_fire_department,
+                            label: 'Calorías hoy',
+                            value: '${kcal.toStringAsFixed(0)} kcal',
+                            subtitle: 'de 2,000 objetivo',
+                            onTap: () => _navigateToDiary(context),
+                          ),
+                          FoodMetricCard(
+                            icon: Icons.fitness_center,
+                            label: 'Proteína hoy',
+                            value: '${protein.toStringAsFixed(0)} g',
+                            subtitle: 'de 150g objetivo',
+                            onTap: () => _navigateToDiary(context),
+                          ),
+                          FoodMetricCard(
+                            icon: Icons.restaurant_menu,
+                            label: 'Recetas guardadas',
+                            value: '$recipesCount',
+                            subtitle: 'en tu biblioteca',
+                            onTap: () => _navigateToRecipes(context),
+                          ),
+                          FoodMetricCard(
+                            icon: Icons.shopping_cart,
+                            label: 'Lista de compra',
+                            value: '$shoppingItems productos',
+                            subtitle: 'pendientes',
+                            onTap: () => _navigateToShopping(context),
+                          ),
+                        ];
 
-                    if (crossAxisCount == 1) {
-                      return Column(
-                        children: cards
-                            .map(
-                              (card) => Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: 10.0,
-                                ),
-                                child: card,
-                              ),
-                            )
-                            .toList(),
-                      );
-                    } else {
-                      return GridView.count(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 10.0,
-                        mainAxisSpacing: 10.0,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        childAspectRatio: 1.8,
-                        children: cards,
-                      );
-                    }
-                  },
+                        if (crossAxisCount == 1) {
+                          return Column(
+                            children: cards
+                                .map(
+                                  (card) => Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10.0,
+                                    ),
+                                    child: card,
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        } else {
+                          return GridView.count(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 10.0,
+                            mainAxisSpacing: 10.0,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            childAspectRatio: 1.8,
+                            children: cards,
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 );
               },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildAlerts(BuildContext context, String dayId, DailyIntakeDoc day) {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final stats$ = CoreAggregationService.I.watchDay(uid, dayId);
+    return StreamBuilder<CoreDailyStats>(
+      stream: stats$,
+      builder: (context, statsSnap) {
+        final stats = statsSnap.data ?? CoreDailyStats(dayId: dayId);
+        return StreamBuilder<Map<String, dynamic>>(
+          stream: widget.svc.streamFlags(),
+          builder: (context, flagsSnap) {
+            final flags = flagsSnap.data ?? const {};
+            final proteinTarget = (day.targets['protein'] ?? day.targets['baseProtein']) as num?;
+            final proteinTotal = (day.totals['protein'] as num?)?.toDouble() ?? 0;
+            final showProtein = stats.workoutsCount > 0 && proteinTarget != null && proteinTotal < proteinTarget.toDouble();
+            final overBudget = flags['overBudgetFood'] == true;
+            if (!showProtein && !overBudget) return const SizedBox.shrink();
+            final cards = <Widget>[];
+            if (showProtein) {
+              final gap = proteinTarget!.toDouble() - proteinTotal;
+              cards.add(
+                _AlertCard(
+                  icon: Icons.warning_amber,
+                  title: 'Proteína baja tras entreno',
+                  message: 'Faltan ${gap.toStringAsFixed(0)} g para el objetivo de hoy.',
+                ),
+              );
+            }
+            if (overBudget) {
+              cards.add(
+                _AlertCard(
+                  icon: Icons.payments,
+                  title: 'Presupuesto de comida superado',
+                  message: 'Revisa el plan o ajusta compras de la semana.',
+                ),
+              );
+            }
+            return Column(
+              children: cards
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: c,
+                      ))
+                  .toList(),
             );
           },
         );
@@ -542,6 +596,43 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       context,
       MaterialPageRoute(
         builder: (_) => ShoppingListsScreen(svc: widget.svc),
+      ),
+    );
+  }
+}
+
+class _AlertCard extends StatelessWidget {
+  const _AlertCard({required this.icon, required this.title, required this.message});
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      color: cs.errorContainer.withOpacity(.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: cs.error),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 4),
+                  Text(message, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

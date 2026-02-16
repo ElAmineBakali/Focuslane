@@ -63,7 +63,7 @@ import 'screens/calendar/calendar_screen.dart';
 import 'navigation/app_route_observer.dart';
 import 'navigation/app_routes.dart';
 import 'core/debug/core_debug_screen.dart';
-import 'core/screens/core_hub_screen.dart';
+import 'core/services/core_sync_service.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -162,6 +162,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     _notifSub?.cancel();
+    CoreSyncService.I.dispose();
     super.dispose();
   }
 
@@ -383,8 +384,6 @@ class _MyAppState extends State<MyApp> {
               _foodSvc ??= FoodFirestoreService(userId);
               return FoodMainScreen(svc: _foodSvc!);
             },
-
-            AppRoutes.coreHub: (_) => const CoreHubScreen(),
 
             '/core/debug': (_) => const CoreDebugScreen(),
 

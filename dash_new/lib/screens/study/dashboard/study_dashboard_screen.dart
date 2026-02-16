@@ -13,7 +13,6 @@ import '../../../ui/components/focus_empty_state.dart';
 import '../../../ui/components/focus_list_tile_compact.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
 import '../../../ui/components/focus_module_header.dart';
-import '../../../core/constants/core_routes.dart';
 
 class StudyDashboardScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -33,13 +32,7 @@ class StudyDashboardScreen extends StatelessWidget {
         title: 'Study',
         subtitle: 'Sesiones, hábitos y productividad',
         leadingMode: FocusModuleLeadingMode.exitModule,
-        actions: [
-          TextButton.icon(
-            onPressed: () => Navigator.pushNamed(context, CoreRoutes.coreHub),
-            icon: const Icon(Icons.hub_outlined, size: 18),
-            label: const Text('Abrir Hub'),
-          ),
-        ],
+        actions: const [],
       ),
       body: SingleChildScrollView(
         padding: FocuslaneTokens.pagePaddingCompact,

@@ -57,7 +57,6 @@ class CoreDeeplinkService {
       CoreRoutes.gymDashboard,
       CoreRoutes.studyDashboard,
       CoreRoutes.financeTransactions,
-      CoreRoutes.coreHub,
       '/calendar',
       '/notes/editor',
     };

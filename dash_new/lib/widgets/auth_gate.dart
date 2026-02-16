@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mi_dashboard_personal/core/services/core_sync_service.dart';
 
 class AuthGate extends StatelessWidget {
   final Widget authenticated;
@@ -25,10 +26,11 @@ class AuthGate extends StatelessWidget {
         }
 
         final user = snapshot.data;
-        
         if (user == null) {
+          CoreSyncService.I.stop();
           return unauthenticated;
         } else {
+          CoreSyncService.I.start(user.uid);
           return authenticated;
         }
       },

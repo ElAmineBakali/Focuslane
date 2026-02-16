@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mi_dashboard_personal/widgets/focuslane_title.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:mi_dashboard_personal/core/services/core_sync_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -134,6 +136,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isNotEmpty) {
+      CoreSyncService.I.start(uid);
+    }
     _loadModules();
   }
 
