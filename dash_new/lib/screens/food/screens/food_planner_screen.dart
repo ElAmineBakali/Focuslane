@@ -217,6 +217,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
           final isMobile = constraints.maxWidth < 800;
           return Column(
             children: [
+              _buildRealtimeStatusBar(),
               if (_showPlannersList) _buildPlannersList(),
               if (isMobile) _buildMobileDaySelector(),
               Expanded(
@@ -234,6 +235,65 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         icon: const Icon(Icons.add),
         label: const Text('Nuevo'),
       ),
+    );
+  }
+
+  Widget _buildRealtimeStatusBar() {
+    return StreamBuilder<Map<String, double?>>(
+      stream: widget.svc.streamGlobalTargets(),
+      builder: (context, targetsSnap) {
+        final targetKcal = targetsSnap.data?['kcal'] ?? 2000;
+        final targetProtein = targetsSnap.data?['protein'] ?? 120;
+        return StreamBuilder<Map<String, dynamic>>(
+          stream: widget.svc.streamAlerts(),
+          builder: (context, alertsSnap) {
+            final alerts = alertsSnap.data ?? const {};
+            final overBudget = alerts['foodOverBudget'] == true;
+            final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
+            final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
+
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Chip(
+                    label: Text('Objetivo kcal ${targetKcal.toStringAsFixed(0)}'),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  Chip(
+                    label: Text('Objetivo proteína ${targetProtein.toStringAsFixed(0)}g'),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  if (proteinLow)
+                    Chip(
+                      label: const Text('Proteína baja tras entreno'),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  if (extremeDeficit)
+                    Chip(
+                      label: const Text('Déficit extremo con entreno fuerte'),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  if (overBudget)
+                    Chip(
+                      label: const Text('Presupuesto food superado'),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

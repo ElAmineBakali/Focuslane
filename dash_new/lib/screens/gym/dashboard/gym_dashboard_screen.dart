@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../gym/services/gym_firestore_service.dart';
-import '../../gym/models/gym_models.dart';
 import '../../gym/routines/routines_list_screen.dart';
 import '../../gym/routines/routine_detail_screen.dart';
 import '../../gym/session/session_history_screen.dart';
@@ -15,8 +15,6 @@ import '../../../ui/components/focus_empty_state.dart';
 import '../../../ui/components/focus_list_tile_compact.dart';
 import '../../../ui/tokens/focuslane_tokens.dart';
 import '../../../ui/components/focus_module_header.dart';
-import '../../../core/models/core_daily_stats.dart';
-import '../../../core/services/core_aggregation_service.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -26,8 +24,6 @@ class GymDashboardScreen extends StatelessWidget {
   Widget _buildAlerts(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (uid.isEmpty) return const SizedBox.shrink();
-    final dayId = DateTime.now().toIso8601String().substring(0, 10);
-    final stats$ = CoreAggregationService.I.watchDay(uid, dayId);
     final alerts$ = FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -37,56 +33,54 @@ class GymDashboardScreen extends StatelessWidget {
         .doc('alerts')
         .snapshots();
 
-    return StreamBuilder<CoreDailyStats>(
-      stream: stats$,
-      builder: (context, statsSnap) {
-        final stats = statsSnap.data ?? CoreDailyStats(dayId: dayId);
-        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: alerts$,
-          builder: (context, alertSnap) {
-            final alert = alertSnap.data?.data() ?? const {};
-            final intake = stats.kcal;
-            final expected = 1800 + stats.workoutMinutes * 8;
-            final deficit = intake - expected;
-            final strongWorkout = stats.workoutMinutes >= 50 || stats.workoutVolumeKg > 5000;
-            final showDeficit = strongWorkout && deficit < -400;
-            final subSoon = alert['subscriptionDueSoon'] == true;
-            if (!showDeficit && !subSoon) return const SizedBox.shrink();
-            final cards = <Widget>[];
-            if (showDeficit) {
-              cards.add(
-                _GymAlertCard(
-                  icon: Icons.local_fire_department,
-                  title: 'Déficit alto con entrenamiento fuerte',
-                  message: 'Revisa la ingesta de hoy para evitar fatiga (déficit ${deficit.toStringAsFixed(0)} kcal).',
-                ),
-              );
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: alerts$,
+      builder: (context, alertSnap) {
+        debugPrint('[GymDashboard][alerts] snapshot state=${alertSnap.connectionState} hasData=${alertSnap.hasData}');
+        final alert = alertSnap.data?.data() ?? const {};
+        debugPrint('[GymDashboard][alerts] data=$alert');
+        final showDeficit = alert['extremeDeficitWorkout'] == true;
+        final subSoon = alert['subscriptionDueSoon'] == true;
+        debugPrint('[GymDashboard][alerts] showDeficit=$showDeficit subSoon=$subSoon');
+        if (!showDeficit && !subSoon) return const SizedBox.shrink();
+        final cards = <Widget>[];
+        if (showDeficit) {
+          final deficit = (alert['deficitKcal'] as num?)?.toDouble() ?? 0;
+          cards.add(
+            _GymAlertCard(
+              icon: Icons.local_fire_department,
+              title: 'Déficit extremo con entreno fuerte',
+              message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
+            ),
+          );
+        }
+        if (subSoon) {
+          final dueDays = (alert['subscriptionDueInDays'] as num?)?.toInt();
+          String dueLabel = 'pronto';
+          if (dueDays != null) {
+            dueLabel = dueDays <= 0 ? 'hoy' : 'en $dueDays días';
+          } else {
+            final due = alert['subscriptionDueAt'];
+            if (due is Timestamp) {
+              dueLabel = DateFormat('d MMM').format(due.toDate());
             }
-            if (subSoon) {
-              final due = alert['subscriptionDueAt'];
-              String dueLabel = 'pronto';
-              if (due is Timestamp) {
-                final date = due.toDate();
-                dueLabel = DateFormat('d MMM').format(date);
-              }
-              cards.add(
-                _GymAlertCard(
-                  icon: Icons.event_available,
-                  title: 'Suscripción de gym próxima',
-                  message: 'Pago estimado el $dueLabel.',
-                ),
-              );
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: cards
-                  .map((c) => Padding(
-                        padding: const EdgeInsets.only(bottom: FocuslaneTokens.spacing12),
-                        child: c,
-                      ))
-                  .toList(),
-            );
-          },
+          }
+          cards.add(
+            _GymAlertCard(
+              icon: Icons.event_available,
+              title: 'Pago próximo',
+              message: 'Suscripción de gym $dueLabel.',
+            ),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: cards
+              .map((c) => Padding(
+                    padding: const EdgeInsets.only(bottom: FocuslaneTokens.spacing12),
+                    child: c,
+                  ))
+              .toList(),
         );
       },
     );
@@ -132,8 +126,10 @@ class GymDashboardScreen extends StatelessWidget {
             future: svc.getStatsForDateRange(start, now),
             builder: (context, snap) {
               final data = snap.data;
+              debugPrint('[GymDashboard][weekStats] state=${snap.connectionState} data=$data');
               final totalSessions = data?['totalSessions'] as int?;
               final totalVolume = data?['totalVolume'] as double?;
+              debugPrint('[GymDashboard][weekStats] totalSessions=$totalSessions totalVolume=$totalVolume');
               final totalSessionsText =
                   totalSessions == null ? '—' : totalSessions.toString();
               final totalVolumeText = totalVolume == null
@@ -147,6 +143,7 @@ class GymDashboardScreen extends StatelessWidget {
                       weightSnap.data?.isNotEmpty == true
                           ? weightSnap.data!.first.weight
                           : null;
+                  debugPrint('[GymDashboard][bodyWeight] state=${weightSnap.connectionState} weight=$weight');
 
                   return FutureBuilder(
                     future: svc.root.get(),
@@ -391,6 +388,10 @@ class GymDashboardScreen extends StatelessWidget {
                           stream: svc.streamSessions(limit: 5),
                           builder: (context, snap) {
                             final sessions = snap.data ?? const [];
+                            debugPrint('[GymDashboard][recentSessions] state=${snap.connectionState} count=${sessions.length}');
+                            for (final s in sessions) {
+                              debugPrint('[GymDashboard][recentSessions]   session dayName=${s.dayName} routineName=${s.routineName} volumeKg=${s.volumeKg} date=${s.date}');
+                            }
                             if (sessions.isEmpty) {
                               return const FocusEmptyState(
                                 icon: Icons.history,

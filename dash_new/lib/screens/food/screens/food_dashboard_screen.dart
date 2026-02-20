@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
@@ -14,8 +14,6 @@ import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../theme/focuslane_ui.dart';
 import '../../../ui/components/focus_module_header.dart';
-import '../../../core/models/core_daily_stats.dart';
-import '../../../core/services/core_aggregation_service.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -30,11 +28,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     with RouteAware {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
   
-  String _getWeekId(DateTime date) {
-    final monday = date.subtract(Duration(days: date.weekday - 1));
-    return _dayId(monday);
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -105,108 +98,119 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     String todayId,
     bool isDesktop,
   ) {
-    return StreamBuilder<DailyIntakeDoc>(
-      stream: widget.svc.streamDay(todayId),
-      builder: (context, daySnap) {
-        final day = daySnap.data ??
-            DailyIntakeDoc(
-              id: todayId,
-              entries: const [],
-              waterMl: 0,
-              totals: const {
-                'kcal': 0.0,
-                'protein': 0.0,
-                'carbs': 0.0,
-                'fat': 0.0,
-              },
-              targets: const {},
-            );
+    return StreamBuilder<Map<String, double?>>(
+      stream: widget.svc.streamGlobalTargets(),
+      builder: (context, targetsSnap) {
+        debugPrint('[FoodDashboard][targets] snapshot state=${targetsSnap.connectionState} data=${targetsSnap.data}');
+        final targetKcal = targetsSnap.data?['kcal'] ?? 2000;
+        final targetProtein = targetsSnap.data?['protein'] ?? 150;
+        debugPrint('[FoodDashboard][targets] targetKcal=$targetKcal targetProtein=$targetProtein');
+        return StreamBuilder<DailyIntakeDoc>(
+          stream: widget.svc.streamDay(todayId),
+          builder: (context, daySnap) {
+            debugPrint('[FoodDashboard][dayIntake] snapshot state=${daySnap.connectionState} dayId=$todayId hasData=${daySnap.hasData}');
+            final day = daySnap.data ??
+                DailyIntakeDoc(
+                  id: todayId,
+                  entries: const [],
+                  waterMl: 0,
+                  totals: const {
+                    'kcal': 0.0,
+                    'protein': 0.0,
+                    'carbs': 0.0,
+                    'fat': 0.0,
+                  },
+                  targets: const {},
+                );
 
-        final kcal = day.totals['kcal'] ?? 0.0;
-        final protein = day.totals['protein'] ?? 0.0;
-        
-        final alerts = _buildAlerts(context, todayId, day);
+            final kcal = day.totals['kcal'] ?? 0.0;
+            final protein = day.totals['protein'] ?? 0.0;
+            debugPrint('[FoodDashboard][dayIntake] totals: kcal=$kcal protein=$protein carbs=${day.totals['carbs']} fat=${day.totals['fat']} waterMl=${day.waterMl} entries=${day.entries.length}');
 
-        return StreamBuilder<List<Recipe>>(
-          stream: widget.svc.streamRecipes(),
-          builder: (context, recipesSnap) {
-            final recipesCount = recipesSnap.data?.length ?? 0;
+            final alerts = _buildAlerts(context);
 
-            return StreamBuilder<List<ShoppingList>>(
-              stream: widget.svc.streamShoppingLists(),
-              builder: (context, shoppingSnap) {
-                final shoppingItems =
-                    shoppingSnap.data?.expand((list) => list.items).length ?? 0;
+            return StreamBuilder<List<Recipe>>(
+              stream: widget.svc.streamRecipes(),
+              builder: (context, recipesSnap) {
+                final recipesCount = recipesSnap.data?.length ?? 0;
 
-                return Column(
-                  children: [
-                    alerts,
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final crossAxisCount = constraints.maxWidth >= 1200
-                            ? 4
-                            : constraints.maxWidth >= 600
-                                ? 2
-                                : 1;
-                        
-                        final cards = [
-                          FoodMetricCard(
-                            icon: Icons.local_fire_department,
-                            label: 'Calorías hoy',
-                            value: '${kcal.toStringAsFixed(0)} kcal',
-                            subtitle: 'de 2,000 objetivo',
-                            onTap: () => _navigateToDiary(context),
-                          ),
-                          FoodMetricCard(
-                            icon: Icons.fitness_center,
-                            label: 'Proteína hoy',
-                            value: '${protein.toStringAsFixed(0)} g',
-                            subtitle: 'de 150g objetivo',
-                            onTap: () => _navigateToDiary(context),
-                          ),
-                          FoodMetricCard(
-                            icon: Icons.restaurant_menu,
-                            label: 'Recetas guardadas',
-                            value: '$recipesCount',
-                            subtitle: 'en tu biblioteca',
-                            onTap: () => _navigateToRecipes(context),
-                          ),
-                          FoodMetricCard(
-                            icon: Icons.shopping_cart,
-                            label: 'Lista de compra',
-                            value: '$shoppingItems productos',
-                            subtitle: 'pendientes',
-                            onTap: () => _navigateToShopping(context),
-                          ),
-                        ];
+                return StreamBuilder<List<ShoppingList>>(
+                  stream: widget.svc.streamShoppingLists(),
+                  builder: (context, shoppingSnap) {
+                    final shoppingItems =
+                        shoppingSnap.data?.expand((list) => list.items).length ?? 0;
 
-                        if (crossAxisCount == 1) {
-                          return Column(
-                            children: cards
-                                .map(
-                                  (card) => Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 10.0,
-                                    ),
-                                    child: card,
-                                  ),
-                                )
-                                .toList(),
-                          );
-                        } else {
-                          return GridView.count(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 10.0,
-                            mainAxisSpacing: 10.0,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            childAspectRatio: 1.8,
-                            children: cards,
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                    return Column(
+                      children: [
+                        alerts,
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final crossAxisCount = constraints.maxWidth >= 1200
+                                ? 4
+                                : constraints.maxWidth >= 600
+                                    ? 2
+                                    : 1;
+
+                            final cards = [
+                              FoodMetricCard(
+                                icon: Icons.local_fire_department,
+                                label: 'Calorías hoy',
+                                value: '${kcal.toStringAsFixed(0)} kcal',
+                                subtitle: 'de ${targetKcal.toStringAsFixed(0)} objetivo',
+                                onTap: () => _navigateToDiary(context),
+                              ),
+                              FoodMetricCard(
+                                icon: Icons.fitness_center,
+                                label: 'Proteína hoy',
+                                value: '${protein.toStringAsFixed(0)} g',
+                                subtitle: 'de ${targetProtein.toStringAsFixed(0)}g objetivo',
+                                onTap: () => _navigateToDiary(context),
+                              ),
+                              FoodMetricCard(
+                                icon: Icons.restaurant_menu,
+                                label: 'Recetas guardadas',
+                                value: '$recipesCount',
+                                subtitle: 'en tu biblioteca',
+                                onTap: () => _navigateToRecipes(context),
+                              ),
+                              FoodMetricCard(
+                                icon: Icons.shopping_cart,
+                                label: 'Lista de compra',
+                                value: '$shoppingItems productos',
+                                subtitle: 'pendientes',
+                                onTap: () => _navigateToShopping(context),
+                              ),
+                            ];
+
+                            if (crossAxisCount == 1) {
+                              return Column(
+                                children: cards
+                                    .map(
+                                      (card) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 10.0,
+                                        ),
+                                        child: card,
+                                      ),
+                                    )
+                                    .toList(),
+                              );
+                            } else {
+                              return GridView.count(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 10.0,
+                                mainAxisSpacing: 10.0,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                childAspectRatio: 1.8,
+                                children: cards,
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             );
@@ -216,51 +220,60 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     );
   }
 
-  Widget _buildAlerts(BuildContext context, String dayId, DailyIntakeDoc day) {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final stats$ = CoreAggregationService.I.watchDay(uid, dayId);
-    return StreamBuilder<CoreDailyStats>(
-      stream: stats$,
-      builder: (context, statsSnap) {
-        final stats = statsSnap.data ?? CoreDailyStats(dayId: dayId);
-        return StreamBuilder<Map<String, dynamic>>(
-          stream: widget.svc.streamFlags(),
-          builder: (context, flagsSnap) {
-            final flags = flagsSnap.data ?? const {};
-            final proteinTarget = (day.targets['protein'] ?? day.targets['baseProtein']) as num?;
-            final proteinTotal = (day.totals['protein'] as num?)?.toDouble() ?? 0;
-            final showProtein = stats.workoutsCount > 0 && proteinTarget != null && proteinTotal < proteinTarget.toDouble();
-            final overBudget = flags['overBudgetFood'] == true;
-            if (!showProtein && !overBudget) return const SizedBox.shrink();
-            final cards = <Widget>[];
-            if (showProtein) {
-              final gap = proteinTarget!.toDouble() - proteinTotal;
-              cards.add(
-                _AlertCard(
-                  icon: Icons.warning_amber,
-                  title: 'Proteína baja tras entreno',
-                  message: 'Faltan ${gap.toStringAsFixed(0)} g para el objetivo de hoy.',
-                ),
-              );
-            }
-            if (overBudget) {
-              cards.add(
-                _AlertCard(
-                  icon: Icons.payments,
-                  title: 'Presupuesto de comida superado',
-                  message: 'Revisa el plan o ajusta compras de la semana.',
-                ),
-              );
-            }
-            return Column(
-              children: cards
-                  .map((c) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: c,
-                      ))
-                  .toList(),
-            );
-          },
+  Widget _buildAlerts(BuildContext context) {
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: widget.svc.streamAlerts(),
+      builder: (context, alertSnap) {
+        debugPrint('[FoodDashboard][alerts] snapshot state=${alertSnap.connectionState} data=${alertSnap.data}');
+        final alerts = alertSnap.data ?? const {};
+        final overBudget = alerts['foodOverBudget'] == true;
+        final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
+        final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
+        debugPrint('[FoodDashboard][alerts] overBudget=$overBudget proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
+        if (!overBudget && !proteinLow && !extremeDeficit) {
+          return const SizedBox.shrink();
+        }
+
+        final cards = <Widget>[];
+        if (proteinLow) {
+          final targetProtein = (alerts['targetProteinToday'] as num?)?.toDouble() ?? 0;
+          final proteinToday = (alerts['proteinToday'] as num?)?.toDouble() ?? 0;
+          final gap = (targetProtein - proteinToday).clamp(0, 9999);
+          cards.add(
+            _AlertCard(
+              icon: Icons.warning_amber,
+              title: 'Proteína baja tras entreno',
+              message: 'Faltan ${gap.toStringAsFixed(0)} g para el objetivo de hoy.',
+            ),
+          );
+        }
+        if (extremeDeficit) {
+          final deficit = (alerts['kcalDeltaToday'] as num?)?.toDouble() ?? 0;
+          cards.add(
+            _AlertCard(
+              icon: Icons.local_fire_department,
+              title: 'Déficit extremo con entreno fuerte',
+              message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
+            ),
+          );
+        }
+        if (overBudget) {
+          cards.add(
+            _AlertCard(
+              icon: Icons.payments,
+              title: 'Presupuesto de comida superado',
+              message: 'Revisa el plan o ajusta compras de la semana.',
+            ),
+          );
+        }
+
+        return Column(
+          children: cards
+              .map((c) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: c,
+                  ))
+              .toList(),
         );
       },
     );

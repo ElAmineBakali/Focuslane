@@ -31,6 +31,8 @@ class AuthGate extends StatelessWidget {
           return unauthenticated;
         } else {
           CoreSyncService.I.start(user.uid);
+
+          // ── TEMPORARY DIAGNOSTIC ──
           return authenticated;
         }
       },
