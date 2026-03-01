@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
-import '../../../widgets/global_ui_components.dart';
-import '../../../theme/focuslane_ui.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/widgets/global_ui_components.dart';
+import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 
@@ -53,9 +53,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildRangeChip(7, '7 días'),
-              _buildRangeChip(30, '30 días'),
-              _buildRangeChip(90, '90 días'),
+              _buildRangeChip(7, '7 dÃ­as'),
+              _buildRangeChip(30, '30 dÃ­as'),
+              _buildRangeChip(90, '90 dÃ­as'),
             ],
           ),
 
@@ -138,7 +138,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                       ),
                     ),
                     const SizedBox(width: FocusSpacing.md),
-                    Text('Calorías', style: FocusTypography.heading3(context)),
+                    Text('CalorÃ­as', style: FocusTypography.heading3(context)),
                   ],
                 ),
                   const SizedBox(height: FocusSpacing.md),
@@ -192,7 +192,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                       ),
                     ),
                     const SizedBox(width: FocusSpacing.md),
-                    Text('Proteínas', style: FocusTypography.heading3(context)),
+                    Text('ProteÃ­nas', style: FocusTypography.heading3(context)),
                   ],
                 ),
                   const SizedBox(height: FocusSpacing.md),
@@ -247,7 +247,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                     ),
                     const SizedBox(width: FocusSpacing.md),
                     Text(
-                      'Hidratación',
+                      'HidrataciÃ³n',
                       style: FocusTypography.heading3(context),
                     ),
                   ],
@@ -296,7 +296,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
               children: [
                 Expanded(
                   child: FocusStatCard(
-                    label: 'Calorías',
+                    label: 'CalorÃ­as',
                     value: avgKcal.toStringAsFixed(0),
                     subtitle: 'kcal promedio',
                     icon: Icons.local_fire_department,
@@ -306,7 +306,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                 const SizedBox(width: FocusSpacing.md),
                 Expanded(
                   child: FocusStatCard(
-                    label: 'Proteínas',
+                    label: 'ProteÃ­nas',
                     value: avgProtein.toStringAsFixed(1),
                     subtitle: 'g promedio',
                     icon: Icons.fitness_center,
@@ -715,3 +715,4 @@ class _FoodHistoryAppBar extends StatelessWidget implements PreferredSizeWidget 
     );
   }
 }
+

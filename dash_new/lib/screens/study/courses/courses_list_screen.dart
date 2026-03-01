@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +8,7 @@ import 'course_edit_sheet.dart';
 import 'course_detail_editable_screen.dart';
 import 'external_links_sheet.dart';
 import '../settings/study_settings_sheet.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class CoursesListScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -126,7 +126,7 @@ class CoursesListScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 32),
                       Text(
-                        '¡Empieza tu jornada!',
+                        'Â¡Empieza tu jornada!',
                         style: GoogleFonts.poppins(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
@@ -341,7 +341,7 @@ class _CourseCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Información adicional
+                    // InformaciÃ³n adicional
                     if (course.credits != null || course.goalHours != null) ...[
                       const SizedBox(height: 16),
                       Wrap(
@@ -351,7 +351,7 @@ class _CourseCard extends StatelessWidget {
                           if (course.credits != null)
                             _InfoChip(
                               icon: Icons.menu_book_rounded,
-                              label: '${course.credits?.toInt()} créditos',
+                              label: '${course.credits?.toInt()} crÃ©ditos',
                               color: color,
                             ),
                           if (course.goalHours != null)
@@ -489,3 +489,4 @@ class _ArchivedCoursesScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../session/live_session_screen.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class RoutineDayPickerScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -47,11 +47,11 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
             context: context,
             builder:
                 (_) => AlertDialog(
-                  title: const Text('Nuevo día'),
+                  title: const Text('Nuevo dÃ­a'),
                   content: TextField(
                     controller: _dayCtrl,
                     decoration: const InputDecoration(
-                      labelText: 'Nombre del día (ej. Push / Pull / Legs)',
+                      labelText: 'Nombre del dÃ­a (ej. Push / Pull / Legs)',
                     ),
                   ),
                   actions: [
@@ -88,7 +88,7 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
           }
           final days = snap.data!;
           if (days.isEmpty) {
-            return const Center(child: Text('Añade tus días con el botón +'));
+            return const Center(child: Text('AÃ±ade tus dÃ­as con el botÃ³n +'));
           }
           return ReorderableListView.builder(
             padding: EdgeInsets.fromLTRB(
@@ -121,7 +121,7 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
                     dayId: d.id,
                   ),
                   trailing: IconButton(
-                    tooltip: 'Eliminar día',
+                    tooltip: 'Eliminar dÃ­a',
                     icon: const Icon(
                       Icons.delete_forever_rounded,
                       color: Colors.redAccent,
@@ -131,9 +131,9 @@ class _RoutineDayPickerScreenState extends State<RoutineDayPickerScreen> {
                         context: context,
                         builder:
                             (_) => AlertDialog(
-                              title: const Text('Eliminar día'),
+                              title: const Text('Eliminar dÃ­a'),
                               content: Text(
-                                '¿Eliminar "${d.name}" y sus ejercicios?',
+                                'Â¿Eliminar "${d.name}" y sus ejercicios?',
                               ),
                               actions: [
                                 TextButton(
@@ -209,12 +209,12 @@ class _LastDoneMini extends StatelessWidget {
       stream: ref.snapshots(),
       builder: (context, snap) {
         if (!snap.hasData || !snap.data!.exists) {
-          return const Text('Sin sesiones aún');
+          return const Text('Sin sesiones aÃºn');
         }
         final data = snap.data!.data() as Map<String, dynamic>;
         final dt =
             _readAsDate(data['lastDone']) ?? _readAsDate(data['lastDoneLocal']);
-        if (dt == null) return const Text('Sin sesiones aún');
+        if (dt == null) return const Text('Sin sesiones aÃºn');
 
         final lastLocal = dt.toLocal();
         final now = DateTime.now();
@@ -223,8 +223,9 @@ class _LastDoneMini extends StatelessWidget {
             lastLocal.month == now.month &&
             lastLocal.day == now.day;
 
-        return Text(sameDay ? 'Hecho hoy ✓' : 'Última vez: $lastLocal');
+        return Text(sameDay ? 'Hecho hoy âœ“' : 'Ãšltima vez: $lastLocal');
       },
     );
   }
 }
+

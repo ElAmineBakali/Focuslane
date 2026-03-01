@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../study/models/study_models.dart';
 import '../../study/services/study_firestore_service.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -171,7 +171,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.check, color: cs.primary),
-                    title: const Text('Asistió'),
+                    title: const Text('AsistiÃ³'),
                     onTap: () {
                       Navigator.pop(context);
                       widget.svc.setAttendance(
@@ -183,7 +183,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ),
                   ListTile(
                     leading: Icon(Icons.close, color: cs.error),
-                    title: const Text('No asistió'),
+                    title: const Text('No asistiÃ³'),
                     onTap: () {
                       Navigator.pop(context);
                       widget.svc.setAttendance(
@@ -261,9 +261,9 @@ class _StatsHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              _chip(context, Icons.check, 'Asistió', attended, attendColor),
+              _chip(context, Icons.check, 'AsistiÃ³', attended, attendColor),
               const SizedBox(width: AppSpacing.sm),
-              _chip(context, Icons.close, 'Faltó', absent, absentColor),
+              _chip(context, Icons.close, 'FaltÃ³', absent, absentColor),
               const SizedBox(width: AppSpacing.sm),
               _chip(context, Icons.remove, 'Sin clase', noClass, freeColor),
             ],
@@ -350,8 +350,8 @@ class _LegendRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _legendChip(attendColor, 'Asistió'),
-        _legendChip(absentColor, 'Faltó'),
+        _legendChip(attendColor, 'AsistiÃ³'),
+        _legendChip(absentColor, 'FaltÃ³'),
         _legendChip(freeColor, 'Sin clase'),
       ],
     );
@@ -504,7 +504,7 @@ class _ActionButtons extends StatelessWidget {
             Expanded(
               child: FilledButton.icon(
                 icon: const Icon(Icons.check),
-                label: const Text('Hoy asistió'),
+                label: const Text('Hoy asistiÃ³'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                   shape: RoundedRectangleBorder(
@@ -518,7 +518,7 @@ class _ActionButtons extends StatelessWidget {
             Expanded(
               child: FilledButton.tonalIcon(
                 icon: const Icon(Icons.close),
-                label: const Text('Hoy no asistió'),
+                label: const Text('Hoy no asistiÃ³'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                   shape: RoundedRectangleBorder(
@@ -547,3 +547,4 @@ class _ActionButtons extends StatelessWidget {
     );
   }
 }
+

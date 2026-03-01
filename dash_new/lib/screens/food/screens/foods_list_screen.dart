@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -24,12 +24,12 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
     return Scaffold(
       appBar: FoodCompactAppBar(
         title: 'Alimentos',
-        subtitle: 'Catálogo',
+        subtitle: 'CatÃ¡logo',
         actions: [
           IconButton(
             icon: const Icon(Icons.add, size: 18),
             onPressed: () => _showAddFoodSheet(context),
-            tooltip: 'Añadir alimento',
+            tooltip: 'AÃ±adir alimento',
           ),
         ],
       ),
@@ -62,7 +62,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                   children: [
                     Expanded(
                       child: ModernChip(
-                        label: 'Sólo suplementos',
+                        label: 'SÃ³lo suplementos',
                         icon: _suppsOnly ? Icons.check : Icons.filter_list,
                         color:
                             _suppsOnly
@@ -106,13 +106,13 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                     message:
                         _searchQuery.isNotEmpty
                             ? 'No se encontraron alimentos'
-                            : 'No hay alimentos en tu catálogo',
+                            : 'No hay alimentos en tu catÃ¡logo',
                     subtitle:
                         _searchQuery.isNotEmpty
-                            ? 'Intenta con otro término de búsqueda'
-                            : 'Añade tu primer alimento para comenzar',
+                            ? 'Intenta con otro tÃ©rmino de bÃºsqueda'
+                            : 'AÃ±ade tu primer alimento para comenzar',
                     actionLabel:
-                        _searchQuery.isEmpty ? 'Añadir alimento' : null,
+                        _searchQuery.isEmpty ? 'AÃ±adir alimento' : null,
                     onAction:
                         _searchQuery.isEmpty
                             ? () => _showAddFoodSheet(context)
@@ -132,7 +132,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
   Widget _buildListView(List<Food> foods) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // En PC: 6 columnas, tablet: 4, móvil: 2
+        // En PC: 6 columnas, tablet: 4, mÃ³vil: 2
         final crossAxisCount = constraints.maxWidth >= 1200
             ? 6
             : constraints.maxWidth >= 900
@@ -207,7 +207,7 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
         ),
       );
       if (mounted) {
-        FoodFeedback.showSuccess(context, '${food.name} añadido a favoritos');
+        FoodFeedback.showSuccess(context, '${food.name} aÃ±adido a favoritos');
       }
     }
   }
@@ -359,7 +359,7 @@ class _FoodListCardState extends State<_FoodListCard> {
   Widget _buildCard(BuildContext context, bool isFavorite) {
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle =
-        '${widget.food.kcal.toStringAsFixed(0)} kcal • ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}${widget.food.brand != null ? ' • ${widget.food.brand!}' : ''}';
+        '${widget.food.kcal.toStringAsFixed(0)} kcal â€¢ ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}${widget.food.brand != null ? ' â€¢ ${widget.food.brand!}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -395,3 +395,4 @@ class _FoodListCardState extends State<_FoodListCard> {
     );
   }
 }
+

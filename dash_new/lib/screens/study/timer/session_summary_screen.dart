@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../models/study_models.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class SessionSummaryScreen extends StatelessWidget {
   final StudySession session;
@@ -25,7 +25,7 @@ class SessionSummaryScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.bookmark),
             title: Text('Curso: ${session.courseId}'),
-            subtitle: Text('Método: ${session.method.name}'),
+            subtitle: Text('MÃ©todo: ${session.method.name}'),
           ),
           Card(
             child: ListTile(
@@ -35,7 +35,7 @@ class SessionSummaryScreen extends StatelessWidget {
                 [
                   if (session.cycles != null) 'Ciclos: ${session.cycles}',
                   if (session.laps != null) 'Laps: ${session.laps}',
-                ].join(' • '),
+                ].join(' â€¢ '),
               ),
             ),
           ),
@@ -56,3 +56,4 @@ class SessionSummaryScreen extends StatelessWidget {
     );
   }
 }
+

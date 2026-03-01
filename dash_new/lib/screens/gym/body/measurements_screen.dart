@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/gym_firestore_service.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 SnackBar _niceBar(String text, {IconData? icon}) {
   return SnackBar(
@@ -74,7 +74,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                               .toList(),
                       onChanged: (v) => setState(() => _selected = v!),
                       decoration: const InputDecoration(
-                        labelText: 'Músculo',
+                        labelText: 'MÃºsculo',
                         prefixIcon: Icon(Icons.fitness_center_outlined),
                       ),
                     ),
@@ -93,7 +93,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                         final v = double.tryParse(
                           (s ?? '').replaceAll(',', '.'),
                         );
-                        if (v == null) return 'Número válido';
+                        if (v == null) return 'NÃºmero vÃ¡lido';
                         if (v <= 0) return 'Mayor que 0';
                         return null;
                       },
@@ -111,7 +111,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           _niceBar(
-                            'Medida guardada 📏',
+                            'Medida guardada ðŸ“',
                             icon: Icons.check_circle_rounded,
                           ),
                         );
@@ -171,3 +171,4 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
     );
   }
 }
+

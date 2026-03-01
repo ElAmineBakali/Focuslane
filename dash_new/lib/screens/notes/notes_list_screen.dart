@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/blocks/dropdown/app_dropdown.dart';
+import 'package:mi_dashboard_personal/design/blocks/dropdown/app_dropdown.dart';
 import 'note_model.dart';
 import 'note_firestore_service.dart';
 
@@ -67,9 +67,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     PopupMenuItem(value: 'updated', child: Text('Recientes')),
                     PopupMenuItem(
                       value: 'created',
-                      child: Text('Más antiguos'),
+                      child: Text('MÃ¡s antiguos'),
                     ),
-                    PopupMenuItem(value: 'title', child: Text('Por título')),
+                    PopupMenuItem(value: 'title', child: Text('Por tÃ­tulo')),
                   ],
             ),
           if (!isPhone) ...[
@@ -89,9 +89,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     ),
                     DropdownMenuItem(
                       value: 'created',
-                      child: Text('Más antiguos'),
+                      child: Text('MÃ¡s antiguos'),
                     ),
-                    DropdownMenuItem(value: 'title', child: Text('Por título')),
+                    DropdownMenuItem(value: 'title', child: Text('Por tÃ­tulo')),
                   ],
                   onChanged: (v) {
                     if (v != null) setState(() => _sort = v);
@@ -141,7 +141,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Toca el botón + para crear una',
+                    'Toca el botÃ³n + para crear una',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: color.onSurfaceVariant,
                     ),
@@ -237,7 +237,7 @@ class _NoteTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          note.title.isEmpty ? 'Sin título' : note.title,
+                          note.title.isEmpty ? 'Sin tÃ­tulo' : note.title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: color.onSurface,
@@ -373,7 +373,7 @@ class _NoteCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          note.title.isEmpty ? 'Sin título' : note.title,
+                          note.title.isEmpty ? 'Sin tÃ­tulo' : note.title,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: color.onSurface,
@@ -393,7 +393,7 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    preview.isEmpty ? 'Nota vacía' : preview,
+                    preview.isEmpty ? 'Nota vacÃ­a' : preview,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: color.onSurfaceVariant,
                       fontSize: isMobile ? 12 : 13,
@@ -441,3 +441,4 @@ Widget _buildFallbackCover(ColorScheme color, double height) {
     ),
   );
 }
+

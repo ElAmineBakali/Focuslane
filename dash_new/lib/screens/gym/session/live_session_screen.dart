@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,8 +6,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import '../services/gym_notification_service.dart';
 import 'session_summary_screen.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
-import '../../../ui/components/focus_module_header.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class LiveSessionScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -226,7 +226,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               FilledButton.icon(
                 onPressed: () => Navigator.pop(context, true),
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('Añadir'),
+                label: const Text('AÃ±adir'),
                 style: FilledButton.styleFrom(
                   backgroundColor: widget.routine.color,
                   padding: const EdgeInsets.symmetric(
@@ -474,7 +474,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Añade ejercicios a este día para empezar',
+                          'AÃ±ade ejercicios a este dÃ­a para empezar',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: s.onSurfaceVariant),
                         ),
@@ -496,8 +496,8 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         maxLines: 3,
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
-                          labelText: 'Notas de la sesión',
-                          hintText: 'Cómo te sentiste, observaciones...',
+                          labelText: 'Notas de la sesiÃ³n',
+                          hintText: 'CÃ³mo te sentiste, observaciones...',
                           prefixIcon: const Icon(Icons.note_rounded),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -592,7 +592,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         runSpacing: 4,
                         children: [
                           _buildMetaChip(
-                            '${e.targetSets} × ${e.targetReps}',
+                            '${e.targetSets} Ã— ${e.targetReps}',
                             Icons.repeat_rounded,
                             s,
                           ),
@@ -632,7 +632,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              content: Text('¿Eliminar "$exName" de este día?'),
+                              content: Text('Â¿Eliminar "$exName" de este dÃ­a?'),
                               actions: [
                                 TextButton(
                                   onPressed:
@@ -789,7 +789,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  'Añade tu primera serie',
+                  'AÃ±ade tu primera serie',
                   style: TextStyle(
                     fontSize: 14,
                     color: s.onSurfaceVariant,
@@ -841,7 +841,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${sets[i].weight.toStringAsFixed(1)} kg × ${sets[i].reps} reps',
+                                    '${sets[i].weight.toStringAsFixed(1)} kg Ã— ${sets[i].reps} reps',
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -961,3 +961,4 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     );
   }
 }
+

@@ -1,6 +1,6 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -8,8 +8,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:mi_dashboard_personal/supabase_config.dart';
-import 'package:mi_dashboard_personal/models/outfit_model.dart';
+import 'package:mi_dashboard_personal/core/config/supabase_config.dart';
+import 'package:mi_dashboard_personal/screens/ropa/models/outfit_model.dart';
 import 'package:mi_dashboard_personal/screens/culture/culture_routes.dart';
 import 'package:mi_dashboard_personal/screens/goals/goals_home_screen.dart';
 import 'package:mi_dashboard_personal/screens/modules_screen.dart';
@@ -24,14 +24,14 @@ import 'package:mi_dashboard_personal/screens/skills/skills_routes.dart';
 import 'package:mi_dashboard_personal/screens/tasks/task_edit_screen.dart';
 import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
 import 'package:mi_dashboard_personal/screens/trading/live/trading_live_chart_screen.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
-import 'package:mi_dashboard_personal/widgets/avoid_fab.dart';
-import 'package:mi_dashboard_personal/widgets/auth_gate.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import 'package:mi_dashboard_personal/design/widgets/avoid_fab.dart';
+import 'package:mi_dashboard_personal/core/auth/auth_gate.dart';
 import 'package:mi_dashboard_personal/screens/auth/login_screen.dart';
-import 'firebase_options.dart';
-import 'theme/theme.dart';
-import 'theme/prefs.dart';
-import 'widgets/app_background.dart';
+import 'package:mi_dashboard_personal/core/config/firebase_options.dart';
+import 'package:mi_dashboard_personal/design/theme/theme.dart';
+import 'package:mi_dashboard_personal/design/theme/prefs.dart';
+import 'design/widgets/app_background.dart';
 import 'screens/home_screen.dart';
 import 'screens/tasks/tasks_main_screen.dart';
 import 'screens/tasks/task_create_screen.dart';
@@ -45,7 +45,7 @@ import 'screens/habits/habit_model.dart';
 import 'screens/gym/main/gym_main_screen.dart';
 import 'screens/gym/services/gym_firestore_service.dart';
 import 'screens/gym/routines/routines_list_screen.dart';
-import 'screens/gym/analytics/gym_analytics_screen_v2.dart';
+import 'screens/gym/analytics/gym_analytics_screen.dart';
 import 'screens/gym/goals/gym_goals_screen.dart';
 import 'screens/gym/body/bodyweight_screen.dart';
 import 'screens/gym/body/measurements_screen.dart';
@@ -63,6 +63,7 @@ import 'screens/calendar/calendar_screen.dart';
 import 'navigation/app_route_observer.dart';
 import 'navigation/app_routes.dart';
 import 'core/services/core_sync_service.dart';
+import 'core/services/ai_backend_client.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -141,6 +142,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode && AiBackendClient.isDevEnv) {
+      unawaited(AiBackendClient().debugPing());
+    }
     _loadPrefs();
     _askNotifPermission();
     NotificationService.I.scheduleHabitDailyReminder(
@@ -350,7 +354,7 @@ class _MyAppState extends State<MyApp> {
             },
             '/gym/analytics': (_) {
               _gymService ??= GymFirestoreService();
-              return GymAnalyticsScreenV2(svc: _gymService!);
+              return GymAnalyticsScreen(svc: _gymService!);
             },
             '/gym/goals': (_) {
               _gymService ??= GymFirestoreService();
@@ -406,3 +410,4 @@ class _MyAppState extends State<MyApp> {
         );
   }
 }
+

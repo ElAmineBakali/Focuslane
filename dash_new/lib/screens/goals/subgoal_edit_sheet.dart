@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../goals/services/goals_firestore_service.dart';
 import '../goals/models/goals_models.dart';
-import '../../widgets/ui_scaffold.dart';
+import '../../design/widgets/ui_scaffold.dart';
 
 class SubGoalEditSheet extends StatefulWidget {
   final String goalId;
@@ -63,7 +63,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'Título'),
+                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -71,7 +71,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 TextFormField(
                   controller: _desc,
                   decoration: const InputDecoration(
-                    labelText: 'Descripción (opcional)',
+                    labelText: 'DescripciÃ³n (opcional)',
                   ),
                   maxLines: 3,
                 ),
@@ -115,7 +115,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 TextFormField(
                   controller: _section,
                   decoration: const InputDecoration(
-                    labelText: 'Sección (agrupación)',
+                    labelText: 'SecciÃ³n (agrupaciÃ³n)',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -135,7 +135,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
                   title: Text(
-                    'Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "—"}',
+                    'Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "â€”"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(
@@ -204,3 +204,4 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
     );
   }
 }
+

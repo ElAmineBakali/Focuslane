@@ -1,14 +1,14 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
+import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 import 'book_edit_screen.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class BookDetailScreen extends StatefulWidget {
   const BookDetailScreen({super.key});
@@ -74,7 +74,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         return;
       }
       if (bytes.length > maxPdfBytes) {
-        AppToast.error(context, 'El PDF supera el límite de 5MB');
+        AppToast.error(context, 'El PDF supera el lÃ­mite de 5MB');
         return;
       }
 
@@ -206,9 +206,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.menu_book),
-              title: Text('${b.author ?? "—"} • ${b.genre ?? ""}'),
+              title: Text('${b.author ?? "â€”"} â€¢ ${b.genre ?? ""}'),
               subtitle: Text(
-                'Estado: ${b.status.name} • Rating: ${b.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${b.status.name} â€¢ Rating: ${b.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -297,7 +297,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           controller: _quickPage,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Página actual',
+                            labelText: 'PÃ¡gina actual',
                           ),
                         ),
                       ),
@@ -338,7 +338,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Resúmenes',
+                    'ResÃºmenes',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   TextField(
@@ -375,10 +375,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                         ),
                       );
                       if (mounted) {
-                        AppToast.success(context, 'Resúmenes guardados');
+                        AppToast.success(context, 'ResÃºmenes guardados');
                       }
                     },
-                    child: const Text('Guardar resúmenes'),
+                    child: const Text('Guardar resÃºmenes'),
                   ),
                 ],
               ),
@@ -403,7 +403,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           controller: _sessPages,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Páginas',
+                            labelText: 'PÃ¡ginas',
                           ),
                         ),
                       ),
@@ -441,7 +441,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                       _sessMin.clear();
                       _sessNotes.clear();
                     },
-                    child: const Text('Añadir sesión'),
+                    child: const Text('AÃ±adir sesiÃ³n'),
                   ),
                   const Divider(),
                   StreamBuilder<List<BookSession>>(
@@ -449,7 +449,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     builder: (_, s) {
                       final data = s.data ?? [];
                       if (data.isEmpty) {
-                        return const Text('Sin sesiones todavía');
+                        return const Text('Sin sesiones todavÃ­a');
                       }
                       return Column(
                         children:
@@ -458,7 +458,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                   (x) => ListTile(
                                     leading: const Icon(Icons.timer),
                                     title: Text(
-                                      '${x.pages} págs • ${x.minutes} min',
+                                      '${x.pages} pÃ¡gs â€¢ ${x.minutes} min',
                                     ),
                                     subtitle: Text(
                                       x.date
@@ -467,7 +467,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                               .split('.')
                                               .first +
                                           (x.notes != null
-                                              ? ' • ${x.notes}'
+                                              ? ' â€¢ ${x.notes}'
                                               : ''),
                                     ),
                                   ),
@@ -501,7 +501,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           controller: _quotePage,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Página',
+                            labelText: 'PÃ¡gina',
                           ),
                         ),
                       ),
@@ -554,7 +554,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                                     leading: const Icon(Icons.format_quote),
                                     title: Text(q.text),
                                     subtitle: Text(
-                                      'Pág. ${q.page ?? "-"} ${q.note != null ? "• ${q.note}" : ""}',
+                                      'PÃ¡g. ${q.page ?? "-"} ${q.note != null ? "â€¢ ${q.note}" : ""}',
                                     ),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete_outline),
@@ -577,3 +577,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     );
   }
 }
+
+
+

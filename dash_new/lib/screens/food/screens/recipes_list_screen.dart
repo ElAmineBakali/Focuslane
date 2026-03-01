@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -23,7 +23,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
     return Scaffold(
       appBar: FoodCompactAppBar(
         title: 'Recetas',
-        subtitle: 'Catálogo',
+        subtitle: 'CatÃ¡logo',
         actions: [
           IconButton(
             icon: const Icon(Icons.add, size: 18),
@@ -34,7 +34,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
                     builder: (_) => RecipeEditScreen(svc: widget.svc),
                   ),
                 ),
-            tooltip: 'Añadir receta',
+            tooltip: 'AÃ±adir receta',
           ),
         ],
       ),
@@ -85,10 +85,10 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
                     message:
                         _searchQuery.isNotEmpty
                             ? 'No se encontraron recetas'
-                            : 'No hay recetas en tu catálogo',
+                            : 'No hay recetas en tu catÃ¡logo',
                     subtitle:
                         _searchQuery.isNotEmpty
-                            ? 'Intenta con otro término de búsqueda'
+                            ? 'Intenta con otro tÃ©rmino de bÃºsqueda'
                             : 'Crea tu primera receta para comenzar',
                     actionLabel: _searchQuery.isEmpty ? 'Crear receta' : null,
                     onAction:
@@ -116,7 +116,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   Widget _buildListView(List<Recipe> recipes) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // En PC: 6 columnas, tablet: 4, móvil: 2
+        // En PC: 6 columnas, tablet: 4, mÃ³vil: 2
         final crossAxisCount = constraints.maxWidth >= 1200
             ? 6
             : constraints.maxWidth >= 900
@@ -225,3 +225,4 @@ class _RecipeGridCard extends StatelessWidget {
     );
   }
 }
+

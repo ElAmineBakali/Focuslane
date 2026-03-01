@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import '../../../theme/focuslane_ui.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -81,7 +81,7 @@ class _ShoppingListDetailScreenState
               ),
               IconButton(
                 icon: const Icon(Icons.add, size: 18),
-                tooltip: 'Añadir producto',
+                tooltip: 'AÃ±adir producto',
                 onPressed: () => _addItemDialog(list),
               ),
               PopupMenuButton<String>(
@@ -177,7 +177,7 @@ class _ShoppingListDetailScreenState
                               _SummaryItem(
                                 icon: Icons.euro,
                                 label: 'Total',
-                                value: '€${total.toStringAsFixed(2)}',
+                                value: 'â‚¬${total.toStringAsFixed(2)}',
                               ),
                             ],
                           ),
@@ -206,7 +206,7 @@ class _ShoppingListDetailScreenState
                           if (totalPurchased > 0) ...[
                             const SizedBox(height: AppSpacing.sm),
                             Text(
-                              'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
+                              'Gastado hasta ahora: â‚¬${totalPurchased.toStringAsFixed(2)}',
                               style: AppTypography.caption(context),
                             ),
                           ],
@@ -222,13 +222,13 @@ class _ShoppingListDetailScreenState
                         ? ModernEmptyState(
                           icon: Icons.shopping_cart_outlined,
                           message:
-                              _hideCompleted ? 'Todo comprado' : 'Lista vacía',
+                              _hideCompleted ? 'Todo comprado' : 'Lista vacÃ­a',
                           subtitle:
                               _hideCompleted
-                                  ? '¡Excelente! Has comprado todo'
-                                  : 'Añade productos con el botón +',
+                                  ? 'Â¡Excelente! Has comprado todo'
+                                  : 'AÃ±ade productos con el botÃ³n +',
                           actionLabel:
-                              _hideCompleted ? null : 'Añadir Producto',
+                              _hideCompleted ? null : 'AÃ±adir Producto',
                           onAction:
                               _hideCompleted
                                   ? null
@@ -327,7 +327,7 @@ class _ShoppingListDetailScreenState
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'Añadir Producto',
+                      'AÃ±adir Producto',
                       style: AppTypography.heading3(context),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -425,7 +425,7 @@ class _ShoppingListDetailScreenState
                                     priceController.text,
                                   ),
                                 }),
-                            child: const Text('Añadir'),
+                            child: const Text('AÃ±adir'),
                           ),
                         ),
                       ],
@@ -650,7 +650,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Eliminar producto'),
             content: Text(
-              '¿Seguro que quieres eliminar "${list.items[index].name}"?',
+              'Â¿Seguro que quieres eliminar "${list.items[index].name}"?',
             ),
             actions: [
               TextButton(
@@ -685,7 +685,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Limpiar comprados'),
             content: Text(
-              '¿Eliminar ${purchased.length} productos ya comprados?',
+              'Â¿Eliminar ${purchased.length} productos ya comprados?',
             ),
             actions: [
               TextButton(
@@ -754,7 +754,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Archivar lista'),
             content: const Text(
-              '¿Marcar esta lista como completada y enviarla al historial?\n\nPodrás restaurarla más tarde si lo necesitas.',
+              'Â¿Marcar esta lista como completada y enviarla al historial?\n\nPodrÃ¡s restaurarla mÃ¡s tarde si lo necesitas.',
             ),
             actions: [
               TextButton(
@@ -857,7 +857,7 @@ class _ShoppingItemCard extends StatelessWidget {
     final qtyText =
         '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${_getUnitShort(item.unit)}';
     final subtitle =
-        '$qtyText${item.total != null ? ' • €${item.total!.toStringAsFixed(2)}' : ''}';
+        '$qtyText${item.total != null ? ' â€¢ â‚¬${item.total!.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -931,3 +931,4 @@ class _ShoppingItemCard extends StatelessWidget {
     }
   }
 }
+

@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class ExportDataScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -172,7 +172,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
             const SizedBox(height: 24),
 
             Text(
-              '¿Qué se exportará?',
+              'Â¿QuÃ© se exportarÃ¡?',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -266,7 +266,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '¡Exportación completa!',
+                            'Â¡ExportaciÃ³n completa!',
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
                               color: Colors.green[700],
@@ -373,3 +373,4 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
     );
   }
 }
+

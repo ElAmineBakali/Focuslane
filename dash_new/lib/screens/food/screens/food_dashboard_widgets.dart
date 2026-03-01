@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import '../../../ui/components/focus_metric_card.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/ui/components/focus_metric_card.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class FoodMetricCard extends StatelessWidget {
   final IconData icon;
@@ -72,7 +72,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Aún no tienes un plan semanal activo.',
+              'AÃºn no tienes un plan semanal activo.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -193,7 +193,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                       }),
                       if (remaining > 0)
                         Text(
-                          '+$remaining más',
+                          '+$remaining mÃ¡s',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 10,
@@ -225,7 +225,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
   String _formatDayLabel(String key) {
     final parsed = DateTime.tryParse(key);
     if (parsed != null) {
-      final weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      final weekdays = ['Lun', 'Mar', 'MiÃ©', 'Jue', 'Vie', 'SÃ¡b', 'Dom'];
       return '${weekdays[parsed.weekday - 1]} ${parsed.day}';
     }
     switch (key) {
@@ -234,13 +234,13 @@ class FoodWeeklyPlanCard extends StatelessWidget {
       case 'Tue':
         return 'Mar';
       case 'Wed':
-        return 'Mié';
+        return 'MiÃ©';
       case 'Thu':
         return 'Jue';
       case 'Fri':
         return 'Vie';
       case 'Sat':
-        return 'Sáb';
+        return 'SÃ¡b';
       case 'Sun':
         return 'Dom';
       default:
@@ -406,7 +406,7 @@ class FoodRecipeCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${protein.toStringAsFixed(0)}g proteína',
+                '${protein.toStringAsFixed(0)}g proteÃ­na',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
@@ -572,7 +572,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                         ),
                         Text(
                           item.total != null
-                              ? '$qtyText • €${item.total!.toStringAsFixed(2)}'
+                              ? '$qtyText â€¢ â‚¬${item.total!.toStringAsFixed(2)}'
                               : qtyText,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
@@ -590,7 +590,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '+ ${pendingItems.length - 6} productos más',
+                '+ ${pendingItems.length - 6} productos mÃ¡s',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -617,3 +617,4 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
     );
   }
 }
+

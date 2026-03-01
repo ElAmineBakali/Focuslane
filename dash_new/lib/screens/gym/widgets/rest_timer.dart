@@ -1,6 +1,6 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class RestTimer extends StatefulWidget {
   final int initialSeconds;
@@ -133,3 +133,4 @@ class _RestTimerState extends State<RestTimer> {
     );
   }
 }
+

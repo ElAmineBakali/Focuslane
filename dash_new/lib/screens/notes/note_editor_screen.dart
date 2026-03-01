@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'note_model.dart';
 import 'note_firestore_service.dart';
-import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
+import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   final Note? note;
@@ -188,7 +188,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   fontSize: isMobile ? 20 : 24,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Título',
+                  hintText: 'TÃ­tulo',
                   border: InputBorder.none,
                   hintStyle: TextStyle(color: color.onSurfaceVariant),
                 ),
@@ -227,3 +227,4 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     );
   }
 }
+

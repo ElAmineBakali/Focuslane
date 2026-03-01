@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 import 'game_edit_screen.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class GameDetailScreen extends StatefulWidget {
   const GameDetailScreen({super.key});
@@ -60,9 +60,9 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.sports_esports),
-              title: Text('${g.platform} • ${g.hours.toStringAsFixed(1)} h'),
+              title: Text('${g.platform} â€¢ ${g.hours.toStringAsFixed(1)} h'),
               subtitle: Text(
-                'Estado: ${g.status.name} • ${g.progressPct}% • Dificultad: ${g.difficulty ?? "-"} • Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${g.status.name} â€¢ ${g.progressPct}% â€¢ Dificultad: ${g.difficulty ?? "-"} â€¢ Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -103,7 +103,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                           controller: _prog,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Progreso % (después)',
+                            labelText: 'Progreso % (despuÃ©s)',
                           ),
                         ),
                       ),
@@ -133,7 +133,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       _prog.clear();
                       _note.clear();
                     },
-                    child: const Text('Añadir sesión'),
+                    child: const Text('AÃ±adir sesiÃ³n'),
                   ),
                   const Divider(),
                   StreamBuilder<List<GameSession>>(
@@ -157,10 +157,10 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                                               .split('.')
                                               .first +
                                           (x.progressAfter != null
-                                              ? ' • ${x.progressAfter}%'
+                                              ? ' â€¢ ${x.progressAfter}%'
                                               : '') +
                                           (x.notes != null
-                                              ? ' • ${x.notes}'
+                                              ? ' â€¢ ${x.notes}'
                                               : ''),
                                     ),
                                   ),
@@ -178,3 +178,6 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
     );
   }
 }
+
+
+

@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class SubscriptionService {
   static final SubscriptionService I = SubscriptionService._();
@@ -66,8 +66,8 @@ class SubscriptionService {
 
     await NotificationService.I.scheduleOnce(
       id: s.id.hashCode,
-      title: 'Próximo pago: ${s.title}',
-      body: 'Vence en ${s.remindDaysBefore} días. Monto: ${s.amount}',
+      title: 'PrÃ³ximo pago: ${s.title}',
+      body: 'Vence en ${s.remindDaysBefore} dÃ­as. Monto: ${s.amount}',
       whenLocal: notifDate,
       useExact: false,
     );
@@ -106,4 +106,5 @@ class SubscriptionService {
     }
   }
 }
+
 

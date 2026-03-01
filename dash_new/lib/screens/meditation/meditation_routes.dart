@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/meditation/presets/breath_presets_screen.dartbreath_presets_screen.dart';
+import 'package:mi_dashboard_personal/screens/meditation/presets/breath_presets_screen.dart';
 import 'dashboard/meditation_home_screen.dart';
 import 'timer/timer_session_screen.dart';
 import 'breathing/breathing_coach_screen.dart';

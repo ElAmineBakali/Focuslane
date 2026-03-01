@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
@@ -7,7 +7,7 @@ import '../timer/study_timer_screen.dart';
 import '../analytics/study_analytics_screen.dart';
 import 'course_edit_sheet.dart';
 import '../attendance/attendance_screen.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -42,7 +42,7 @@ class CourseDetailScreen extends StatelessWidget {
                 ),
           ),
           IconButton(
-            tooltip: 'Estadísticas',
+            tooltip: 'EstadÃ­sticas',
             icon: const Icon(Icons.bar_chart_rounded),
             onPressed:
                 () => Navigator.push(
@@ -63,7 +63,7 @@ class CourseDetailScreen extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.play_circle_fill, color: accent),
               title: const Text('Estudiar ahora'),
-              subtitle: const Text('Inicia una sesión con el último preset'),
+              subtitle: const Text('Inicia una sesiÃ³n con el Ãºltimo preset'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -81,7 +81,7 @@ class CourseDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: Icon(Icons.checklist, color: accent),
-              title: const Text('Tareas / Exámenes'),
+              title: const Text('Tareas / ExÃ¡menes'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -103,7 +103,7 @@ class CourseDetailScreen extends StatelessWidget {
               subtitle: Text(
                 course.attendanceRequired != null
                     ? 'Requerida: ${course.attendanceRequired!.toStringAsFixed(0)}%'
-                    : 'Define el % requerido en “Editar” (opcional)',
+                    : 'Define el % requerido en â€œEditarâ€ (opcional)',
               ),
               onTap: () {
                 Navigator.push(
@@ -120,3 +120,4 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 }
+

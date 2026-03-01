@@ -1,8 +1,8 @@
-// lib/screens/meditation/presets/breath_preset_edit_screen.dart
+﻿// lib/screens/meditation/presets/breath_preset_edit_screen.dart
 import 'package:flutter/material.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class BreathPresetEditScreen extends StatefulWidget {
   const BreathPresetEditScreen({super.key});
@@ -66,7 +66,7 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [2, 3, 4, 5, 6, 7, 8, 10],
                 ),
                 _numPicker(
-                  'Mantén (s)',
+                  'MantÃ©n (s)',
                   _hold,
                   (v) => setState(() => _hold = v),
                   [0, 2, 3, 4, 5, 6, 8, 10],
@@ -78,7 +78,7 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [2, 3, 4, 5, 6, 7, 8, 10],
                 ),
                 _numPicker(
-                  'Mantén 2 (s)',
+                  'MantÃ©n 2 (s)',
                   _hold2,
                   (v) => setState(() => _hold2 = v),
                   [0, 2, 3, 4, 5, 6, 8, 10],
@@ -90,14 +90,14 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [3, 4, 5, 6, 7, 8, 10, 12],
                 ),
                 SwitchListTile(
-                  title: const Text('Vibración'),
+                  title: const Text('VibraciÃ³n'),
                   value: _vibration,
                   onChanged: (v) => setState(() => _vibration = v),
                 ),
                 DropdownButtonFormField<String>(
                   initialValue: _visual,
                   items: const [
-                    DropdownMenuItem(value: 'circle', child: Text('Círculo')),
+                    DropdownMenuItem(value: 'circle', child: Text('CÃ­rculo')),
                     DropdownMenuItem(value: 'dot', child: Text('Punto')),
                     DropdownMenuItem(value: 'wave', child: Text('Ola')),
                   ],
@@ -168,3 +168,4 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
     );
   }
 }
+

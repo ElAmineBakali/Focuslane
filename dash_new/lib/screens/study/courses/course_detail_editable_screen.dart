@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
-import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
-import '../../../ui/components/focus_module_header.dart';
+import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -124,7 +124,7 @@ class _CourseDetailEditableScreenState
               style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              '¿Estás seguro de que deseas archivar este curso? Podrás restaurarlo más tarde.',
+              'Â¿EstÃ¡s seguro de que deseas archivar este curso? PodrÃ¡s restaurarlo mÃ¡s tarde.',
               style: GoogleFonts.plusJakartaSans(),
             ),
             actions: [
@@ -158,7 +158,7 @@ class _CourseDetailEditableScreenState
               style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              '¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.',
+              'Â¿EstÃ¡s seguro de que deseas eliminar este curso? Esta acciÃ³n no se puede deshacer.',
               style: GoogleFonts.plusJakartaSans(),
             ),
             actions: [
@@ -291,7 +291,7 @@ class _CourseDetailEditableScreenState
                   children: [
                     if (_isEditing) ...[
                       Text(
-                        'Información del curso',
+                        'InformaciÃ³n del curso',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -318,7 +318,7 @@ class _CourseDetailEditableScreenState
                           Expanded(
                             child: _TaskFormTextField(
                               controller: _creditsController,
-                              label: 'Créditos',
+                              label: 'CrÃ©ditos',
                               icon: Icons.star_rounded,
                               keyboardType: TextInputType.number,
                             ),
@@ -396,7 +396,7 @@ class _CourseDetailEditableScreenState
                           Expanded(
                             child: _StatCard(
                               icon: Icons.star_rounded,
-                              label: 'Créditos',
+                              label: 'CrÃ©ditos',
                               value: widget.course.credits?.toString() ?? '-',
                               color: Colors.amber,
                             ),
@@ -536,3 +536,4 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
+

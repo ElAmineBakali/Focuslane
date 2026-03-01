@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/dashboard/study_dashboard_screen.dart';
 import '../../study/diary/study_diary_screen.dart';
@@ -9,8 +9,8 @@ import '../../study/pantry/study_pantry_screen.dart';
 import '../../study/history/study_history_screen.dart';
 import '../../study/settings/study_settings_screen.dart';
 import '../../study/notifications/study_notifications_screen.dart';
-import '../../../ui/layouts/module_shell.dart';
-import '../../../ui/layouts/module_sidebar.dart';
+import '../../../design/ui/layouts/module_shell.dart';
+import '../../../design/ui/layouts/module_sidebar.dart';
 
 class StudyMainScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -63,8 +63,9 @@ class _StudyMainScreenState extends State<StudyMainScreen> {
         index: _selectedIndex,
         children: _screens(),
       ),
-      moduleTitle: 'Módulo Study',
+      moduleTitle: 'MÃ³dulo Study',
       moduleIcon: Icons.school,
     );
   }
 }
+

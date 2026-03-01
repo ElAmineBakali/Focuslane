@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
@@ -7,7 +7,7 @@ import 'package:mi_dashboard_personal/screens/habits/widgets/emoji_icon_picker.d
 import 'package:mi_dashboard_personal/screens/habits/widgets/tag_selector.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/template_selector.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class HabitCreateScreen extends StatefulWidget {
   final Habit? habit;
@@ -204,7 +204,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Editar hábito' : 'Crear nuevo hábito'),
+        title: Text(_isEditing ? 'Editar hÃ¡bito' : 'Crear nuevo hÃ¡bito'),
         actions: [
           if (!_isEditing)
             IconButton(
@@ -274,7 +274,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Icono del hábito',
+                                  'Icono del hÃ¡bito',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -307,7 +307,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
-                    labelText: 'Nombre del hábito',
+                    labelText: 'Nombre del hÃ¡bito',
                   ),
                   validator:
                       (v) =>
@@ -320,7 +320,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
+                  decoration: const InputDecoration(labelText: 'DescripciÃ³n'),
                   maxLines: 2,
                 ),
 
@@ -466,9 +466,9 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                 const SizedBox(height: 16),
 
                 SwitchListTile(
-                  title: const Text('¿Es cuantitativo?'),
+                  title: const Text('Â¿Es cuantitativo?'),
                   subtitle: Text(
-                    'Permite registrar números (ej: páginas leídas, km corridos)',
+                    'Permite registrar nÃºmeros (ej: pÃ¡ginas leÃ­das, km corridos)',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: cs.onSurfaceVariant,
                     ),
@@ -482,7 +482,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                   TextFormField(
                     initialValue: _unit,
                     decoration: const InputDecoration(
-                      labelText: 'Unidad (ej. páginas, km, vasos...)',
+                      labelText: 'Unidad (ej. pÃ¡ginas, km, vasos...)',
                     ),
                     onChanged: (v) => _unit = v.trim(),
                     validator:
@@ -498,7 +498,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Color del hábito:',
+                      'Color del hÃ¡bito:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 12),
@@ -526,7 +526,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                       _isEditing ? Icons.save_rounded : Icons.add_rounded,
                     ),
                     label: Text(
-                      _isEditing ? 'Guardar cambios' : 'Crear hábito',
+                      _isEditing ? 'Guardar cambios' : 'Crear hÃ¡bito',
                     ),
                     style: FilledButton.styleFrom(
                       padding: EdgeInsets.symmetric(
@@ -544,3 +544,4 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     );
   }
 }
+

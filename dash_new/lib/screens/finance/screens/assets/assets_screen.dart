@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/asset_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/asset_service.dart';
 
-import '../../../../ui/components/focus_card.dart';
-import '../../../../ui/components/focus_module_header.dart';
-import '../../../../ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/focus_card.dart';
+import '../../../../design/ui/components/focus_module_header.dart';
+import '../../../../design/ui/tokens/focuslane_tokens.dart';
 
 class AssetsScreen extends StatelessWidget {
   const AssetsScreen({
@@ -62,7 +62,7 @@ class AssetsScreen extends StatelessWidget {
                           title: Text(a.name),
                           subtitle: Text(a.type),
                           trailing: Text(
-                            '${a.currentValue.toStringAsFixed(2)}€',
+                            '${a.currentValue.toStringAsFixed(2)}â‚¬',
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                           onTap: () => Navigator.pushNamed(
@@ -83,6 +83,7 @@ class AssetsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

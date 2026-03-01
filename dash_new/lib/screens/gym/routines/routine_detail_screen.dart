@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/gym_firestore_service.dart';
 import '../session/live_session_screen.dart';
-import '../analytics/gym_analytics_screen_v2.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../analytics/gym_analytics_screen.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class RoutineDetailScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -72,12 +72,12 @@ class RoutineDetailScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.bar_chart_rounded),
-                tooltip: 'Estadísticas',
+                tooltip: 'EstadÃ­sticas',
                 onPressed:
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => GymAnalyticsScreenV2(svc: svc),
+                        builder: (_) => GymAnalyticsScreen(svc: svc),
                       ),
                     ),
               ),
@@ -118,7 +118,7 @@ class RoutineDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Sin días aún',
+                          'Sin dÃ­as aÃºn',
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -127,7 +127,7 @@ class RoutineDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Crea tu primer día con el botón inferior',
+                          'Crea tu primer dÃ­a con el botÃ³n inferior',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: s.onSurfaceVariant,
@@ -160,7 +160,7 @@ class RoutineDetailScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _createDaySheet(context),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Añadir Día'),
+        label: const Text('AÃ±adir DÃ­a'),
         backgroundColor: routine.color,
         foregroundColor: Colors.white,
       ),
@@ -277,7 +277,7 @@ class RoutineDetailScreen extends StatelessWidget {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               _buildSnackBar(
-                                'Día duplicado ✨',
+                                'DÃ­a duplicado âœ¨',
                                 Icons.copy_all_rounded,
                                 s,
                               ),
@@ -290,13 +290,13 @@ class RoutineDetailScreen extends StatelessWidget {
                             builder:
                                 (_) => AlertDialog(
                                   title: Text(
-                                    'Eliminar día',
+                                    'Eliminar dÃ­a',
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   content: Text(
-                                    '¿Eliminar "${d.name}" y sus ejercicios?',
+                                    'Â¿Eliminar "${d.name}" y sus ejercicios?',
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
@@ -323,7 +323,7 @@ class RoutineDetailScreen extends StatelessWidget {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 _buildSnackBar(
-                                  'Día eliminado 🗑️',
+                                  'DÃ­a eliminado ðŸ—‘ï¸',
                                   Icons.delete_outline,
                                   s,
                                 ),
@@ -340,7 +340,7 @@ class RoutineDetailScreen extends StatelessWidget {
                                 children: [
                                   Icon(Icons.content_copy_rounded, size: 20),
                                   SizedBox(width: 12),
-                                  Text('Duplicar día'),
+                                  Text('Duplicar dÃ­a'),
                                 ],
                               ),
                             ),
@@ -350,7 +350,7 @@ class RoutineDetailScreen extends StatelessWidget {
                                 children: [
                                   Icon(Icons.delete_rounded, size: 20),
                                   SizedBox(width: 12),
-                                  Text('Eliminar día'),
+                                  Text('Eliminar dÃ­a'),
                                 ],
                               ),
                             ),
@@ -408,7 +408,7 @@ class RoutineDetailScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'Nuevo día',
+                  'Nuevo dÃ­a',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -428,7 +428,7 @@ class RoutineDetailScreen extends StatelessWidget {
                   autofocus: true,
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: 'Nombre del día',
+                    labelText: 'Nombre del dÃ­a',
                     hintText: 'Ej: Pecho/Espalda, Push, Pierna...',
                     prefixIcon: const Icon(Icons.label_rounded),
                     border: OutlineInputBorder(
@@ -483,7 +483,7 @@ class RoutineDetailScreen extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          'Crear día',
+                          'Crear dÃ­a',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -527,7 +527,7 @@ class RoutineDetailScreen extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         _buildSnackBar(
-          'Día "$name" creado correctamente 🎉',
+          'DÃ­a "$name" creado correctamente ðŸŽ‰',
           Icons.check_circle_rounded,
           Theme.of(context).colorScheme,
         ),
@@ -573,7 +573,7 @@ class _LastDoneSubtitle extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData || !snap.data!.exists) {
           return Text(
-            'Sin sesiones aún',
+            'Sin sesiones aÃºn',
             style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }
@@ -584,7 +584,7 @@ class _LastDoneSubtitle extends StatelessWidget {
 
         if (dt == null) {
           return Text(
-            'Sin sesiones aún',
+            'Sin sesiones aÃºn',
             style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }
@@ -626,3 +626,4 @@ class _LastDoneSubtitle extends StatelessWidget {
     return 'ahora';
   }
 }
+

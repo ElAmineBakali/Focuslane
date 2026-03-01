@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
 
 class CultureHomeScreen extends StatelessWidget {
   const CultureHomeScreen({super.key});
@@ -14,7 +14,7 @@ class CultureHomeScreen extends StatelessWidget {
         title: const Text('Cultura'),
         actions: [
           IconButton(
-            tooltip: 'Analíticas',
+            tooltip: 'AnalÃ­ticas',
             icon: const Icon(Icons.insights),
             onPressed: () => Navigator.pushNamed(context, '/culture/analytics'),
           ),
@@ -41,7 +41,7 @@ class CultureHomeScreen extends StatelessWidget {
                     };
                 final items = [
                   _kpiSmall(context, 'Libros terminados', '${m['booksDone']}'),
-                  _kpiSmall(context, 'Películas vistas', '${m['moviesDone']}'),
+                  _kpiSmall(context, 'PelÃ­culas vistas', '${m['moviesDone']}'),
                   _kpiSmall(
                     context,
                     'Series completadas',
@@ -60,8 +60,8 @@ class CultureHomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _nav(context, 'Libros', Icons.menu_book, '/culture/books'),
             _nav(context, 'Series / Anime', Icons.tv, '/culture/series'),
-            _nav(context, 'Películas', Icons.local_movies, '/culture/movies'),
-            _nav(context, 'Música', Icons.album, '/culture/music'),
+            _nav(context, 'PelÃ­culas', Icons.local_movies, '/culture/movies'),
+            _nav(context, 'MÃºsica', Icons.album, '/culture/music'),
             _nav(context, 'Juegos', Icons.sports_esports, '/culture/games'),
             _nav(
               context,
@@ -91,7 +91,7 @@ class CultureHomeScreen extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Añadir',
+                  'AÃ±adir',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: cs.onPrimary,
                     fontWeight: FontWeight.w700,
@@ -132,11 +132,11 @@ class CultureHomeScreen extends StatelessWidget {
               it('Libro', Icons.menu_book_outlined, '/culture/book/edit'),
               it('Serie/Anime', Icons.tv_outlined, '/culture/series/edit'),
               it(
-                'Película',
+                'PelÃ­cula',
                 Icons.local_movies_outlined,
                 '/culture/movie/edit',
               ),
-              it('Álbum', Icons.album_outlined, '/culture/album/edit'),
+              it('Ãlbum', Icons.album_outlined, '/culture/album/edit'),
               it('Juego', Icons.sports_esports_outlined, '/culture/game/edit'),
               const SizedBox(height: 8),
             ],
@@ -235,3 +235,4 @@ class CultureHomeScreen extends StatelessWidget {
         ),
       );
 }
+

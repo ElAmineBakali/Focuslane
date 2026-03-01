@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../widgets/exercise_picker_sheet.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class RoutineBuilderScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -130,7 +130,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                         validator: (s) {
                           if ((s ?? '').trim().isEmpty) return 'Pon un nombre';
                           if ((s ?? '').trim().length < 3) {
-                            return 'Mínimo 3 caracteres';
+                            return 'MÃ­nimo 3 caracteres';
                           }
                           return null;
                         },
@@ -202,7 +202,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                 final days = snap.data!;
                 if (days.isEmpty) {
                   return const Center(
-                    child: Text('Crea al menos un día en la rutina'),
+                    child: Text('Crea al menos un dÃ­a en la rutina'),
                   );
                 }
                 return ListView.builder(
@@ -273,7 +273,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                                               'RPE: ${e.targetRPE}',
                                             if (e.targetPercent1RM != null)
                                               '%1RM: ${e.targetPercent1RM}',
-                                          ].join(' • '),
+                                          ].join(' â€¢ '),
                                         ),
                                         trailing: PopupMenuButton<String>(
                                           onSelected: (v) async {
@@ -317,7 +317,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                                   ),
                                   ListTile(
                                     leading: const Icon(Icons.add),
-                                    title: const Text('Añadir ejercicio'),
+                                    title: const Text('AÃ±adir ejercicio'),
                                     onTap: () async {
                                       final picked = await showModalBottomSheet<
                                         RoutineExercise
@@ -459,3 +459,4 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     }
   }
 }
+

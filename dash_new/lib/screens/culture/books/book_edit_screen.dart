@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class BookEditScreen extends StatefulWidget {
   const BookEditScreen({super.key});
@@ -61,7 +61,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Debes iniciar sesión para subir PDF')),
+          const SnackBar(content: Text('Debes iniciar sesiÃ³n para subir PDF')),
         );
         return;
       }
@@ -135,7 +135,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
             children: [
               TextFormField(
                 controller: _title,
-                decoration: const InputDecoration(labelText: 'Título'),
+                decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                 validator:
                     (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
@@ -145,17 +145,17 @@ class _BookEditScreenState extends State<BookEditScreen> {
               ),
               TextFormField(
                 controller: _genre,
-                decoration: const InputDecoration(labelText: 'Género'),
+                decoration: const InputDecoration(labelText: 'GÃ©nero'),
               ),
               TextFormField(
                 controller: _year,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Año'),
+                decoration: const InputDecoration(labelText: 'AÃ±o'),
               ),
               TextFormField(
                 controller: _pages,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Páginas totales'),
+                decoration: const InputDecoration(labelText: 'PÃ¡ginas totales'),
               ),
               TextFormField(
                 controller: _cover,
@@ -201,7 +201,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Valoración (0..10)'),
+                title: const Text('ValoraciÃ³n (0..10)'),
                 trailing: SizedBox(
                   width: 100,
                   child: TextField(
@@ -257,3 +257,6 @@ class _BookEditScreenState extends State<BookEditScreen> {
     );
   }
 }
+
+
+

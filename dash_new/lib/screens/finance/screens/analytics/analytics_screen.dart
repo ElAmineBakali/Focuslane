@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
-import '../../../../ui/components/focus_card.dart';
-import '../../../../ui/components/focus_module_header.dart';
-import '../../../../ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/focus_card.dart';
+import '../../../../design/ui/components/focus_module_header.dart';
+import '../../../../design/ui/tokens/focuslane_tokens.dart';
 
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({
@@ -69,12 +69,13 @@ class AnalyticsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
-          Text('${value.toStringAsFixed(2)}€', style: TextStyle(color: color, fontWeight: FontWeight.w700)),
+          Text('${value.toStringAsFixed(2)}â‚¬', style: TextStyle(color: color, fontWeight: FontWeight.w700)),
         ],
       ),
     );
   }
 }
+
 
 
 

@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import '../../../theme/focuslane_ui.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -54,7 +54,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
           },
           {
             'slot': 'snack',
-            'name': 'Media Mañana',
+            'name': 'Media MaÃ±ana',
             'icon': Icons.cookie.codePoint,
             'enabled': true,
           },
@@ -270,17 +270,17 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                     visualDensity: VisualDensity.compact,
                   ),
                   Chip(
-                    label: Text('Objetivo proteína ${targetProtein.toStringAsFixed(0)}g'),
+                    label: Text('Objetivo proteÃ­na ${targetProtein.toStringAsFixed(0)}g'),
                     visualDensity: VisualDensity.compact,
                   ),
                   if (proteinLow)
                     Chip(
-                      label: const Text('Proteína baja tras entreno'),
+                      label: const Text('ProteÃ­na baja tras entreno'),
                       visualDensity: VisualDensity.compact,
                     ),
                   if (extremeDeficit)
                     Chip(
-                      label: const Text('Déficit extremo con entreno fuerte'),
+                      label: const Text('DÃ©ficit extremo con entreno fuerte'),
                       visualDensity: VisualDensity.compact,
                     ),
                   if (overBudget)
@@ -420,7 +420,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Última edición',
+                          'Ãšltima ediciÃ³n',
                           style: AppTypography.caption(
                             context,
                           ).copyWith(color: AppColors.textSecondary),
@@ -454,7 +454,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         }
 
         final planner = snap.data!;
-        final days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        final days = ['Lun', 'Mar', 'MiÃ©', 'Jue', 'Vie', 'SÃ¡b', 'Dom'];
         final dayKeys = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         final slots = _slotsLoaded ? _getActiveSlots() : MealSlot.values;
 
@@ -499,7 +499,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                     ),
                                       const SizedBox(width: AppSpacing.xs),
                                     Text(
-                                      'Toca para añadir • Mantén pulsado para eliminar',
+                                      'Toca para aÃ±adir â€¢ MantÃ©n pulsado para eliminar',
                                       style: AppTypography.caption(
                                         context,
                                       ).copyWith(
@@ -840,7 +840,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
               controller: controller,
               decoration: InputDecoration(
                 labelText: 'Nombre del planificador',
-                hintText: 'Ej: Definición, Volumen, Familiar',
+                hintText: 'Ej: DefiniciÃ³n, Volumen, Familiar',
               ),
               autofocus: true,
             ),
@@ -1048,10 +1048,10 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
     final days = [
       'lunes',
       'martes',
-      'miércoles',
+      'miÃ©rcoles',
       'jueves',
       'viernes',
-      'sábado',
+      'sÃ¡bado',
       'domingo',
     ];
     final colorScheme = Theme.of(context).colorScheme;
@@ -1201,7 +1201,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                           padding: const EdgeInsets.all(AppSpacing.lg),
                           child: Center(
                             child: Text(
-                              'Toca + para añadir alimento',
+                              'Toca + para aÃ±adir alimento',
                               style: AppTypography.caption(context),
                             ),
                           ),
@@ -1244,7 +1244,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                             ),
                             title: Text(food.name),
                             subtitle: Text(
-                              '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal • ${entry.servings}x porción',
+                              '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal â€¢ ${entry.servings}x porciÃ³n',
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: AppColors.error),
@@ -1324,7 +1324,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
           },
           {
             'slot': 'snack',
-            'name': 'Media Mañana',
+            'name': 'Media MaÃ±ana',
             'icon': Icons.cookie.codePoint,
             'enabled': true,
           },
@@ -1434,7 +1434,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                         style: AppTypography.heading2(context),
                       ),
                       Text(
-                        'Personaliza las comidas del día',
+                        'Personaliza las comidas del dÃ­a',
                         style: AppTypography.caption(context),
                       ),
                     ],
@@ -1526,7 +1526,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                           },
                           {
                             'slot': 'snack',
-                            'name': 'Media Mañana',
+                            'name': 'Media MaÃ±ana',
                             'icon': Icons.cookie.codePoint,
                             'enabled': true,
                           },
@@ -1573,7 +1573,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                         Navigator.pop(context);
                         FoodFeedback.showSuccess(
                           context,
-                          'Configuración guardada',
+                          'ConfiguraciÃ³n guardada',
                         );
                       }
                     },
@@ -1587,3 +1587,4 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
     );
   }
 }
+

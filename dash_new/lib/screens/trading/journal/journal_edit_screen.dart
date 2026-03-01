@@ -1,9 +1,9 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum Outcome { win, loss, breakeven }
@@ -223,7 +223,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                   decoration: deco('market / limit / stop'),
                 ),
                 const SizedBox(height: 12),
-                Text('Tamaño (Size)', style: tt.titleMedium),
+                Text('TamaÃ±o (Size)', style: tt.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _sizeCtrl,
@@ -270,7 +270,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                   decoration: deco('Close price'),
                 ),
                 const SizedBox(height: 12),
-                Text('Comisión', style: tt.titleMedium),
+                Text('ComisiÃ³n', style: tt.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _commissionCtrl,
@@ -313,7 +313,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                 ),
                 const SizedBox(height: 12),
                 SwitchListTile(
-                  title: const Text('¿Cumplí la estrategia?'),
+                  title: const Text('Â¿CumplÃ­ la estrategia?'),
                   value: _strategyOk,
                   onChanged: (v) => setState(() => _strategyOk = v),
                 ),
@@ -325,7 +325,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                 TextFormField(
                   controller: _commentsCtrl,
                   maxLines: 4,
-                  decoration: deco('Ideas, psicología, gestión…'),
+                  decoration: deco('Ideas, psicologÃ­a, gestiÃ³nâ€¦'),
                 ),
                 const SizedBox(height: 16),
 
@@ -350,7 +350,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                     TextButton.icon(
                       onPressed: _pickImage,
                       icon: const Icon(Icons.image_outlined),
-                      label: const Text('Galería / Archivos'),
+                      label: const Text('GalerÃ­a / Archivos'),
                     ),
                   ],
                 ),
@@ -372,3 +372,4 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
     );
   }
 }
+

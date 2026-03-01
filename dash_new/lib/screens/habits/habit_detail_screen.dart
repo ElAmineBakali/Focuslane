@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
@@ -159,7 +159,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar hábito'),
+        title: const Text('Editar hÃ¡bito'),
         actions: [
           IconButton(icon: const Icon(Icons.save), onPressed: _saveChanges),
         ],
@@ -223,7 +223,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Icono del hábito',
+                                  'Icono del hÃ¡bito',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -260,7 +260,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
+                  decoration: const InputDecoration(labelText: 'DescripciÃ³n'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 12),
@@ -394,7 +394,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 const SizedBox(height: 16),
 
                 SwitchListTile(
-                  title: const Text('¿Es cuantitativo?'),
+                  title: const Text('Â¿Es cuantitativo?'),
                   value: _isQuantitative,
                   onChanged: (val) => setState(() => _isQuantitative = val),
                 ),
@@ -416,7 +416,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   ),
                 ),
                 SwitchListTile(
-                  title: const Text('¿Está activo?'),
+                  title: const Text('Â¿EstÃ¡ activo?'),
                   value: _isActive,
                   onChanged: (val) => setState(() => _isActive = val),
                 ),
@@ -428,3 +428,4 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     );
   }
 }
+

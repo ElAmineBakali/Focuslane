@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/prenda_firestore_service.dart';
-import '../../models/prenda_model.dart';
-import '../../models/outfit_model.dart';
+import '../../screens/ropa/services/prenda_firestore_service.dart';
+import 'models/prenda_model.dart';
+import 'models/outfit_model.dart';
 
 class OutfitDetailScreen extends StatelessWidget {
   final Outfit outfit;
@@ -48,7 +48,7 @@ class OutfitDetailScreen extends StatelessWidget {
                           ),
                 ),
                 title: Text(label),
-                subtitle: Text(p?.nombre ?? '—'),
+                subtitle: Text(p?.nombre ?? 'â€”'),
               );
             }
 
@@ -66,7 +66,7 @@ class OutfitDetailScreen extends StatelessWidget {
                 tile('accessories', 'Accesorios'),
                 const Divider(),
                 Text("Veces usado: ${outfit.vecesUsado}"),
-                Text("Última vez: ${outfit.ultimaVezUsado ?? 'Nunca'}"),
+                Text("Ãšltima vez: ${outfit.ultimaVezUsado ?? 'Nunca'}"),
               ],
             );
           },
@@ -75,3 +75,6 @@ class OutfitDetailScreen extends StatelessWidget {
     );
   }
 }
+
+
+

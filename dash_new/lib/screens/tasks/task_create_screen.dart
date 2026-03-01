@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'task_model.dart';
 import 'task_firestore_service.dart';
-import 'package:mi_dashboard_personal/services/reminder_service.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/screens/tasks/services/reminder_service.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class TaskCreateScreen extends StatefulWidget {
   const TaskCreateScreen({super.key});
@@ -67,7 +67,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
 
     if (_enableReminder && _titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El recordatorio requiere un título')),
+        const SnackBar(content: Text('El recordatorio requiere un tÃ­tulo')),
       );
       return;
     }
@@ -142,12 +142,12 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Título', style: textTheme.titleMedium),
+                Text('TÃ­tulo', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    hintText: 'Introduce un título',
+                    hintText: 'Introduce un tÃ­tulo',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -157,12 +157,12 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty)
-                              ? 'Escribe un título'
+                              ? 'Escribe un tÃ­tulo'
                               : null,
                 ),
                 const SizedBox(height: 16),
 
-                Text('Repetición', style: textTheme.titleMedium),
+                Text('RepeticiÃ³n', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 DropdownButtonFormField<RepeatRule>(
                   initialValue: _repeatRule,
@@ -190,7 +190,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
 
                 Tooltip(
                   message:
-                      'Esta opción afectará al módulo Calendario próximamente',
+                      'Esta opciÃ³n afectarÃ¡ al mÃ³dulo Calendario prÃ³ximamente',
                   child: SwitchListTile(
                     value: _isCalendarVisible,
                     onChanged: null,
@@ -217,7 +217,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                                           title: t,
                                         ),
                                 decoration: InputDecoration(
-                                  hintText: 'Título de subtarea',
+                                  hintText: 'TÃ­tulo de subtarea',
                                   filled: true,
                                   fillColor: colorScheme.surface,
                                   border: OutlineInputBorder(
@@ -250,13 +250,13 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                           });
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('Añadir subtarea'),
+                        label: const Text('AÃ±adir subtarea'),
                       ),
                     ),
                   ],
                 ),
 
-                Text('Descripción', style: textTheme.titleMedium),
+                Text('DescripciÃ³n', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _descController,
@@ -264,7 +264,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    hintText: 'Escribe una descripción…',
+                    hintText: 'Escribe una descripciÃ³nâ€¦',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -274,12 +274,12 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                Text('Categoría (opcional)', style: textTheme.titleMedium),
+                Text('CategorÃ­a (opcional)', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _categoryController,
                   decoration: InputDecoration(
-                    hintText: 'Ej: Trabajo, Personal…',
+                    hintText: 'Ej: Trabajo, Personalâ€¦',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -294,7 +294,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 TextFormField(
                   controller: _tagsController,
                   decoration: InputDecoration(
-                    hintText: 'Ej: urgente, reunión, compras',
+                    hintText: 'Ej: urgente, reuniÃ³n, compras',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -334,7 +334,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 ),
 
                 const SizedBox(height: 16),
-                Text('Fecha límite', style: textTheme.titleMedium),
+                Text('Fecha lÃ­mite', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 Row(
                   children: [
@@ -353,7 +353,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text('Hora límite', style: textTheme.titleMedium),
+                Text('Hora lÃ­mite', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 Row(
                   children: [
@@ -390,7 +390,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                       }
                     });
                   },
-                  title: const Text('Añadir recordatorio'),
+                  title: const Text('AÃ±adir recordatorio'),
                 ),
                 if (_enableReminder) ...[
                   const SizedBox(height: 8),
@@ -473,3 +473,4 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
     );
   }
 }
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/food_firestore_service.dart';
 import '../screens/food_dashboard_screen.dart';
 import '../screens/food_diary_screen.dart';
@@ -9,8 +9,8 @@ import '../screens/shopping_lists_screen.dart';
 import '../screens/pantry_screen.dart';
 import '../screens/food_history_screen.dart';
 import '../screens/food_settings_notifications_screen.dart';
-import '../../../ui/layouts/module_shell.dart';
-import '../../../ui/layouts/module_sidebar.dart';
+import '../../../design/ui/layouts/module_shell.dart';
+import '../../../design/ui/layouts/module_sidebar.dart';
 
 class FoodMainScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -66,8 +66,9 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
         index: _selectedIndex,
         children: _getScreens(),
       ),
-      moduleTitle: 'Módulo Food',
+      moduleTitle: 'MÃ³dulo Food',
       moduleIcon: Icons.restaurant,
     );
   }
 }
+

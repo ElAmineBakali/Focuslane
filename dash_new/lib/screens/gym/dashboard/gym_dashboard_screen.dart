@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +8,13 @@ import '../../gym/routines/routines_list_screen.dart';
 import '../../gym/routines/routine_detail_screen.dart';
 import '../../gym/session/session_history_screen.dart';
 import '../../gym/goals/gym_goals_screen.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_metric_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_empty_state.dart';
-import '../../../ui/components/focus_list_tile_compact.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_metric_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_list_tile_compact.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -49,8 +49,8 @@ class GymDashboardScreen extends StatelessWidget {
           cards.add(
             _GymAlertCard(
               icon: Icons.local_fire_department,
-              title: 'Déficit extremo con entreno fuerte',
-              message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
+              title: 'DÃ©ficit extremo con entreno fuerte',
+              message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
             ),
           );
         }
@@ -58,7 +58,7 @@ class GymDashboardScreen extends StatelessWidget {
           final dueDays = (alert['subscriptionDueInDays'] as num?)?.toInt();
           String dueLabel = 'pronto';
           if (dueDays != null) {
-            dueLabel = dueDays <= 0 ? 'hoy' : 'en $dueDays días';
+            dueLabel = dueDays <= 0 ? 'hoy' : 'en $dueDays dÃ­as';
           } else {
             final due = alert['subscriptionDueAt'];
             if (due is Timestamp) {
@@ -68,8 +68,8 @@ class GymDashboardScreen extends StatelessWidget {
           cards.add(
             _GymAlertCard(
               icon: Icons.event_available,
-              title: 'Pago próximo',
-              message: 'Suscripción de gym $dueLabel.',
+              title: 'Pago prÃ³ximo',
+              message: 'SuscripciÃ³n de gym $dueLabel.',
             ),
           );
         }
@@ -108,7 +108,7 @@ class GymDashboardScreen extends StatelessWidget {
           children: [
           _buildAlerts(context),
           FocusSectionTitle(
-            title: 'Resumen del día',
+            title: 'Resumen del dÃ­a',
             subtitle: 'Actualizado $dateLabel',
             action: TextButton(
               onPressed: () {
@@ -131,9 +131,9 @@ class GymDashboardScreen extends StatelessWidget {
               final totalVolume = data?['totalVolume'] as double?;
               debugPrint('[GymDashboard][weekStats] totalSessions=$totalSessions totalVolume=$totalVolume');
               final totalSessionsText =
-                  totalSessions == null ? '—' : totalSessions.toString();
+                  totalSessions == null ? 'â€”' : totalSessions.toString();
               final totalVolumeText = totalVolume == null
-                  ? '—'
+                  ? 'â€”'
                   : '${(totalVolume / 1000).toStringAsFixed(1)} ton';
 
               return StreamBuilder<List<BodyWeightEntry>>(
@@ -151,10 +151,10 @@ class GymDashboardScreen extends StatelessWidget {
                       final rootData = rootSnap.data?.data();
                       final target = (rootData?['bodyWeightTarget'] as num?)?.toDouble();
                       final weightText = weight == null
-                          ? '—'
+                          ? 'â€”'
                           : '${weight.toStringAsFixed(1)} kg';
                       final targetText = target == null
-                          ? '—'
+                          ? 'â€”'
                           : '${target.toStringAsFixed(1)} kg';
 
                       return LayoutBuilder(
@@ -170,7 +170,7 @@ class GymDashboardScreen extends StatelessWidget {
                               icon: Icons.fitness_center,
                               label: 'Entrenos esta semana',
                               value: totalSessionsText,
-                              subtitle: 'Últimos 7 días',
+                              subtitle: 'Ãšltimos 7 dÃ­as',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -184,7 +184,7 @@ class GymDashboardScreen extends StatelessWidget {
                               icon: Icons.auto_graph,
                               label: 'Volumen total',
                               value: totalVolumeText,
-                              subtitle: 'Últimos 7 días',
+                              subtitle: 'Ãšltimos 7 dÃ­as',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -197,7 +197,7 @@ class GymDashboardScreen extends StatelessWidget {
                             const FocusMetricCard(
                               icon: Icons.bolt,
                               label: 'Racha',
-                              value: '—',
+                              value: 'â€”',
                               subtitle: 'Actual',
                             ),
                             FocusMetricCard(
@@ -236,7 +236,7 @@ class GymDashboardScreen extends StatelessWidget {
           const SizedBox(height: FocuslaneTokens.spacing16),
           FocusSectionTitle(
             title: 'Rutina semanal',
-            subtitle: 'Tu planificación principal',
+            subtitle: 'Tu planificaciÃ³n principal',
             action: TextButton(
               onPressed: () {
                 Navigator.push(
@@ -260,7 +260,7 @@ class GymDashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Aún no tienes una rutina principal',
+                        'AÃºn no tienes una rutina principal',
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
@@ -306,7 +306,7 @@ class GymDashboardScreen extends StatelessWidget {
                         const SizedBox(height: FocuslaneTokens.spacing8),
                         if (days.isEmpty)
                           Text(
-                            'Añade días y ejercicios para estructurar tu semana.',
+                            'AÃ±ade dÃ­as y ejercicios para estructurar tu semana.',
                             style: Theme.of(context).textTheme.bodySmall,
                           )
                         else
@@ -381,7 +381,7 @@ class GymDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const FocusSectionTitle(
-                          title: 'Últimos entrenos',
+                          title: 'Ãšltimos entrenos',
                           subtitle: 'Sesiones recientes',
                         ),
                         StreamBuilder<List<SessionDoc>>(
@@ -405,10 +405,10 @@ class GymDashboardScreen extends StatelessWidget {
                                   final date = DateFormat('d MMM', 'es')
                                       .format(s.date);
                                   final subtitle =
-                                      '${s.routineName} · $date';
+                                      '${s.routineName} Â· $date';
                                   final volume = s.volumeKg > 0
                                       ? '${(s.volumeKg / 1000).toStringAsFixed(1)} ton'
-                                      : '—';
+                                      : 'â€”';
 
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 8),
@@ -516,3 +516,4 @@ class _GymAlertCard extends StatelessWidget {
     );
   }
 }
+

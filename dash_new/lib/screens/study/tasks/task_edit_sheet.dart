@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 
@@ -292,12 +292,12 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
 
                       ModernTextField(
                         controller: _titleController,
-                        label: 'Título*',
+                        label: 'TÃ­tulo*',
                         hint: 'Ej: Entregar ensayo',
                         prefixIcon: Icons.title_rounded,
                         validator: (value) {
                           if (value?.trim().isEmpty ?? true) {
-                            return 'El título es obligatorio';
+                            return 'El tÃ­tulo es obligatorio';
                           }
                           return null;
                         },
@@ -451,7 +451,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       const SizedBox(height: AppSpacing.lg),
 
                       Text(
-                        'Fecha límite',
+                        'Fecha lÃ­mite',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -497,7 +497,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                                 child: Text(
                                   _dueDate != null
                                       ? '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}'
-                                      : 'Sin fecha límite',
+                                      : 'Sin fecha lÃ­mite',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -632,3 +632,4 @@ class _OptionChip extends StatelessWidget {
     );
   }
 }
+

@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../services/skills_firestore_service.dart';
 import '../models/skills_models.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class SkillEditScreen extends StatefulWidget {
   const SkillEditScreen({super.key});
@@ -78,25 +78,25 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                 // Nombre
                 TextFormField(
                   controller: _name,
-                  decoration: deco('Nombre (Guitarra, Ilustración, Cocina...)'),
+                  decoration: deco('Nombre (Guitarra, IlustraciÃ³n, Cocina...)'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 const SizedBox(height: 16),
 
-                // Descripción
+                // DescripciÃ³n
                 TextFormField(
                   controller: _desc,
-                  decoration: deco('Descripción / ¿qué es?'),
+                  decoration: deco('DescripciÃ³n / Â¿quÃ© es?'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
 
-                // Motivación
+                // MotivaciÃ³n
                 TextFormField(
                   controller: _motivation,
-                  decoration: deco('Motivación (¿por qué?)'),
+                  decoration: deco('MotivaciÃ³n (Â¿por quÃ©?)'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
@@ -194,9 +194,9 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
 
                 const Divider(height: 32),
 
-                // Métricas
+                // MÃ©tricas
                 Text(
-                  'Métricas específicas (nombre y unidad, p.ej. "BPM" - "bpm", "Precisión" - "%")',
+                  'MÃ©tricas especÃ­ficas (nombre y unidad, p.ej. "BPM" - "bpm", "PrecisiÃ³n" - "%")',
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -210,7 +210,7 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                           child: TextFormField(
                             initialValue: e.key,
                             readOnly: true,
-                            decoration: deco('Métrica'),
+                            decoration: deco('MÃ©trica'),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -234,7 +234,7 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
 
                 const SizedBox(height: 8),
 
-                // Tags + añadir métrica
+                // Tags + aÃ±adir mÃ©trica
                 Row(
                   children: [
                     Expanded(
@@ -246,9 +246,9 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add),
-                      label: const Text('Añadir métrica'),
+                      label: const Text('AÃ±adir mÃ©trica'),
                       onPressed: () async {
-                        final name = await _promptStr('Nombre de la métrica');
+                        final name = await _promptStr('Nombre de la mÃ©trica');
                         if (name == null || name.trim().isEmpty) return;
                         final unit = await _promptStr(
                           'Unidad/ayuda (p.ej. %, bpm, min)',
@@ -368,3 +368,4 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
     );
   }
 }
+

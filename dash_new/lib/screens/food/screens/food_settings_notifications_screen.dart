@@ -1,11 +1,11 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../../services/notification_service.dart';
-import '../../../shared/ui/app_card.dart';
-import '../../../shared/ui/app_feedback.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../core/services/notification_service.dart';
+import '../../../design/ui/shared/app_card.dart';
+import '../../../design/ui/shared/app_feedback.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../models/food_notification_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -115,7 +115,7 @@ class _FoodSettingsNotificationsScreenState
       FoodReminderDefinition(
         id: 'food_desayuno',
         title: 'Desayuno',
-        description: 'Empieza el día con energía',
+        description: 'Empieza el dÃ­a con energÃ­a',
         enabled: true,
         channel: 'food',
         trigger: FoodReminderTrigger(type: 'daily_time', hour: 8, minute: 30),
@@ -124,7 +124,7 @@ class _FoodSettingsNotificationsScreenState
       FoodReminderDefinition(
         id: 'food_comida',
         title: 'Comida',
-        description: 'Planifica tu comida del día',
+        description: 'Planifica tu comida del dÃ­a',
         enabled: true,
         channel: 'food',
         trigger: FoodReminderTrigger(type: 'daily_time', hour: 13, minute: 30),
@@ -133,7 +133,7 @@ class _FoodSettingsNotificationsScreenState
       FoodReminderDefinition(
         id: 'food_cena',
         title: 'Cena',
-        description: 'Cierra el día con una cena ligera',
+        description: 'Cierra el dÃ­a con una cena ligera',
         enabled: true,
         channel: 'food',
         trigger: FoodReminderTrigger(type: 'daily_time', hour: 20, minute: 30),
@@ -218,7 +218,7 @@ class _FoodSettingsNotificationsScreenState
     setState(() => _masterEnabled = false);
     await _persistAndSchedule();
     if (mounted) {
-      AppFeedback.showInfo(context, 'Notificaciones del módulo canceladas');
+      AppFeedback.showInfo(context, 'Notificaciones del mÃ³dulo canceladas');
     }
   }
 
@@ -228,7 +228,7 @@ class _FoodSettingsNotificationsScreenState
       return const Scaffold(
         appBar: FoodCompactAppBar(
           title: 'Notificaciones y recordatorios',
-          subtitle: 'Módulo Food',
+          subtitle: 'MÃ³dulo Food',
         ),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -237,7 +237,7 @@ class _FoodSettingsNotificationsScreenState
     return Scaffold(
       appBar: const FoodCompactAppBar(
         title: 'Notificaciones y recordatorios',
-        subtitle: 'Módulo Food',
+        subtitle: 'MÃ³dulo Food',
       ),
       body: ListView(
         controller: _scrollController,
@@ -258,14 +258,14 @@ class _FoodSettingsNotificationsScreenState
                   children: [
                     Icon(Icons.tune, size: 18, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: AppSpacing.sm),
-                    Text('Notificaciones del módulo', style: AppTypography.heading3(context)),
+                    Text('Notificaciones del mÃ³dulo', style: AppTypography.heading3(context)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Activar notificaciones'),
-                  subtitle: const Text('Recordatorios diarios del módulo Food'),
+                  subtitle: const Text('Recordatorios diarios del mÃ³dulo Food'),
                   value: _masterEnabled,
                   onChanged: _toggleMaster,
                 ),
@@ -303,8 +303,8 @@ class _FoodSettingsNotificationsScreenState
           _SectionHeader(
             key: _configKey,
             icon: Icons.settings,
-            title: 'Configuración',
-            subtitle: 'Acciones rápidas y mantenimiento',
+            title: 'ConfiguraciÃ³n',
+            subtitle: 'Acciones rÃ¡pidas y mantenimiento',
           ),
           AppSurface(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -315,7 +315,7 @@ class _FoodSettingsNotificationsScreenState
                   children: [
                     Icon(Icons.build_circle, size: 18, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: AppSpacing.sm),
-                    Text('Acciones rápidas', style: AppTypography.heading3(context)),
+                    Text('Acciones rÃ¡pidas', style: AppTypography.heading3(context)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -469,3 +469,5 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+
+

@@ -1,11 +1,11 @@
-import 'package:fl_chart/fl_chart.dart';
+﻿import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class StudyAnalyticsScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -19,7 +19,7 @@ class StudyAnalyticsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Analíticas',
+          'AnalÃ­ticas',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         leading: FocusModuleHeader.buildLeading(
@@ -231,7 +231,7 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
             children: [
               const ListTile(
                 leading: Icon(Icons.calendar_today),
-                title: Text('Días activos por curso'),
+                title: Text('DÃ­as activos por curso'),
               ),
               if (items.isEmpty)
                 const Padding(
@@ -242,7 +242,7 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
                 ...items.map(
                   (e) => ListTile(
                     title: Text(e.key),
-                    trailing: Text('${e.value} días'),
+                    trailing: Text('${e.value} dÃ­as'),
                   ),
                 ),
             ],
@@ -291,7 +291,7 @@ class _StreakCard extends StatelessWidget {
               color: Colors.orange,
             ),
             title: const Text('Racha de estudio'),
-            subtitle: Text('$streak días seguidos'),
+            subtitle: Text('$streak dÃ­as seguidos'),
           ),
         );
       },
@@ -345,7 +345,7 @@ class _MinutesBarCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Minutos últimos 30 días'),
+                const Text('Minutos Ãºltimos 30 dÃ­as'),
                 SizedBox(
                   height: 220,
                   child: BarChart(
@@ -396,12 +396,12 @@ class _MethodDistributionCard extends StatelessWidget {
             children: [
               const ListTile(
                 leading: Icon(Icons.pie_chart),
-                title: Text('Distribución por método'),
+                title: Text('DistribuciÃ³n por mÃ©todo'),
               ),
               if (items.isEmpty)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 12),
-                  child: Text('Sin sesiones todavía'),
+                  child: Text('Sin sesiones todavÃ­a'),
                 )
               else
                 ...items.map(
@@ -417,3 +417,4 @@ class _MethodDistributionCard extends StatelessWidget {
     );
   }
 }
+

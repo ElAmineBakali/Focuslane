@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../goals/services/goals_firestore_service.dart';
 import '../goals/models/goals_models.dart';
-import '../../widgets/ui_scaffold.dart';
+import '../../design/widgets/ui_scaffold.dart';
 
 class GoalEditSheet extends StatefulWidget {
   final Goal? initial;
@@ -77,7 +77,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
 
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'Título'),
+                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -85,7 +85,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                 TextFormField(
                   controller: _desc,
                   decoration: const InputDecoration(
-                    labelText: 'Descripción (opcional)',
+                    labelText: 'DescripciÃ³n (opcional)',
                   ),
                   maxLines: 3,
                 ),
@@ -145,7 +145,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
                   title: Text(
-                    'Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "—"}',
+                    'Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "â€”"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(
@@ -267,3 +267,4 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
     );
   }
 }
+

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class ReminderEditScreen extends StatefulWidget {
   const ReminderEditScreen({super.key});
@@ -67,11 +67,11 @@ class _ReminderEditScreenState extends State<ReminderEditScreen> {
                   reminder,
                 );
 
-                // Programar notificación diaria (simple por ahora)
+                // Programar notificaciÃ³n diaria (simple por ahora)
                 await NotificationService.I.scheduleDaily(
                   id: _notifId(id),
-                  title: 'Meditación',
-                  body: 'Tómate 5–10 min para meditar 🧘',
+                  title: 'MeditaciÃ³n',
+                  body: 'TÃ³mate 5â€“10 min para meditar ðŸ§˜',
                   at: _parseTime(reminder.timeOfDay),
                   useExact: true,
                 );
@@ -85,3 +85,4 @@ class _ReminderEditScreenState extends State<ReminderEditScreen> {
     );
   }
 }
+

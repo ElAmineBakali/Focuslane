@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mi_dashboard_personal/widgets/focuslane_title.dart';
+import 'package:mi_dashboard_personal/design/widgets/focuslane_title.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:mi_dashboard_personal/core/services/core_sync_service.dart';
 
@@ -30,19 +30,24 @@ class _Module {
 const List<_Module> _defaultModules = [
   _Module(
     'Calendario',
-    '/calendar',
+    AppRoutes.calendarDashboard,
     Icons.calendar_month,
     'assets/home/calendario.jpg',
   ),
   _Module(
     'Tareas',
-    '/tasks',
+    AppRoutes.tasksDashboard,
     Icons.check_circle_outlined,
     'assets/home/tareas.jpg',
   ),
-  _Module('Notas', '/notes', Icons.notes_outlined, 'assets/home/notas.jpg'),
   _Module(
-    'Hábitos',
+    'Notas',
+    AppRoutes.notesDashboard,
+    Icons.notes_outlined,
+    'assets/home/notas.jpg',
+  ),
+  _Module(
+    'HÃ¡bitos',
     '/habits',
     Icons.checklist_outlined,
     'assets/home/habitos.jpg',
@@ -60,7 +65,7 @@ const List<_Module> _defaultModules = [
     'assets/home/gimnasio.jpg',
   ),
   _Module(
-    'Meditación',
+    'MeditaciÃ³n',
     '/meditation',
     Icons.self_improvement_outlined,
     'assets/home/meditacion.jpg',
@@ -73,7 +78,7 @@ const List<_Module> _defaultModules = [
   ),
   _Module(
     'Finanzas',
-    '/finance',
+    AppRoutes.financeDashboard,
     Icons.account_balance_wallet_outlined,
     'assets/home/finanzas.jpg',
   ),
@@ -400,3 +405,4 @@ class _NoGlowNoScrollbarBehavior extends ScrollBehavior {
   Widget buildScrollbar(BuildContext c, Widget child, ScrollableDetails d) =>
       child;
 }
+

@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'task_model.dart';
 import 'task_firestore_service.dart';
 import 'task_helpers.dart';
-import 'package:mi_dashboard_personal/services/reminder_service.dart';
+import 'package:mi_dashboard_personal/screens/tasks/services/reminder_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -617,7 +617,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                       Navigator.pop(context);
                     },
                     items: const [
-                      DropdownMenuItem(value: 'smart', child: Text('Agrupación inteligente')),
+                      DropdownMenuItem(value: 'smart', child: Text('AgrupaciÃ³n inteligente')),
                       DropdownMenuItem(value: 'manual', child: Text('Orden manual')),
                       DropdownMenuItem(value: 'dateAsc', child: Text('Fecha ascendente')),
                       DropdownMenuItem(value: 'dateDesc', child: Text('Fecha descendente')),
@@ -788,7 +788,7 @@ class _Checklist {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text('Todo marcado ✅'),
+          content: Text('Todo marcado âœ…'),
         ),
       );
     }
@@ -800,7 +800,7 @@ class _Checklist {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text('Todo desmarcado ✨'),
+          content: Text('Todo desmarcado âœ¨'),
         ),
       );
     }
@@ -876,7 +876,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                     child: TextField(
                       controller: _ctrl,
                       decoration: const InputDecoration(
-                        labelText: 'Nuevo ítem rápido',
+                        labelText: 'Nuevo Ã­tem rÃ¡pido',
                         prefixIcon: Icon(Icons.add_task),
                       ),
                       onSubmitted: (s) async {
@@ -895,7 +895,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                       await _Checklist.add(t);
                       _ctrl.clear();
                     },
-                    child: const Text('Añadir'),
+                    child: const Text('AÃ±adir'),
                   ),
                 ],
               ),
@@ -1088,3 +1088,4 @@ class _ColorMenuButton extends StatelessWidget {
     );
   }
 }
+

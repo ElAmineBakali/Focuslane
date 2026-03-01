@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +6,7 @@ import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../services/study_notifications.dart';
 import 'schedule_widgets.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class ScheduleScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -18,7 +18,7 @@ class ScheduleScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Horario académico'),
+        title: const Text('Horario acadÃ©mico'),
         leading: FocusModuleHeader.buildLeading(
           context,
           mode: FocusModuleLeadingMode.backToModuleDashboard,
@@ -83,7 +83,7 @@ class _WeeklyScheduleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final days = const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    final days = const ['Lun', 'Mar', 'MiÃ©', 'Jue', 'Vie', 'SÃ¡b', 'Dom'];
 
     return CustomScrollView(
       slivers: [
@@ -155,7 +155,7 @@ class _WeeklyScheduleView extends StatelessWidget {
                                   final c = courseById[b.courseId];
                                   final name = (c?.name ?? b.courseId).trim();
                                   final label =
-                                      '$name • ${b.start.format(context)}-${b.end.format(context)}${b.room != null ? ' • ${b.room}' : ''}';
+                                      '$name â€¢ ${b.start.format(context)}-${b.end.format(context)}${b.room != null ? ' â€¢ ${b.room}' : ''}';
                                   return InkWell(
                                     borderRadius: BorderRadius.circular(8),
                                     onTap: () async {
@@ -178,7 +178,7 @@ class _WeeklyScheduleView extends StatelessWidget {
                                                 'Eliminar bloque',
                                               ),
                                               content: Text(
-                                                '¿Eliminar "$label"?',
+                                                'Â¿Eliminar "$label"?',
                                               ),
                                               actions: [
                                                 TextButton(
@@ -305,10 +305,10 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
     final dayNames = const [
       'Lunes',
       'Martes',
-      'Miércoles',
+      'MiÃ©rcoles',
       'Jueves',
       'Viernes',
-      'Sábado',
+      'SÃ¡bado',
       'Domingo',
     ];
     final dayNamesShort = const ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -482,7 +482,7 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                             (_) => AlertDialog(
                               title: const Text('Eliminar clase'),
                               content: Text(
-                                '¿Eliminar "${course?.name ?? block.courseId}"?',
+                                'Â¿Eliminar "${course?.name ?? block.courseId}"?',
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -751,7 +751,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
               const SizedBox(height: 28),
 
               Text(
-                'Días de la semana',
+                'DÃ­as de la semana',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -766,10 +766,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                   final labels = const [
                     'Lun',
                     'Mar',
-                    'Mié',
+                    'MiÃ©',
                     'Jue',
                     'Vie',
-                    'Sáb',
+                    'SÃ¡b',
                     'Dom',
                   ];
                   final label = labels[i];
@@ -921,7 +921,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                     ),
                                   ),
                                   content: Text(
-                                    '¿Estás seguro de que deseas eliminar este bloque del horario?',
+                                    'Â¿EstÃ¡s seguro de que deseas eliminar este bloque del horario?',
                                     style: GoogleFonts.plusJakartaSans(),
                                   ),
                                   actions: [
@@ -1023,7 +1023,7 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Completa curso y días de la semana',
+                                  'Completa curso y dÃ­as de la semana',
                                   style: GoogleFonts.plusJakartaSans(),
                                 ),
                                 backgroundColor: Colors.orange.shade600,
@@ -1201,3 +1201,4 @@ class _TimePickerButton extends StatelessWidget {
     );
   }
 }
+

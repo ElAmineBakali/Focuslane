@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../../../ui/layouts/module_shell.dart';
-import '../../../ui/layouts/module_sidebar.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/ui/layouts/module_shell.dart';
+import '../../../design/ui/layouts/module_sidebar.dart';
 import '../screens/dashboard/finance_dashboard_screen.dart';
 import '../screens/transactions/transactions_screen.dart';
 import '../screens/budgets/budgets_screen.dart';
@@ -68,3 +68,4 @@ class _FinanceMainScreenState extends State<FinanceMainScreen> {
     );
   }
 }
+

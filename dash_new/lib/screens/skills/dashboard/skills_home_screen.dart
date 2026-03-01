@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/skills_firestore_service.dart';
 import '../models/skills_models.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
 import '../skills/skill_edit_screen.dart';
 import '../skills/skill_detail_screen.dart';
 
@@ -42,7 +42,7 @@ class SkillsHomeScreen extends StatelessWidget {
           }
           if (data.isEmpty) {
             return const Center(
-              child: Text('Crea tu primera habilidad con el botón +'),
+              child: Text('Crea tu primera habilidad con el botÃ³n +'),
             );
           }
           return ListView.builder(
@@ -57,7 +57,7 @@ class SkillsHomeScreen extends StatelessWidget {
                   ),
                   title: Text(x.name),
                   subtitle: Text(
-                    '${skillLevelLabel(x.currentLevel)} • ${x.totalHours.toStringAsFixed(1)}h • racha ${x.streakDays}d',
+                    '${skillLevelLabel(x.currentLevel)} â€¢ ${x.totalHours.toStringAsFixed(1)}h â€¢ racha ${x.streakDays}d',
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap:
@@ -80,3 +80,4 @@ class SkillsHomeScreen extends StatelessWidget {
     );
   }
 }
+

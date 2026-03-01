@@ -1,6 +1,6 @@
-// lib/screens/meditation/guided/guided_edit_screen.dart
+﻿// lib/screens/meditation/guided/guided_edit_screen.dart
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
 
@@ -47,7 +47,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
               children: [
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'Título'),
+                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -58,7 +58,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                   decoration: const InputDecoration(
                     labelText: 'URL o asset',
                     helperText:
-                        'Ejemplos: https://...  ó  assets/audio/guided/mi_audio.mp3',
+                        'Ejemplos: https://...  Ã³  assets/audio/guided/mi_audio.mp3',
                   ),
                   validator:
                       (v) =>
@@ -67,7 +67,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('Duración (min)')),
+                    const Expanded(child: Text('DuraciÃ³n (min)')),
                     DropdownButton<int>(
                       value: _minutes,
                       onChanged: (v) => setState(() => _minutes = v ?? 10),
@@ -122,3 +122,4 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
     );
   }
 }
+

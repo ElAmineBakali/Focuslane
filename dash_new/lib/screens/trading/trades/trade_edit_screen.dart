@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/trading_firestore_service.dart';
 import '../models/trading_models.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class TradeEditScreen extends StatefulWidget {
   const TradeEditScreen({super.key});
@@ -94,7 +94,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _symbol,
-                        decoration: const InputDecoration(labelText: 'Símbolo'),
+                        decoration: const InputDecoration(labelText: 'SÃ­mbolo'),
                         textCapitalization: TextCapitalization.characters,
                         validator:
                             (v) =>
@@ -148,7 +148,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                         validator:
                             (v) =>
                                 double.tryParse(v ?? '') == null
-                                    ? 'Inválido'
+                                    ? 'InvÃ¡lido'
                                     : null,
                       ),
                     ),
@@ -160,12 +160,12 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                           decimal: true,
                         ),
                         decoration: const InputDecoration(
-                          labelText: 'Tamaño (unidades)',
+                          labelText: 'TamaÃ±o (unidades)',
                         ),
                         validator:
                             (v) =>
                                 double.tryParse(v ?? '') == null
-                                    ? 'Inválido'
+                                    ? 'InvÃ¡lido'
                                     : null,
                       ),
                     ),
@@ -246,7 +246,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event_available),
                   title: Text(
-                    'Salida: ${_exitDate != null ? _exitDate!.toLocal().toString().split(" ").first : "—"}',
+                    'Salida: ${_exitDate != null ? _exitDate!.toLocal().toString().split(" ").first : "â€”"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(
@@ -305,7 +305,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: _calcRisk,
-                      child: const Text('Calcular tamaño'),
+                      child: const Text('Calcular tamaÃ±o'),
                     ),
                   ],
                 ),
@@ -313,7 +313,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      'Tamaño sugerido: ${_calcSize?.toStringAsFixed(2) ?? "-"}  •  R esperado: ${_expR?.toStringAsFixed(2) ?? "-"}',
+                      'TamaÃ±o sugerido: ${_calcSize?.toStringAsFixed(2) ?? "-"}  â€¢  R esperado: ${_expR?.toStringAsFixed(2) ?? "-"}',
                     ),
                   ),
 
@@ -494,7 +494,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
       return;
     }
 
-    // riesgo en € = capital * %; riesgo por unidad = |entry - stop|
+    // riesgo en â‚¬ = capital * %; riesgo por unidad = |entry - stop|
     final riskCash = capital * riskPct;
     final riskPerUnit = (entry - stop).abs();
     final size = riskPerUnit > 0 ? (riskCash / riskPerUnit) : 0;
@@ -512,3 +512,4 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
     });
   }
 }
+

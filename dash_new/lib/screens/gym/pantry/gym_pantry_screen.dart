@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../gym/services/gym_firestore_service.dart';
 import '../../gym/body/bodyweight_screen.dart';
 import '../../gym/body/measurements_screen.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class GymPantryScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -90,3 +90,4 @@ class GymPantryScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
-import 'package:mi_dashboard_personal/widgets/external_link_picker_widget.dart';
-import 'package:mi_dashboard_personal/widgets/global_color_picker_widget.dart';
+import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/widgets/external_link_picker_widget.dart';
+import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 
@@ -212,7 +212,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ModernTextField(
                     controller: _nameController,
                     label: 'Nombre del curso*',
-                    hint: 'Ej: Álgebra lineal',
+                    hint: 'Ej: Ãlgebra lineal',
                     prefixIcon: Icons.book_rounded,
                     validator: (value) {
                       if (value?.trim().isEmpty ?? true) {
@@ -238,7 +238,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       Expanded(
                         child: ModernTextField(
                           controller: _creditsController,
-                          label: 'Créditos',
+                          label: 'CrÃ©ditos',
                           hint: 'Ej: 4',
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.star_rounded,
@@ -293,7 +293,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                     onLinkSelected: (link) {
                       setState(() => _externalLink = link);
                     },
-                    label: 'Enlaces rápidos',
+                    label: 'Enlaces rÃ¡pidos',
                   ),
 
                   const SizedBox(height: AppSpacing.xl),
@@ -340,3 +340,4 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     );
   }
 }
+

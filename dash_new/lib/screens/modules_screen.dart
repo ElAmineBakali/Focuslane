@@ -41,15 +41,15 @@ class _ModulesScreenState extends State<ModulesScreen> {
     final hidden = (sp.getStringList(_kHidden) ?? const <String>[]).toSet();
 
     const base = [
-      ('/calendar', 'Calendario', Icons.calendar_month),
-      ('/tasks', 'Tareas', Icons.check_circle_outlined),
-      ('/notes', 'Notas', Icons.notes_outlined),
+      (AppRoutes.calendarDashboard, 'Calendario', Icons.calendar_month),
+      (AppRoutes.tasksDashboard, 'Tareas', Icons.check_circle_outlined),
+      (AppRoutes.notesDashboard, 'Notas', Icons.notes_outlined),
       ('/habits', 'Hábitos', Icons.checklist_outlined),
       (AppRoutes.studyDashboard, 'Estudio', Icons.school_outlined),
       (AppRoutes.gymDashboard, 'Gimnasio', Icons.fitness_center_outlined),
       ('/meditation', 'Meditación', Icons.self_improvement_outlined),
       (AppRoutes.foodDashboard, 'Food', Icons.restaurant_outlined),
-      ('/finance', 'Finanzas', Icons.account_balance_wallet_outlined),
+      (AppRoutes.financeDashboard, 'Finanzas', Icons.account_balance_wallet_outlined),
       ('/trading', 'Trading', Icons.candlestick_chart),
       ('/culture', 'Cultura', Icons.smart_display),
       ('/skills', 'Hobbies', Icons.interests),

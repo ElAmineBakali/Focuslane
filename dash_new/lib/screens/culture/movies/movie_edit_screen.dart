@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
-import '../../../widgets/ui_scaffold.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class MovieEditScreen extends StatefulWidget {
   const MovieEditScreen({super.key});
@@ -45,7 +45,7 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nueva película' : 'Editar película'),
+        title: Text(editing == null ? 'Nueva pelÃ­cula' : 'Editar pelÃ­cula'),
       ),
       body: TaskFormTheme(
         child: ListView(
@@ -53,12 +53,12 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'Título'),
+              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
             ),
             TextField(
               controller: _year,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Año'),
+              decoration: const InputDecoration(labelText: 'AÃ±o'),
             ),
             TextField(
               controller: _minutes,
@@ -94,7 +94,7 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Valoración (0..10)'),
+              title: const Text('ValoraciÃ³n (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
@@ -139,3 +139,6 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
     );
   }
 }
+
+
+

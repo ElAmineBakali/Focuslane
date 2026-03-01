@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -7,7 +7,7 @@ import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'task_edit_sheet.dart';
 import '../timer/study_timer_screen.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class StudyTasksScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -37,7 +37,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tareas y Exámenes',
+          'Tareas y ExÃ¡menes',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         leading: FocusModuleHeader.buildLeading(
@@ -162,7 +162,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                 ),
                                 const SizedBox(height: 24),
                                 Text(
-                                  '¡Todo despejado!',
+                                  'Â¡Todo despejado!',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 28,
                                     fontWeight: FontWeight.w700,
@@ -672,7 +672,7 @@ class _TaskCard extends StatelessWidget {
     final now = DateTime.now();
     final diff = date.difference(now).inDays;
     if (diff == 0) return 'Hoy';
-    if (diff == 1) return 'Mañana';
+    if (diff == 1) return 'MaÃ±ana';
     if (diff < 0) return 'Vencida';
     return '${diff}d';
   }
@@ -955,3 +955,4 @@ class _FiltersBar extends StatelessWidget {
     );
   }
 }
+

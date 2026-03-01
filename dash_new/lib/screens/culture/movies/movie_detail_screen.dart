@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 import 'movie_edit_screen.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class MovieDetailScreen extends StatelessWidget {
   const MovieDetailScreen({super.key});
@@ -13,7 +13,7 @@ class MovieDetailScreen extends StatelessWidget {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
     if (arg is! Movie) {
-      return const Scaffold(body: Center(child: Text('Sin película')));
+      return const Scaffold(body: Center(child: Text('Sin pelÃ­cula')));
     }
     final m = arg;
 
@@ -44,9 +44,9 @@ class MovieDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.local_movies),
-              title: Text('${m.year ?? "—"} • ${m.minutes ?? "-"} min'),
+              title: Text('${m.year ?? "â€”"} â€¢ ${m.minutes ?? "-"} min'),
               subtitle: Text(
-                'Estado: ${m.status.name} • Rating: ${m.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${m.status.name} â€¢ Rating: ${m.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -69,7 +69,7 @@ class MovieDetailScreen extends StatelessWidget {
           const ListTile(
             title: Text('Sugerencias'),
             subtitle: Text(
-              '• Marca “vista” cuando la termines\n• Añade a una colección temática',
+              'â€¢ Marca â€œvistaâ€ cuando la termines\nâ€¢ AÃ±ade a una colecciÃ³n temÃ¡tica',
             ),
           ),
         ],
@@ -77,3 +77,6 @@ class MovieDetailScreen extends StatelessWidget {
     );
   }
 }
+
+
+

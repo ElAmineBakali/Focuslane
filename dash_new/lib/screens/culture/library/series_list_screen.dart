@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 
 class SeriesListScreen extends StatefulWidget {
   const SeriesListScreen({super.key});
@@ -68,7 +68,7 @@ class _SeriesListScreenState extends State<SeriesListScreen> {
               return ListTile(
                 leading: const Icon(Icons.tv),
                 title: Text(x.title),
-                subtitle: Text('${x.platform ?? "—"} • ${x.status.name}'),
+                subtitle: Text('${x.platform ?? "â€”"} â€¢ ${x.status.name}'),
                 trailing: Text(x.rating?.toStringAsFixed(1) ?? '-'),
                 onTap:
                     () => Navigator.pushNamed(
@@ -84,3 +84,6 @@ class _SeriesListScreenState extends State<SeriesListScreen> {
     );
   }
 }
+
+
+

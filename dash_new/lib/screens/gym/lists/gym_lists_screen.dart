@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../gym/services/gym_firestore_service.dart';
-import '../../gym/analytics/gym_analytics_screen_v2.dart';
+import '../../gym/analytics/gym_analytics_screen.dart';
 
 class GymListsScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -9,6 +9,6 @@ class GymListsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GymAnalyticsScreenV2(svc: svc);
+    return GymAnalyticsScreen(svc: svc);
   }
 }

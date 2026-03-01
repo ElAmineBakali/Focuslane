@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/layouts/module_shell.dart';
-import '../../../ui/layouts/module_sidebar.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/layouts/module_shell.dart';
+import '../../../design/ui/layouts/module_sidebar.dart';
 
 class FinanceShell extends StatelessWidget {
   final int selectedIndex;
@@ -87,3 +87,4 @@ class FinanceShell extends StatelessWidget {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 }
+

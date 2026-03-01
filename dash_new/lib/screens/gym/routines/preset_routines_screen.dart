@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/preset_routines_data.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class PresetRoutinesScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -282,7 +282,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          '${routine.days.length} días/semana',
+                          '${routine.days.length} dÃ­as/semana',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.grey[600],
@@ -426,7 +426,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                           const SizedBox(height: 24),
 
                           Text(
-                            'Estructura (${routine.days.length} días)',
+                            'Estructura (${routine.days.length} dÃ­as)',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -480,7 +480,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 leading: const Icon(Icons.fitness_center, size: 20),
                 title: Text(ex.name, style: GoogleFonts.poppins(fontSize: 13)),
                 subtitle: Text(
-                  '${ex.targetSets} × ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
+                  '${ex.targetSets} Ã— ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     color: Colors.grey[600],
@@ -498,11 +498,11 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       builder:
           (context) => AlertDialog(
             title: Text(
-              '¿Aplicar rutina?',
+              'Â¿Aplicar rutina?',
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              '¿Quieres crear "${routine.name}" como tu nueva rutina? Podrás editarla después.',
+              'Â¿Quieres crear "${routine.name}" como tu nueva rutina? PodrÃ¡s editarla despuÃ©s.',
               style: GoogleFonts.poppins(),
             ),
             actions: [
@@ -547,7 +547,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
                 Text(
-                  '✅ Rutina "${routine.name}" creada',
+                  'âœ… Rutina "${routine.name}" creada',
                   style: GoogleFonts.poppins(color: Colors.white),
                 ),
               ],
@@ -647,3 +647,4 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     }
   }
 }
+

@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/prenda_firestore_service.dart';
-import '../../models/prenda_model.dart';
+import '../../screens/ropa/services/prenda_firestore_service.dart';
+import 'models/prenda_model.dart';
 import 'prenda_form_screen.dart';
-import '../../widgets/prenda_card.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
+import '../../screens/ropa/widgets/prenda_card.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
 
 class RopaHomeScreen extends StatelessWidget {
   const RopaHomeScreen({super.key});
@@ -46,7 +46,7 @@ class RopaHomeScreen extends StatelessWidget {
                       builder:
                           (_) => AlertDialog(
                             title: const Text('Eliminar prenda'),
-                            content: Text('¿Eliminar "${p.nombre}"?'),
+                            content: Text('Â¿Eliminar "${p.nombre}"?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -122,7 +122,7 @@ class RopaHomeScreen extends StatelessWidget {
           }
           final prendas = snapshot.data!;
           if (prendas.isEmpty) {
-            return const Center(child: Text("Aún no tienes prendas añadidas"));
+            return const Center(child: Text("AÃºn no tienes prendas aÃ±adidas"));
           }
           return GridView.builder(
             padding: const EdgeInsets.all(10),
@@ -149,3 +149,6 @@ class RopaHomeScreen extends StatelessWidget {
     );
   }
 }
+
+
+

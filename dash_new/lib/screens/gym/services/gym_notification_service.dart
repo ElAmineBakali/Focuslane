@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GymNotificationService {
@@ -38,7 +38,7 @@ class GymNotificationService {
     final id = 'gym_routine_${routineId}_$dayId';
     await NotificationService.I.scheduleWeeklyReminder(
       id: id,
-      title: '💪 Día de entrenamiento',
+      title: 'ðŸ’ª DÃ­a de entrenamiento',
       body: '$routineName - $dayName',
       weekdays: [_dayIntToEnum(weekday)],
       time: time,
@@ -71,8 +71,8 @@ class GymNotificationService {
     final at = DateTime(base.year, base.month, base.day, 10, 0);
     await NotificationService.I.scheduleOnce(
       id: _inactivityId,
-      title: '🏋️ Vuelve al gym',
-      body: 'Llevas $days días sin entrenar. ¡Hora de una sesión!',
+      title: 'ðŸ‹ï¸ Vuelve al gym',
+      body: 'Llevas $days dÃ­as sin entrenar. Â¡Hora de una sesiÃ³n!',
       whenLocal: at,
       useExact: false,
       payload: 'GYM_INACTIVITY',
@@ -104,7 +104,7 @@ class GymNotificationService {
     await NotificationService.I.cancel(_weeklyWeightId);
     await NotificationService.I.scheduleWeeklyReminder(
       id: 'gym_weekly_weight',
-      title: '⚖️ Registro de peso',
+      title: 'âš–ï¸ Registro de peso',
       body: 'Es momento de registrar tu peso corporal',
       weekdays: [_dayIntToEnum(weekday)],
       time: t,
@@ -141,8 +141,8 @@ class GymNotificationService {
     await NotificationService.I.cancel(_mondayMeasurementsId);
     await NotificationService.I.scheduleWeeklyReminder(
       id: 'gym_weekly_measurements',
-      title: '📏 Medidas corporales',
-      body: 'Registra tus medidas físicas de esta semana',
+      title: 'ðŸ“ Medidas corporales',
+      body: 'Registra tus medidas fÃ­sicas de esta semana',
       weekdays: [_dayIntToEnum(weekday)],
       time: t,
       payload: 'GYM_MEASUREMENTS',
@@ -188,3 +188,4 @@ class GymNotificationService {
     await NotificationService.I.cancelAllNotificationsForModule('gym');
   }
 }
+

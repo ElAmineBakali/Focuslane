@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 
 class SeriesEditScreen extends StatefulWidget {
   const SeriesEditScreen({super.key});
@@ -46,7 +46,7 @@ class _SeriesEditScreenState extends State<SeriesEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'Título'),
+              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
             ),
             TextField(
               controller: _platform,
@@ -72,7 +72,7 @@ class _SeriesEditScreenState extends State<SeriesEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Valoración (0..10)'),
+              title: const Text('ValoraciÃ³n (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
@@ -116,3 +116,6 @@ class _SeriesEditScreenState extends State<SeriesEditScreen> {
     );
   }
 }
+
+
+

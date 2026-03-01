@@ -1,19 +1,19 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
-import '../../../shared/ui/app_card.dart';
+import '../../../design/ui/shared/app_card.dart';
 import 'food_diary_screen.dart';
 import 'recipes_list_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
-import '../../../theme/focuslane_ui.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -61,7 +61,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       backgroundColor: colorScheme.surface,
       appBar: FoodCompactAppBar(
         title: 'Food',
-        subtitle: 'Planificación, recetas y seguimiento',
+        subtitle: 'PlanificaciÃ³n, recetas y seguimiento',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
@@ -154,14 +154,14 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                             final cards = [
                               FoodMetricCard(
                                 icon: Icons.local_fire_department,
-                                label: 'Calorías hoy',
+                                label: 'CalorÃ­as hoy',
                                 value: '${kcal.toStringAsFixed(0)} kcal',
                                 subtitle: 'de ${targetKcal.toStringAsFixed(0)} objetivo',
                                 onTap: () => _navigateToDiary(context),
                               ),
                               FoodMetricCard(
                                 icon: Icons.fitness_center,
-                                label: 'Proteína hoy',
+                                label: 'ProteÃ­na hoy',
                                 value: '${protein.toStringAsFixed(0)} g',
                                 subtitle: 'de ${targetProtein.toStringAsFixed(0)}g objetivo',
                                 onTap: () => _navigateToDiary(context),
@@ -242,7 +242,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           cards.add(
             _AlertCard(
               icon: Icons.warning_amber,
-              title: 'Proteína baja tras entreno',
+              title: 'ProteÃ­na baja tras entreno',
               message: 'Faltan ${gap.toStringAsFixed(0)} g para el objetivo de hoy.',
             ),
           );
@@ -252,8 +252,8 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           cards.add(
             _AlertCard(
               icon: Icons.local_fire_department,
-              title: 'Déficit extremo con entreno fuerte',
-              message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
+              title: 'DÃ©ficit extremo con entreno fuerte',
+              message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
             ),
           );
         }
@@ -392,7 +392,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
             children: [
               FoodSectionHeader(
                 title: 'Recetas recientes',
-                subtitle: 'Favoritas y últimas',
+                subtitle: 'Favoritas y Ãºltimas',
                 icon: Icons.restaurant,
                 actionLabel: 'Ver todas',
                 onActionPressed: () => _navigateToRecipes(context),
@@ -418,7 +418,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                         ),
                         TextButton(
                           onPressed: () => _navigateToRecipes(context),
-                          child: const Text('Añadir primera receta'),
+                          child: const Text('AÃ±adir primera receta'),
                         ),
                       ],
                     ),
@@ -494,7 +494,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     
     if (recipe.name.toLowerCase().contains('pollo') ||
         recipe.name.toLowerCase().contains('pavo')) {
-      tags.add('Alto en proteína');
+      tags.add('Alto en proteÃ­na');
     }
     if (recipe.name.toLowerCase().contains('ensalada') ||
         recipe.name.toLowerCase().contains('vegetal')) {
@@ -650,3 +650,5 @@ class _AlertCard extends StatelessWidget {
     );
   }
 }
+
+

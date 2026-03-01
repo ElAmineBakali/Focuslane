@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 
 class MusicListScreen extends StatefulWidget {
   const MusicListScreen({super.key});
@@ -19,7 +19,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Música (Álbumes)'),
+        title: const Text('MÃºsica (Ãlbumes)'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.link_rounded),
@@ -55,7 +55,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin álbumes'));
+          if (data.isEmpty) return const Center(child: Text('Sin Ã¡lbumes'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -64,7 +64,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
               return ListTile(
                 leading: const Icon(Icons.album_outlined),
                 title: Text(a.title),
-                subtitle: Text('${a.artist} • ${a.status.name}'),
+                subtitle: Text('${a.artist} â€¢ ${a.status.name}'),
                 trailing: Text(a.rating?.toStringAsFixed(1) ?? '-'),
                 onTap:
                     () => Navigator.pushNamed(
@@ -80,3 +80,6 @@ class _MusicListScreenState extends State<MusicListScreen> {
     );
   }
 }
+
+
+

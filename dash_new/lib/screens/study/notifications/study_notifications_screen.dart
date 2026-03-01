@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/services/study_notifications.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class StudyNotificationsScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -116,3 +116,4 @@ class _StudyNotificationsScreenState extends State<StudyNotificationsScreen> {
     );
   }
 }
+

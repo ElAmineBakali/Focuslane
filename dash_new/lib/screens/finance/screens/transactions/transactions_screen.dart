@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
-import '../../../../ui/components/focus_card.dart';
-import '../../../../ui/components/focus_module_header.dart';
-import '../../../../ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/focus_card.dart';
+import '../../../../design/ui/components/focus_module_header.dart';
+import '../../../../design/ui/tokens/focuslane_tokens.dart';
 
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({
@@ -28,7 +28,7 @@ class TransactionsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Nueva transacción',
+            tooltip: 'Nueva transacciÃ³n',
             onPressed: () =>
                 Navigator.pushNamed(context, '/finance/transactions/form'),
           ),
@@ -90,6 +90,7 @@ class TransactionsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

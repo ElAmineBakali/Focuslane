@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 
 class BooksListScreen extends StatefulWidget {
   const BooksListScreen({super.key});
@@ -54,7 +54,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                 leading: const Icon(Icons.menu_book_outlined),
                 title: Text(b.title),
                 subtitle: Text(
-                  '${b.author ?? "—"} • ${b.genre ?? ""} • ${b.status.name}',
+                  '${b.author ?? "â€”"} â€¢ ${b.genre ?? ""} â€¢ ${b.status.name}',
                 ),
                 trailing: SizedBox(
                   width: 80,
@@ -62,7 +62,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(b.rating?.toStringAsFixed(1) ?? '-'),
-                      const Text('⭐', style: TextStyle(fontSize: 10)),
+                      const Text('â­', style: TextStyle(fontSize: 10)),
                     ],
                   ),
                 ),
@@ -80,3 +80,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
     );
   }
 }
+
+
+

@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 SnackBar _niceBar(String text, {IconData? icon}) {
   return SnackBar(
@@ -80,7 +80,7 @@ class GymGoalsScreen extends StatelessWidget {
                                   final v = double.tryParse(
                                     (s ?? '').replaceAll(',', '.'),
                                   );
-                                  if (v == null) return 'Número válido';
+                                  if (v == null) return 'NÃºmero vÃ¡lido';
                                   if (v <= 0) return 'Mayor que 0';
                                   return null;
                                 },
@@ -100,7 +100,7 @@ class GymGoalsScreen extends StatelessWidget {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     _niceBar(
-                                      'Objetivo actualizado 🎯',
+                                      'Objetivo actualizado ðŸŽ¯',
                                       icon: Icons.check_circle_rounded,
                                     ),
                                   );
@@ -115,7 +115,7 @@ class GymGoalsScreen extends StatelessWidget {
                                 await svc.setBodyWeightTarget(null);
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    _niceBar('Objetivo eliminado 🧽'),
+                                    _niceBar('Objetivo eliminado ðŸ§½'),
                                   );
                                 }
                               },
@@ -131,7 +131,7 @@ class GymGoalsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Próximamente: objetivos por ejercicio (peso/reps/volumen)…',
+                'PrÃ³ximamente: objetivos por ejercicio (peso/reps/volumen)â€¦',
               ),
             ],
           );
@@ -140,3 +140,4 @@ class GymGoalsScreen extends StatelessWidget {
     );
   }
 }
+

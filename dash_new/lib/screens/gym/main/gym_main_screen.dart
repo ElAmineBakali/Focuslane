@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../gym/services/gym_firestore_service.dart';
 import '../../gym/dashboard/gym_dashboard_screen.dart';
 import '../../gym/diary/gym_diary_screen.dart';
@@ -8,8 +8,8 @@ import '../../gym/lists/gym_lists_screen.dart';
 import '../../gym/pantry/gym_pantry_screen.dart';
 import '../../gym/history/gym_history_screen.dart';
 import '../../gym/settings/gym_settings_screen.dart';
-import '../../../ui/layouts/module_shell.dart';
-import '../../../ui/layouts/module_sidebar.dart';
+import '../../../design/ui/layouts/module_shell.dart';
+import '../../../design/ui/layouts/module_sidebar.dart';
 
 class GymMainScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -43,7 +43,7 @@ class _GymMainScreenState extends State<GymMainScreen> {
       const ModuleSidebarItem(icon: Icons.receipt_long, label: 'Diario'),
       const ModuleSidebarItem(icon: Icons.list_alt, label: 'Rutinas'),
       const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
-      const ModuleSidebarItem(icon: Icons.bar_chart, label: 'Analíticas'),
+      const ModuleSidebarItem(icon: Icons.bar_chart, label: 'AnalÃ­ticas'),
       const ModuleSidebarItem(icon: Icons.monitor_weight, label: 'Cuerpo'),
       const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
       const ModuleSidebarItem(icon: Icons.tune, label: 'Objetivos'),
@@ -57,8 +57,9 @@ class _GymMainScreenState extends State<GymMainScreen> {
         index: _selectedIndex,
         children: _screens(),
       ),
-      moduleTitle: 'Módulo Gym',
+      moduleTitle: 'MÃ³dulo Gym',
       moduleIcon: Icons.fitness_center,
     );
   }
 }
+

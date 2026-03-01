@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
@@ -6,10 +6,10 @@ import 'package:mi_dashboard_personal/screens/finance/services/budget_service.da
 import 'package:mi_dashboard_personal/screens/finance/services/subscription_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
-import '../../../../ui/components/focus_card.dart';
-import '../../../../ui/components/focus_metric_card.dart';
-import '../../../../ui/components/focus_module_header.dart';
-import '../../../../ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/focus_card.dart';
+import '../../../../design/ui/components/focus_metric_card.dart';
+import '../../../../design/ui/components/focus_module_header.dart';
+import '../../../../design/ui/tokens/focuslane_tokens.dart';
 
 class FinanceDashboardScreen extends StatelessWidget {
   const FinanceDashboardScreen({super.key, required this.onSelectSection});
@@ -27,12 +27,12 @@ class FinanceDashboardScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: FocusModuleHeader(
         title: 'Finanzas',
-        subtitle: 'Patrimonio, gastos y análisis',
+        subtitle: 'Patrimonio, gastos y anÃ¡lisis',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Nueva transacción',
+            tooltip: 'Nueva transacciÃ³n',
             onPressed: () =>
                 Navigator.pushNamed(context, '/finance/transactions/form'),
           ),
@@ -162,8 +162,8 @@ class _MetricsRow extends StatelessWidget {
         icon: Icons.savings_outlined,
         label: 'Ahorro / tasa',
         value: income == 0
-            ? '—'
-            : '${(income - expense).toStringAsFixed(2)} · ${(savings * 100).toStringAsFixed(1)}%',
+            ? 'â€”'
+            : '${(income - expense).toStringAsFixed(2)} Â· ${(savings * 100).toStringAsFixed(1)}%',
         subtitle: 'Ingreso - gasto',
         onTap: () => onSelectSection(2),
       ),
@@ -263,7 +263,7 @@ class _RecentTransactions extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Últimas transacciones', style: TextStyle(fontWeight: FontWeight.w700)),
+              const Text('Ãšltimas transacciones', style: TextStyle(fontWeight: FontWeight.w700)),
               TextButton(
                 onPressed: () => onSelectSection(1),
                 child: const Text('Ver todas'),
@@ -287,7 +287,7 @@ class _RecentTransactions extends StatelessWidget {
                 return ListTile(
                   dense: true,
                   title: Text(t.title),
-                  subtitle: Text(t.category ?? 'Sin categoría'),
+                  subtitle: Text(t.category ?? 'Sin categorÃ­a'),
                   trailing: Text(
                     '$sign${t.amount.toStringAsFixed(2)}',
                     style: TextStyle(color: color, fontWeight: FontWeight.w700),
@@ -438,7 +438,8 @@ class _SubsCard extends StatelessWidget {
   }
 }
 
-String _currency(double v) => '${v.toStringAsFixed(2)}€';
+String _currency(double v) => '${v.toStringAsFixed(2)}â‚¬';
+
 
 
 

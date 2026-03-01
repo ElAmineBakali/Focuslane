@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/settings/study_settings_sheet.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_dialog.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_dialog.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class StudySettingsScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -18,7 +18,7 @@ class StudySettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: const FocusModuleHeader(
         title: 'Ajustes',
-        subtitle: 'Preferencias del módulo',
+        subtitle: 'Preferencias del mÃ³dulo',
         leadingMode: FocusModuleLeadingMode.backToModuleDashboard,
         backRouteName: AppRoutes.studyDashboard,
       ),
@@ -29,7 +29,7 @@ class StudySettingsScreen extends StatelessWidget {
           children: [
             const FocusSectionTitle(
               title: 'Ajustes',
-              subtitle: 'Preferencias del módulo',
+              subtitle: 'Preferencias del mÃ³dulo',
             ),
             FocusCard(
               onTap: () {
@@ -44,7 +44,7 @@ class StudySettingsScreen extends StatelessWidget {
                   const SizedBox(width: FocuslaneTokens.spacing12),
                   Expanded(
                     child: Text(
-                      'Configuración avanzada',
+                      'ConfiguraciÃ³n avanzada',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium
@@ -61,3 +61,4 @@ class StudySettingsScreen extends StatelessWidget {
     );
   }
 }
+

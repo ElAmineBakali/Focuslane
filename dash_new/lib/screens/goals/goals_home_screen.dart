@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../goals/services/goals_firestore_service.dart';
 import '../goals/models/goals_models.dart';
-import '../../widgets/ui_scaffold.dart';
+import '../../design/widgets/ui_scaffold.dart';
 import 'goal_edit_sheet.dart';
 import 'goal_detail_screen.dart';
 
@@ -47,7 +47,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
           }
           if (data.isEmpty) {
             return const Center(
-              child: Text('Crea tu primera meta con el botón +'),
+              child: Text('Crea tu primera meta con el botÃ³n +'),
             );
           }
           return ReorderableListView.builder(
@@ -103,7 +103,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                     children: [
                       if (x.targetDate != null)
                         Text(
-                          'Límite: ${x.targetDate!.toLocal().toString().split(' ').first}',
+                          'LÃ­mite: ${x.targetDate!.toLocal().toString().split(' ').first}',
                         ),
                       if (x.progressTarget != null)
                         Text(
@@ -133,7 +133,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                           builder:
                               (_) => AlertDialog(
                                 title: const Text('Eliminar meta'),
-                                content: Text('¿Eliminar "${x.title}"?'),
+                                content: Text('Â¿Eliminar "${x.title}"?'),
                                 actions: [
                                   TextButton(
                                     onPressed:
@@ -168,3 +168,4 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
     );
   }
 }
+

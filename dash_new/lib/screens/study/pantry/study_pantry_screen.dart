@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/models/study_models.dart';
 import '../../study/grades/grades_screen.dart';
 import '../../study/attendance/attendance_screen.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_empty_state.dart';
-import '../../../ui/components/focus_list_tile_compact.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_list_tile_compact.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class StudyPantryScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -32,7 +32,7 @@ class StudyPantryScreen extends StatelessWidget {
           children: [
             const FocusSectionTitle(
               title: 'Notas y asistencia',
-              subtitle: 'Seguimiento académico',
+              subtitle: 'Seguimiento acadÃ©mico',
             ),
             FocusCard(
               onTap: () {
@@ -111,3 +111,4 @@ class StudyPantryScreen extends StatelessWidget {
     );
   }
 }
+

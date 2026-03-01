@@ -1,19 +1,19 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
-import 'package:mi_dashboard_personal/blocks/toast/app_toast.dart';
-import 'package:mi_dashboard_personal/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
+import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../analytics/study_analytics_screen.dart';
 import 'presets_sheet.dart';
 import 'session_summary_screen.dart';
 import 'circular_timer_widget.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
-import '../../../ui/components/focus_module_header.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class StudyTimerScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -147,7 +147,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
             const [];
         if (seq.isEmpty) {
-          AppToast.error(context, 'Secuencia vacía');
+          AppToast.error(context, 'Secuencia vacÃ­a');
           return;
         }
         final first = seq.first;
@@ -166,7 +166,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         NotificationService.I.showNow(
           id: _N_WORK_START,
           title: 'Estudio',
-          body: 'Sesión iniciada',
+          body: 'SesiÃ³n iniciada',
         );
         break;
     }
@@ -311,7 +311,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     await NotificationService.I.showNow(
       id: _N_SESSION_SAVED,
       title: 'Estudio',
-      body: 'Sesión guardada ($minutes min)',
+      body: 'SesiÃ³n guardada ($minutes min)',
     );
 
     if (!mounted) return;
@@ -407,7 +407,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                     },
                   ),
                   IconButton(
-                    tooltip: 'Analíticas',
+                    tooltip: 'AnalÃ­ticas',
                     icon: const Icon(Icons.stacked_line_chart_rounded),
                     onPressed: () {
                       Navigator.push(
@@ -612,7 +612,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               ),
               icon: const Icon(Icons.save_rounded, size: 24),
               label: Text(
-                'Guardar sesión',
+                'Guardar sesiÃ³n',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -638,18 +638,18 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         final short = (_cfg['short'] ?? 5).toString();
         final long = (_cfg['long'] ?? 15).toString();
         final cycles = (_cfg['cycles'] ?? 4).toString();
-        return 'Pomodoro • $work trabajo / $short descanso (largo $long cada $cycles)';
+        return 'Pomodoro â€¢ $work trabajo / $short descanso (largo $long cada $cycles)';
       case StudyMethod.flowtime:
         final ratio = (_cfg['ratio'] ?? 0.2).toString();
-        return 'Flowtime • Descanso proporcional (ratio $ratio)';
+        return 'Flowtime â€¢ Descanso proporcional (ratio $ratio)';
       case StudyMethod.timeboxing:
         final block = (_cfg['block'] ?? 50).toString();
         final rest = (_cfg['rest'] ?? 10).toString();
-        return 'Timeboxing • $block min bloque / $rest min pausa';
+        return 'Timeboxing â€¢ $block min bloque / $rest min pausa';
       case StudyMethod.custom:
-        return 'Secuencia personalizada • ${(_cfg['sequence'] as List? ?? []).length} bloques';
+        return 'Secuencia personalizada â€¢ ${(_cfg['sequence'] as List? ?? []).length} bloques';
       case StudyMethod.simple:
-        return 'Cronómetro simple • cuenta ascendente';
+        return 'CronÃ³metro simple â€¢ cuenta ascendente';
     }
   }
 }
@@ -1099,7 +1099,7 @@ class _HeaderSelectors extends StatelessWidget {
                       initialValue: taskId,
                       hint: const Text('Vincular tarea (opcional)'),
                       items: [
-                        const DropdownMenuItem(value: null, child: Text('—')),
+                        const DropdownMenuItem(value: null, child: Text('â€”')),
                         ...tasks.map(
                           (t) => DropdownMenuItem(
                             value: t.id,
@@ -1118,3 +1118,4 @@ class _HeaderSelectors extends StatelessWidget {
     );
   }
 }
+

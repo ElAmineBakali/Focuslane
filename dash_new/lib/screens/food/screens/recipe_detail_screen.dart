@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -59,7 +59,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Descripción',
+                          'DescripciÃ³n',
                           style: AppTypography.heading4(context),
                         ),
                       ],
@@ -108,7 +108,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Información Nutricional',
+                          'InformaciÃ³n Nutricional',
                           style: AppTypography.heading4(context),
                         ),
                       ],
@@ -120,13 +120,13 @@ class RecipeDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     _NutrientRow(
-                      label: 'Calorías',
+                      label: 'CalorÃ­as',
                       value: '${recipe.kcal!.toStringAsFixed(0)} kcal',
                       icon: Icons.local_fire_department,
                       color: colorScheme.primary,
                     ),
                     _NutrientRow(
-                      label: 'Proteínas',
+                      label: 'ProteÃ­nas',
                       value: '${recipe.protein!.toStringAsFixed(1)} g',
                       icon: Icons.fitness_center,
                       color: colorScheme.secondary,
@@ -224,7 +224,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Preparación',
+                          'PreparaciÃ³n',
                           style: AppTypography.heading4(context),
                         ),
                       ],
@@ -287,3 +287,4 @@ class _NutrientRow extends StatelessWidget {
     );
   }
 }
+

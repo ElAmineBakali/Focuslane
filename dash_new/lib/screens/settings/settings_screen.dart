@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:mi_dashboard_personal/theme/prefs.dart';
-import '../../theme/theme.dart';
+import 'package:mi_dashboard_personal/design/theme/prefs.dart';
+import '../../design/theme/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -175,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Información del perfil',
+                                'InformaciÃ³n del perfil',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 12),
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 controller: _nameController,
                                 decoration: const InputDecoration(
                                   labelText: 'Nombre para mostrar',
-                                  hintText: 'Ej: Juan Pérez',
+                                  hintText: 'Ej: Juan PÃ©rez',
                                   prefixIcon: Icon(Icons.badge_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -192,8 +192,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               TextField(
                                 controller: _bioController,
                                 decoration: const InputDecoration(
-                                  labelText: 'Bio / Descripción',
-                                  hintText: 'Cuéntanos sobre ti...',
+                                  labelText: 'Bio / DescripciÃ³n',
+                                  hintText: 'CuÃ©ntanos sobre ti...',
                                   prefixIcon: Icon(Icons.description_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -230,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Datos técnicos',
+                                'Datos tÃ©cnicos',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: scheme.onSurfaceVariant,
                                     ),
@@ -270,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ),
                                     )
                                   : const Icon(Icons.logout),
-                              label: const Text('Cerrar sesión'),
+                              label: const Text('Cerrar sesiÃ³n'),
                               onPressed: _signingOut ? null : _signOut,
                             ),
                           ),
@@ -291,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Diseño de color',
+                    'DiseÃ±o de color',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -353,7 +353,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 12),
           Text(
-            'Consejo: asegúrate de que los botones y textos tengan buen contraste en ambos modos.',
+            'Consejo: asegÃºrate de que los botones y textos tengan buen contraste en ambos modos.',
             style: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
           ),
           const SizedBox(height: 16),
@@ -421,3 +421,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+

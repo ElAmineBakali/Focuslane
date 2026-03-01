@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../../models/calendar_models.dart';
-import '../../services/calendar_service.dart';
+﻿import 'package:flutter/material.dart';
+import 'models/calendar_models.dart';
+import '../../screens/calendar/services/calendar_service.dart';
 
 class TimetableEditorScreen extends StatefulWidget {
   final Timetable? timetable;
@@ -194,7 +194,7 @@ class _SlotsEditor extends StatelessWidget {
                     leading: const Icon(Icons.event),
                     title: Text(x.title),
                     subtitle: Text(
-                      '${x.day} • ${x.start}–${x.end} • ${x.type.name}',
+                      '${x.day} â€¢ ${x.start}â€“${x.end} â€¢ ${x.type.name}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
@@ -254,11 +254,11 @@ class _SlotsEditor extends StatelessWidget {
                                 )
                                 .toList(),
                         onChanged: (v) => setS(() => day = v ?? day),
-                        decoration: const InputDecoration(labelText: 'Día'),
+                        decoration: const InputDecoration(labelText: 'DÃ­a'),
                       ),
                       TextField(
                         controller: title,
-                        decoration: const InputDecoration(labelText: 'Título'),
+                        decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                       ),
                       Row(
                         children: [
@@ -350,3 +350,5 @@ class _SlotsEditor extends StatelessWidget {
     );
   }
 }
+
+

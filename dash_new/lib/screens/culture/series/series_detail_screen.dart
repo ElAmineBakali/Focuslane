@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 import 'series_edit_screen.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class SeriesDetailScreen extends StatefulWidget {
   const SeriesDetailScreen({super.key});
@@ -61,9 +61,9 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.tv),
-              title: Text(x.platform ?? '—'),
+              title: Text(x.platform ?? 'â€”'),
               subtitle: Text(
-                'Estado: ${x.status.name} • Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${x.status.name} â€¢ Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -96,7 +96,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                           controller: _e,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Nº Episodio',
+                            labelText: 'NÂº Episodio',
                           ),
                         ),
                       ),
@@ -105,7 +105,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                   TextField(
                     controller: _title,
                     decoration: const InputDecoration(
-                      labelText: 'Título (opcional)',
+                      labelText: 'TÃ­tulo (opcional)',
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -123,7 +123,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                       await svc.addEpisode(x.id, ep);
                       _title.clear();
                     },
-                    child: const Text('Añadir episodio'),
+                    child: const Text('AÃ±adir episodio'),
                   ),
                   const Divider(),
                   StreamBuilder<List<Episode>>(
@@ -136,7 +136,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      if (data.isEmpty) return const Text('Sin episodios aún');
+                      if (data.isEmpty) return const Text('Sin episodios aÃºn');
                       return Column(
                         children:
                             data
@@ -178,3 +178,6 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
     );
   }
 }
+
+
+

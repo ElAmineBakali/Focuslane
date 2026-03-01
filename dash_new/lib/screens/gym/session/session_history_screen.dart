@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import '../services/gym_firestore_service.dart';
 import '../session/session_summary_screen.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class SessionHistoryScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -74,7 +74,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                     onChanged:
                         (v) => setState(() => _searchQuery = v.toLowerCase()),
                     decoration: InputDecoration(
-                      hintText: 'Buscar por nombre de rutina o día...',
+                      hintText: 'Buscar por nombre de rutina o dÃ­a...',
                       prefixIcon: const Icon(Icons.search_rounded),
                       filled: true,
                       fillColor: colorScheme.surfaceContainerHighest,
@@ -321,20 +321,20 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                       const SizedBox(width: 6),
                       if (session.feelingEnergy != null)
                         Text(
-                          '⚡ ${session.feelingEnergy}',
+                          'âš¡ ${session.feelingEnergy}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       if (session.feelingFatigue != null) ...[
                         const SizedBox(width: 8),
                         Text(
-                          '💪 ${session.feelingFatigue}',
+                          'ðŸ’ª ${session.feelingFatigue}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       ],
                       if (session.feelingMotivation != null) ...[
                         const SizedBox(width: 8),
                         Text(
-                          '❤️ ${session.feelingMotivation}',
+                          'â¤ï¸ ${session.feelingMotivation}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       ],
@@ -374,3 +374,4 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
     );
   }
 }
+

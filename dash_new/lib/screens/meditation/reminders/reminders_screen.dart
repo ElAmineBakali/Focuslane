@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
 import 'reminder_edit_screen.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class RemindersScreen extends StatelessWidget {
   const RemindersScreen({super.key});
@@ -16,7 +16,7 @@ class RemindersScreen extends StatelessWidget {
   }
 
   int _notifId(String reminderId) {
-    // id estable y aislado para meditación
+    // id estable y aislado para meditaciÃ³n
     return 42000 ^ (reminderId.hashCode & 0x7fffffff);
   }
 
@@ -25,8 +25,8 @@ class RemindersScreen extends StatelessWidget {
     if (enable) {
       await NotificationService.I.scheduleDaily(
         id: id,
-        title: 'Meditación',
-        body: 'Tómate 5–10 min para meditar 🧘',
+        title: 'MeditaciÃ³n',
+        body: 'TÃ³mate 5â€“10 min para meditar ðŸ§˜',
         at: _parseTime(r.timeOfDay),
         useExact: true,
       );
@@ -64,12 +64,12 @@ class RemindersScreen extends StatelessWidget {
                     enabled: enabled,
                   );
                   await MeditationFirestoreService.I.updateReminder(newR);
-                  // Programa/cancela al vuelo (diario; los días de la semana
-                  // se implementarán en el siguiente paso con acciones).
+                  // Programa/cancela al vuelo (diario; los dÃ­as de la semana
+                  // se implementarÃ¡n en el siguiente paso con acciones).
                   await _scheduleOrCancel(newR, enabled);
                 },
                 title: Text(r.timeOfDay),
-                subtitle: Text('Días: ${r.daysOfWeek.join(", ")}'),
+                subtitle: Text('DÃ­as: ${r.daysOfWeek.join(", ")}'),
                 secondary: const Icon(Icons.notifications_active_outlined),
               );
             },
@@ -83,3 +83,4 @@ class RemindersScreen extends StatelessWidget {
     );
   }
 }
+

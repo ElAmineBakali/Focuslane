@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../../../ui/components/focus_card.dart';
-import '../../../../ui/components/focus_module_header.dart';
-import '../../../../ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/focus_card.dart';
+import '../../../../design/ui/components/focus_module_header.dart';
+import '../../../../design/ui/tokens/focuslane_tokens.dart';
 
 class FinanceSettingsScreen extends StatelessWidget {
   const FinanceSettingsScreen({
@@ -32,7 +32,7 @@ class FinanceSettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text(
-                'Configuración básica',
+                'ConfiguraciÃ³n bÃ¡sica',
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               SizedBox(height: 8),
@@ -44,5 +44,6 @@ class FinanceSettingsScreen extends StatelessWidget {
     );
   }
 }
+
 
 

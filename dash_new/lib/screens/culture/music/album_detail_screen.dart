@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import '../models/culture_models.dart';
 import 'album_edit_screen.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../widgets/ui_scaffold.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class AlbumDetailScreen extends StatelessWidget {
   const AlbumDetailScreen({super.key});
@@ -13,13 +13,13 @@ class AlbumDetailScreen extends StatelessWidget {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
     if (arg is! Album) {
-      return const Scaffold(body: Center(child: Text('Sin álbum')));
+      return const Scaffold(body: Center(child: Text('Sin Ã¡lbum')));
     }
     final a = arg;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${a.artist} • ${a.title}'),
+        title: Text('${a.artist} â€¢ ${a.title}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -44,9 +44,9 @@ class AlbumDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.album),
-              title: Text('${a.year ?? "—"}'),
+              title: Text('${a.year ?? "â€”"}'),
               subtitle: Text(
-                'Estado: ${a.status.name} • Rating: ${a.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${a.status.name} â€¢ Rating: ${a.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -55,7 +55,7 @@ class AlbumDetailScreen extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.music_note),
                 title: const Text('Temas favoritos'),
-                subtitle: Text(a.favoriteTracks.join(' • ')),
+                subtitle: Text(a.favoriteTracks.join(' â€¢ ')),
               ),
             ),
           if (a.notes != null && a.notes!.isNotEmpty)
@@ -71,3 +71,6 @@ class AlbumDetailScreen extends StatelessWidget {
     );
   }
 }
+
+
+

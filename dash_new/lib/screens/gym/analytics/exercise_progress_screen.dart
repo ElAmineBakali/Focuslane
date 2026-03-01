@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import 'package:intl/intl.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class ExerciseProgressScreen extends StatefulWidget {
   final GymFirestoreService svc;
@@ -141,7 +141,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildE1rmTab() {
     if (_e1rmHistory.isEmpty) {
-      return _buildEmptyState('No hay datos de e1RM todavía');
+      return _buildEmptyState('No hay datos de e1RM todavÃ­a');
     }
 
     final maxE1rm = _e1rmHistory
@@ -171,7 +171,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               Colors.blue,
             ),
             (
-              'Máximo',
+              'MÃ¡ximo',
               '${maxE1rm.toStringAsFixed(1)} kg',
               Icons.trending_up,
               Colors.green,
@@ -186,7 +186,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           const SizedBox(height: 24),
 
           Text(
-            'Evolución e1RM',
+            'EvoluciÃ³n e1RM',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -213,7 +213,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildVolumeTab() {
     if (_volumeHistory.isEmpty) {
-      return _buildEmptyState('No hay datos de volumen todavía');
+      return _buildEmptyState('No hay datos de volumen todavÃ­a');
     }
 
     final totalVolume = _volumeHistory
@@ -243,7 +243,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               Colors.blue,
             ),
             (
-              'Máximo',
+              'MÃ¡ximo',
               '${maxVolume.toStringAsFixed(0)} kg',
               Icons.trending_up,
               Colors.green,
@@ -252,7 +252,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           const SizedBox(height: 24),
 
           Text(
-            'Volumen por Sesión',
+            'Volumen por SesiÃ³n',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -270,7 +270,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildPRsTab() {
     if (_prs.isEmpty) {
-      return _buildEmptyState('¡Entrena para lograr tu primer PR!');
+      return _buildEmptyState('Â¡Entrena para lograr tu primer PR!');
     }
 
     return ListView.builder(
@@ -476,7 +476,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
                         ),
                       ),
                       Text(
-                        ' × ${pr.reps}',
+                        ' Ã— ${pr.reps}',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -745,3 +745,4 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
     );
   }
 }
+

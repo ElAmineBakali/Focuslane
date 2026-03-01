@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
-import '../../../widgets/ui_scaffold.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
+import '../../../design/widgets/ui_scaffold.dart';
 
 class AlbumEditScreen extends StatefulWidget {
   const AlbumEditScreen({super.key});
@@ -45,7 +45,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nuevo álbum' : 'Editar álbum'),
+        title: Text(editing == null ? 'Nuevo Ã¡lbum' : 'Editar Ã¡lbum'),
       ),
       body: TaskFormTheme(
         child: ListView(
@@ -53,7 +53,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'Título'),
+              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
             ),
             TextField(
               controller: _artist,
@@ -62,7 +62,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
             TextField(
               controller: _year,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Año'),
+              decoration: const InputDecoration(labelText: 'AÃ±o'),
             ),
             TextField(
               controller: _cover,
@@ -95,7 +95,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Valoración (0..10)'),
+              title: const Text('ValoraciÃ³n (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(
@@ -145,3 +145,6 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
     );
   }
 }
+
+
+

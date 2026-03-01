@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import 'routine_detail_screen.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 class RoutinesListScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -70,7 +70,7 @@ class RoutinesListScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Sin rutinas aún',
+                            'Sin rutinas aÃºn',
                             style: GoogleFonts.poppins(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -79,7 +79,7 @@ class RoutinesListScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Toca el botón + para crear tu primera rutina',
+                            'Toca el botÃ³n + para crear tu primera rutina',
                             style: TextStyle(color: s.onSurfaceVariant),
                           ),
                         ],
@@ -239,7 +239,7 @@ class RoutinesListScreen extends StatelessWidget {
                                     ),
                                   ),
                                   content: Text(
-                                    '¿Eliminar "${r.name}" y todo su contenido?',
+                                    'Â¿Eliminar "${r.name}" y todo su contenido?',
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
@@ -555,7 +555,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 validator: (s) {
                   final t = (s ?? '').trim();
                   if (t.isEmpty) return 'Pon un nombre';
-                  if (t.length < 3) return 'Mínimo 3 caracteres';
+                  if (t.length < 3) return 'MÃ­nimo 3 caracteres';
                   return null;
                 },
               ),
@@ -565,7 +565,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 style: const TextStyle(fontSize: 16),
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: 'Descripción (opcional)',
+                  labelText: 'DescripciÃ³n (opcional)',
                   hintText: 'Detalles de tu rutina...',
                   prefixIcon: const Icon(Icons.notes_rounded),
                   border: OutlineInputBorder(
@@ -620,7 +620,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 validator: (s) {
                   if ((s ?? '').trim().isEmpty) return 'Indica segundos';
                   final v = int.tryParse((s ?? '').trim());
-                  if (v == null) return 'Número entero';
+                  if (v == null) return 'NÃºmero entero';
                   if (v < 0) return 'No negativo';
                   return null;
                 },
@@ -698,7 +698,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                       ),
                     ),
                     subtitle: const Text(
-                      'Se usará por defecto en tus sesiones',
+                      'Se usarÃ¡ por defecto en tus sesiones',
                     ),
                     secondary: Icon(Icons.star_rounded, color: cs.primary),
                     shape: RoundedRectangleBorder(
@@ -784,3 +784,4 @@ String _rgbToHex(int argb) {
   final rgb = argb & 0x00FFFFFF;
   return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 }
+

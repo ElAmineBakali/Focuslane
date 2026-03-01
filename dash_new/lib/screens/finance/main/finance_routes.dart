@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 // V2 Redesigned screens
 import '../main/finance_main_screen.dart';
-import '../screens/transactions/transaction_form_screen.dart';
-import '../screens/budgets/budget_form_screen.dart';
-import '../screens/subscriptions/subscription_form_screen.dart';
-import '../screens/debts/debt_form_screen.dart';
-import '../screens/assets/asset_form_screen.dart';
+import '../screens/forms/transaction_form_screen.dart';
+import '../screens/forms/budget_form_screen.dart';
+import '../screens/forms/subscription_form_screen.dart';
+import '../screens/forms/debt_form_screen.dart';
+import '../screens/forms/asset_form_screen.dart';
 
 // Models for argument passing
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';

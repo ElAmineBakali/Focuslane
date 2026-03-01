@@ -1,8 +1,8 @@
-// lib/screens/meditation/sessions/session_edit_screen.dart
+﻿// lib/screens/meditation/sessions/session_edit_screen.dart
 import 'package:flutter/material.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class SessionEditScreen extends StatefulWidget {
   const SessionEditScreen({super.key});
@@ -42,12 +42,12 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
     final svc = MeditationFirestoreService.I;
     final durationOptions = [3, 5, 10, 15, 20, 30, 45, 60, 90, 120];
     if (!durationOptions.contains(_durationMin)) {
-      _durationMin = durationOptions.first; // 🔒 evita assert del Dropdown
+      _durationMin = durationOptions.first; // ðŸ”’ evita assert del Dropdown
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nueva sesión' : 'Editar sesión'),
+        title: Text(editing == null ? 'Nueva sesiÃ³n' : 'Editar sesiÃ³n'),
       ),
       body: TaskFormTheme(
         child: Padding(
@@ -65,7 +65,7 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
                     ),
                     DropdownMenuItem(
                       value: SessionType.breath,
-                      child: Text('Respiración'),
+                      child: Text('RespiraciÃ³n'),
                     ),
                     DropdownMenuItem(
                       value: SessionType.guided,
@@ -80,13 +80,13 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(
-                    labelText: 'Título (opcional)',
+                    labelText: 'TÃ­tulo (opcional)',
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('Duración (min)')),
+                    const Expanded(child: Text('DuraciÃ³n (min)')),
                     DropdownButton<int>(
                       value: _durationMin,
                       onChanged:
@@ -183,3 +183,4 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
     );
   }
 }
+

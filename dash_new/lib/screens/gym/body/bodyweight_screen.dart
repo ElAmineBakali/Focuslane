@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
-import '../../../ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 
 SnackBar _niceBar(String text, {IconData? icon}) {
   return SnackBar(
@@ -73,7 +73,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Añadir peso (kg)',
+                          'AÃ±adir peso (kg)',
                           style: theme.textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -96,7 +96,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                         (s ?? '').replaceAll(',', '.'),
                                       );
                                       if (v == null) {
-                                        return 'Introduce un número válido';
+                                        return 'Introduce un nÃºmero vÃ¡lido';
                                       }
                                       if (v <= 0) return 'Debe ser mayor que 0';
                                       return null;
@@ -123,7 +123,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                         context,
                                       ).showSnackBar(
                                         _niceBar(
-                                          'Peso guardado ✅',
+                                          'Peso guardado âœ…',
                                           icon: Icons.check_circle_rounded,
                                         ),
                                       );
@@ -152,7 +152,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Objetivo (kg) • línea en gráfica',
+                            'Objetivo (kg) â€¢ lÃ­nea en grÃ¡fica',
                             style: theme.textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),
@@ -176,7 +176,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        _niceBar('Objetivo actualizado 🎯'),
+                                        _niceBar('Objetivo actualizado ðŸŽ¯'),
                                       );
                                     }
                                   },
@@ -188,7 +188,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                   await svc.setBodyWeightTarget(null);
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      _niceBar('Objetivo eliminado 🧽'),
+                                      _niceBar('Objetivo eliminado ðŸ§½'),
                                     );
                                   }
                                 },
@@ -264,3 +264,4 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
     );
   }
 }
+

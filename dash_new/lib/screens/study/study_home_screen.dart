@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../widgets/global_ui_components.dart';
+import '../../design/widgets/global_ui_components.dart';
 import 'courses/courses_list_screen.dart';
 import 'tasks/study_tasks_screen.dart';
 import 'timer/study_timer_screen.dart';
@@ -13,10 +13,10 @@ import 'services/study_firestore_service.dart';
 import 'services/study_notifications.dart';
 import 'models/study_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../ui/components/focus_module_header.dart';
+import '../../design/ui/components/focus_module_header.dart';
 
-/// 📚 STUDY HOME SCREEN - Rediseñado
-/// Dashboard principal del módulo de estudio con diseño moderno
+/// ðŸ“š STUDY HOME SCREEN - RediseÃ±ado
+/// Dashboard principal del mÃ³dulo de estudio con diseÃ±o moderno
 class StudyHomeScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   const StudyHomeScreen({super.key, required this.svc});
@@ -158,9 +158,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Sección de acciones rápidas
+                  // SecciÃ³n de acciones rÃ¡pidas
                   Text(
-                    'Acciones Rápidas',
+                    'Acciones RÃ¡pidas',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -175,7 +175,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
 
                   // Acceso a funciones principales
                   Text(
-                    'Gestión y Análisis',
+                    'GestiÃ³n y AnÃ¡lisis',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -209,7 +209,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                 final sessions = sessionsSnap.data ?? [];
                 final tasks = tasksSnap.data ?? [];
 
-                // Calcular estadísticas
+                // Calcular estadÃ­sticas
                 final thisWeekSessions =
                     sessions.where((s) {
                       return s.date.isAfter(
@@ -377,8 +377,8 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
     return Column(
       children: [
         _FeatureListTile(
-          title: 'Analíticas',
-          subtitle: 'Estadísticas de estudio y progreso',
+          title: 'AnalÃ­ticas',
+          subtitle: 'EstadÃ­sticas de estudio y progreso',
           icon: Icons.analytics,
           color: colorScheme.primary,
           onTap: () {
@@ -785,7 +785,7 @@ class _FeatureListTile extends StatelessWidget {
   }
 }
 
-// Bottom Sheet de configuración de notificaciones
+// Bottom Sheet de configuraciÃ³n de notificaciones
 class _NotificationSettingsSheet extends StatefulWidget {
   final VoidCallback onSave;
   const _NotificationSettingsSheet({required this.onSave});
@@ -908,7 +908,7 @@ class _NotificationSettingsSheetState
 
                   _buildSwitchTile(
                     title: 'Recordar tareas',
-                    subtitle: 'Notificaciones de tareas y exámenes',
+                    subtitle: 'Notificaciones de tareas y exÃ¡menes',
                     icon: Icons.task_alt,
                     value: _notifyTasks,
                     onChanged: (v) => setState(() => _notifyTasks = v),
@@ -916,7 +916,7 @@ class _NotificationSettingsSheetState
 
                   const SizedBox(height: 24),
 
-                  // Botón guardar
+                  // BotÃ³n guardar
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
@@ -1008,3 +1008,4 @@ class _NotificationSettingsSheetState
     );
   }
 }
+

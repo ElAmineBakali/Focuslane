@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../../services/culture_firestore_service.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
 
 class CultureAnalyticsScreen extends StatelessWidget {
   const CultureAnalyticsScreen({super.key});
@@ -9,7 +9,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: const Text('Analíticas de Cultura')),
+      appBar: AppBar(title: const Text('AnalÃ­ticas de Cultura')),
       body: FutureBuilder<Map<String, dynamic>>(
         future: svc.quickKpis(),
         builder: (_, s) {
@@ -25,7 +25,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             children: [
               _tile('Libros terminados', '${m['booksDone']}'),
-              _tile('Películas vistas', '${m['moviesDone']}'),
+              _tile('PelÃ­culas vistas', '${m['moviesDone']}'),
               _tile('Series completadas', '${m['seriesDone']}'),
               _tile(
                 'Horas totales de juegos',
@@ -35,7 +35,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
               const ListTile(
                 title: Text('Siguientes ideas'),
                 subtitle: Text(
-                  '• Racha de lectura diaria\n• % de backlog completado\n• Tiempo medio por libro / serie / juego',
+                  'â€¢ Racha de lectura diaria\nâ€¢ % de backlog completado\nâ€¢ Tiempo medio por libro / serie / juego',
                 ),
               ),
             ],
@@ -53,3 +53,4 @@ class CultureAnalyticsScreen extends StatelessWidget {
     ),
   );
 }
+

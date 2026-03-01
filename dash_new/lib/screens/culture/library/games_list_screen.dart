@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
-import '../../../services/culture_firestore_service.dart';
-import '../../../models/culture_models.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
+import '../../../screens/culture/services/culture_firestore_service.dart';
+import '../models/culture_models.dart';
 
 class GamesListScreen extends StatefulWidget {
   const GamesListScreen({super.key});
@@ -70,7 +70,7 @@ class _GamesListScreenState extends State<GamesListScreen> {
                 leading: const Icon(Icons.sports_esports),
                 title: Text(g.title),
                 subtitle: Text(
-                  '${g.platform} • ${g.status.name} • ${g.progressPct}%',
+                  '${g.platform} â€¢ ${g.status.name} â€¢ ${g.progressPct}%',
                 ),
                 trailing: Text('${g.hours.toStringAsFixed(1)} h'),
                 onTap:
@@ -87,3 +87,6 @@ class _GamesListScreenState extends State<GamesListScreen> {
     );
   }
 }
+
+
+

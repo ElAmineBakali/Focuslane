@@ -1,11 +1,11 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../models/prenda_model.dart';
-import '../../services/prenda_firestore_service.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'models/prenda_model.dart';
+import '../../screens/ropa/services/prenda_firestore_service.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 
 class PrendaFormScreen extends StatefulWidget {
   final Prenda? initial;
@@ -162,7 +162,7 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
         _imagenes['thumb'] ?? _imagenes['medium'] ?? _imagenes['full'];
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initial == null ? 'Añadir prenda' : 'Editar prenda'),
+        title: Text(widget.initial == null ? 'AÃ±adir prenda' : 'Editar prenda'),
       ),
       body: TaskFormTheme(
         child: Padding(
@@ -187,14 +187,14 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                       TextFormField(
                         controller: _descripcionCtrl,
                         decoration: const InputDecoration(
-                          labelText: 'Descripción',
+                          labelText: 'DescripciÃ³n',
                         ),
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         initialValue: _categoriaSeleccionada,
                         decoration: const InputDecoration(
-                          labelText: 'Categoría',
+                          labelText: 'CategorÃ­a',
                         ),
                         items:
                             _categorias.entries
@@ -253,12 +253,12 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                           ElevatedButton.icon(
                             onPressed: _saving ? null : _pickFromGallery,
                             icon: const Icon(Icons.image_outlined),
-                            label: const Text('Galería / Archivos'),
+                            label: const Text('GalerÃ­a / Archivos'),
                           ),
                           ElevatedButton.icon(
                             onPressed: _saving ? null : _pickFromCamera,
                             icon: const Icon(Icons.photo_camera_outlined),
-                            label: const Text('Cámara'),
+                            label: const Text('CÃ¡mara'),
                           ),
                         ],
                       ),
@@ -277,7 +277,7 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                           : const Icon(Icons.save),
                   label: Text(
                     _saving
-                        ? 'Guardando…'
+                        ? 'Guardandoâ€¦'
                         : (widget.initial == null ? 'Guardar' : 'Actualizar'),
                   ),
                   onPressed: _saving ? null : _guardar,
@@ -290,3 +290,6 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
     );
   }
 }
+
+
+

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:mi_dashboard_personal/utils/app_links.dart';
+import 'package:mi_dashboard_personal/shared/app_links.dart';
 
 class ExternalLinksSheet extends StatelessWidget {
   const ExternalLinksSheet({super.key});
@@ -69,7 +69,7 @@ class ExternalLinksSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'Accede rápidamente a tus herramientas de estudio',
+              'Accede rÃ¡pidamente a tus herramientas de estudio',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -176,7 +176,7 @@ class ExternalLinksSheet extends StatelessWidget {
                 _ExternalLinkTile(
                       icon: Icons.code_rounded,
                       title: 'GitHub',
-                      subtitle: 'Repositorios de código',
+                      subtitle: 'Repositorios de cÃ³digo',
                       gradient: LinearGradient(
                         colors: [
                           Colors.purple.shade400,
@@ -218,7 +218,7 @@ class ExternalLinksSheet extends StatelessWidget {
                 _ExternalLinkTile(
                       icon: Icons.library_books_rounded,
                       title: 'Google Scholar',
-                      subtitle: 'Artículos académicos',
+                      subtitle: 'ArtÃ­culos acadÃ©micos',
                       gradient: LinearGradient(
                         colors: [
                           Colors.indigo.shade400,
@@ -345,3 +345,4 @@ class _ExternalLinkTile extends StatelessWidget {
     );
   }
 }
+

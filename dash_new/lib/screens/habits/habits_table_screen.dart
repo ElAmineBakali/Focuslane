@@ -1,11 +1,11 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/confetti_animation.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class HabitsTableScreen extends StatefulWidget {
   const HabitsTableScreen({super.key});
@@ -88,10 +88,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   }
 
   Widget _valueContent(Habit habit, dynamic value, ThemeData theme) {
-    if (value == '✔️') {
+    if (value == 'âœ”ï¸') {
       return Icon(Icons.check_rounded, color: habit.color, size: 22);
     }
-    if (value == '❌') {
+    if (value == 'âŒ') {
       return Icon(Icons.close_rounded, color: habit.color, size: 22);
     }
     final s = value?.toString();
@@ -117,7 +117,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       );
     }
     return Text(
-      '–',
+      'â€“',
       style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(.45)),
     );
   }
@@ -132,15 +132,15 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         context: context,
         builder:
             (_) => AlertDialog(
-              title: const Text('¿Qué quieres marcar?'),
+              title: const Text('Â¿QuÃ© quieres marcar?'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, '✔️'),
+                  onPressed: () => Navigator.pop(context, 'âœ”ï¸'),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Icon(Icons.check_rounded),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context, '❌'),
+                  onPressed: () => Navigator.pop(context, 'âŒ'),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Icon(Icons.close_rounded),
                 ),
@@ -156,14 +156,14 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         await _habitService.updateHabitHistory(habit.id, date, result);
         habit.history[key] = result;
 
-        if (result == '✔️' && _isToday(date)) {
+        if (result == 'âœ”ï¸' && _isToday(date)) {
           await _updateStreak(habit, true);
 
           if (mounted) {
             final allHabits = _orderedHabits ?? [];
             final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
             final allCompleted = allHabits.every(
-              (h) => h.history[todayKey] == '✔️',
+              (h) => h.history[todayKey] == 'âœ”ï¸',
             );
 
             if (allCompleted && allHabits.isNotEmpty) {
@@ -172,7 +172,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               _showConfetti(habit: habit, isPerfectDay: false);
             }
           }
-        } else if (result == '❌' && _isToday(date)) {
+        } else if (result == 'âŒ' && _isToday(date)) {
           await _updateStreak(habit, false);
         }
 
@@ -227,7 +227,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                 final v = int.tryParse(val?.toString() ?? '0') ?? 0;
                 return v > 0;
               }
-              return val == '✔️';
+              return val == 'âœ”ï¸';
             });
 
             if (allCompleted && allHabits.isNotEmpty) {
@@ -309,7 +309,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Editar hábito'),
+                title: const Text('Editar hÃ¡bito'),
                 onTap: () async {
                   Navigator.pop(context);
                   final result = await Navigator.pushNamed(
@@ -323,7 +323,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               if (h.isActive)
                 ListTile(
                   leading: const Icon(Icons.archive_rounded),
-                  title: const Text('Archivar hábito'),
+                  title: const Text('Archivar hÃ¡bito'),
                   onTap: () async {
                     Navigator.pop(context);
                     await _habitService.archiveHabit(h.id);
@@ -333,7 +333,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               else
                 ListTile(
                   leading: const Icon(Icons.unarchive_rounded),
-                  title: const Text('Desarchivar hábito'),
+                  title: const Text('Desarchivar hÃ¡bito'),
                   onTap: () async {
                     Navigator.pop(context);
                     await _habitService.unarchiveHabit(h.id);
@@ -386,7 +386,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               ? const Color.fromARGB(255, 255, 255, 255)
               : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Hábitos'),
+        title: const Text('HÃ¡bitos'),
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Recordatorios',
@@ -406,7 +406,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                       const SnackBar(
                         behavior: SnackBarBehavior.floating,
                         content: Text(
-                          '👌 Te avisaré todos los días a la hora elegida para revisar hábitos.',
+                          'ðŸ‘Œ Te avisarÃ© todos los dÃ­as a la hora elegida para revisar hÃ¡bitos.',
                         ),
                       ),
                     );
@@ -418,7 +418,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       behavior: SnackBarBehavior.floating,
-                      content: Text('⏰ Recordatorio diario cancelado.'),
+                      content: Text('â° Recordatorio diario cancelado.'),
                     ),
                   );
                 }
@@ -718,3 +718,4 @@ class _NameRow extends StatelessWidget {
     );
   }
 }
+

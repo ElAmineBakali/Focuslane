@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import '../../../theme/focuslane_ui.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../design/theme/focuslane_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../theme/global_ui_theme.dart';
+import '../../../design/theme/global_ui_theme.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
@@ -38,7 +38,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEntrySheet(context, dayId),
         icon: const Icon(Icons.add),
-        label: const Text('Añadir'),
+        label: const Text('AÃ±adir'),
       ).animate().scale(delay: 300.ms, duration: 200.ms),
       body: StreamBuilder<Map<String, double?>>(
         stream: widget.svc.streamGlobalTargets(),
@@ -129,9 +129,9 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
     if (entries.isEmpty) {
       return ModernEmptyState(
         icon: Icons.restaurant_outlined,
-        message: 'No hay entradas para este día',
-        subtitle: 'Toca el botón + para añadir tu primera comida',
-        actionLabel: 'Añadir entrada',
+        message: 'No hay entradas para este dÃ­a',
+        subtitle: 'Toca el botÃ³n + para aÃ±adir tu primera comida',
+        actionLabel: 'AÃ±adir entrada',
         onAction: () => _showAddEntrySheet(context, dayId),
       );
     }
@@ -326,14 +326,14 @@ class _KpiRow extends StatelessWidget {
         final isWide = constraints.maxWidth >= 720;
         final cards = [
           _KpiCard(
-            label: 'Calorías',
+            label: 'CalorÃ­as',
             value: (t['kcal'] ?? 0).toStringAsFixed(0),
             unit: 'kcal',
             target: targets['kcal'],
             icon: Icons.local_fire_department,
           ),
           _KpiCard(
-            label: 'Proteína',
+            label: 'ProteÃ­na',
             value: (t['protein'] ?? 0).toStringAsFixed(0),
             unit: 'g',
             target: targets['protein'],
@@ -519,7 +519,7 @@ class _MealSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                '+ ${entries.length - 4} más',
+                '+ ${entries.length - 4} mÃ¡s',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -549,8 +549,8 @@ class _SidePanel extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final waterTarget = (targets['water'] ?? 2000).toInt();
     final summary = [
-      _GoalRow(label: 'Calorías', value: targets['kcal'], unit: 'kcal'),
-      _GoalRow(label: 'Proteína', value: targets['protein'], unit: 'g'),
+      _GoalRow(label: 'CalorÃ­as', value: targets['kcal'], unit: 'kcal'),
+      _GoalRow(label: 'ProteÃ­na', value: targets['protein'], unit: 'g'),
       _GoalRow(label: 'Carbohidratos', value: targets['carbs'], unit: 'g'),
       _GoalRow(label: 'Grasas', value: targets['fat'], unit: 'g'),
       _GoalRow(label: 'Fibra', value: targets['fiber'], unit: 'g'),
@@ -573,7 +573,7 @@ class _SidePanel extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Objetivos del día', style: AppTypography.heading4(context)),
+                  Text('Objetivos del dÃ­a', style: AppTypography.heading4(context)),
                   TextButton(
                     onPressed: onEditGoals,
                     style: TextButton.styleFrom(
@@ -685,7 +685,7 @@ class _MacrosSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Nutrición del Día', style: AppTypography.heading3(context)),
+          Text('NutriciÃ³n del DÃ­a', style: AppTypography.heading3(context)),
           const SizedBox(height: AppSpacing.md),
 
           FoodCompactCard(
@@ -696,7 +696,7 @@ class _MacrosSummary extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Calorías', style: AppTypography.heading4(context)),
+                    Text('CalorÃ­as', style: AppTypography.heading4(context)),
                     Icon(
                       Icons.local_fire_department,
                       color: colorScheme.primary,
@@ -749,7 +749,7 @@ class _MacrosSummary extends StatelessWidget {
             childAspectRatio: 2.2,
             children: [
               _MacroCard(
-                label: 'Proteínas',
+                label: 'ProteÃ­nas',
                 value: t['protein'] ?? 0,
                 target: g['protein'],
                 unit: 'g',
@@ -914,7 +914,7 @@ class _ModernWaterCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hidratación', style: AppTypography.heading4(context)),
+                    Text('HidrataciÃ³n', style: AppTypography.heading4(context)),
                     Text(
                       '$water / $waterTarget ml',
                       style: AppTypography.bodySmall(context),
@@ -982,7 +982,7 @@ class _ModernWaterCard extends StatelessWidget {
       builder:
           (ctx) => AlertDialog(
             title: Text(
-              'Añadir agua personalizada',
+              'AÃ±adir agua personalizada',
               style: AppTypography.heading3(ctx),
             ),
             content: FoodCompactTextField(
@@ -1005,7 +1005,7 @@ class _ModernWaterCard extends StatelessWidget {
                     Navigator.pop(ctx);
                   }
                 },
-                child: const Text('Añadir'),
+                child: const Text('AÃ±adir'),
               ),
             ],
           ),
@@ -1032,7 +1032,7 @@ class _EntryCard extends StatelessWidget {
     final fat = entry.macrosSnapshot['fat'] ?? 0;
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle =
-        '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} • ${kcal.toStringAsFixed(0)} kcal • P ${protein.toStringAsFixed(0)}g • C ${carbs.toStringAsFixed(0)}g • G ${fat.toStringAsFixed(0)}g';
+        '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} â€¢ ${kcal.toStringAsFixed(0)} kcal â€¢ P ${protein.toStringAsFixed(0)}g â€¢ C ${carbs.toStringAsFixed(0)}g â€¢ G ${fat.toStringAsFixed(0)}g';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -1170,7 +1170,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Añadir al Diario',
+                      'AÃ±adir al Diario',
                       style: AppTypography.heading2(context),
                     ),
                   ),
@@ -1200,7 +1200,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               unselectedLabelColor: colorScheme.onSurfaceVariant,
               indicatorColor: FocuslaneUI.accent(context),
               tabs: const [
-                Tab(icon: Icon(Icons.flash_on), text: 'Rápido'),
+                Tab(icon: Icon(Icons.flash_on), text: 'RÃ¡pido'),
                 Tab(icon: Icon(Icons.star), text: 'Favoritos'),
                 Tab(icon: Icon(Icons.restaurant), text: 'Alimentos'),
                 Tab(icon: Icon(Icons.menu_book), text: 'Recetas'),
@@ -1232,7 +1232,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Añade calorías rápidamente',
+            'AÃ±ade calorÃ­as rÃ¡pidamente',
             style: AppTypography.body(context),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1249,7 +1249,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
             children: [
               Expanded(
                 child: FoodCompactTextField(
-                  label: 'Calorías*',
+                  label: 'CalorÃ­as*',
                   hint: '250',
                   controller: _kcalController,
                   keyboardType: TextInputType.number,
@@ -1260,7 +1260,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: FoodCompactTextField(
-                  label: 'Proteínas (g)',
+                  label: 'ProteÃ­nas (g)',
                   hint: '20',
                   controller: _proteinController,
                   keyboardType: TextInputType.number,
@@ -1273,7 +1273,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           const SizedBox(height: AppSpacing.md),
 
           ModernPrimaryButton(
-            label: 'Añadir entrada rápida',
+            label: 'AÃ±adir entrada rÃ¡pida',
             icon: Icons.check,
             fullWidth: true,
             color: FocuslaneUI.accent(context),
@@ -1319,7 +1319,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
           padding: const EdgeInsets.all(AppSpacing.md),
           child: FoodCompactTextField(
             label: 'Buscar alimentos',
-            hint: 'Busca en tu catálogo...',
+            hint: 'Busca en tu catÃ¡logo...',
             controller: _searchController,
             prefixIcon: Icons.search,
             onChanged: (v) => setState(() => _searchQuery = v),
@@ -1423,13 +1423,13 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
   Future<void> _addQuickEntry() async {
     final name =
       _nameController.text.trim().isEmpty
-        ? 'Entrada rápida'
+        ? 'Entrada rÃ¡pida'
         : _nameController.text.trim();
     final kcal = double.tryParse(_kcalController.text) ?? 0;
     final protein = double.tryParse(_proteinController.text) ?? 0;
 
     if (kcal <= 0) {
-      FoodFeedback.showError(context, 'Las calorías son requeridas');
+      FoodFeedback.showError(context, 'Las calorÃ­as son requeridas');
       return;
     }
 
@@ -1657,14 +1657,14 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Configura tus objetivos diarios de nutrición',
+                'Configura tus objetivos diarios de nutriciÃ³n',
                 style: AppTypography.body(context),
               ),
 
               const SizedBox(height: AppSpacing.md),
 
               FoodCompactTextField(
-                label: 'Calorías objetivo (kcal)',
+                label: 'CalorÃ­as objetivo (kcal)',
                 hint: '2000',
                 controller: _kcalController,
                 keyboardType: TextInputType.number,
@@ -1674,7 +1674,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
               const SizedBox(height: AppSpacing.lg),
 
               FoodCompactTextField(
-                label: 'Proteínas (g)',
+                label: 'ProteÃ­nas (g)',
                 hint: '150',
                 controller: _proteinController,
                 keyboardType: TextInputType.number,
@@ -1806,7 +1806,7 @@ class _FavList extends StatelessWidget {
             icon: Icons.star_border,
             message: 'No hay favoritos',
             subtitle:
-                'Marca alimentos o recetas como favoritos para verlos aquí',
+                'Marca alimentos o recetas como favoritos para verlos aquÃ­',
           );
         }
 
@@ -1817,7 +1817,7 @@ class _FavList extends StatelessWidget {
             final f = list[i];
             final colorScheme = Theme.of(context).colorScheme;
             return ModernListCard(
-              title: f.alias ?? '${f.type.name} • ${f.refId}',
+              title: f.alias ?? '${f.type.name} â€¢ ${f.refId}',
               subtitle:
                   'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
               leadingIcon:
@@ -1867,8 +1867,8 @@ class _FoodList extends StatelessWidget {
             message: 'No se encontraron alimentos',
             subtitle:
                 query.isNotEmpty
-                    ? 'Intenta con otro término de búsqueda'
-                    : 'Añade alimentos a tu catálogo',
+                    ? 'Intenta con otro tÃ©rmino de bÃºsqueda'
+                    : 'AÃ±ade alimentos a tu catÃ¡logo',
           );
         }
 
@@ -1926,8 +1926,8 @@ class _RecipeList extends StatelessWidget {
             message: 'No se encontraron recetas',
             subtitle:
                 query.isNotEmpty
-                    ? 'Intenta con otro término de búsqueda'
-                    : 'Crea recetas para verlas aquí',
+                    ? 'Intenta con otro tÃ©rmino de bÃºsqueda'
+                    : 'Crea recetas para verlas aquÃ­',
           );
         }
 
@@ -1938,7 +1938,7 @@ class _RecipeList extends StatelessWidget {
             final r = list[i];
             final macrosText =
                 r.kcal != null
-                    ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
+                    ? '${r.kcal!.toStringAsFixed(0)} kcal â€¢ ${r.servings} raciones'
                     : '${r.servings} raciones';
             final colorScheme = Theme.of(context).colorScheme;
 
@@ -1956,3 +1956,4 @@ class _RecipeList extends StatelessWidget {
     );
   }
 }
+

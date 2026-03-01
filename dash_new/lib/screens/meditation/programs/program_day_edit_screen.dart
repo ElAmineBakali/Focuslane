@@ -1,6 +1,6 @@
-// lib/screens/meditation/programs/program_day_edit_screen.dart
+﻿// lib/screens/meditation/programs/program_day_edit_screen.dart
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
 import '../services/meditation_firestore_service.dart';
 import '../models/meditation_models.dart';
 
@@ -49,7 +49,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
     }
     final svc = MeditationFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo día' : 'Editar día')),
+      appBar: AppBar(title: Text(editing == null ? 'Nuevo dÃ­a' : 'Editar dÃ­a')),
       body: TaskFormTheme(
         child: Padding(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
@@ -59,7 +59,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
               children: [
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'Título'),
+                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -68,13 +68,13 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                 TextFormField(
                   controller: _goal,
                   decoration: const InputDecoration(
-                    labelText: 'Objetivo / guía',
+                    labelText: 'Objetivo / guÃ­a',
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('Día #')),
+                    const Expanded(child: Text('DÃ­a #')),
                     DropdownButton<int>(
                       value: _dayNumber,
                       onChanged: (v) => setState(() => _dayNumber = v ?? 1),
@@ -124,7 +124,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // ---- Guía opcional (nullable seguro)
+                // ---- GuÃ­a opcional (nullable seguro)
                 StreamBuilder<List<GuidedAudio>>(
                   stream: svc.watchGuided(),
                   builder: (context, s) {
@@ -135,18 +135,18 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                       items: [
                         const DropdownMenuItem<String?>(
                           value: null,
-                          child: Text('Sin guía'),
+                          child: Text('Sin guÃ­a'),
                         ),
                         ...list.map(
                           (g) => DropdownMenuItem<String?>(
                             value: g.id,
-                            child: Text('Guía: ${g.title}'),
+                            child: Text('GuÃ­a: ${g.title}'),
                           ),
                         ),
                       ],
                       onChanged: (v) => setState(() => _guidedId = v),
                       decoration: const InputDecoration(
-                        labelText: 'Guía (opcional)',
+                        labelText: 'GuÃ­a (opcional)',
                       ),
                     );
                   },
@@ -194,3 +194,4 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
     );
   }
 }
+

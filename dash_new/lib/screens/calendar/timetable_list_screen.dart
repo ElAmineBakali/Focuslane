@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../../models/calendar_models.dart';
-import '../../services/calendar_service.dart';
+﻿import 'package:flutter/material.dart';
+import 'models/calendar_models.dart';
+import '../../screens/calendar/services/calendar_service.dart';
 import 'timetable_editor_screen.dart';
 
 class TimetablesListScreen extends StatelessWidget {
@@ -47,7 +47,7 @@ class TimetablesListScreen extends StatelessWidget {
                 leading: const Icon(Icons.view_week),
                 title: Text(t.name),
                 subtitle: Text(
-                  '${t.days.join(', ')} • ${t.startHour}–${t.endHour} • ${t.slotMinutes}\'',
+                  '${t.days.join(', ')} â€¢ ${t.startHour}â€“${t.endHour} â€¢ ${t.slotMinutes}\'',
                 ),
                 trailing: Icon(t.isDefault ? Icons.star : Icons.chevron_right),
                 onTap:
@@ -74,3 +74,5 @@ class TimetablesListScreen extends StatelessWidget {
     );
   }
 }
+
+

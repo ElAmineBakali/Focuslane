@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/models/study_models.dart';
 import '../../study/timer/study_timer_screen.dart';
-import '../../../ui/components/focus_card.dart';
-import '../../../ui/components/focus_section_title.dart';
-import '../../../ui/components/focus_empty_state.dart';
-import '../../../ui/components/focus_list_tile_compact.dart';
-import '../../../ui/components/focus_module_header.dart';
-import '../../../ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_card.dart';
+import '../../../design/ui/components/focus_section_title.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_list_tile_compact.dart';
+import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 
 class StudyDiaryScreen extends StatelessWidget {
   final StudyFirestoreService svc;
@@ -42,7 +42,7 @@ class StudyDiaryScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Iniciar sesión'),
+                child: const Text('Iniciar sesiÃ³n'),
               ),
             ),
             StreamBuilder<List<StudySession>>(
@@ -60,7 +60,7 @@ class StudyDiaryScreen extends StatelessWidget {
                   child: Column(
                     children: sessions.map((s) {
                       final date = DateFormat('d MMM', 'es').format(s.date);
-                      final subtitle = '$date · ${s.minutes} min';
+                      final subtitle = '$date Â· ${s.minutes} min';
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: FocusListTileCompact(
@@ -79,3 +79,4 @@ class StudyDiaryScreen extends StatelessWidget {
     );
   }
 }
+

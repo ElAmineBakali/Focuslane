@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/prenda_firestore_service.dart';
-import '../../services/outfit_firestore_service.dart';
-import '../../models/prenda_model.dart';
-import '../../models/outfit_model.dart';
+import '../../screens/ropa/services/prenda_firestore_service.dart';
+import '../../screens/ropa/services/outfit_firestore_service.dart';
+import 'models/prenda_model.dart';
+import 'models/outfit_model.dart';
 
 class OutfitBuilderScreen extends StatefulWidget {
   const OutfitBuilderScreen({super.key});
@@ -85,7 +85,7 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Una única suscripción al stream y luego filtro por categoría
+          // Una Ãºnica suscripciÃ³n al stream y luego filtro por categorÃ­a
           StreamBuilder<List<Prenda>>(
             stream: prendaService.prendasStream(uid),
             builder: (context, snapshot) {
@@ -201,3 +201,6 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
     );
   }
 }
+
+
+

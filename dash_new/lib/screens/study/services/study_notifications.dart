@@ -1,7 +1,7 @@
-import 'study_firestore_service.dart';
+﻿import 'study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class StudyNotifications {
   final StudyFirestoreService svc;
@@ -24,7 +24,7 @@ class StudyNotifications {
       if (when.isAfter(now)) {
         await NotificationService.I.scheduleOnce(
           id: _id('CLASS', b, when),
-          title: 'Clase próxima',
+          title: 'Clase prÃ³xima',
           body:
               'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
           whenLocal: when,
@@ -45,8 +45,8 @@ class StudyNotifications {
       if (oneDayBefore.isAfter(DateTime.now())) {
         await NotificationService.I.scheduleOnce(
           id: _hash('TASK1', t.id, oneDayBefore),
-          title: 'Tarea próxima',
-          body: 'Entrega de ${t.title} mañana',
+          title: 'Tarea prÃ³xima',
+          body: 'Entrega de ${t.title} maÃ±ana',
           whenLocal: oneDayBefore,
           useExact: false,
         );
@@ -77,3 +77,4 @@ class StudyNotifications {
     }
   }
 }
+

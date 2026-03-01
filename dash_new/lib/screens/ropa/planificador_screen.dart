@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/plan_outfit_firestore_service.dart';
-import '../../services/outfit_firestore_service.dart';
-import '../../models/outfit_model.dart';
-import '../../models/plan_outfit_model.dart';
+import '../../screens/ropa/services/plan_outfit_firestore_service.dart';
+import '../../screens/ropa/services/outfit_firestore_service.dart';
+import 'models/outfit_model.dart';
+import 'models/plan_outfit_model.dart';
 
 class PlanificadorScreen extends StatelessWidget {
   const PlanificadorScreen({super.key});
@@ -80,10 +80,10 @@ class PlanificadorScreen extends StatelessWidget {
                   DropdownButtonFormField<String>(
                     initialValue: parte,
                     decoration: const InputDecoration(
-                      labelText: 'Parte del día (opcional)',
+                      labelText: 'Parte del dÃ­a (opcional)',
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'mañana', child: Text('Mañana')),
+                      DropdownMenuItem(value: 'maÃ±ana', child: Text('MaÃ±ana')),
                       DropdownMenuItem(value: 'tarde', child: Text('Tarde')),
                       DropdownMenuItem(value: 'noche', child: Text('Noche')),
                     ],
@@ -97,7 +97,7 @@ class PlanificadorScreen extends StatelessWidget {
                       if (data.isEmpty) {
                         return const ListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: Text('No tienes outfits aún'),
+                          title: Text('No tienes outfits aÃºn'),
                           subtitle: Text('Crea uno para poder planificarlo'),
                         );
                       }
@@ -221,7 +221,7 @@ class PlanificadorScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Plan • ${outfit?.nombre ?? 'Outfit'}',
+                  'Plan â€¢ ${outfit?.nombre ?? 'Outfit'}',
                   style: Theme.of(ctx).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
@@ -351,7 +351,7 @@ class PlanificadorScreen extends StatelessWidget {
                           Text(
                             "${plan.fecha.toLocal()}".split(' ')[0] +
                                 (plan.parteDelDia != null
-                                    ? ' • ${plan.parteDelDia}'
+                                    ? ' â€¢ ${plan.parteDelDia}'
                                     : ''),
                           ),
                           if (plan.nota.isNotEmpty)
@@ -399,7 +399,7 @@ class PlanificadorScreen extends StatelessWidget {
                                       (_) => AlertDialog(
                                         title: const Text('Eliminar plan'),
                                         content: Text(
-                                          '¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?',
+                                          'Â¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?',
                                         ),
                                         actions: [
                                           TextButton(
@@ -462,3 +462,6 @@ class PlanificadorScreen extends StatelessWidget {
     );
   }
 }
+
+
+
