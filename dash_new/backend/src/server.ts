@@ -1,5 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { aiRouter } from './routes.js';
 import { config, isProd } from './config.js';
@@ -10,6 +12,19 @@ if (!config.openAiApiKey) {
   process.exit(1);
 }
 console.log('[BOOT] OPENAI_API_KEY loaded');
+
+if (config.env === 'dev') {
+  const credsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  const hasInlineServiceAccount = Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  const hasCredentialFile = Boolean(
+    credsPath && fs.existsSync(path.isAbsolute(credsPath) ? credsPath : path.resolve(process.cwd(), credsPath)),
+  );
+
+  if (!hasInlineServiceAccount && !hasCredentialFile) {
+    console.error('[BOOT] FIRESTORE service account missing (set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_SERVICE_ACCOUNT_JSON)');
+    process.exit(1);
+  }
+}
 
 const app = express();
 const json2Mb = express.json({ limit: '2mb' });

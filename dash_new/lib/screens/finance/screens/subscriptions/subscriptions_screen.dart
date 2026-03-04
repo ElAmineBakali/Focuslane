@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/subscription_service.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
@@ -64,7 +65,7 @@ class SubscriptionsScreen extends StatelessWidget {
                         return ListTile(
                           title: Text(s.title),
                           subtitle: Text(
-                            '${s.category ?? 'General'} Â· ${s.frequency}',
+                            '${labelForCategory(s.category)} Â· ${s.frequency}',
                           ),
                           trailing: Text('En $daysLeft d'),
                           onTap: () => Navigator.pushNamed(

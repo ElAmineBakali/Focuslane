@@ -24,8 +24,10 @@ function elapsedMs(start) {
 async function safePersistAiLog(input, route) {
     try {
         await persistAiLog(input);
+        console.log('[AI_LOG] persisted OK');
     }
     catch (error) {
+        console.error(`[AI_LOG] persist failed: ${error instanceof Error ? error.message : 'unknown_error'}`);
         log('warn', {
             event: 'ai.persist_failed',
             uid: input.uid,
@@ -80,7 +82,10 @@ router.post('/v1/ai/finance/classify', async (req, res) => {
                 model: ai.model,
             },
         });
-        res.status(200).json(ai.data);
+        res.status(200).json({
+            ...ai.data,
+            model: ai.model,
+        });
     }
     catch (error) {
         const latencyMs = elapsedMs(start);

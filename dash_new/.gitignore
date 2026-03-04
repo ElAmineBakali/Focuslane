@@ -47,3 +47,4 @@ app.*.map.json
 # Backend AI (Cloud Run)
 backend/node_modules/
 backend/.env
+backend/service-account.json

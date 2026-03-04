@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
 
 import '../../widgets/finance_shell.dart';
@@ -29,15 +30,16 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
   double _alertThreshold = 0.8;
 
   final _categories = [
-    'General',
-    'Alimentacion',
-    'Transporte',
-    'Vivienda',
-    'Ocio',
-    'Salud',
-    'Educacion',
-    'Compras',
-    'Otros',
+    'alimentacion',
+    'transporte',
+    'hogar',
+    'suscripciones',
+    'salud',
+    'ocio',
+    'educacion',
+    'trabajo',
+    'ahorro',
+    'otros',
   ];
 
   final _periods = {
@@ -174,7 +176,12 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
       ),
       hint: const Text('Sin categoria especifica'),
       items: _categories
-          .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+          .map(
+            (cat) => DropdownMenuItem(
+              value: cat,
+              child: Text(labelForCategory(cat)),
+            ),
+          )
           .toList(),
       onChanged: (v) => setState(() => _category = v),
     );
@@ -328,7 +335,7 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
       name: _nameCtrl.text.trim(),
       amount: double.parse(_limitCtrl.text),
       limit: double.parse(_limitCtrl.text),
-      category: _category ?? 'General',
+      category: _category ?? 'otros',
       period: BudgetPeriod.values.firstWhere(
         (e) => e.name == _period,
         orElse: () => BudgetPeriod.monthly,

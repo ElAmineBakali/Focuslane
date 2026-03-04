@@ -1,12 +1,15 @@
 ﻿import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mi_dashboard_personal/core/services/ai_backend_client.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_normalizer.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_preferences.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
 import '../../widgets/finance_shell.dart';
@@ -23,10 +26,17 @@ class TransactionFormScreen extends StatefulWidget {
 }
 
 class _TransactionFormScreenState extends State<TransactionFormScreen> {
+  static const bool _aiDefaultAutoEnabled = false;
+  static const bool _aiClassifyOnSave = true;
+  static const bool _aiDebounceWhileTyping = false;
+  static const int _aiDebounceMs = 900;
+  static const Duration _aiRecentWindow = Duration(minutes: 10);
+
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  final _ai = AiBackendClient();
 
   late TxType _type;
   late DateTime _date;
@@ -38,41 +48,50 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   double _fxRate = 1.0;
   String _recurrence = 'once';
   String? _envelopeId;
+  bool _isSaving = false;
+  bool _autoClassifyEnabled = _aiDefaultAutoEnabled;
+  bool _manualOverride = false;
+  bool _isClassifying = false;
+  FinanceAiMeta? _aiMeta;
+  _AiSuggestion? _pendingSuggestion;
+  Timer? _classifyDebounce;
+  int _classifyRequestSeq = 0;
+  bool _forceReclassifyOnSave = false;
 
   final _categories = {
-    TxType.income: ['Salario', 'Freelance', 'Inversiones', 'Otros Ingresos'],
+    TxType.income: ['trabajo', 'freelance', 'inversiones', 'ahorro', 'otros'],
     TxType.expense: [
-      'Alimentacion',
-      'Transporte',
-      'Vivienda',
-      'Ocio',
-      'Salud',
-      'Educacion',
-      'Compras',
-      'Otros Gastos',
+      'alimentacion',
+      'transporte',
+      'hogar',
+      'suscripciones',
+      'salud',
+      'ocio',
+      'educacion',
+      'otros',
     ],
   };
 
   final _subCategories = {
-    'Alimentacion': ['Supermercado', 'Restaurantes', 'Delivery'],
-    'Transporte': [
-      'Gasolina',
-      'Transporte Publico',
-      'Taxi/Uber',
-      'Mantenimiento',
+    'alimentacion': ['supermercado', 'restaurantes', 'delivery', 'comestibles'],
+    'transporte': [
+      'gasolina',
+      'transporte_publico',
+      'taxi_uber',
+      'mantenimiento',
     ],
-    'Vivienda': [
-      'Alquiler',
-      'Hipoteca',
-      'Electricidad',
-      'Agua',
-      'Internet',
-      'Reparaciones',
+    'hogar': [
+      'alquiler',
+      'hipoteca',
+      'electricidad',
+      'agua',
+      'internet',
+      'reparaciones',
     ],
-    'Ocio': ['Cine', 'Conciertos', 'Viajes', 'Hobbies', 'Streaming'],
-    'Salud': ['Medico', 'Farmacia', 'Gimnasio', 'Seguros'],
-    'Educacion': ['Cursos', 'Libros', 'Material'],
-    'Compras': ['Ropa', 'Tecnologia', 'Hogar'],
+    'ocio': ['cine', 'conciertos', 'viajes', 'hobbies', 'streaming'],
+    'salud': ['medico', 'farmacia', 'gimnasio', 'seguros'],
+    'educacion': ['cursos', 'libros', 'material'],
+    'suscripciones': ['streaming', 'software', 'membresia', 'servicios'],
   };
 
   final _divisas = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD'];
@@ -102,10 +121,30 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       _fxRate = t.fxRate ?? 1.0;
       _recurrence = t.recurrence ?? 'once';
       _envelopeId = t.envelopeId;
+      _aiMeta = t.aiMeta;
+      _manualOverride = t.aiMeta?.manualOverride == true;
     } else {
       _type = TxType.expense;
       _date = DateTime.now();
     }
+    _titleCtrl.addListener(_onInputChanged);
+    _amountCtrl.addListener(_onInputChanged);
+    _notesCtrl.addListener(_onInputChanged);
+    unawaited(_loadAutoClassifyPreference());
+  }
+
+  Future<void> _loadAutoClassifyPreference() async {
+    final enabled = await FinanceAiPreferences.getAutoClassifyEnabled(
+      fallback: _aiDefaultAutoEnabled,
+    );
+    if (!mounted) return;
+    setState(() {
+      _autoClassifyEnabled = enabled;
+    });
+  }
+
+  Future<void> _persistAutoClassifyPreference(bool enabled) {
+    return FinanceAiPreferences.setAutoClassifyEnabled(enabled);
   }
 
   @override
@@ -119,10 +158,16 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       title: 'Finanzas',
       subtitle: subtitle,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _save,
+        onPressed: _isSaving ? null : _save,
         heroTag: null,
-        icon: const Icon(Icons.check),
-        label: const Text('Guardar'),
+        icon: _isSaving
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.check),
+        label: Text(_isSaving ? 'Guardando...' : 'Guardar'),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -153,6 +198,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                             _buildTitleField(),
                             const SizedBox(height: 16),
                             _buildAmountField(),
+                            const SizedBox(height: 12),
+                            _buildAiAssistPanel(),
                             const SizedBox(height: 16),
                             _buildDateField(),
                             const SizedBox(height: 16),
@@ -346,10 +393,12 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
           lastDate: DateTime(2100),
         );
         if (picked != null) {
+          if (!mounted) return;
           final time = await showTimePicker(
             context: context,
             initialTime: TimeOfDay.fromDateTime(_date),
           );
+          if (!mounted) return;
           setState(() {
             _date = DateTime(
               picked.year,
@@ -373,27 +422,41 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   }
 
   Widget _buildCategoryField() {
+    final options = [..._categories[_type]!];
+    if (_category != null && _category!.isNotEmpty && !options.contains(_category)) {
+      options.insert(0, _category!);
+    }
     return DropdownButtonFormField<String>(
       initialValue: _category,
       decoration: InputDecoration(
-        labelText: 'Categoria *',
+        labelText: 'Categoria',
         prefixIcon: const Icon(Icons.category),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       hint: const Text('Selecciona una categoria'),
-      items: _categories[_type]!
-          .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+      items: options
+          .map(
+            (cat) => DropdownMenuItem(
+              value: cat,
+              child: Text(labelForCategory(cat)),
+            ),
+          )
           .toList(),
       onChanged: (v) => setState(() {
         _category = v;
         _subCategory = null;
+        _setManualOverrideIfNeeded();
       }),
-      validator: (v) => v == null ? 'Requerido' : null,
     );
   }
 
   Widget _buildSubCategoryField() {
-    final subs = _subCategories[_category] ?? [];
+    final subs = [...(_subCategories[_category] ?? <String>[])];
+    if (_subCategory != null &&
+        _subCategory!.isNotEmpty &&
+        !subs.contains(_subCategory)) {
+      subs.insert(0, _subCategory!);
+    }
     if (subs.isEmpty) return const SizedBox.shrink();
     return DropdownButtonFormField<String>(
       initialValue: _subCategory,
@@ -404,9 +467,17 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       ),
       hint: const Text('Opcional'),
       items: subs
-          .map((sub) => DropdownMenuItem(value: sub, child: Text(sub)))
+          .map(
+            (sub) => DropdownMenuItem(
+              value: sub,
+              child: Text(labelForSubCategory(sub)),
+            ),
+          )
           .toList(),
-      onChanged: (v) => setState(() => _subCategory = v),
+      onChanged: (v) => setState(() {
+        _subCategory = v;
+        _setManualOverrideIfNeeded();
+      }),
     );
   }
 
@@ -465,7 +536,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
           ),
           onFieldSubmitted: (v) {
             if (v.isNotEmpty && !_tags.contains(v)) {
-              setState(() => _tags.add(v));
+              setState(() {
+                _tags.add(v);
+                _setManualOverrideIfNeeded();
+              });
             }
           },
         ),
@@ -478,13 +552,208 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                 .map((tag) => Chip(
                       label: Text(tag),
                       deleteIcon: const Icon(Icons.close, size: 18),
-                      onDeleted: () => setState(() => _tags.remove(tag)),
+                      onDeleted: () => setState(() {
+                        _tags.remove(tag);
+                        _setManualOverrideIfNeeded();
+                      }),
                     ))
                 .toList(),
           ),
         ],
       ],
     );
+  }
+
+  Widget _buildAiAssistPanel() {
+    final confidence = _pendingSuggestion?.confidence ?? _aiMeta?.confidence;
+    final hasSuggestion = _pendingSuggestion != null;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              OutlinedButton.icon(
+                onPressed: _isClassifying ? null : _onAutoClassifyPressed,
+                icon: _isClassifying
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.auto_awesome, size: 18),
+                label: Text(_isClassifying ? 'Clasificando…' : 'Auto-clasificar'),
+              ),
+              FilterChip(
+                label: const Text('Auto'),
+                selected: _autoClassifyEnabled,
+                onSelected: (v) {
+                  setState(() {
+                    _autoClassifyEnabled = v;
+                    if (!v) _cancelClassify();
+                  });
+                  unawaited(_persistAutoClassifyPreference(v));
+                },
+              ),
+              if (_isClassifying)
+                TextButton(
+                  onPressed: _cancelClassify,
+                  child: const Text('Cancelar'),
+                ),
+              if (hasSuggestion)
+                Text(
+                  'Sugerido por IA${confidence != null ? ' (${confidence.toStringAsFixed(2)})' : ''}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              if (hasSuggestion)
+                FilledButton.tonal(
+                  onPressed: _applyPendingSuggestion,
+                  child: const Text('Aplicar'),
+                ),
+              if (_manualOverride)
+                const Text(
+                  'Manual override',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _onInputChanged() {
+    if (!_aiDebounceWhileTyping || !_autoClassifyEnabled) return;
+    _classifyDebounce?.cancel();
+    _classifyDebounce = Timer(const Duration(milliseconds: _aiDebounceMs), () {
+      unawaited(_runClassification(manualRequest: false, forSave: false));
+    });
+  }
+
+  void _cancelClassify() {
+    _classifyDebounce?.cancel();
+    _classifyRequestSeq += 1;
+    if (mounted) {
+      setState(() {
+        _isClassifying = false;
+      });
+    }
+  }
+
+  void _onAutoClassifyPressed() {
+    _forceReclassifyOnSave = true;
+    unawaited(_runClassification(manualRequest: true, forSave: false));
+  }
+
+  void _setManualOverrideIfNeeded() {
+    if (_aiMeta == null && _pendingSuggestion == null) return;
+    _manualOverride = true;
+    if (_aiMeta != null) {
+      _aiMeta = _aiMeta!.copyWith(manualOverride: true);
+    }
+  }
+
+  String _buildClassificationText() {
+    final parts = <String>[
+      _titleCtrl.text.trim(),
+      if (_accountId != null && _accountId!.trim().isNotEmpty) _accountId!.trim(),
+      if (_amountCtrl.text.trim().isNotEmpty) _amountCtrl.text.trim(),
+      _divisa,
+      if (_notesCtrl.text.trim().isNotEmpty) _notesCtrl.text.trim(),
+    ];
+    return parts.where((e) => e.isNotEmpty).join(' ').trim();
+  }
+
+  String _classificationInputHash(String value) {
+    final normalized = value.trim().toLowerCase();
+    final bytes = utf8.encode(normalized);
+    var hash = 2166136261;
+    for (final b in bytes) {
+      hash ^= b;
+      hash = (hash * 16777619) & 0xFFFFFFFF;
+    }
+    return hash.toRadixString(16).padLeft(8, '0');
+  }
+
+  bool _hasRecentSameHash(String inputHash) {
+    final meta = _aiMeta;
+    if (meta == null || meta.inputHash != inputHash || meta.classifiedAt == null) {
+      return false;
+    }
+    return DateTime.now().difference(meta.classifiedAt!).abs() <= _aiRecentWindow;
+  }
+
+  bool _missingClassificationFields() {
+    return (_category == null || _category!.trim().isEmpty) ||
+        (_subCategory == null || _subCategory!.trim().isEmpty) ||
+        _tags.isEmpty;
+  }
+
+  Future<void> _runClassification({
+    required bool manualRequest,
+    required bool forSave,
+  }) async {
+    final text = _buildClassificationText();
+    if (text.isEmpty) {
+      if (manualRequest && mounted) {
+        FocusFeedback.showError(context, 'Completa titulo/importe para clasificar');
+      }
+      return;
+    }
+
+    final inputHash = _classificationInputHash(text);
+    if (!manualRequest && _hasRecentSameHash(inputHash)) {
+      return;
+    }
+
+    final seq = ++_classifyRequestSeq;
+    if (mounted) {
+      setState(() {
+        _isClassifying = true;
+      });
+    }
+
+    try {
+      final result = await _ai.classifyFinance(text: text);
+      if (!mounted || seq != _classifyRequestSeq) return;
+
+      final suggestion = _AiSuggestion.fromResponse(result, inputHash);
+      setState(() {
+        _pendingSuggestion = suggestion;
+        _isClassifying = false;
+      });
+
+      final shouldApplyNow = forSave &&
+          (!_manualOverride && (_missingClassificationFields() || manualRequest));
+      if (shouldApplyNow) {
+        _applyPendingSuggestion();
+      }
+    } catch (e) {
+      if (!mounted || seq != _classifyRequestSeq) return;
+      setState(() {
+        _isClassifying = false;
+      });
+      if (manualRequest || forSave) {
+        FocusFeedback.showError(context, 'No se pudo auto-clasificar');
+      }
+    }
+  }
+
+  void _applyPendingSuggestion() {
+    final suggestion = _pendingSuggestion;
+    if (suggestion == null) return;
+    setState(() {
+      _category = suggestion.category;
+      _subCategory = suggestion.subCategory;
+      _tags = suggestion.tags;
+      _aiMeta = suggestion.toMeta(manualOverride: false);
+      _pendingSuggestion = null;
+      _manualOverride = false;
+    });
   }
 
   Widget _buildNotesField() {
@@ -503,45 +772,49 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final tx = FinanceTransaction(
-      id: widget.transaction?.id ?? '',
-      userId: widget.transaction?.userId ?? '',
-      date: _date,
-      type: _type,
-      title: _titleCtrl.text.trim(),
-      amount: double.parse(_amountCtrl.text),
-      category: _category,
-      subCategory: _subCategory,
-      accountId: _accountId,
-      notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text.trim(),
-      tags: _tags,
-      originalCurrency: _divisa != 'EUR' ? _divisa : null,
-      fxRate: _divisa != 'EUR' ? _fxRate : null,
-      recurrence: _recurrence != 'once' ? _recurrence : null,
-      envelopeId: _envelopeId,
-      relatedTxId: null,
-    );
+    setState(() => _isSaving = true);
 
     try {
-      if (kDebugMode && AiBackendClient.isDevEnv) {
-        final textForClassify = '${tx.title} ${tx.notes ?? ''}'.trim();
-        if (textForClassify.isNotEmpty) {
-          final ai = AiBackendClient();
-          unawaited(
-            ai.classifyFinance(text: textForClassify).then((value) {
-              debugPrint('[AI classify] $value');
-            }).catchError((error) {
-              debugPrint('[AI classify] error: $error');
-            }),
-          );
-        }
+      final shouldRunAi = _autoClassifyEnabled &&
+          (_forceReclassifyOnSave || _missingClassificationFields()) &&
+          _aiClassifyOnSave;
+      if (shouldRunAi) {
+        await _runClassification(
+          manualRequest: _forceReclassifyOnSave,
+          forSave: true,
+        );
       }
+
+      final effectiveAiMeta = _manualOverride && _aiMeta != null
+          ? _aiMeta!.copyWith(manualOverride: true)
+          : _aiMeta;
+
+      final tx = FinanceTransaction(
+        id: widget.transaction?.id ?? '',
+        userId: widget.transaction?.userId ?? '',
+        date: _date,
+        type: _type,
+        title: _titleCtrl.text.trim(),
+        amount: double.parse(_amountCtrl.text),
+        category: _category,
+        subCategory: _subCategory,
+        accountId: _accountId,
+        notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text.trim(),
+        tags: _tags,
+        originalCurrency: _divisa != 'EUR' ? _divisa : null,
+        fxRate: _divisa != 'EUR' ? _fxRate : null,
+        recurrence: _recurrence != 'once' ? _recurrence : null,
+        envelopeId: _envelopeId,
+        relatedTxId: null,
+        aiMeta: effectiveAiMeta,
+      );
 
       if (widget.transaction == null) {
         await TransactionService.I.create(tx);
       } else {
         await TransactionService.I.update(tx);
       }
+      _forceReclassifyOnSave = false;
       if (mounted) {
         Navigator.pop(context, true);
         FocusFeedback.showSuccess(
@@ -555,15 +828,68 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       if (mounted) {
         FocusFeedback.showError(context, 'Error: $e');
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
   @override
   void dispose() {
+    _classifyDebounce?.cancel();
     _titleCtrl.dispose();
     _amountCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
+  }
+}
+
+class _AiSuggestion {
+  const _AiSuggestion({
+    required this.category,
+    required this.subCategory,
+    required this.tags,
+    required this.model,
+    required this.confidence,
+    required this.reasoningShort,
+    required this.inputHash,
+    required this.classifiedAt,
+  });
+
+  final String category;
+  final String? subCategory;
+  final List<String> tags;
+  final String? model;
+  final double? confidence;
+  final String? reasoningShort;
+  final String inputHash;
+  final DateTime classifiedAt;
+
+  static _AiSuggestion fromResponse(Map<String, dynamic> raw, String inputHash) {
+    final normalized = FinanceAiNormalizer.normalize(raw);
+    return _AiSuggestion(
+      category: normalized.category,
+      subCategory: normalized.subCategory,
+      tags: normalized.tags,
+      model: raw['model']?.toString(),
+      confidence: (raw['confidence'] as num?)?.toDouble(),
+      reasoningShort: raw['reasoning_short']?.toString() ?? raw['reasoningShort']?.toString(),
+      inputHash: inputHash,
+      classifiedAt: DateTime.now(),
+    );
+  }
+
+  FinanceAiMeta toMeta({required bool manualOverride}) {
+    return FinanceAiMeta(
+      source: 'openai',
+      model: model,
+      confidence: confidence,
+      reasoningShort: reasoningShort,
+      classifiedAt: classifiedAt,
+      inputHash: inputHash,
+      manualOverride: manualOverride,
+    );
   }
 }
 

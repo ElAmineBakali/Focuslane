@@ -3,6 +3,7 @@ import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/subscription_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
@@ -287,7 +288,7 @@ class _RecentTransactions extends StatelessWidget {
                 return ListTile(
                   dense: true,
                   title: Text(t.title),
-                  subtitle: Text(t.category ?? 'Sin categorÃ­a'),
+                  subtitle: Text(labelForCategory(t.category)),
                   trailing: Text(
                     '$sign${t.amount.toStringAsFixed(2)}',
                     style: TextStyle(color: color, fontWeight: FontWeight.w700),
@@ -363,7 +364,7 @@ class _BudgetsCard extends StatelessWidget {
                   return ListTile(
                     dense: true,
                     title: Text(b.name),
-                    subtitle: Text(b.category.isEmpty ? 'General' : b.category),
+                    subtitle: Text(labelForCategory(b.category)),
                     trailing: Text(
                       '${b.limit.toStringAsFixed(2)} EUR',
                       style: const TextStyle(fontWeight: FontWeight.w700),
@@ -424,7 +425,7 @@ class _SubsCard extends StatelessWidget {
                   return ListTile(
                     dense: true,
                     title: Text(s.title),
-                    subtitle: Text(s.category ?? 'General'),
+                    subtitle: Text(labelForCategory(s.category)),
                     trailing: Text('En $daysLeft d'),
                     onTap: () => Navigator.pushNamed(context, '/finance/subscriptions/form', arguments: s),
                   );

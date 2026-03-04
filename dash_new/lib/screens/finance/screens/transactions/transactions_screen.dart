@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
@@ -63,8 +64,45 @@ class TransactionsScreen extends StatelessWidget {
                         final color = isIncome ? Colors.green : Colors.red;
                         final sign = isIncome ? '+' : '-';
                         return ListTile(
-                          title: Text(t.title),
-                          subtitle: Text(t.category ?? 'General'),
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(t.title)),
+                              if (t.aiMeta != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    'IA',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Icon(
+                                iconForCategory(t.category),
+                                size: 14,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(labelForCategory(t.category)),
+                            ],
+                          ),
                           trailing: Text(
                             '$sign${t.amount.toStringAsFixed(2)}',
                             style: TextStyle(

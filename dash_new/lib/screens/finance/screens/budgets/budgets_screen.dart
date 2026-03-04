@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
@@ -61,7 +62,7 @@ class BudgetsScreen extends StatelessWidget {
                             (b.progress * 100).clamp(0, 999).toStringAsFixed(0);
                         return ListTile(
                           title: Text(b.budget.name),
-                          subtitle: Text(b.budget.category ?? 'General'),
+                          subtitle: Text(labelForCategory(b.budget.category)),
                           trailing: Text(
                             '$pct%',
                             style: const TextStyle(fontWeight: FontWeight.w700),

@@ -41,6 +41,7 @@ export async function callOpenAiJson(options) {
             image_url: `data:${options.image.mimeType};base64,${options.image.imageBase64}`,
         });
     }
+    const startedAt = Date.now();
     const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: {
@@ -49,7 +50,6 @@ export async function callOpenAiJson(options) {
         },
         body: JSON.stringify({
             model: options.model,
-            temperature: 0,
             input: [
                 {
                     role: 'system',
@@ -68,7 +68,10 @@ export async function callOpenAiJson(options) {
         }),
     });
     const payload = await response.json();
+    const latencyMs = Date.now() - startedAt;
+    console.log(`OpenAI response received (status=${response.status}, latencyMs=${latencyMs})`);
     if (!response.ok) {
+        console.log(`OpenAI error payload: ${JSON.stringify(payload)}`);
         const reason = typeof payload?.error?.message === 'string'
             ? payload.error.message
             : 'openai_request_failed';
