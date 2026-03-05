@@ -62,14 +62,14 @@ export const receiptScanOutputSchema = z.object({
   merchant: z.string().nullable(),
   total: z.number().nonnegative().nullable(),
   currency: z.string().min(3).max(3).nullable(),
-  dateISO: z.string().nullable(),
+  dateISO: z.string().nullable().optional(),
   items: z.array(
     z.object({
       name: z.string().min(1),
-      qty: z.number().positive(),
+      qty: z.number().nonnegative(),
       price: z.number().nonnegative(),
     }),
-  ).max(40).optional(),
+  ).max(40).optional().default([]),
   confidence: z.number().min(0).max(1),
 });
 

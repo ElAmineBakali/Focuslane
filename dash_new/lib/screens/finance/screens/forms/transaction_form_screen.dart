@@ -1,8 +1,11 @@
 ﻿import 'dart:async';
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mi_dashboard_personal/core/services/ai_backend_client.dart';
@@ -10,6 +13,7 @@ import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.d
 import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_normalizer.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_preferences.dart';
+import 'package:mi_dashboard_personal/screens/finance/services/finance_receipt_ai_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
 
 import '../../widgets/finance_shell.dart';
@@ -37,6 +41,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   final _amountCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   final _ai = AiBackendClient();
+  final _receiptAiService = FinanceReceiptAiService();
 
   late TxType _type;
   late DateTime _date;
@@ -54,6 +59,12 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   bool _isClassifying = false;
   FinanceAiMeta? _aiMeta;
   _AiSuggestion? _pendingSuggestion;
+  _ReceiptScanDraft? _receiptDraft;
+  bool _receiptDraftAppliedToForm = false;
+  bool _isScanningReceipt = false;
+  int? _activeReceiptScanSeq;
+  int _receiptScanSeq = 0;
+  bool _dateTouchedManually = false;
   Timer? _classifyDebounce;
   int _classifyRequestSeq = 0;
   bool _forceReclassifyOnSave = false;
@@ -68,6 +79,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       'salud',
       'ocio',
       'educacion',
+      'otros_gastos',
       'otros',
     ],
   };
@@ -198,6 +210,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                             _buildTitleField(),
                             const SizedBox(height: 16),
                             _buildAmountField(),
+                            const SizedBox(height: 12),
+                            _buildReceiptScanPanel(),
                             const SizedBox(height: 12),
                             _buildAiAssistPanel(),
                             const SizedBox(height: 16),
@@ -407,6 +421,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               time?.hour ?? _date.hour,
               time?.minute ?? _date.minute,
             );
+            _dateTouchedManually = true;
           });
         }
       },
@@ -564,6 +579,72 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     );
   }
 
+  Widget _buildReceiptScanPanel() {
+    final draft = _receiptDraft;
+    final hasDraft = draft != null;
+    final confidence = draft?.result.confidence;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            OutlinedButton.icon(
+              onPressed: (_isScanningReceipt || _isSaving)
+                  ? null
+                  : _startReceiptScanFlow,
+              icon: const Icon(Icons.receipt_long_outlined, size: 18),
+              label: const Text('Escanear ticket (IA)'),
+            ),
+            if (_isScanningReceipt) ...[
+              const SizedBox(width: 10),
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 8),
+              const Text('Analizando ticket…'),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: _cancelReceiptScan,
+                child: const Text('Cancelar'),
+              ),
+            ],
+          ],
+        ),
+        if (hasDraft) ...[
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                'Ticket IA listo${confidence != null ? ' (${(confidence * 100).toStringAsFixed(0)}%)' : ''}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                draft.summary,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              Text(
+                _receiptDraftAppliedToForm
+                    ? 'Aplicado al formulario'
+                    : 'Pendiente de aplicar',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              TextButton(
+                onPressed: _clearReceiptDraft,
+                child: const Text('Quitar ticket'),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
   Widget _buildAiAssistPanel() {
     final confidence = _pendingSuggestion?.confidence ?? _aiMeta?.confidence;
     final hasSuggestion = _pendingSuggestion != null;
@@ -624,6 +705,344 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         ),
       ],
     );
+  }
+
+  void _clearReceiptDraft() {
+    setState(() {
+      _receiptDraft = null;
+      _receiptDraftAppliedToForm = false;
+      if (_aiMeta?.source == 'receipt_scan') {
+        _aiMeta = null;
+        _manualOverride = false;
+      }
+    });
+  }
+
+  void _cancelReceiptScan() {
+    if (!_isScanningReceipt) return;
+    setState(() {
+      _activeReceiptScanSeq = null;
+      _isScanningReceipt = false;
+    });
+    if (kDebugMode) {
+      debugPrint('[FinanceReceiptAI] analysis cancelled by user');
+    }
+  }
+
+  Future<void> _startReceiptScanFlow() async {
+    final file = await _pickImageForReceipt();
+    if (file == null || !mounted) return;
+
+    final seq = ++_receiptScanSeq;
+
+    try {
+      setState(() {
+        _isScanningReceipt = true;
+        _activeReceiptScanSeq = seq;
+      });
+
+      final result = await _receiptAiService.scanFromImage(file);
+
+      if (!mounted || _activeReceiptScanSeq != seq) return;
+      setState(() {
+        _isScanningReceipt = false;
+        _activeReceiptScanSeq = null;
+      });
+      await _showReceiptAiPreview(result);
+    } catch (error) {
+      if (!mounted || _activeReceiptScanSeq != seq) return;
+      setState(() {
+        _isScanningReceipt = false;
+        _activeReceiptScanSeq = null;
+      });
+      final message = error is FinanceReceiptAiException
+          ? error.message
+          : 'No se pudo analizar el ticket. Puedes continuar en modo manual.';
+      if (kDebugMode) {
+        debugPrint('[FinanceReceiptAI] scan error message=$message');
+      }
+      FocusFeedback.showError(context, message);
+    }
+  }
+
+  Future<XFile?> _pickImageForReceipt() async {
+    final picker = ImagePicker();
+    try {
+      if (kIsWeb) {
+        final picked = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          withData: true,
+          allowMultiple: false,
+        );
+        final files = picked?.files;
+        if (files == null || files.isEmpty) return null;
+        final file = files.first;
+        final bytes = file.bytes;
+        if (bytes == null || bytes.isEmpty) {
+          FocusFeedback.showError(
+            context,
+            'No se pudo leer la imagen seleccionada.',
+          );
+          return null;
+        }
+        return XFile.fromData(
+          bytes,
+          name: file.name,
+          mimeType: file.extension != null
+              ? 'image/${file.extension!.toLowerCase()}'
+              : null,
+        );
+      }
+
+      final source = await showModalBottomSheet<ImageSource>(
+        context: context,
+        builder: (ctx) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_camera_outlined),
+                  title: const Text('Cámara'),
+                  onTap: () => Navigator.pop(ctx, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text('Galería'),
+                  onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (source == null) return null;
+      return picker.pickImage(source: source);
+    } catch (_) {
+      if (!mounted) return null;
+      FocusFeedback.showError(
+        context,
+        'No se pudo abrir el selector de imágenes.',
+      );
+      return null;
+    }
+  }
+
+  Future<void> _showReceiptAiPreview(FinanceReceiptAiResult result) async {
+    if (!mounted) return;
+    final hostContext = context;
+
+    await showDialog<void>(
+      context: hostContext,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        var applyToForm = true;
+        var confirming = false;
+        var showItems = false;
+
+        return StatefulBuilder(
+          builder: (_, setStateSheet) {
+            Future<void> onConfirm() async {
+              if (confirming) return;
+              setStateSheet(() => confirming = true);
+
+              final draft = _ReceiptScanDraft.fromResult(result);
+
+              if (!mounted) return;
+              setState(() {
+                _receiptDraft = draft;
+                _receiptDraftAppliedToForm = applyToForm;
+                _aiMeta = draft.toMeta(manualOverride: false);
+                _manualOverride = false;
+                _pendingSuggestion = null;
+                if (applyToForm) {
+                  _applyReceiptDraftToForm(draft);
+                }
+              });
+
+              if (kDebugMode) {
+                debugPrint(
+                  '[FinanceReceiptAI] preview confirmed applyToForm=$applyToForm merchant=${result.merchant ?? 'null'} total=${result.total?.toStringAsFixed(2) ?? 'null'}',
+                );
+              }
+
+              if (dialogContext.mounted && Navigator.of(dialogContext).canPop()) {
+                Navigator.of(dialogContext).pop();
+              }
+
+              if (!mounted) return;
+              FocusFeedback.showSuccess(
+                hostContext,
+                applyToForm
+                    ? 'Datos del ticket aplicados al formulario.'
+                    : 'Ticket analizado. Puedes seguir en modo manual.',
+              );
+            }
+
+            final totalText = result.total == null
+                ? 'Sin total'
+                : '${result.total!.toStringAsFixed(2)} ${result.currency ?? _divisa}';
+            final dateText = result.dateISO ?? 'No detectada';
+
+            return AlertDialog(
+              title: const Text('Escanear ticket (IA)'),
+              content: SizedBox(
+                width: 560,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: const Icon(Icons.storefront_outlined),
+                        title: const Text('Comercio'),
+                        subtitle: Text(result.merchant ?? 'No detectado'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: const Icon(Icons.payments_outlined),
+                        title: const Text('Total'),
+                        subtitle: Text(totalText),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: const Icon(Icons.event_outlined),
+                        title: const Text('Fecha'),
+                        subtitle: Text(dateText),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: const Icon(Icons.insights_outlined),
+                        title: const Text('Modelo y confianza'),
+                        subtitle: Text(
+                          '${result.model} · ${(result.confidence * 100).toStringAsFixed(0)}%',
+                        ),
+                      ),
+                      if (result.items.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        ExpansionTile(
+                          tilePadding: EdgeInsets.zero,
+                          title: Text('Items (${result.items.length})'),
+                          initiallyExpanded: showItems,
+                          onExpansionChanged: (v) {
+                            setStateSheet(() => showItems = v);
+                          },
+                          children: result.items
+                              .map(
+                                (item) => ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text(item.name),
+                                  subtitle: Text(
+                                    'Cantidad ${item.qty.toStringAsFixed(2)}',
+                                  ),
+                                  trailing: Text(
+                                    '${item.price.toStringAsFixed(2)} ${result.currency ?? _divisa}',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        value: applyToForm,
+                        onChanged: confirming
+                            ? null
+                            : (value) => setStateSheet(() => applyToForm = value),
+                        title: const Text('Aplicar a formulario'),
+                        subtitle: const Text(
+                          'Rellena importe/fecha/comercio y categoría sugerida, sin guardar automáticamente.',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                OutlinedButton(
+                  onPressed: confirming
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                FilledButton(
+                  onPressed: confirming ? null : onConfirm,
+                  child: Text(confirming ? 'Aplicando…' : 'Confirmar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _applyReceiptDraftToForm(_ReceiptScanDraft draft) {
+    final result = draft.result;
+    final merchant = result.merchant;
+    final suggestedCategory = _suggestExpenseCategoryFromMerchant(merchant);
+
+    _type = TxType.expense;
+
+    if (result.total != null) {
+      _amountCtrl.text = result.total!.toStringAsFixed(2);
+    }
+
+    if (merchant != null && merchant.isNotEmpty) {
+      _titleCtrl.text = merchant;
+      final notes = _notesCtrl.text.trim();
+      final merchantNote = 'Comercio: $merchant';
+      if (notes.isEmpty) {
+        _notesCtrl.text = merchantNote;
+      } else if (!notes.toLowerCase().contains(merchant.toLowerCase())) {
+        _notesCtrl.text = '$notes · $merchantNote';
+      }
+    } else if (_titleCtrl.text.trim().isEmpty) {
+      _titleCtrl.text = 'Ticket escaneado';
+    }
+
+    final parsedDate = result.parsedDate;
+    if (parsedDate != null) {
+      _date = DateTime(parsedDate.year, parsedDate.month, parsedDate.day, 12, 0);
+      _dateTouchedManually = false;
+    }
+
+    _category = suggestedCategory;
+    _subCategory = suggestedCategory == 'alimentacion' ? 'supermercado' : 'otros';
+
+    if (result.currency != null && result.currency!.isNotEmpty) {
+      _divisa = result.currency!;
+      if (_divisa == 'EUR') {
+        _fxRate = 1.0;
+      }
+    }
+  }
+
+  static const Set<String> _supermarketHints = {
+    'mercadona',
+    'carrefour',
+    'lidl',
+    'aldi',
+    'dia',
+    'eroski',
+    'ahorramas',
+  };
+
+  String _suggestExpenseCategoryFromMerchant(String? merchant) {
+    if (merchant == null || merchant.trim().isEmpty) return 'otros_gastos';
+    final lower = merchant.toLowerCase();
+    for (final hint in _supermarketHints) {
+      if (lower.contains(hint)) return 'alimentacion';
+    }
+    return 'otros_gastos';
   }
 
   void _onInputChanged() {
@@ -775,14 +1194,47 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final hasReceiptDraft = _receiptDraft != null || _aiMeta?.source == 'receipt_scan';
       final shouldRunAi = _autoClassifyEnabled &&
           (_forceReclassifyOnSave || _missingClassificationFields()) &&
-          _aiClassifyOnSave;
+          _aiClassifyOnSave &&
+          !hasReceiptDraft;
       if (shouldRunAi) {
         await _runClassification(
           manualRequest: _forceReclassifyOnSave,
           forSave: true,
         );
+      }
+
+      final receiptResult = _receiptDraft?.result;
+      final inferredCategory = (_type == TxType.expense)
+          ? _suggestExpenseCategoryFromMerchant(receiptResult?.merchant)
+          : null;
+      final effectiveCategory = (_category == null || _category!.trim().isEmpty)
+          ? inferredCategory
+          : _category;
+      final effectiveSubCategory = (_subCategory == null || _subCategory!.trim().isEmpty)
+          ? (effectiveCategory == 'alimentacion' ? 'supermercado' : 'otros')
+          : _subCategory;
+
+      DateTime effectiveDate = _date;
+      if (!_dateTouchedManually && receiptResult != null) {
+        final parsed = receiptResult.parsedDate;
+        effectiveDate = parsed == null
+            ? DateTime.now()
+            : DateTime(parsed.year, parsed.month, parsed.day, 12, 0);
+      }
+
+      String? effectiveNotes =
+          _notesCtrl.text.isEmpty ? null : _notesCtrl.text.trim();
+      final merchant = receiptResult?.merchant;
+      if (merchant != null && merchant.isNotEmpty) {
+        final merchantTag = 'Comercio: $merchant';
+        if (effectiveNotes == null || effectiveNotes.isEmpty) {
+          effectiveNotes = merchantTag;
+        } else if (!effectiveNotes.toLowerCase().contains(merchant.toLowerCase())) {
+          effectiveNotes = '$effectiveNotes · $merchantTag';
+        }
       }
 
       final effectiveAiMeta = _manualOverride && _aiMeta != null
@@ -792,14 +1244,14 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       final tx = FinanceTransaction(
         id: widget.transaction?.id ?? '',
         userId: widget.transaction?.userId ?? '',
-        date: _date,
+        date: effectiveDate,
         type: _type,
         title: _titleCtrl.text.trim(),
         amount: double.parse(_amountCtrl.text),
-        category: _category,
-        subCategory: _subCategory,
+        category: effectiveCategory,
+        subCategory: effectiveSubCategory,
         accountId: _accountId,
-        notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text.trim(),
+        notes: effectiveNotes,
         tags: _tags,
         originalCurrency: _divisa != 'EUR' ? _divisa : null,
         fxRate: _divisa != 'EUR' ? _fxRate : null,
@@ -809,11 +1261,18 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         aiMeta: effectiveAiMeta,
       );
 
+      String? createdDocId;
       if (widget.transaction == null) {
-        await TransactionService.I.create(tx);
+        createdDocId = await TransactionService.I.createAndReturnId(tx);
       } else {
         await TransactionService.I.update(tx);
+        createdDocId = widget.transaction!.id;
       }
+
+      if (kDebugMode) {
+        debugPrint('[FinanceReceiptAI] saved tx docId=${createdDocId ?? 'null'}');
+      }
+
       _forceReclassifyOnSave = false;
       if (mounted) {
         Navigator.pop(context, true);
@@ -842,6 +1301,53 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     _amountCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
+  }
+}
+
+class _ReceiptScanDraft {
+  const _ReceiptScanDraft({
+    required this.result,
+    required this.classifiedAt,
+  });
+
+  final FinanceReceiptAiResult result;
+  final DateTime classifiedAt;
+
+  String get summary {
+    final merchant = result.merchant;
+    final amount = result.total;
+    if (merchant == null || merchant.isEmpty || amount == null) {
+      return 'Revisa y guarda manualmente';
+    }
+    final currency = result.currency ?? 'EUR';
+    return '$merchant · ${amount.toStringAsFixed(2)} $currency';
+  }
+
+  static _ReceiptScanDraft fromResult(FinanceReceiptAiResult result) {
+    return _ReceiptScanDraft(
+      result: result,
+      classifiedAt: DateTime.now(),
+    );
+  }
+
+  FinanceAiMeta toMeta({required bool manualOverride}) {
+    final merchant = result.merchant ?? 'comercio_no_detectado';
+    final amount = result.total?.toStringAsFixed(2) ?? 'total_no_detectado';
+    final currency = result.currency ?? 'EUR';
+    final baseShort = 'Ticket $merchant · $amount $currency'.trim();
+    final short = baseShort.length <= 120
+      ? baseShort
+      : baseShort.substring(0, 120);
+
+    return FinanceAiMeta(
+      source: 'receipt_scan',
+      model: result.model,
+      confidence: result.confidence,
+      reasoningShort: short,
+      classifiedAt: classifiedAt,
+      inputHash: result.inputHash,
+      manualOverride: manualOverride,
+    );
   }
 }
 

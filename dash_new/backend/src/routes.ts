@@ -39,6 +39,31 @@ function elapsedMs(start: bigint): number {
   return Number((process.hrtime.bigint() - start) / 1000000n);
 }
 
+function normalizeCurrency(value: unknown): string | null {
+  if (value == null) return null;
+  const upper = value.toString().trim().toUpperCase();
+  if (!upper) return null;
+  return /^[A-Z]{3}$/.test(upper) ? upper : null;
+}
+
+function normalizeDateISO(value: unknown): string | null {
+  if (value == null) return null;
+  const raw = value.toString().trim();
+  if (!raw) return null;
+  const direct = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (direct) return `${direct[1]}-${direct[2]}-${direct[3]}`;
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString().slice(0, 10);
+}
+
+function normalizeMerchant(value: unknown): string | null {
+  if (value == null) return null;
+  const normalized = value.toString().trim();
+  return normalized.length === 0 ? null : normalized;
+}
+
 async function safePersistAiLog(input: Parameters<typeof persistAiLog>[0], route: string): Promise<void> {
   try {
     await persistAiLog(input);
@@ -260,6 +285,22 @@ router.post('/v1/ai/finance/receipt_scan', async (req: AuthenticatedRequest, res
       },
     });
 
+    const normalizedResponse = {
+      merchant: normalizeMerchant(ai.data.merchant),
+      total: ai.data.total,
+      currency: normalizeCurrency(ai.data.currency),
+      dateISO: normalizeDateISO(ai.data.dateISO),
+      items: (ai.data.items ?? [])
+        .map((item) => ({
+          name: item.name.trim(),
+          qty: item.qty > 0 ? item.qty : 1,
+          price: item.price >= 0 ? item.price : 0,
+        }))
+        .filter((item) => item.name.length > 0),
+      confidence: ai.data.confidence,
+      model: ai.model,
+    };
+
     const latencyMs = elapsedMs(start);
   console.log(`OpenAI response received (latencyMs=${latencyMs})`);
     await safePersistAiLog({
@@ -275,10 +316,11 @@ router.post('/v1/ai/finance/receipt_scan', async (req: AuthenticatedRequest, res
       model: ai.model,
       tokens: ai.tokens,
       requestId,
-      resultSummary: `${ai.data.merchant ?? 'null'} total=${ai.data.total ?? 'null'} c=${ai.data.confidence.toFixed(2)}`,
+      resultSummary: `${normalizedResponse.merchant ?? 'null'} total=${normalizedResponse.total ?? 'null'} c=${normalizedResponse.confidence.toFixed(2)}`,
     }, req.path);
 
-    res.status(200).json(ai.data);
+    console.log(`[AI_RECEIPT_SCAN] status=200 payload=${JSON.stringify(normalizedResponse)}`);
+    res.status(200).json(normalizedResponse);
   } catch (error) {
     const latencyMs = elapsedMs(start);
     const message = error instanceof Error ? error.message : 'unknown_error';

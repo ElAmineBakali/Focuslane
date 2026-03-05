@@ -74,9 +74,14 @@ class TransactionService {
   }
 
   Future<void> create(FinanceTransaction tx) async {
+    await createAndReturnId(tx);
+  }
+
+  Future<String?> createAndReturnId(FinanceTransaction tx) async {
     final uid = _uid;
-    if (uid == null || uid.isEmpty) return;
-    await _col.add(tx.toMap()..['userId'] = uid);
+    if (uid == null || uid.isEmpty) return null;
+    final doc = await _col.add(tx.toMap()..['userId'] = uid);
+    return doc.id;
   }
 
   Future<void> update(FinanceTransaction tx) async {

@@ -17,8 +17,8 @@ class StudyTasksSyncService {
   DocumentReference<Map<String, dynamic>> get _studyRoot =>
       _db.collection('users').doc(_uid).collection('study').doc('root');
 
-  DocumentReference<Map<String, dynamic>> get _tasksRoot =>
-      _db.collection('users').doc(_uid).collection('tasks').doc('root');
+  CollectionReference<Map<String, dynamic>> get _tasksCol =>
+      _db.collection('users').doc(_uid).collection('tasks');
 
   Future<void> syncTaskStatusToTasks(
     String? syncedTaskId,
@@ -26,7 +26,7 @@ class StudyTasksSyncService {
   ) async {
     if (syncedTaskId == null || syncedTaskId.isEmpty) return;
     try {
-      await _tasksRoot.collection('items').doc(syncedTaskId).update({
+      await _tasksCol.doc(syncedTaskId).update({
         'completed': newStatus == TaskStatus.done,
       });
     } catch (_) {}
@@ -61,8 +61,7 @@ class StudyTasksSyncService {
         updateMap['priority'] = _studyPriorityToTaskPriorityLabel(priority);
       }
       if (updateMap.isNotEmpty) {
-        await _tasksRoot
-            .collection('items')
+        await _tasksCol
             .doc(syncedTaskId)
             .update(updateMap);
       }

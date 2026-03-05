@@ -251,6 +251,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
             final overBudget = alerts['overBudget'] == true || alerts['foodOverBudget'] == true;
             final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
             final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
+            debugPrint('[FoodPlanner][statusBar] targets=kcal:$targetKcal protein:$targetProtein overBudget=$overBudget proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
 
             return Container(
               width: double.infinity,

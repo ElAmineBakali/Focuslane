@@ -7,7 +7,11 @@ import '../../screens/calendar/models/calendar_models.dart';
 import '../../screens/food/services/food_firestore_service.dart';
 import '../utils/date_utils.dart';
 
-const bool kCoreSyncDebug = kDebugMode;
+/// Sync-debug logging.
+/// Active by default in debug builds; pass `--dart-define=DEBUG_SYNC_LOGS=false`
+/// to mute, or `--dart-define=DEBUG_SYNC_LOGS=true` to enable in release/profile.
+const bool kCoreSyncDebug =
+    bool.fromEnvironment('DEBUG_SYNC_LOGS', defaultValue: kDebugMode);
 
 class CoreSyncService {
   CoreSyncService._();
