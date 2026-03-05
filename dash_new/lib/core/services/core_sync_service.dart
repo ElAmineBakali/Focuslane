@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../screens/finance/models/subscription_model.dart';
-import '../../screens/finance/services/subscription_service.dart';
+import '../../screens/calendar/models/calendar_models.dart';
 import '../../screens/food/services/food_firestore_service.dart';
 import '../utils/date_utils.dart';
 
-const bool kCoreSyncDebug = true;
+const bool kCoreSyncDebug = kDebugMode;
 
 class CoreSyncService {
   CoreSyncService._();
@@ -22,7 +21,7 @@ class CoreSyncService {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _tasksSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeBudgetsSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeTxSub;
-  StreamSubscription<List<Subscription>>? _subsDueSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeSubsSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeRecurringSub;
 
   static const _actorStudy = 'core-sync:study';
@@ -73,18 +72,24 @@ class CoreSyncService {
     _tasksSub?.cancel();
     _financeBudgetsSub?.cancel();
     _financeTxSub?.cancel();
-    _subsDueSub?.cancel();
+    _financeSubsSub?.cancel();
     _financeRecurringSub?.cancel();
   }
 
-  void _logListener(String listener, String uid, String docId) {
+  void _log(String message) {
     if (!kCoreSyncDebug) return;
-    debugPrint('CoreSync: $listener fired uid=$uid docId=$docId');
+    debugPrint(message);
+  }
+
+  void _logError(String scope, Object error, [StackTrace? stackTrace]) {
+    _log('[CoreSync][$scope] ERROR $error');
+    if (stackTrace != null) {
+      _log('[CoreSync][$scope] STACK $stackTrace');
+    }
   }
 
   void _logWrite(String path, Map<String, dynamic> values) {
-    if (!kCoreSyncDebug) return;
-    debugPrint('CoreSync: write path=$path values=$values');
+    _log('[CoreSync] → side-effect write path=$path values=$values');
   }
 
   void _watchGymToday(String uid) {
@@ -107,7 +112,13 @@ class CoreSyncService {
             debugPrint('[CoreSync][gymToday]   change type=${ch.type.name} docId=${ch.doc.id} durationMin=${d['durationMin']} volumeKg=${d['volumeKg']} date=${d['date']}');
           }
           debugPrint('[CoreSync][gymToday] → side-effect: _syncFoodTargets(${snap.docs.length} sessions)');
-          _syncFoodTargets(uid, snap.docs);
+          unawaited(
+            _syncFoodTargets(uid, snap.docs).catchError((Object e, StackTrace st) {
+              _logError('gymToday→syncFoodTargets', e, st);
+            }),
+          );
+        }, onError: (Object e, StackTrace st) {
+          _logError('gymToday', e, st);
         });
   }
 
@@ -127,7 +138,13 @@ class CoreSyncService {
             debugPrint('[CoreSync][studyTasks]   change type=${ch.type.name} docId=${ch.doc.id} title=${d['title']} status=${d['status']} syncedTaskId=${d['syncedTaskId']}');
           }
           debugPrint('[CoreSync][studyTasks] → side-effect: _mirrorStudyIntoTasks');
-          _mirrorStudyIntoTasks(uid, snap);
+          unawaited(
+            _mirrorStudyIntoTasks(uid, snap).catchError((Object e, StackTrace st) {
+              _logError('studyTasks→mirrorStudyIntoTasks', e, st);
+            }),
+          );
+        }, onError: (Object e, StackTrace st) {
+          _logError('studyTasks', e, st);
         });
   }
 
@@ -145,7 +162,13 @@ class CoreSyncService {
             debugPrint('[CoreSync][tasks]   change type=${ch.type.name} docId=${ch.doc.id} title=${d['title']} completed=${d['completed']} syncedStudyTaskId=${d['syncedStudyTaskId']}');
           }
           debugPrint('[CoreSync][tasks] → side-effect: _mirrorTasksIntoStudy');
-          _mirrorTasksIntoStudy(uid, snap);
+          unawaited(
+            _mirrorTasksIntoStudy(uid, snap).catchError((Object e, StackTrace st) {
+              _logError('tasks→mirrorTasksIntoStudy', e, st);
+            }),
+          );
+        }, onError: (Object e, StackTrace st) {
+          _logError('tasks', e, st);
         });
   }
 
@@ -163,7 +186,13 @@ class CoreSyncService {
             debugPrint('[CoreSync][financeBudgets]   change type=${ch.type.name} docId=${ch.doc.id} category=${d['category']} amount=${d['amount']} period=${d['period']}');
           }
           debugPrint('[CoreSync][financeBudgets] → side-effect: _recalcFoodOverBudget');
-          _recalcFoodOverBudget(uid);
+          unawaited(
+            _recalcFoodOverBudget(uid).catchError((Object e, StackTrace st) {
+              _logError('financeBudgets→recalcFoodOverBudget', e, st);
+            }),
+          );
+        }, onError: (Object e, StackTrace st) {
+          _logError('financeBudgets', e, st);
         });
 
     debugPrint('[CoreSync][financeTransactions] LISTENER STARTED uid=$uid');
@@ -180,28 +209,39 @@ class CoreSyncService {
             debugPrint('[CoreSync][financeTransactions]   change type=${ch.type.name} docId=${ch.doc.id} category=${d['category']} amount=${d['amount']} date=${d['date']}');
           }
           debugPrint('[CoreSync][financeTransactions] → side-effect: _recalcFoodOverBudget');
-          _recalcFoodOverBudget(uid);
+          unawaited(
+            _recalcFoodOverBudget(uid).catchError((Object e, StackTrace st) {
+              _logError('financeTransactions→recalcFoodOverBudget', e, st);
+            }),
+          );
+        }, onError: (Object e, StackTrace st) {
+          _logError('financeTransactions', e, st);
         });
   }
 
   Future<void> _recalcFoodOverBudget(String uid) async {
     if (_recalcBudgetBusy) {
-      debugPrint('[CoreSync][_recalcFoodOverBudget] SKIPPED — already busy uid=$uid');
+      _log('[CoreSync][_recalcFoodOverBudget] SKIP already busy uid=$uid');
       return;
     }
     _recalcBudgetBusy = true;
-    debugPrint('[CoreSync][_recalcFoodOverBudget] ENTER uid=$uid budgetDocs=${_cachedBudgetDocs.length} txDocs=${_cachedFinanceDocs.length}');
+    _log('[CoreSync][_recalcFoodOverBudget] ENTER uid=$uid budgetDocs=${_cachedBudgetDocs.length} txDocs=${_cachedFinanceDocs.length}');
     try {
       final now = DateTime.now();
       var overBudget = false;
       String? overBudgetId;
+      var selectedSpent = 0.0;
+      var selectedLimit = 0.0;
 
       for (final d in _cachedBudgetDocs) {
         final m = d.data();
-        final cat = (m['category'] ?? '').toString().toLowerCase();
-        if (cat != 'food') continue;
-        final amount = _n(m['amount']) ?? _n(m['limit']) ?? 0;
-        if (amount <= 0) continue;
+        final cat = _normalizeCategoryKey((m['category'] ?? '').toString());
+        if (!_isFoodCategory(cat)) continue;
+        final amount = _n(m['limit']) ?? _n(m['amount']) ?? 0;
+        if (amount <= 0) {
+          _log('[CoreSync][_recalcFoodOverBudget] SKIP budget=${d.id} invalid limit=$amount');
+          continue;
+        }
 
         final period = (m['period'] ?? 'monthly').toString();
         final startDate = _toDate(m['startDate']) ?? now;
@@ -211,19 +251,21 @@ class CoreSyncService {
         double spent = 0;
         for (final tx in _cachedFinanceDocs) {
           final t = tx.data();
-          final txCat = (t['category'] ?? '').toString().toLowerCase();
-          if (txCat != 'food') continue;
+          final txCat = _normalizeCategoryKey((t['category'] ?? '').toString());
+          if (!_isFoodCategory(txCat)) continue;
           final txDate = _toDate(t['date']);
           if (txDate == null) continue;
           if (txDate.isBefore(rangeStart) || txDate.isAfter(rangeEnd)) continue;
           spent += _n(t['amount']) ?? 0;
         }
 
-        debugPrint('[CoreSync][_recalcFoodOverBudget]   budget=${d.id} cat=$cat amount=$amount spent=$spent over=${spent > amount}');
+        selectedSpent = spent;
+        selectedLimit = amount;
+        _log('[CoreSync][_recalcFoodOverBudget] budget=${d.id} cat=$cat spent=$spent limit=$amount over=${spent > amount}');
         if (spent > amount) {
           overBudget = true;
           overBudgetId = d.id;
-          debugPrint('[CoreSync][_recalcFoodOverBudget] ⚠ OVER BUDGET detected id=$overBudgetId spent=$spent > limit=$amount');
+          _log('[CoreSync][_recalcFoodOverBudget] OVER-BUDGET budgetId=$overBudgetId spent=$spent limit=$amount');
           break;
         }
       }
@@ -235,30 +277,21 @@ class CoreSyncService {
           .doc('root')
           .collection('config')
           .doc('alerts');
-      final flagsRef = _db
-          .collection('users')
-          .doc(uid)
-          .collection('food')
-          .doc('root')
-          .collection('config')
-          .doc('flags');
 
       final alertsPatch = {
+        'overBudget': overBudget,
+        'categoryKey': 'alimentacion',
+        'spent': selectedSpent,
+        'limit': selectedLimit,
         'foodOverBudget': overBudget,
         'foodOverBudgetBudgetId': overBudgetId,
+        'foodOverBudgetSpent': selectedSpent,
+        'foodOverBudgetLimit': selectedLimit,
         'updatedAt': FieldValue.serverTimestamp(),
       };
       _logWrite('users/$uid/food/root/config/alerts', alertsPatch);
       await alertsRef.set(alertsPatch, SetOptions(merge: true));
-
-      final flagsPatch = {
-        'overBudgetFood': overBudget,
-        'overBudgetBudgetId': overBudgetId,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
-      _logWrite('users/$uid/food/root/config/flags', flagsPatch);
-      await flagsRef.set(flagsPatch, SetOptions(merge: true));
-      debugPrint('[CoreSync][_recalcFoodOverBudget] RESULT overBudget=$overBudget overBudgetId=$overBudgetId');
+      _log('[CoreSync][_recalcFoodOverBudget] RESULT overBudget=$overBudget spent=$selectedSpent limit=$selectedLimit budgetId=$overBudgetId');
     } finally {
       _recalcBudgetBusy = false;
     }
@@ -287,50 +320,76 @@ class CoreSyncService {
   }
 
   void _watchSubscriptions(String uid) {
-    debugPrint('[CoreSync][subscriptionsDue] LISTENER STARTED uid=$uid');
-    _subsDueSub = SubscriptionService.I.upcomingPayments(daysAhead: 7).listen((subs) async {
-      debugPrint('[CoreSync][subscriptionsDue] ▶ EVENT received uid=$uid subs=${subs.length}');
-      final docId = subs.isEmpty ? '-' : (subs.first.id.isEmpty ? '-' : subs.first.id);
-      _logListener('subscriptionsDue', uid, docId);
+    _log('[CoreSync][financeSubscriptions] LISTENER STARTED uid=$uid');
+    _financeSubsSub = _db
+        .collection('finance_subscriptions')
+        .where('userId', isEqualTo: uid)
+        .snapshots()
+        .listen((snap) async {
+          try {
+            _log('[CoreSync][financeSubscriptions] ▶ EVENT received uid=$uid docs=${snap.docs.length} changes=${snap.docChanges.length}');
+            for (final ch in snap.docChanges) {
+              final d = ch.doc.data() ?? const <String, dynamic>{};
+              _log('[CoreSync][financeSubscriptions] change type=${ch.type.name} docId=${ch.doc.id} title=${d['title'] ?? d['name']} nextPaymentDate=${d['nextPaymentDate'] ?? d['nextDue']} amount=${d['amount']}');
+            }
 
-      final gymSubs = subs.where((s) => s.category.toLowerCase().contains('gym')).toList();
-      debugPrint('[CoreSync][subscriptionsDue]   gymSubs=${gymSubs.length}');
-      for (final s in gymSubs) {
-        debugPrint('[CoreSync][subscriptionsDue]   gym sub: id=${s.id} title=${s.title} nextDue=${s.nextDue}');
-      }
-      final ref = _db
-          .collection('users')
-          .doc(uid)
-          .collection('gym')
-          .doc('root')
-          .collection('config')
-          .doc('alerts');
+            final today = DateTime.now();
+            final startOfToday = DateTime(today.year, today.month, today.day);
+            final lastDueDate = DateTime(
+              startOfToday.year,
+              startOfToday.month,
+              startOfToday.day + 7,
+              23,
+              59,
+              59,
+            );
 
-      if (gymSubs.isEmpty) {
-        final patch = {
-          'subscriptionDueSoon': false,
-          'subscriptionDueAt': null,
-          'subscriptionDueInDays': null,
-          'updatedAt': FieldValue.serverTimestamp(),
-        };
-        _logWrite('users/$uid/gym/root/config/alerts', patch);
-        await ref.set(patch, SetOptions(merge: true));
-        return;
-      }
+            QueryDocumentSnapshot<Map<String, dynamic>>? nextDoc;
+            DateTime? nextPaymentDate;
+            double? amount;
 
-      final next = gymSubs.first;
-      final now = DateTime.now();
-      final dueInDays = next.nextDue.difference(DateTime(now.year, now.month, now.day)).inDays;
-      final patch = {
-        'subscriptionDueSoon': true,
-        'subscriptionDueAt': Timestamp.fromDate(next.nextDue),
-        'subscriptionTitle': next.title,
-        'subscriptionDueInDays': dueInDays,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
-      _logWrite('users/$uid/gym/root/config/alerts', patch);
-      await ref.set(patch, SetOptions(merge: true));
-    });
+            for (final doc in snap.docs) {
+              final data = doc.data();
+              final active = (data['active'] ?? data['isActive'] ?? true) == true;
+              if (!active) continue;
+
+              final dueDate = _toDate(data['nextPaymentDate']) ?? _toDate(data['nextDue']);
+              if (dueDate == null) continue;
+              if (dueDate.isBefore(startOfToday) || dueDate.isAfter(lastDueDate)) continue;
+
+              if (nextPaymentDate == null || dueDate.isBefore(nextPaymentDate)) {
+                nextDoc = doc;
+                nextPaymentDate = dueDate;
+                amount = _n(data['amount']) ?? 0;
+              }
+            }
+
+            final dueSoon = nextDoc != null;
+            final ref = _db
+                .collection('users')
+                .doc(uid)
+                .collection('gym')
+                .doc('root')
+                .collection('alerts')
+                .doc('subscription');
+
+            final patch = {
+              'dueSoon': dueSoon,
+              'nextPaymentDate': dueSoon && nextPaymentDate != null
+                  ? Timestamp.fromDate(nextPaymentDate)
+                  : null,
+              'amount': dueSoon ? amount : null,
+              'subscriptionId': dueSoon ? nextDoc.id : null,
+              'updatedAt': FieldValue.serverTimestamp(),
+            };
+            _logWrite('users/$uid/gym/root/alerts/subscription', patch);
+            await ref.set(patch, SetOptions(merge: true));
+          } catch (e, st) {
+            _logError('financeSubscriptions→computeAndWrite', e, st);
+          }
+        }, onError: (Object e, StackTrace st) {
+          _logError('financeSubscriptions', e, st);
+        });
   }
 
   void _watchRecurringFinance(String uid) {
@@ -340,16 +399,24 @@ class CoreSyncService {
         .where('userId', isEqualTo: uid)
         .where('recurrence', isNotEqualTo: null)
         .snapshots()
-        .listen((snap) {
+        .listen((snap) async {
           debugPrint('[CoreSync][financeRecurring] ▶ EVENT received uid=$uid docs=${snap.docs.length} changes=${snap.docChanges.length}');
           for (final ch in snap.docChanges) {
-            final d = ch.doc.data() ?? {};
-            debugPrint('[CoreSync][financeRecurring]   change type=${ch.type.name} docId=${ch.doc.id} title=${d['title']} recurrence=${d['recurrence']} amount=${d['amount']}');
+            try {
+              final d = ch.doc.data() ?? {};
+              debugPrint('[CoreSync][financeRecurring]   change type=${ch.type.name} docId=${ch.doc.id} title=${d['title']} recurrence=${d['recurrence']} amount=${d['amount']}');
+              if (ch.type == DocumentChangeType.removed) {
+                _log('[CoreSync][financeRecurring] SKIP removed tx=${ch.doc.id}');
+                continue;
+              }
+              _log('[CoreSync][financeRecurring] → side-effect _materializeRecurring tx=${ch.doc.id}');
+              await _materializeRecurring(uid, ch.doc.id, d);
+            } catch (e, st) {
+              _logError('financeRecurring→materialize tx=${ch.doc.id}', e, st);
+            }
           }
-          debugPrint('[CoreSync][financeRecurring] → side-effect: _materializeRecurring for ${snap.docs.length} docs');
-          for (final doc in snap.docs) {
-            _materializeRecurring(uid, doc.id, doc.data());
-          }
+        }, onError: (Object e, StackTrace st) {
+          _logError('financeRecurring', e, st);
         });
   }
 
@@ -640,19 +707,21 @@ class CoreSyncService {
   Future<void> _materializeRecurring(String uid, String txId, Map<String, dynamic> data) async {
     final recurrence = (data['recurrence'] ?? '').toString();
     if (recurrence.isEmpty || recurrence == 'none') {
-      debugPrint('[CoreSync][_materializeRecurring] SKIP txId=$txId — no recurrence');
+      _log('[CoreSync][_materializeRecurring] SKIP txId=$txId no recurrence');
       return;
     }
-    debugPrint('[CoreSync][_materializeRecurring] ENTER uid=$uid txId=$txId recurrence=$recurrence title=${data['title']} amount=${data['amount']}');
+    _log('[CoreSync][_materializeRecurring] ENTER uid=$uid txId=$txId recurrence=$recurrence title=${data['title']} amount=${data['amount']}');
 
-    final baseDate = (data['date'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final baseDate = _toDate(data['date']) ?? DateTime.now();
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     DateTime next = baseDate;
-    while (!next.isAfter(now)) {
+    while (DateTime(next.year, next.month, next.day).isBefore(today)) {
       next = _nextDate(next, recurrence);
     }
+    final nextDay = DateTime(next.year, next.month, next.day);
 
-    final dayId = dayIdFromDateTime(next);
+    final dayId = dayIdFromDateTime(nextDay);
     final plannedDoc = _db
         .collection('users')
         .doc(uid)
@@ -661,10 +730,10 @@ class CoreSyncService {
         .collection('transactions')
         .doc('$txId-$dayId');
 
-    debugPrint('[CoreSync][_materializeRecurring] nextDate=$next dayId=$dayId');
+    _log('[CoreSync][_materializeRecurring] nextDate=$nextDay dayId=$dayId');
     final already = await plannedDoc.get();
     if (!already.exists) {
-      debugPrint('[CoreSync][_materializeRecurring] CREATING planned transaction $txId-$dayId');
+      _log('[CoreSync][_materializeRecurring] → side-effect create planned tx $txId-$dayId');
       final plannedPatch = {
         'title': data['title'] ?? 'Recurrente',
         'amount': data['amount'] ?? 0,
@@ -672,37 +741,66 @@ class CoreSyncService {
         'type': data['type'] ?? 'expense',
         'planned': true,
         'isBill': false,
-        'date': Timestamp.fromDate(next),
-        'dueDate': Timestamp.fromDate(next),
+        'date': Timestamp.fromDate(nextDay),
+        'dueDate': Timestamp.fromDate(nextDay),
         'recurrence': recurrence,
         'sourceRecurringId': txId,
       };
       _logWrite('users/$uid/finance/data/transactions/$txId-$dayId', plannedPatch);
       await plannedDoc.set(plannedPatch);
+    } else {
+      _log('[CoreSync][_materializeRecurring] SKIP planned tx already exists doc=$txId-$dayId');
     }
 
-    final calRef = _db
+    final calendarCol = _db
         .collection('users')
         .doc(uid)
         .collection('planner')
         .doc('data')
-        .collection('calendar')
-        .doc('fin-$txId-$dayId');
+        .collection('calendar');
+    final dedupeKey = '$txId|$dayId';
+    final calendarDocId = 'fin-rec-$txId-$dayId';
+    final calRef = calendarCol.doc(calendarDocId);
+
     final calSnap = await calRef.get();
-    if (!calSnap.exists) {
-      debugPrint('[CoreSync][_materializeRecurring] CREATING calendar entry fin-$txId-$dayId');
-      final calPatch = {
-        'title': data['title'] ?? 'Pago recurrente',
-        'type': 'finance',
-        'priority': 'normal',
-        'start': Timestamp.fromDate(next),
-        'allDay': true,
-        'notes': data['category'],
-        'sourceRecurringId': txId,
-      };
-      _logWrite('users/$uid/planner/data/calendar/fin-$txId-$dayId', calPatch);
-      await calRef.set(calPatch);
+    if (calSnap.exists) {
+      _log('[CoreSync][_materializeRecurring] SKIP calendar idempotent doc=$calendarDocId');
+      return;
     }
+
+    final dup = await calendarCol
+        .where('relatedTxId', isEqualTo: txId)
+        .where('dedupeKey', isEqualTo: dedupeKey)
+        .limit(1)
+        .get();
+    if (dup.docs.isNotEmpty) {
+      _log('[CoreSync][_materializeRecurring] SKIP calendar idempotent dedupeKey=$dedupeKey doc=${dup.docs.first.id}');
+      return;
+    }
+
+    final event = CalendarEvent(
+      id: calendarDocId,
+      title: (data['title'] ?? 'Pago recurrente').toString(),
+      type: CalendarType.finance,
+      priority: CalendarPriority.normal,
+      start: nextDay,
+      end: DateTime(nextDay.year, nextDay.month, nextDay.day, 23, 59),
+      allDay: true,
+      notes: (data['category'] ?? '').toString(),
+      relatedActionId: 'finance-recurring:$txId:$dayId',
+      relatedTxId: txId,
+      dedupeKey: dedupeKey,
+    );
+    final calPatch = {
+      ...event.toMap(),
+      'relatedTxId': txId,
+      'dedupeKey': dedupeKey,
+      'amount': _n(data['amount']) ?? 0,
+      'sourceRecurringId': txId,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    _logWrite('users/$uid/planner/data/calendar/$calendarDocId', calPatch);
+    await calRef.set(calPatch, SetOptions(merge: true));
   }
 
   ({String start, String end}) _todayIsoRange() {
@@ -718,6 +816,8 @@ class CoreSyncService {
     switch (recurrence) {
       case 'weekly':
         return base.add(const Duration(days: 7));
+      case 'daily':
+        return base.add(const Duration(days: 1));
       case 'yearly':
         return DateTime(base.year + 1, base.month, base.day);
       case 'monthly':
@@ -736,6 +836,55 @@ class CoreSyncService {
     if (v is DateTime) return v;
     if (v is String && v.isNotEmpty) return DateTime.tryParse(v);
     return null;
+  }
+
+  bool _isFoodCategory(String normalizedCategoryKey) {
+    return normalizedCategoryKey == 'alimentacion' ||
+        normalizedCategoryKey == 'food' ||
+        normalizedCategoryKey == 'comida' ||
+        normalizedCategoryKey == 'supermercado';
+  }
+
+  String _normalizeCategoryKey(String raw) {
+    var value = raw.trim().toLowerCase();
+    if (value.isEmpty) return '';
+
+    const replacements = {
+      'á': 'a',
+      'à': 'a',
+      'ä': 'a',
+      'â': 'a',
+      'ã': 'a',
+      'é': 'e',
+      'è': 'e',
+      'ë': 'e',
+      'ê': 'e',
+      'í': 'i',
+      'ì': 'i',
+      'ï': 'i',
+      'î': 'i',
+      'ó': 'o',
+      'ò': 'o',
+      'ö': 'o',
+      'ô': 'o',
+      'õ': 'o',
+      'ú': 'u',
+      'ù': 'u',
+      'ü': 'u',
+      'û': 'u',
+      'ñ': 'n',
+      'ç': 'c',
+    };
+
+    replacements.forEach((from, to) {
+      value = value.replaceAll(from, to);
+    });
+
+    value = value
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+    return value;
   }
 
   String _studyHash(Map<String, dynamic> m) {

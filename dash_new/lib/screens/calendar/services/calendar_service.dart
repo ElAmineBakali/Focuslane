@@ -117,6 +117,8 @@ class CalendarService {
         allDay: true,
         notes: e.notes,
         relatedActionId: e.relatedActionId,
+        relatedTxId: e.relatedTxId,
+        dedupeKey: e.dedupeKey,
         completed: e.completed,
       );
     } else {
@@ -130,6 +132,8 @@ class CalendarService {
         allDay: false,
         notes: e.notes,
         relatedActionId: e.relatedActionId,
+        relatedTxId: e.relatedTxId,
+        dedupeKey: e.dedupeKey,
         completed: e.completed,
       );
     }

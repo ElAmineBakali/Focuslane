@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 enum UnitKind { g, ml, unit }
 
-enum FavoriteType { food, recipe }
+enum FavoriteType { food, recipe, photoAi }
 
 enum MealSlot { breakfast, snack, lunch, merienda, dinner }
 
@@ -266,8 +266,12 @@ class Favorite {
   });
 
   factory Favorite.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) =>
-        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) {
+      final raw = '$v';
+      if (raw == 'recipe') return FavoriteType.recipe;
+      if (raw == 'photo_ai' || raw == 'photoAi') return FavoriteType.photoAi;
+      return FavoriteType.food;
+    }
     UnitKind u(dynamic v) {
       switch ('$v') {
         case 'g':
@@ -290,12 +294,23 @@ class Favorite {
   }
 
   Map<String, dynamic> toMap() => {
-    'type': type.name,
+    'type': _favoriteTypeStorage(type),
     'refId': refId,
     'defaultQty': defaultQty,
     'defaultUnit': defaultUnit.name,
     if (alias != null) 'alias': alias,
   };
+}
+
+String _favoriteTypeStorage(FavoriteType type) {
+  switch (type) {
+    case FavoriteType.food:
+      return 'food';
+    case FavoriteType.recipe:
+      return 'recipe';
+    case FavoriteType.photoAi:
+      return 'photo_ai';
+  }
 }
 
 class IntakeEntry {
@@ -307,6 +322,7 @@ class IntakeEntry {
   final String nameSnapshot;
   final Map<String, double> macrosSnapshot;
   final MealSlot meal;
+  final Map<String, dynamic>? aiMeta;
 
   const IntakeEntry({
     required this.id,
@@ -317,11 +333,16 @@ class IntakeEntry {
     required this.nameSnapshot,
     required this.macrosSnapshot,
     required this.meal,
+    this.aiMeta,
   });
 
   factory IntakeEntry.fromMap(String id, Map<String, dynamic> m) {
-    FavoriteType t(dynamic v) =>
-        ('$v' == 'recipe') ? FavoriteType.recipe : FavoriteType.food;
+    FavoriteType t(dynamic v) {
+      final raw = '$v';
+      if (raw == 'recipe') return FavoriteType.recipe;
+      if (raw == 'photo_ai' || raw == 'photoAi') return FavoriteType.photoAi;
+      return FavoriteType.food;
+    }
     UnitKind u(dynamic v) {
       switch ('$v') {
         case 'g':
@@ -362,17 +383,19 @@ class IntakeEntry {
             const {},
       ),
       meal: meal(m['meal']),
+      aiMeta: (m['aiMeta'] as Map?)?.cast<String, dynamic>(),
     );
   }
 
   Map<String, dynamic> toMap() => {
-    'type': type.name,
+    'type': _favoriteTypeStorage(type),
     'refId': refId,
     'qty': qty,
     'unit': unit.name,
     'nameSnapshot': nameSnapshot,
     'macrosSnapshot': macrosSnapshot,
     'meal': meal.name,
+    if (aiMeta != null) 'aiMeta': aiMeta,
   };
 }
 

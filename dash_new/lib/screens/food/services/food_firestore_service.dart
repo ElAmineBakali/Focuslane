@@ -238,15 +238,30 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 
-  Future<void> addEntry(String dayId, IntakeEntry entry) async {
+  Future<List<Map<String, dynamic>>> _loadEntries(String dayId) async {
     final snap = await _dayRef(dayId).get();
     final data = snap.data() ?? {};
-    final entries =
-        ((data['entries'] as List?) ?? const [])
-            .map((e) => Map<String, dynamic>.from(e as Map))
-            .toList();
+    return ((data['entries'] as List?) ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  Future<void> recomputeTotals(String dayId) async {
+    final entries = await _loadEntries(dayId);
+    await _recalcTotals(dayId, entries);
+  }
+
+  Future<void> addEntry(String dayId, IntakeEntry entry) async {
+    final entries = await _loadEntries(dayId);
     entries.add(entry.toMap());
     await _recalcTotals(dayId, entries);
+  }
+
+  Future<void> addPhotoAiEntry({
+    required String dayId,
+    required IntakeEntry entry,
+  }) async {
+    await addEntry(dayId, entry);
   }
 
   Future<void> updateEntry(

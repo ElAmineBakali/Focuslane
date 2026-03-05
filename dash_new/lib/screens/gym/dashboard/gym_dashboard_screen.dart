@@ -24,7 +24,7 @@ class GymDashboardScreen extends StatelessWidget {
   Widget _buildAlerts(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (uid.isEmpty) return const SizedBox.shrink();
-    final alerts$ = FirebaseFirestore.instance
+    final configAlerts$ = FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .collection('gym')
@@ -32,55 +32,86 @@ class GymDashboardScreen extends StatelessWidget {
         .collection('config')
         .doc('alerts')
         .snapshots();
+    final subscriptionAlert$ = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('gym')
+        .doc('root')
+        .collection('alerts')
+        .doc('subscription')
+        .snapshots();
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: alerts$,
-      builder: (context, alertSnap) {
-        debugPrint('[GymDashboard][alerts] snapshot state=${alertSnap.connectionState} hasData=${alertSnap.hasData}');
-        final alert = alertSnap.data?.data() ?? const {};
-        debugPrint('[GymDashboard][alerts] data=$alert');
-        final showDeficit = alert['extremeDeficitWorkout'] == true;
-        final subSoon = alert['subscriptionDueSoon'] == true;
-        debugPrint('[GymDashboard][alerts] showDeficit=$showDeficit subSoon=$subSoon');
-        if (!showDeficit && !subSoon) return const SizedBox.shrink();
-        final cards = <Widget>[];
-        if (showDeficit) {
-          final deficit = (alert['deficitKcal'] as num?)?.toDouble() ?? 0;
-          cards.add(
-            _GymAlertCard(
-              icon: Icons.local_fire_department,
-              title: 'DÃ©ficit extremo con entreno fuerte',
-              message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
-            ),
-          );
-        }
-        if (subSoon) {
-          final dueDays = (alert['subscriptionDueInDays'] as num?)?.toInt();
-          String dueLabel = 'pronto';
-          if (dueDays != null) {
-            dueLabel = dueDays <= 0 ? 'hoy' : 'en $dueDays dÃ­as';
-          } else {
-            final due = alert['subscriptionDueAt'];
-            if (due is Timestamp) {
-              dueLabel = DateFormat('d MMM').format(due.toDate());
+      stream: configAlerts$,
+      builder: (context, configSnap) {
+        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: subscriptionAlert$,
+          builder: (context, subSnap) {
+            debugPrint('[GymDashboard][alerts] configState=${configSnap.connectionState} subState=${subSnap.connectionState}');
+            final configAlert = configSnap.data?.data() ?? const {};
+            final subscriptionAlert = subSnap.data?.data() ?? const {};
+            debugPrint('[GymDashboard][alerts] config=$configAlert');
+            debugPrint('[GymDashboard][alerts] subscription=$subscriptionAlert');
+
+            final showDeficit = configAlert['extremeDeficitWorkout'] == true;
+            final subSoon = subscriptionAlert['dueSoon'] == true ||
+                configAlert['subscriptionDueSoon'] == true;
+            debugPrint('[GymDashboard][alerts] showDeficit=$showDeficit subSoon=$subSoon');
+            if (!showDeficit && !subSoon) return const SizedBox.shrink();
+
+            final cards = <Widget>[];
+            if (showDeficit) {
+              final deficit = (configAlert['deficitKcal'] as num?)?.toDouble() ?? 0;
+              cards.add(
+                _GymAlertCard(
+                  icon: Icons.local_fire_department,
+                  title: 'DÃ©ficit extremo con entreno fuerte',
+                  message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
+                ),
+              );
             }
-          }
-          cards.add(
-            _GymAlertCard(
-              icon: Icons.event_available,
-              title: 'Pago prÃ³ximo',
-              message: 'SuscripciÃ³n de gym $dueLabel.',
-            ),
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: cards
-              .map((c) => Padding(
-                    padding: const EdgeInsets.only(bottom: FocuslaneTokens.spacing12),
-                    child: c,
-                  ))
-              .toList(),
+
+            if (subSoon) {
+              final dueRaw = subscriptionAlert['nextPaymentDate'] ?? configAlert['subscriptionDueAt'];
+              DateTime? dueDate;
+              if (dueRaw is Timestamp) {
+                dueDate = dueRaw.toDate();
+              } else if (dueRaw is DateTime) {
+                dueDate = dueRaw;
+              }
+              final amount = (subscriptionAlert['amount'] as num?)?.toDouble();
+
+              String dueLabel = 'pronto';
+              if (dueDate != null) {
+                final now = DateTime.now();
+                final dayNow = DateTime(now.year, now.month, now.day);
+                final dayDue = DateTime(dueDate.year, dueDate.month, dueDate.day);
+                final dueDays = dayDue.difference(dayNow).inDays;
+                dueLabel = dueDays <= 0
+                    ? 'hoy'
+                    : 'en $dueDays dÃ­as (${DateFormat('d MMM').format(dueDate)})';
+              }
+
+              final amountLabel = amount == null ? '' : ' de ${amount.toStringAsFixed(2)}';
+              cards.add(
+                _GymAlertCard(
+                  icon: Icons.event_available,
+                  title: 'Pago prÃ³ximo',
+                  message: 'SuscripciÃ³n$amountLabel $dueLabel.',
+                ),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: cards
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.only(bottom: FocuslaneTokens.spacing12),
+                        child: c,
+                      ))
+                  .toList(),
+            );
+          },
         );
       },
     );

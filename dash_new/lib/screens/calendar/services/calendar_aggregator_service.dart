@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:mi_dashboard_personal/core/models/core_entity_ref.dart';
 import 'package:mi_dashboard_personal/core/models/core_recommendation.dart';
-import 'package:mi_dashboard_personal/core/utils/date_utils.dart';
 import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
 import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
@@ -424,6 +423,7 @@ class CalendarAggregatorService {
               final planned = (m['planned'] ?? false) as bool;
               final isBill = (m['isBill'] ?? false) as bool;
               final dueTs = (m['dueDate'] as Timestamp?);
+              if (m['sourceRecurringId'] != null) return null;
               final date =
                   (dueTs ?? (m['date'] as Timestamp?))?.toDate() ??
                   DateTime.now();

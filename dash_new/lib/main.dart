@@ -66,6 +66,10 @@ import 'core/services/core_sync_service.dart';
 import 'core/services/ai_backend_client.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
+const String _coreSyncCustomToken = String.fromEnvironment(
+  'CORE_SYNC_CUSTOM_TOKEN',
+  defaultValue: '',
+);
 
 @pragma('vm:entry-point')
 Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
@@ -142,6 +146,23 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode && _coreSyncCustomToken.trim().isNotEmpty) {
+      unawaited(
+        fb_auth.FirebaseAuth.instance
+            .signInWithCustomToken(_coreSyncCustomToken.trim())
+            .then((cred) {
+              debugPrint('[CoreSync][debugAuth] signed uid=${cred.user?.uid}');
+              final uid = cred.user?.uid;
+              if (uid != null && uid.isNotEmpty) {
+                CoreSyncService.I.stop();
+                CoreSyncService.I.start(uid);
+              }
+            })
+            .catchError((e) {
+              debugPrint('[CoreSync][debugAuth] signInWithCustomToken failed: $e');
+            }),
+      );
+    }
     if (kDebugMode && AiBackendClient.isDevEnv) {
       unawaited(AiBackendClient().debugPing());
     }

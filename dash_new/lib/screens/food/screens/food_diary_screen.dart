@@ -1030,67 +1030,78 @@ class _EntryCard extends StatelessWidget {
     final protein = entry.macrosSnapshot['protein'] ?? 0;
     final carbs = entry.macrosSnapshot['carbs'] ?? 0;
     final fat = entry.macrosSnapshot['fat'] ?? 0;
+    final title = entry.type == FavoriteType.photoAi
+      ? (entry.nameSnapshot.trim().isEmpty
+        ? 'Foto (IA)'
+        : 'Foto (IA) · ${entry.nameSnapshot}')
+      : entry.nameSnapshot;
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle =
         '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} â€¢ ${kcal.toStringAsFixed(0)} kcal â€¢ P ${protein.toStringAsFixed(0)}g â€¢ C ${carbs.toStringAsFixed(0)}g â€¢ G ${fat.toStringAsFixed(0)}g';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: FoodCompactTile(
-        height: 52,
-        leading: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
+      child: Semantics(
+        container: true,
+        label: '$title. $subtitle',
+        child: FoodCompactTile(
+          height: 52,
+          leading: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              entry.type == FavoriteType.food
+                  ? Icons.restaurant
+                  : (entry.type == FavoriteType.photoAi
+                      ? Icons.add_a_photo_outlined
+                      : Icons.menu_book),
+              color: colorScheme.onPrimaryContainer,
+              size: 18,
+            ),
           ),
-          child: Icon(
-            entry.type == FavoriteType.food
-                ? Icons.restaurant
-                : Icons.menu_book,
-            color: colorScheme.onPrimaryContainer,
-            size: 18,
+          title: title,
+          subtitle: subtitle,
+          trailing: PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            onSelected: (v) {
+              if (v == 'dup') onDuplicate();
+              if (v == 'del') onDelete();
+            },
+            itemBuilder:
+                (_) => [
+                  const PopupMenuItem(
+                    value: 'dup',
+                    child: Row(
+                      children: [
+                        Icon(Icons.copy, size: 20),
+                        SizedBox(width: AppSpacing.sm),
+                        Text('Duplicar'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'del',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.delete,
+                          size: 20,
+                          color: colorScheme.error,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Eliminar',
+                          style: TextStyle(color: colorScheme.error),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
           ),
-        ),
-        title: entry.nameSnapshot,
-        subtitle: subtitle,
-        trailing: PopupMenuButton<String>(
-          padding: EdgeInsets.zero,
-          onSelected: (v) {
-            if (v == 'dup') onDuplicate();
-            if (v == 'del') onDelete();
-          },
-          itemBuilder:
-              (_) => [
-                const PopupMenuItem(
-                  value: 'dup',
-                  child: Row(
-                    children: [
-                      Icon(Icons.copy, size: 20),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Duplicar'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'del',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: colorScheme.error,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Eliminar',
-                        style: TextStyle(color: colorScheme.error),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
         ),
       ),
     );

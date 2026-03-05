@@ -1,8 +1,10 @@
 ﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
+import '../services/food_photo_ai_service.dart';
 import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
 import '../../../design/ui/shared/app_card.dart';
@@ -27,6 +29,7 @@ class FoodDashboardScreen extends StatefulWidget {
 class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     with RouteAware {
   String _dayId(DateTime d) => d.toIso8601String().substring(0, 10);
+  final FoodPhotoAiService _photoAiService = FoodPhotoAiService();
   
   @override
   void didChangeDependencies() {
@@ -64,6 +67,11 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         subtitle: 'PlanificaciÃ³n, recetas y seguimiento',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+            tooltip: 'Añadir por foto',
+            onPressed: _startPhotoAiFlow,
+          ),
           IconButton(
             icon: const Icon(Icons.calendar_today, size: 18),
             tooltip: 'Plan semanal',
@@ -226,7 +234,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       builder: (context, alertSnap) {
         debugPrint('[FoodDashboard][alerts] snapshot state=${alertSnap.connectionState} data=${alertSnap.data}');
         final alerts = alertSnap.data ?? const {};
-        final overBudget = alerts['foodOverBudget'] == true;
+        final overBudget = alerts['overBudget'] == true || alerts['foodOverBudget'] == true;
         final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
         final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
         debugPrint('[FoodDashboard][alerts] overBudget=$overBudget proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
@@ -258,11 +266,17 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           );
         }
         if (overBudget) {
+          final spent = (alerts['spent'] as num?)?.toDouble() ??
+              (alerts['foodOverBudgetSpent'] as num?)?.toDouble() ??
+              0;
+          final limit = (alerts['limit'] as num?)?.toDouble() ??
+              (alerts['foodOverBudgetLimit'] as num?)?.toDouble() ??
+              0;
           cards.add(
             _AlertCard(
               icon: Icons.payments,
               title: 'Presupuesto de comida superado',
-              message: 'Revisa el plan o ajusta compras de la semana.',
+              message: 'Gastado ${spent.toStringAsFixed(0)} / límite ${limit.toStringAsFixed(0)}.',
             ),
           );
         }
@@ -612,6 +626,332 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       ),
     );
   }
+
+  Future<void> _startPhotoAiFlow() async {
+    final file = await _pickImageForPhotoAi();
+    if (file == null || !mounted) return;
+
+    final rootNavigator = Navigator.of(context, rootNavigator: true);
+    var analyzingShown = false;
+    var analysisCanceled = false;
+    try {
+      void cancelAnalysis() {
+        analysisCanceled = true;
+        if (analyzingShown && mounted && rootNavigator.canPop()) {
+          rootNavigator.pop();
+          analyzingShown = false;
+        }
+        if (kDebugMode) {
+          debugPrint('[FoodPhotoAI] analysis cancelled by user');
+        }
+      }
+
+      analyzingShown = true;
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _PhotoAiAnalyzingDialog(onCancel: cancelAnalysis),
+      );
+
+      final result = await _photoAiService.estimateFromImage(file);
+
+      if (analysisCanceled) {
+        return;
+      }
+
+      if (analyzingShown && mounted && rootNavigator.canPop()) {
+        rootNavigator.pop();
+        analyzingShown = false;
+      }
+
+      if (!mounted) return;
+      final dayId = _dayId(DateTime.now());
+      await _showPhotoAiPreview(dayId, result);
+    } catch (error) {
+      if (analyzingShown && mounted && rootNavigator.canPop()) {
+        rootNavigator.pop();
+      }
+
+      if (analysisCanceled) {
+        return;
+      }
+
+      if (!mounted) return;
+      final message = error is FoodPhotoAiException
+          ? error.message
+          : 'No se pudo analizar la foto. Revisa la conexión e inténtalo de nuevo.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
+  }
+
+  Future<XFile?> _pickImageForPhotoAi() async {
+    final picker = ImagePicker();
+    try {
+      if (kIsWeb) {
+        return picker.pickImage(source: ImageSource.gallery);
+      }
+
+      final source = await showModalBottomSheet<ImageSource>(
+        context: context,
+        builder: (ctx) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_camera_outlined),
+                  title: const Text('Cámara'),
+                  onTap: () => Navigator.pop(ctx, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text('Galería'),
+                  onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (source == null) return null;
+      return picker.pickImage(source: source);
+    } catch (_) {
+      if (!mounted) return null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el selector de imágenes.')),
+      );
+      return null;
+    }
+  }
+
+  Future<void> _showPhotoAiPreview(
+    String dayId,
+    CaloriesAiResult result,
+  ) async {
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        var factor = 1.0;
+        var saving = false;
+        return StatefulBuilder(
+          builder: (context, setStateSheet) {
+            final scaled = result.scaled(factor);
+            final kcal = scaled.calories;
+            final macros = scaled.macros;
+
+            Future<void> onConfirm() async {
+              if (saving) return;
+              setStateSheet(() => saving = true);
+              try {
+                await _savePhotoAiEntry(
+                  dayId: dayId,
+                  result: result,
+                  factor: factor,
+                );
+                if (!sheetContext.mounted) return;
+                Navigator.of(sheetContext).pop();
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Entrada añadida por foto.')),
+                );
+              } catch (_) {
+                if (sheetContext.mounted) {
+                  setStateSheet(() => saving = false);
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'No se pudo guardar la entrada. Inténtalo de nuevo.',
+                      ),
+                    ),
+                  );
+                }
+              }
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Añadir por foto',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${kcal.toStringAsFixed(0)} kcal',
+                        style: const TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Modelo ${result.model} · confianza ${(result.confidence * 100).toStringAsFixed(0)}%',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          Chip(label: Text('P ${macros.protein.toStringAsFixed(0)} g')),
+                          Chip(label: Text('C ${macros.carbs.toStringAsFixed(0)} g')),
+                          Chip(label: Text('G ${macros.fat.toStringAsFixed(0)} g')),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Macros · P ${macros.protein.toStringAsFixed(0)} g · C ${macros.carbs.toStringAsFixed(0)} g · G ${macros.fat.toStringAsFixed(0)} g',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      if (scaled.items.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Items estimados',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        ...scaled.items.map(
+                          (item) => ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
+                            title: Text(item.name),
+                            subtitle: Text(item.portion),
+                            trailing: Text('${item.calories.toStringAsFixed(0)} kcal'),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      Text('Ajuste por ración: ${factor.toStringAsFixed(2)}x'),
+                      Slider(
+                        value: factor,
+                        min: 0.5,
+                        max: 2.0,
+                        divisions: 15,
+                        onChanged: saving
+                            ? null
+                            : (value) => setStateSheet(() => factor = value),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: saving
+                                  ? null
+                                  : () => Navigator.of(sheetContext).pop(),
+                              child: const Text('Cancelar'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: saving ? null : onConfirm,
+                              child: Text(saving ? 'Guardando…' : 'Confirmar'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _savePhotoAiEntry({
+    required String dayId,
+    required CaloriesAiResult result,
+    required double factor,
+  }) async {
+    final scaled = result.scaled(factor);
+    final nowIso = DateTime.now().toIso8601String();
+    final entry = IntakeEntry(
+      id: '',
+      type: FavoriteType.photoAi,
+      refId: 'ai:${DateTime.now().millisecondsSinceEpoch}',
+      qty: factor,
+      unit: UnitKind.unit,
+      nameSnapshot: scaled.items.isNotEmpty
+          ? scaled.items.first.name
+          : 'Comida estimada por foto',
+      macrosSnapshot: {
+        'kcal': scaled.calories,
+        'protein': scaled.macros.protein,
+        'carbs': scaled.macros.carbs,
+        'fat': scaled.macros.fat,
+        'fiber': 0.0,
+        'sodium': 0.0,
+      },
+      meal: MealSlot.lunch,
+      aiMeta: {
+        'source': 'openai',
+        'model': result.model,
+        'confidence': result.confidence,
+        'classifiedAt': nowIso,
+        'mimeType': result.mimeType,
+        'bytesLength': result.bytesLength,
+        'items': result.items
+            .map((item) => {
+                  'name': item.name,
+                  'portion': item.portion,
+                  'calories': item.calories,
+                })
+            .toList(),
+        if (result.inputHash != null && result.inputHash!.trim().isNotEmpty)
+          'inputHash': result.inputHash,
+      },
+    );
+
+    await widget.svc.addPhotoAiEntry(dayId: dayId, entry: entry);
+    if (kDebugMode) {
+      debugPrint('[FoodPhotoAI] saved entry dayId=$dayId');
+    }
+  }
+}
+
+class _PhotoAiAnalyzingDialog extends StatelessWidget {
+  const _PhotoAiAnalyzingDialog({required this.onCancel});
+
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: const Row(
+        children: [
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2.4),
+          ),
+          SizedBox(width: 12),
+          Expanded(child: Text('Analizando…')),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: onCancel, child: const Text('Cancelar')),
+      ],
+    );
+  }
 }
 
 class _AlertCard extends StatelessWidget {
@@ -625,7 +965,7 @@ class _AlertCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Card(
-      color: cs.errorContainer.withOpacity(.2),
+      color: cs.errorContainer.withValues(alpha: .2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),

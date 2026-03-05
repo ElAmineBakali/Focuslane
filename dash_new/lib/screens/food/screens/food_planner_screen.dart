@@ -248,7 +248,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
           stream: widget.svc.streamAlerts(),
           builder: (context, alertsSnap) {
             final alerts = alertsSnap.data ?? const {};
-            final overBudget = alerts['foodOverBudget'] == true;
+            final overBudget = alerts['overBudget'] == true || alerts['foodOverBudget'] == true;
             final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
             final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
 

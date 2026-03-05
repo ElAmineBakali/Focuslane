@@ -164,7 +164,10 @@ router.post('/v1/ai/food/calories_from_photo', async (req, res) => {
             requestId,
             resultSummary: `kcal=${ai.data.estimatedCalories ?? 'null'} c=${ai.data.confidence.toFixed(2)}`,
         }, req.path);
-        res.status(200).json(ai.data);
+        res.status(200).json({
+            ...ai.data,
+            model: ai.model,
+        });
     }
     catch (error) {
         const latencyMs = elapsedMs(start);

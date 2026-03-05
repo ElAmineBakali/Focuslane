@@ -14,6 +14,8 @@ class CalendarEvent {
   final bool allDay;
   final String? notes;
   final String? relatedActionId;
+  final String? relatedTxId;
+  final String? dedupeKey;
 
   final bool? completed;
 
@@ -27,6 +29,8 @@ class CalendarEvent {
     this.allDay = false,
     this.notes,
     this.relatedActionId,
+    this.relatedTxId,
+    this.dedupeKey,
     this.completed,
   });
 
@@ -39,6 +43,8 @@ class CalendarEvent {
     'allDay': allDay,
     if (notes != null && notes!.trim().isNotEmpty) 'notes': notes,
     if (relatedActionId != null) 'relatedActionId': relatedActionId,
+    if (relatedTxId != null) 'relatedTxId': relatedTxId,
+    if (dedupeKey != null) 'dedupeKey': dedupeKey,
     if (completed != null) 'completed': completed,
   };
 
@@ -58,6 +64,8 @@ class CalendarEvent {
       allDay: (m['allDay'] ?? false) as bool,
       notes: m['notes'] as String?,
       relatedActionId: m['relatedActionId'] as String?,
+      relatedTxId: m['relatedTxId'] as String?,
+      dedupeKey: m['dedupeKey'] as String?,
       completed: m['completed'] as bool?,
     );
   }
