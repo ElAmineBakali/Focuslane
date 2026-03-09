@@ -53,7 +53,7 @@ class _CandleEditScreenState extends State<CandleEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'AÃ±adir vela' : 'Editar vela'),
+        title: Text(editing == null ? 'Añadir vela' : 'Editar vela'),
       ),
       body: TaskFormTheme(
         child: Padding(
@@ -67,7 +67,7 @@ class _CandleEditScreenState extends State<CandleEditScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _symbol,
-                        decoration: const InputDecoration(labelText: 'SÃ­mbolo'),
+                        decoration: const InputDecoration(labelText: 'Símbolo'),
                         textCapitalization: TextCapitalization.characters,
                         validator:
                             (v) =>
@@ -230,6 +230,6 @@ class _CandleEditScreenState extends State<CandleEditScreen> {
   }
 
   String? _v(String? v) =>
-      (double.tryParse(v ?? '') == null) ? 'InvÃ¡lido' : null;
+      (double.tryParse(v ?? '') == null) ? 'Inválido' : null;
 }
 

@@ -65,8 +65,8 @@ class GymDashboardScreen extends StatelessWidget {
               cards.add(
                 _GymAlertCard(
                   icon: Icons.local_fire_department,
-                  title: 'DÃ©ficit extremo con entreno fuerte',
-                  message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
+                  title: 'Déficit extremo con entreno fuerte',
+                  message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
                 ),
               );
             }
@@ -89,15 +89,15 @@ class GymDashboardScreen extends StatelessWidget {
                 final dueDays = dayDue.difference(dayNow).inDays;
                 dueLabel = dueDays <= 0
                     ? 'hoy'
-                    : 'en $dueDays dÃ­as (${DateFormat('d MMM').format(dueDate)})';
+                    : 'en $dueDays días (${DateFormat('d MMM').format(dueDate)})';
               }
 
               final amountLabel = amount == null ? '' : ' de ${amount.toStringAsFixed(2)}';
               cards.add(
                 _GymAlertCard(
                   icon: Icons.event_available,
-                  title: 'Pago prÃ³ximo',
-                  message: 'SuscripciÃ³n$amountLabel $dueLabel.',
+                  title: 'Pago próximo',
+                  message: 'Suscripción$amountLabel $dueLabel.',
                 ),
               );
             }
@@ -139,7 +139,7 @@ class GymDashboardScreen extends StatelessWidget {
           children: [
           _buildAlerts(context),
           FocusSectionTitle(
-            title: 'Resumen del dÃ­a',
+            title: 'Resumen del día',
             subtitle: 'Actualizado $dateLabel',
             action: TextButton(
               onPressed: () {
@@ -162,9 +162,9 @@ class GymDashboardScreen extends StatelessWidget {
               final totalVolume = data?['totalVolume'] as double?;
               debugPrint('[GymDashboard][weekStats] totalSessions=$totalSessions totalVolume=$totalVolume');
               final totalSessionsText =
-                  totalSessions == null ? 'â€”' : totalSessions.toString();
+                  totalSessions == null ? '–' : totalSessions.toString();
               final totalVolumeText = totalVolume == null
-                  ? 'â€”'
+                  ? '–'
                   : '${(totalVolume / 1000).toStringAsFixed(1)} ton';
 
               return StreamBuilder<List<BodyWeightEntry>>(
@@ -182,10 +182,10 @@ class GymDashboardScreen extends StatelessWidget {
                       final rootData = rootSnap.data?.data();
                       final target = (rootData?['bodyWeightTarget'] as num?)?.toDouble();
                       final weightText = weight == null
-                          ? 'â€”'
+                          ? '–'
                           : '${weight.toStringAsFixed(1)} kg';
                       final targetText = target == null
-                          ? 'â€”'
+                          ? '–'
                           : '${target.toStringAsFixed(1)} kg';
 
                       return LayoutBuilder(
@@ -201,7 +201,7 @@ class GymDashboardScreen extends StatelessWidget {
                               icon: Icons.fitness_center,
                               label: 'Entrenos esta semana',
                               value: totalSessionsText,
-                              subtitle: 'Ãšltimos 7 dÃ­as',
+                              subtitle: 'Últimos 7 días',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -215,7 +215,7 @@ class GymDashboardScreen extends StatelessWidget {
                               icon: Icons.auto_graph,
                               label: 'Volumen total',
                               value: totalVolumeText,
-                              subtitle: 'Ãšltimos 7 dÃ­as',
+                              subtitle: 'Últimos 7 días',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -228,7 +228,7 @@ class GymDashboardScreen extends StatelessWidget {
                             const FocusMetricCard(
                               icon: Icons.bolt,
                               label: 'Racha',
-                              value: 'â€”',
+                              value: '–',
                               subtitle: 'Actual',
                             ),
                             FocusMetricCard(
@@ -267,7 +267,7 @@ class GymDashboardScreen extends StatelessWidget {
           const SizedBox(height: FocuslaneTokens.spacing16),
           FocusSectionTitle(
             title: 'Rutina semanal',
-            subtitle: 'Tu planificaciÃ³n principal',
+            subtitle: 'Tu planificación principal',
             action: TextButton(
               onPressed: () {
                 Navigator.push(
@@ -291,7 +291,7 @@ class GymDashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'AÃºn no tienes una rutina principal',
+                        'Aún no tienes una rutina principal',
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
@@ -337,7 +337,7 @@ class GymDashboardScreen extends StatelessWidget {
                         const SizedBox(height: FocuslaneTokens.spacing8),
                         if (days.isEmpty)
                           Text(
-                            'AÃ±ade dÃ­as y ejercicios para estructurar tu semana.',
+                            'Añade días y ejercicios para estructurar tu semana.',
                             style: Theme.of(context).textTheme.bodySmall,
                           )
                         else
@@ -412,7 +412,7 @@ class GymDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const FocusSectionTitle(
-                          title: 'Ãšltimos entrenos',
+                          title: 'Últimos entrenos',
                           subtitle: 'Sesiones recientes',
                         ),
                         StreamBuilder<List<SessionDoc>>(
@@ -439,7 +439,7 @@ class GymDashboardScreen extends StatelessWidget {
                                       '${s.routineName} Â· $date';
                                   final volume = s.volumeKg > 0
                                       ? '${(s.volumeKg / 1000).toStringAsFixed(1)} ton'
-                                      : 'â€”';
+                                      : '–';
 
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 8),

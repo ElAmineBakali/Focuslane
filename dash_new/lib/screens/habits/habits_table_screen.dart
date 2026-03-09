@@ -117,7 +117,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       );
     }
     return Text(
-      'â€“',
+      '—',
       style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(.45)),
     );
   }
@@ -132,7 +132,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         context: context,
         builder:
             (_) => AlertDialog(
-              title: const Text('Â¿QuÃ© quieres marcar?'),
+              title: const Text('¿Qué quieres marcar?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'âœ”ï¸'),
@@ -309,7 +309,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Editar hÃ¡bito'),
+                title: const Text('Editar hábito'),
                 onTap: () async {
                   Navigator.pop(context);
                   final result = await Navigator.pushNamed(
@@ -323,7 +323,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               if (h.isActive)
                 ListTile(
                   leading: const Icon(Icons.archive_rounded),
-                  title: const Text('Archivar hÃ¡bito'),
+                  title: const Text('Archivar hábito'),
                   onTap: () async {
                     Navigator.pop(context);
                     await _habitService.archiveHabit(h.id);
@@ -333,7 +333,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               else
                 ListTile(
                   leading: const Icon(Icons.unarchive_rounded),
-                  title: const Text('Desarchivar hÃ¡bito'),
+                  title: const Text('Desarchivar hábito'),
                   onTap: () async {
                     Navigator.pop(context);
                     await _habitService.unarchiveHabit(h.id);
@@ -386,7 +386,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               ? const Color.fromARGB(255, 255, 255, 255)
               : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('HÃ¡bitos'),
+        title: const Text('Hábitos'),
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Recordatorios',
@@ -406,7 +406,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                       const SnackBar(
                         behavior: SnackBarBehavior.floating,
                         content: Text(
-                          'ðŸ‘Œ Te avisarÃ© todos los dÃ­as a la hora elegida para revisar hÃ¡bitos.',
+                          'ðŸ‘Œ Te avisaré todos los días a la hora elegida para revisar hábitos.',
                         ),
                       ),
                     );

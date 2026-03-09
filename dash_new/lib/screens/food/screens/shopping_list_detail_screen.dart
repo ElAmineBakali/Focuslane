@@ -81,7 +81,7 @@ class _ShoppingListDetailScreenState
               ),
               IconButton(
                 icon: const Icon(Icons.add, size: 18),
-                tooltip: 'AÃ±adir producto',
+                tooltip: 'Añadir producto',
                 onPressed: () => _addItemDialog(list),
               ),
               PopupMenuButton<String>(
@@ -222,13 +222,13 @@ class _ShoppingListDetailScreenState
                         ? ModernEmptyState(
                           icon: Icons.shopping_cart_outlined,
                           message:
-                              _hideCompleted ? 'Todo comprado' : 'Lista vacÃ­a',
+                              _hideCompleted ? 'Todo comprado' : 'Lista vacía',
                           subtitle:
                               _hideCompleted
-                                  ? 'Â¡Excelente! Has comprado todo'
-                                  : 'AÃ±ade productos con el botÃ³n +',
+                                  ? '¡Excelente! Has comprado todo'
+                                  : 'Añade productos con el botón +',
                           actionLabel:
-                              _hideCompleted ? null : 'AÃ±adir Producto',
+                              _hideCompleted ? null : 'Añadir Producto',
                           onAction:
                               _hideCompleted
                                   ? null
@@ -327,7 +327,7 @@ class _ShoppingListDetailScreenState
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'AÃ±adir Producto',
+                      'Añadir Producto',
                       style: AppTypography.heading3(context),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -425,7 +425,7 @@ class _ShoppingListDetailScreenState
                                     priceController.text,
                                   ),
                                 }),
-                            child: const Text('AÃ±adir'),
+                            child: const Text('Añadir'),
                           ),
                         ),
                       ],
@@ -650,7 +650,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Eliminar producto'),
             content: Text(
-              'Â¿Seguro que quieres eliminar "${list.items[index].name}"?',
+              '¿Seguro que quieres eliminar "${list.items[index].name}"?',
             ),
             actions: [
               TextButton(
@@ -685,7 +685,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Limpiar comprados'),
             content: Text(
-              'Â¿Eliminar ${purchased.length} productos ya comprados?',
+              '¿Eliminar ${purchased.length} productos ya comprados?',
             ),
             actions: [
               TextButton(
@@ -754,7 +754,7 @@ class _ShoppingListDetailScreenState
             backgroundColor: colorScheme.surface,
             title: const Text('Archivar lista'),
             content: const Text(
-              'Â¿Marcar esta lista como completada y enviarla al historial?\n\nPodrÃ¡s restaurarla mÃ¡s tarde si lo necesitas.',
+              '¿Marcar esta lista como completada y enviarla al historial?\n\nPodrás restaurarla más tarde si lo necesitas.',
             ),
             actions: [
               TextButton(
@@ -857,7 +857,7 @@ class _ShoppingItemCard extends StatelessWidget {
     final qtyText =
         '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${_getUnitShort(item.unit)}';
     final subtitle =
-        '$qtyText${item.total != null ? ' â€¢ â‚¬${item.total!.toStringAsFixed(2)}' : ''}';
+        '$qtyText${item.total != null ? ' • â‚¬${item.total!.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),

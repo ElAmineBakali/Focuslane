@@ -63,7 +63,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                  decoration: const InputDecoration(labelText: 'Título'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -71,7 +71,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 TextFormField(
                   controller: _desc,
                   decoration: const InputDecoration(
-                    labelText: 'DescripciÃ³n (opcional)',
+                    labelText: 'Descripción (opcional)',
                   ),
                   maxLines: 3,
                 ),
@@ -115,7 +115,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                 TextFormField(
                   controller: _section,
                   decoration: const InputDecoration(
-                    labelText: 'SecciÃ³n (agrupaciÃ³n)',
+                    labelText: 'Sección (agrupación)',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -135,7 +135,7 @@ class _SubGoalEditSheetState extends State<SubGoalEditSheet> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
                   title: Text(
-                    'Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "â€”"}',
+                    'Fecha: ${_due != null ? _due!.toLocal().toString().split(" ").first : "–"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(

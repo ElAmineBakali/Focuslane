@@ -54,7 +54,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                 leading: const Icon(Icons.menu_book_outlined),
                 title: Text(b.title),
                 subtitle: Text(
-                  '${b.author ?? "â€”"} â€¢ ${b.genre ?? ""} â€¢ ${b.status.name}',
+                  '${b.author ?? "–"} • ${b.genre ?? ""} • ${b.status.name}',
                 ),
                 trailing: SizedBox(
                   width: 80,

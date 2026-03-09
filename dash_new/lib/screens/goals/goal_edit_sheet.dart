@@ -77,7 +77,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
 
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                  decoration: const InputDecoration(labelText: 'Título'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -85,7 +85,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                 TextFormField(
                   controller: _desc,
                   decoration: const InputDecoration(
-                    labelText: 'DescripciÃ³n (opcional)',
+                    labelText: 'Descripción (opcional)',
                   ),
                   maxLines: 3,
                 ),
@@ -145,7 +145,7 @@ class _GoalEditSheetState extends State<GoalEditSheet> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event),
                   title: Text(
-                    'Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "â€”"}',
+                    'Fecha objetivo: ${_targetDate != null ? _targetDate!.toLocal().toString().split(" ").first : "–"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(

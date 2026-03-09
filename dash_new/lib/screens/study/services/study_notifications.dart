@@ -24,7 +24,7 @@ class StudyNotifications {
       if (when.isAfter(now)) {
         await NotificationService.I.scheduleOnce(
           id: _id('CLASS', b, when),
-          title: 'Clase prÃ³xima',
+          title: 'Clase próxima',
           body:
               'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
           whenLocal: when,
@@ -45,8 +45,8 @@ class StudyNotifications {
       if (oneDayBefore.isAfter(DateTime.now())) {
         await NotificationService.I.scheduleOnce(
           id: _hash('TASK1', t.id, oneDayBefore),
-          title: 'Tarea prÃ³xima',
-          body: 'Entrega de ${t.title} maÃ±ana',
+          title: 'Tarea próxima',
+          body: 'Entrega de ${t.title} mañana',
           whenLocal: oneDayBefore,
           useExact: false,
         );

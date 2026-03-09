@@ -29,7 +29,7 @@ class TransactionsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Nueva transacciÃ³n',
+            tooltip: 'Nueva transacción',
             onPressed: () =>
                 Navigator.pushNamed(context, '/finance/transactions/form'),
           ),

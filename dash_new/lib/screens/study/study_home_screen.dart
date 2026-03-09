@@ -15,8 +15,8 @@ import 'models/study_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design/ui/components/focus_module_header.dart';
 
-/// ðŸ“š STUDY HOME SCREEN - RediseÃ±ado
-/// Dashboard principal del mÃ³dulo de estudio con diseÃ±o moderno
+/// ðŸ“š STUDY HOME SCREEN - Rediseñado
+/// Dashboard principal del módulo de estudio con diseño moderno
 class StudyHomeScreen extends StatefulWidget {
   final StudyFirestoreService svc;
   const StudyHomeScreen({super.key, required this.svc});
@@ -158,9 +158,9 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
 
                   const SizedBox(height: 24),
 
-                  // SecciÃ³n de acciones rÃ¡pidas
+                  // Sección de acciones rápidas
                   Text(
-                    'Acciones RÃ¡pidas',
+                    'Acciones Rápidas',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -175,7 +175,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
 
                   // Acceso a funciones principales
                   Text(
-                    'GestiÃ³n y AnÃ¡lisis',
+                    'Gestión y Análisis',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -209,7 +209,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
                 final sessions = sessionsSnap.data ?? [];
                 final tasks = tasksSnap.data ?? [];
 
-                // Calcular estadÃ­sticas
+                // Calcular estadísticas
                 final thisWeekSessions =
                     sessions.where((s) {
                       return s.date.isAfter(
@@ -377,8 +377,8 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
     return Column(
       children: [
         _FeatureListTile(
-          title: 'AnalÃ­ticas',
-          subtitle: 'EstadÃ­sticas de estudio y progreso',
+          title: 'Analíticas',
+          subtitle: 'Estadísticas de estudio y progreso',
           icon: Icons.analytics,
           color: colorScheme.primary,
           onTap: () {
@@ -785,7 +785,7 @@ class _FeatureListTile extends StatelessWidget {
   }
 }
 
-// Bottom Sheet de configuraciÃ³n de notificaciones
+// Bottom Sheet de configuración de notificaciones
 class _NotificationSettingsSheet extends StatefulWidget {
   final VoidCallback onSave;
   const _NotificationSettingsSheet({required this.onSave});
@@ -908,7 +908,7 @@ class _NotificationSettingsSheetState
 
                   _buildSwitchTile(
                     title: 'Recordar tareas',
-                    subtitle: 'Notificaciones de tareas y exÃ¡menes',
+                    subtitle: 'Notificaciones de tareas y exámenes',
                     icon: Icons.task_alt,
                     value: _notifyTasks,
                     onChanged: (v) => setState(() => _notifyTasks = v),
@@ -916,7 +916,7 @@ class _NotificationSettingsSheetState
 
                   const SizedBox(height: 24),
 
-                  // BotÃ³n guardar
+                  // Botón guardar
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(

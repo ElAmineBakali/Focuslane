@@ -35,12 +35,12 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
                 ],
           ),
           IconButton(
-            tooltip: 'GrÃ¡fico USTEC en vivo',
+            tooltip: 'Gráfico USTEC en vivo',
             icon: const Icon(Icons.show_chart),
             onPressed: () => Navigator.pushNamed(context, '/trading/live'),
           ),
           IconButton(
-            tooltip: 'AnalÃ­ticas',
+            tooltip: 'Analíticas',
             icon: const Icon(Icons.insights),
             onPressed: () => Navigator.pushNamed(context, '/trading/analytics'),
           ),
@@ -110,7 +110,7 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
               Icons.book_outlined,
               () => Navigator.pushNamed(context, '/trading/journal'),
             ),
-            //_nav('AnalÃ­ticas', Icons.insights, () => Navigator.pushNamed(context, '/trading/analytics')),
+            //_nav('Analíticas', Icons.insights, () => Navigator.pushNamed(context, '/trading/analytics')),
             _nav(
               'Tags',
               Icons.tag,
@@ -125,19 +125,19 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
             const Divider(),
             const SizedBox(height: 8),
 
-            // Ãšltimos 5 trades
+            // Últimos 5 trades
             StreamBuilder<List<Trade>>(
               stream: svc.watchTrades(),
               builder: (_, s) {
                 final data = (s.data ?? []).take(5).toList();
                 if (data.isEmpty) {
-                  return const ListTile(title: Text('AÃºn no hay trades'));
+                  return const ListTile(title: Text('Aún no hay trades'));
                 }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Ãšltimos trades',
+                      'Últimos trades',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 6),
@@ -154,10 +154,10 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
                                 : Icons.hourglass_empty,
                           ),
                           title: Text(
-                            '${t.symbol} â€¢ ${t.direction.name.toUpperCase()}',
+                            '${t.symbol} • ${t.direction.name.toUpperCase()}',
                           ),
                           subtitle: Text(
-                            '${t.entryDate.toLocal().toString().split(" ").first} â€¢ P&L ${t.pnl.toStringAsFixed(2)} â€¢ R ${t.rMultiple?.toStringAsFixed(2) ?? "-"}',
+                            '${t.entryDate.toLocal().toString().split(" ").first} • P&L ${t.pnl.toStringAsFixed(2)} • R ${t.rMultiple?.toStringAsFixed(2) ?? "-"}',
                           ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap:
@@ -179,7 +179,7 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
     );
   }
 
-  // KPI compacto (dos por fila en mÃ³vil)
+  // KPI compacto (dos por fila en móvil)
   Widget _kpiSmall(
     BuildContext context,
     String title,
@@ -245,7 +245,7 @@ class _TradingHomeScreenState extends State<TradingHomeScreen> {
         if (!isNarrow) {
           return Wrap(spacing: 8, runSpacing: 8, children: items);
         }
-        // 2 columnas en mÃ³vil; centrar Ãºltimo si impar
+        // 2 columnas en móvil; centrar último si impar
         final rows = <Widget>[];
         for (var i = 0; i < items.length; i += 2) {
           if (i + 1 < items.length) {

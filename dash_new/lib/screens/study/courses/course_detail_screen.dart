@@ -42,7 +42,7 @@ class CourseDetailScreen extends StatelessWidget {
                 ),
           ),
           IconButton(
-            tooltip: 'EstadÃ­sticas',
+            tooltip: 'Estadísticas',
             icon: const Icon(Icons.bar_chart_rounded),
             onPressed:
                 () => Navigator.push(
@@ -63,7 +63,7 @@ class CourseDetailScreen extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.play_circle_fill, color: accent),
               title: const Text('Estudiar ahora'),
-              subtitle: const Text('Inicia una sesiÃ³n con el Ãºltimo preset'),
+              subtitle: const Text('Inicia una sesión con el último preset'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -81,7 +81,7 @@ class CourseDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: Icon(Icons.checklist, color: accent),
-              title: const Text('Tareas / ExÃ¡menes'),
+              title: const Text('Tareas / Exámenes'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -103,7 +103,7 @@ class CourseDetailScreen extends StatelessWidget {
               subtitle: Text(
                 course.attendanceRequired != null
                     ? 'Requerida: ${course.attendanceRequired!.toStringAsFixed(0)}%'
-                    : 'Define el % requerido en â€œEditarâ€ (opcional)',
+                    : 'Define el % requerido en “Editarâ€ (opcional)',
               ),
               onTap: () {
                 Navigator.push(

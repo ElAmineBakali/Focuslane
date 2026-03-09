@@ -145,7 +145,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
           return const ModernEmptyState(
             icon: Icons.history,
             message: 'Sin historial',
-            subtitle: 'Las listas completadas aparecerÃ¡n aquÃ­',
+            subtitle: 'Las listas completadas aparecerán aquí',
           );
         }
 
@@ -400,7 +400,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
       builder:
           (context) => AlertDialog(
             title: const Text('Eliminar lista'),
-            content: Text('Â¿Seguro que quieres eliminar "${list.name}"?'),
+            content: Text('¿Seguro que quieres eliminar "${list.name}"?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -459,7 +459,7 @@ class _ShoppingListTile extends StatelessWidget {
     );
     final purchased = list.items.where((i) => i.checked).length;
     final subtitle =
-        '${list.items.length} productos â€¢ ${_getScopeLabel(list.scope)} â€¢ $purchased/${list.items.length} comprados${total > 0 ? ' â€¢ â‚¬${total.toStringAsFixed(2)}' : ''}';
+        '${list.items.length} productos • ${_getScopeLabel(list.scope)} • $purchased/${list.items.length} comprados${total > 0 ? ' • â‚¬${total.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -588,7 +588,7 @@ class _HistoryListCard extends StatelessWidget {
         ),
         title: list.name,
         subtitle:
-            'Completada el $completedDate â€¢ ${list.items.length} productos${total > 0 ? ' â€¢ â‚¬${total.toStringAsFixed(2)}' : ''}',
+            'Completada el $completedDate • ${list.items.length} productos${total > 0 ? ' • â‚¬${total.toStringAsFixed(2)}' : ''}',
         trailing: PopupMenuButton<String>(
           padding: EdgeInsets.zero,
           onSelected: (value) {

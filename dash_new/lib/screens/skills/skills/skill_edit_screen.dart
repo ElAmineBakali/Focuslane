@@ -78,25 +78,25 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                 // Nombre
                 TextFormField(
                   controller: _name,
-                  decoration: deco('Nombre (Guitarra, IlustraciÃ³n, Cocina...)'),
+                  decoration: deco('Nombre (Guitarra, Ilustración, Cocina...)'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
                 ),
                 const SizedBox(height: 16),
 
-                // DescripciÃ³n
+                // Descripción
                 TextFormField(
                   controller: _desc,
-                  decoration: deco('DescripciÃ³n / Â¿quÃ© es?'),
+                  decoration: deco('Descripción / ¿qué es?'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
 
-                // MotivaciÃ³n
+                // Motivación
                 TextFormField(
                   controller: _motivation,
-                  decoration: deco('MotivaciÃ³n (Â¿por quÃ©?)'),
+                  decoration: deco('Motivación (¿por qué?)'),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
@@ -194,9 +194,9 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
 
                 const Divider(height: 32),
 
-                // MÃ©tricas
+                // Métricas
                 Text(
-                  'MÃ©tricas especÃ­ficas (nombre y unidad, p.ej. "BPM" - "bpm", "PrecisiÃ³n" - "%")',
+                  'Métricas específicas (nombre y unidad, p.ej. "BPM" - "bpm", "Precisión" - "%")',
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -210,7 +210,7 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                           child: TextFormField(
                             initialValue: e.key,
                             readOnly: true,
-                            decoration: deco('MÃ©trica'),
+                            decoration: deco('Métrica'),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -234,7 +234,7 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
 
                 const SizedBox(height: 8),
 
-                // Tags + aÃ±adir mÃ©trica
+                // Tags + añadir métrica
                 Row(
                   children: [
                     Expanded(
@@ -246,9 +246,9 @@ class _SkillEditScreenState extends State<SkillEditScreen> {
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add),
-                      label: const Text('AÃ±adir mÃ©trica'),
+                      label: const Text('Añadir métrica'),
                       onPressed: () async {
-                        final name = await _promptStr('Nombre de la mÃ©trica');
+                        final name = await _promptStr('Nombre de la métrica');
                         if (name == null || name.trim().isEmpty) return;
                         final unit = await _promptStr(
                           'Unidad/ayuda (p.ej. %, bpm, min)',

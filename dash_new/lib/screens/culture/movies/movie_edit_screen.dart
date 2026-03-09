@@ -45,7 +45,7 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nueva pelÃ­cula' : 'Editar pelÃ­cula'),
+        title: Text(editing == null ? 'Nueva película' : 'Editar película'),
       ),
       body: TaskFormTheme(
         child: ListView(
@@ -53,12 +53,12 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+              decoration: const InputDecoration(labelText: 'Título'),
             ),
             TextField(
               controller: _year,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'AÃ±o'),
+              decoration: const InputDecoration(labelText: 'Año'),
             ),
             TextField(
               controller: _minutes,
@@ -94,7 +94,7 @@ class _MovieEditScreenState extends State<MovieEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('ValoraciÃ³n (0..10)'),
+              title: const Text('Valoración (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(

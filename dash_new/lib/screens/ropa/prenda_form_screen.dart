@@ -162,7 +162,7 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
         _imagenes['thumb'] ?? _imagenes['medium'] ?? _imagenes['full'];
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initial == null ? 'AÃ±adir prenda' : 'Editar prenda'),
+        title: Text(widget.initial == null ? 'Añadir prenda' : 'Editar prenda'),
       ),
       body: TaskFormTheme(
         child: Padding(
@@ -187,14 +187,14 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                       TextFormField(
                         controller: _descripcionCtrl,
                         decoration: const InputDecoration(
-                          labelText: 'DescripciÃ³n',
+                          labelText: 'Descripción',
                         ),
                       ),
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         initialValue: _categoriaSeleccionada,
                         decoration: const InputDecoration(
-                          labelText: 'CategorÃ­a',
+                          labelText: 'Categoría',
                         ),
                         items:
                             _categorias.entries
@@ -253,12 +253,12 @@ class _PrendaFormScreenState extends State<PrendaFormScreen> {
                           ElevatedButton.icon(
                             onPressed: _saving ? null : _pickFromGallery,
                             icon: const Icon(Icons.image_outlined),
-                            label: const Text('GalerÃ­a / Archivos'),
+                            label: const Text('Galería / Archivos'),
                           ),
                           ElevatedButton.icon(
                             onPressed: _saving ? null : _pickFromCamera,
                             icon: const Icon(Icons.photo_camera_outlined),
-                            label: const Text('CÃ¡mara'),
+                            label: const Text('Cámara'),
                           ),
                         ],
                       ),

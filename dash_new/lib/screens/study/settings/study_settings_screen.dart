@@ -18,7 +18,7 @@ class StudySettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: const FocusModuleHeader(
         title: 'Ajustes',
-        subtitle: 'Preferencias del mÃ³dulo',
+        subtitle: 'Preferencias del módulo',
         leadingMode: FocusModuleLeadingMode.backToModuleDashboard,
         backRouteName: AppRoutes.studyDashboard,
       ),
@@ -29,7 +29,7 @@ class StudySettingsScreen extends StatelessWidget {
           children: [
             const FocusSectionTitle(
               title: 'Ajustes',
-              subtitle: 'Preferencias del mÃ³dulo',
+              subtitle: 'Preferencias del módulo',
             ),
             FocusCard(
               onTap: () {
@@ -44,7 +44,7 @@ class StudySettingsScreen extends StatelessWidget {
                   const SizedBox(width: FocuslaneTokens.spacing12),
                   Expanded(
                     child: Text(
-                      'ConfiguraciÃ³n avanzada',
+                      'Configuración avanzada',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium

@@ -395,7 +395,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         TextField(
                           controller: title,
                           decoration: const InputDecoration(
-                            labelText: 'TÃ­tulo del evento',
+                            labelText: 'Título del evento',
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -444,7 +444,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         SwitchListTile(
                           value: allDay,
                           onChanged: (v) => setS(() => allDay = v),
-                          title: const Text('Todo el dÃ­a'),
+                          title: const Text('Todo el día'),
                           contentPadding: EdgeInsets.zero,
                         ),
                         ListTile(
@@ -614,10 +614,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   String _humanDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   String _humanDateTime(DateTime d, bool allDay) {
-    if (allDay) return '${_humanDate(d)} (todo el dÃ­a)';
+    if (allDay) return '${_humanDate(d)} (todo el día)';
     final hh = d.hour.toString().padLeft(2, '0');
     final mm = d.minute.toString().padLeft(2, '0');
-    return '${_humanDate(d)} â€¢ $hh:$mm';
+    return '${_humanDate(d)} • $hh:$mm';
   }
 }
 
@@ -687,7 +687,7 @@ class _DayEventList extends StatelessWidget {
     if (events.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(16),
-        child: Text('No hay eventos para este dÃ­a'),
+        child: Text('No hay eventos para este día'),
       );
     }
     final s = Theme.of(context).colorScheme;
@@ -715,7 +715,7 @@ class _DayEventList extends StatelessWidget {
             e.priority == CalendarPriority.high ? Colors.redAccent : s.primary;
         final timeLabel =
             e.allDay
-                ? 'Todo el dÃ­a'
+                ? 'Todo el día'
                 : '${e.start.hour.toString().padLeft(2, '0')}:${e.start.minute.toString().padLeft(2, '0')}';
 
         final isCompleted =
@@ -740,7 +740,7 @@ class _DayEventList extends StatelessWidget {
           ),
           title: Text(e.title, style: baseTitle),
           subtitle: Text(
-            [timeLabel, if ((e.notes ?? '').isNotEmpty) e.notes!].join(' â€¢ '),
+            [timeLabel, if ((e.notes ?? '').isNotEmpty) e.notes!].join(' • '),
             style: baseSub,
           ),
           onTap: () => onEdit(e),

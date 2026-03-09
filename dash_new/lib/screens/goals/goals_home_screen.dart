@@ -47,7 +47,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
           }
           if (data.isEmpty) {
             return const Center(
-              child: Text('Crea tu primera meta con el botÃ³n +'),
+              child: Text('Crea tu primera meta con el botón +'),
             );
           }
           return ReorderableListView.builder(
@@ -103,7 +103,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                     children: [
                       if (x.targetDate != null)
                         Text(
-                          'LÃ­mite: ${x.targetDate!.toLocal().toString().split(' ').first}',
+                          'Límite: ${x.targetDate!.toLocal().toString().split(' ').first}',
                         ),
                       if (x.progressTarget != null)
                         Text(
@@ -133,7 +133,7 @@ class _GoalsHomeScreenState extends State<GoalsHomeScreen> {
                           builder:
                               (_) => AlertDialog(
                                 title: const Text('Eliminar meta'),
-                                content: Text('Â¿Eliminar "${x.title}"?'),
+                                content: Text('¿Eliminar "${x.title}"?'),
                                 actions: [
                                   TextButton(
                                     onPressed:

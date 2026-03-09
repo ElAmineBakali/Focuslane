@@ -46,7 +46,7 @@ class _SeriesEditScreenState extends State<SeriesEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+              decoration: const InputDecoration(labelText: 'Título'),
             ),
             TextField(
               controller: _platform,
@@ -72,7 +72,7 @@ class _SeriesEditScreenState extends State<SeriesEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('ValoraciÃ³n (0..10)'),
+              title: const Text('Valoración (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(

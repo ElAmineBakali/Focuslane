@@ -126,7 +126,7 @@ class CoursesListScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 32),
                       Text(
-                        'Â¡Empieza tu jornada!',
+                        '¡Empieza tu jornada!',
                         style: GoogleFonts.poppins(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
@@ -341,7 +341,7 @@ class _CourseCard extends StatelessWidget {
                       ],
                     ),
 
-                    // InformaciÃ³n adicional
+                    // Información adicional
                     if (course.credits != null || course.goalHours != null) ...[
                       const SizedBox(height: 16),
                       Wrap(
@@ -351,7 +351,7 @@ class _CourseCard extends StatelessWidget {
                           if (course.credits != null)
                             _InfoChip(
                               icon: Icons.menu_book_rounded,
-                              label: '${course.credits?.toInt()} crÃ©ditos',
+                              label: '${course.credits?.toInt()} créditos',
                               color: color,
                             ),
                           if (course.goalHours != null)

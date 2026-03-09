@@ -72,7 +72,7 @@ class RoutineDetailScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.bar_chart_rounded),
-                tooltip: 'EstadÃ­sticas',
+                tooltip: 'Estadísticas',
                 onPressed:
                     () => Navigator.push(
                       context,
@@ -118,7 +118,7 @@ class RoutineDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Sin dÃ­as aÃºn',
+                          'Sin días aún',
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -127,7 +127,7 @@ class RoutineDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Crea tu primer dÃ­a con el botÃ³n inferior',
+                          'Crea tu primer día con el botón inferior',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: s.onSurfaceVariant,
@@ -160,7 +160,7 @@ class RoutineDetailScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _createDaySheet(context),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('AÃ±adir DÃ­a'),
+        label: const Text('Añadir Día'),
         backgroundColor: routine.color,
         foregroundColor: Colors.white,
       ),
@@ -277,7 +277,7 @@ class RoutineDetailScreen extends StatelessWidget {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               _buildSnackBar(
-                                'DÃ­a duplicado âœ¨',
+                                'Día duplicado âœ¨',
                                 Icons.copy_all_rounded,
                                 s,
                               ),
@@ -290,13 +290,13 @@ class RoutineDetailScreen extends StatelessWidget {
                             builder:
                                 (_) => AlertDialog(
                                   title: Text(
-                                    'Eliminar dÃ­a',
+                                    'Eliminar día',
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   content: Text(
-                                    'Â¿Eliminar "${d.name}" y sus ejercicios?',
+                                    '¿Eliminar "${d.name}" y sus ejercicios?',
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
@@ -323,7 +323,7 @@ class RoutineDetailScreen extends StatelessWidget {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 _buildSnackBar(
-                                  'DÃ­a eliminado ðŸ—‘ï¸',
+                                  'Día eliminado ðŸ—‘ï¸',
                                   Icons.delete_outline,
                                   s,
                                 ),
@@ -340,7 +340,7 @@ class RoutineDetailScreen extends StatelessWidget {
                                 children: [
                                   Icon(Icons.content_copy_rounded, size: 20),
                                   SizedBox(width: 12),
-                                  Text('Duplicar dÃ­a'),
+                                  Text('Duplicar día'),
                                 ],
                               ),
                             ),
@@ -350,7 +350,7 @@ class RoutineDetailScreen extends StatelessWidget {
                                 children: [
                                   Icon(Icons.delete_rounded, size: 20),
                                   SizedBox(width: 12),
-                                  Text('Eliminar dÃ­a'),
+                                  Text('Eliminar día'),
                                 ],
                               ),
                             ),
@@ -408,7 +408,7 @@ class RoutineDetailScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'Nuevo dÃ­a',
+                  'Nuevo día',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -428,7 +428,7 @@ class RoutineDetailScreen extends StatelessWidget {
                   autofocus: true,
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: 'Nombre del dÃ­a',
+                    labelText: 'Nombre del día',
                     hintText: 'Ej: Pecho/Espalda, Push, Pierna...',
                     prefixIcon: const Icon(Icons.label_rounded),
                     border: OutlineInputBorder(
@@ -483,7 +483,7 @@ class RoutineDetailScreen extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          'Crear dÃ­a',
+                          'Crear día',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -527,7 +527,7 @@ class RoutineDetailScreen extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         _buildSnackBar(
-          'DÃ­a "$name" creado correctamente ðŸŽ‰',
+          'Día "$name" creado correctamente ðŸŽ‰',
           Icons.check_circle_rounded,
           Theme.of(context).colorScheme,
         ),
@@ -573,7 +573,7 @@ class _LastDoneSubtitle extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData || !snap.data!.exists) {
           return Text(
-            'Sin sesiones aÃºn',
+            'Sin sesiones aún',
             style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }
@@ -584,7 +584,7 @@ class _LastDoneSubtitle extends StatelessWidget {
 
         if (dt == null) {
           return Text(
-            'Sin sesiones aÃºn',
+            'Sin sesiones aún',
             style: TextStyle(fontSize: 12, color: s.onSurfaceVariant),
           );
         }

@@ -49,7 +49,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
     }
     final svc = MeditationFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: Text(editing == null ? 'Nuevo dÃ­a' : 'Editar dÃ­a')),
+      appBar: AppBar(title: Text(editing == null ? 'Nuevo día' : 'Editar día')),
       body: TaskFormTheme(
         child: Padding(
           padding: EdgeInsets.fromLTRB(12, 12, 12, screenPad(context)),
@@ -59,7 +59,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
               children: [
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                  decoration: const InputDecoration(labelText: 'Título'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -68,13 +68,13 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                 TextFormField(
                   controller: _goal,
                   decoration: const InputDecoration(
-                    labelText: 'Objetivo / guÃ­a',
+                    labelText: 'Objetivo / guía',
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('DÃ­a #')),
+                    const Expanded(child: Text('Día #')),
                     DropdownButton<int>(
                       value: _dayNumber,
                       onChanged: (v) => setState(() => _dayNumber = v ?? 1),
@@ -124,7 +124,7 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // ---- GuÃ­a opcional (nullable seguro)
+                // ---- Guía opcional (nullable seguro)
                 StreamBuilder<List<GuidedAudio>>(
                   stream: svc.watchGuided(),
                   builder: (context, s) {
@@ -135,18 +135,18 @@ class _ProgramDayEditScreenState extends State<ProgramDayEditScreen> {
                       items: [
                         const DropdownMenuItem<String?>(
                           value: null,
-                          child: Text('Sin guÃ­a'),
+                          child: Text('Sin guía'),
                         ),
                         ...list.map(
                           (g) => DropdownMenuItem<String?>(
                             value: g.id,
-                            child: Text('GuÃ­a: ${g.title}'),
+                            child: Text('Guía: ${g.title}'),
                           ),
                         ),
                       ],
                       onChanged: (v) => setState(() => _guidedId = v),
                       decoration: const InputDecoration(
-                        labelText: 'GuÃ­a (opcional)',
+                        labelText: 'Guía (opcional)',
                       ),
                     );
                   },

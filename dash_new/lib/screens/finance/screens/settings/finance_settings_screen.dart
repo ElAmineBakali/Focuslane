@@ -32,7 +32,7 @@ class FinanceSettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text(
-                'ConfiguraciÃ³n bÃ¡sica',
+                'Configuración básica',
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
               SizedBox(height: 8),

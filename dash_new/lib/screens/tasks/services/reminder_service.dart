@@ -46,7 +46,7 @@ class ReminderService {
 
     await NotificationService.I.scheduleDailyReminder(
       id: id,
-      title: habit.name.isEmpty ? 'HÃ¡bito' : habit.name,
+      title: habit.name.isEmpty ? 'Hábito' : habit.name,
       body: 'Registra tu progreso',
       time: time,
       payload: '/habits/${habit.id}',
@@ -135,7 +135,7 @@ class ReminderService {
 
     await NotificationService.I.scheduleWeeklyReminder(
       id: baseId,
-      title: 'MeditaciÃ³n',
+      title: 'Meditación',
       body: 'Respira y medita',
       weekdays: days,
       time: time,

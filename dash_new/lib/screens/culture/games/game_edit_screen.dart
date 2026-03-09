@@ -56,7 +56,7 @@ class _GameEditScreenState extends State<GameEditScreen> {
             TextField(
               controller: _title,
               decoration: const InputDecoration(
-                labelText: 'TÃ­tulo',
+                labelText: 'Título',
                 hintText: 'Ej. Elden Ring',
               ),
             ),
@@ -115,7 +115,7 @@ class _GameEditScreenState extends State<GameEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('ValoraciÃ³n (0..10)'),
+              title: const Text('Valoración (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(

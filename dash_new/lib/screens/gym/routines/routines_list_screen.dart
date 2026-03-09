@@ -70,7 +70,7 @@ class RoutinesListScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Sin rutinas aÃºn',
+                            'Sin rutinas aún',
                             style: GoogleFonts.poppins(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -79,7 +79,7 @@ class RoutinesListScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Toca el botÃ³n + para crear tu primera rutina',
+                            'Toca el botón + para crear tu primera rutina',
                             style: TextStyle(color: s.onSurfaceVariant),
                           ),
                         ],
@@ -239,7 +239,7 @@ class RoutinesListScreen extends StatelessWidget {
                                     ),
                                   ),
                                   content: Text(
-                                    'Â¿Eliminar "${r.name}" y todo su contenido?',
+                                    '¿Eliminar "${r.name}" y todo su contenido?',
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
@@ -555,7 +555,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 validator: (s) {
                   final t = (s ?? '').trim();
                   if (t.isEmpty) return 'Pon un nombre';
-                  if (t.length < 3) return 'MÃ­nimo 3 caracteres';
+                  if (t.length < 3) return 'Mínimo 3 caracteres';
                   return null;
                 },
               ),
@@ -565,7 +565,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 style: const TextStyle(fontSize: 16),
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: 'DescripciÃ³n (opcional)',
+                  labelText: 'Descripción (opcional)',
                   hintText: 'Detalles de tu rutina...',
                   prefixIcon: const Icon(Icons.notes_rounded),
                   border: OutlineInputBorder(
@@ -620,7 +620,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 validator: (s) {
                   if ((s ?? '').trim().isEmpty) return 'Indica segundos';
                   final v = int.tryParse((s ?? '').trim());
-                  if (v == null) return 'NÃºmero entero';
+                  if (v == null) return 'Número entero';
                   if (v < 0) return 'No negativo';
                   return null;
                 },
@@ -698,7 +698,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                       ),
                     ),
                     subtitle: const Text(
-                      'Se usarÃ¡ por defecto en tus sesiones',
+                      'Se usará por defecto en tus sesiones',
                     ),
                     secondary: Icon(Icons.star_rounded, color: cs.primary),
                     shape: RoundedRectangleBorder(

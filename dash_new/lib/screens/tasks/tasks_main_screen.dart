@@ -617,7 +617,7 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
                       Navigator.pop(context);
                     },
                     items: const [
-                      DropdownMenuItem(value: 'smart', child: Text('AgrupaciÃ³n inteligente')),
+                      DropdownMenuItem(value: 'smart', child: Text('Agrupación inteligente')),
                       DropdownMenuItem(value: 'manual', child: Text('Orden manual')),
                       DropdownMenuItem(value: 'dateAsc', child: Text('Fecha ascendente')),
                       DropdownMenuItem(value: 'dateDesc', child: Text('Fecha descendente')),
@@ -876,7 +876,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                     child: TextField(
                       controller: _ctrl,
                       decoration: const InputDecoration(
-                        labelText: 'Nuevo Ã­tem rÃ¡pido',
+                        labelText: 'Nuevo ítem rápido',
                         prefixIcon: Icon(Icons.add_task),
                       ),
                       onSubmitted: (s) async {
@@ -895,7 +895,7 @@ class _ChecklistTodayState extends State<_ChecklistToday> {
                       await _Checklist.add(t);
                       _ctrl.clear();
                     },
-                    child: const Text('AÃ±adir'),
+                    child: const Text('Añadir'),
                   ),
                 ],
               ),

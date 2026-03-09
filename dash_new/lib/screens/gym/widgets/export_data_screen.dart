@@ -172,7 +172,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
             const SizedBox(height: 24),
 
             Text(
-              'Â¿QuÃ© se exportarÃ¡?',
+              '¿Qué se exportará?',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -266,7 +266,7 @@ class _ExportDataScreenState extends State<ExportDataScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Â¡ExportaciÃ³n completa!',
+                            '¡Exportación completa!',
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
                               color: Colors.green[700],

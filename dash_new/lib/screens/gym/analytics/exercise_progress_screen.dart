@@ -141,7 +141,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildE1rmTab() {
     if (_e1rmHistory.isEmpty) {
-      return _buildEmptyState('No hay datos de e1RM todavÃ­a');
+      return _buildEmptyState('No hay datos de e1RM todavía');
     }
 
     final maxE1rm = _e1rmHistory
@@ -171,7 +171,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               Colors.blue,
             ),
             (
-              'MÃ¡ximo',
+              'Máximo',
               '${maxE1rm.toStringAsFixed(1)} kg',
               Icons.trending_up,
               Colors.green,
@@ -186,7 +186,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           const SizedBox(height: 24),
 
           Text(
-            'EvoluciÃ³n e1RM',
+            'Evolución e1RM',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -213,7 +213,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildVolumeTab() {
     if (_volumeHistory.isEmpty) {
-      return _buildEmptyState('No hay datos de volumen todavÃ­a');
+      return _buildEmptyState('No hay datos de volumen todavía');
     }
 
     final totalVolume = _volumeHistory
@@ -243,7 +243,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
               Colors.blue,
             ),
             (
-              'MÃ¡ximo',
+              'Máximo',
               '${maxVolume.toStringAsFixed(0)} kg',
               Icons.trending_up,
               Colors.green,
@@ -252,7 +252,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
           const SizedBox(height: 24),
 
           Text(
-            'Volumen por SesiÃ³n',
+            'Volumen por Sesión',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -270,7 +270,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
 
   Widget _buildPRsTab() {
     if (_prs.isEmpty) {
-      return _buildEmptyState('Â¡Entrena para lograr tu primer PR!');
+      return _buildEmptyState('¡Entrena para lograr tu primer PR!');
     }
 
     return ListView.builder(

@@ -110,12 +110,12 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('TÃ­tulo', style: textTheme.titleMedium),
+                Text('Título', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    hintText: 'Introduce un tÃ­tulo',
+                    hintText: 'Introduce un título',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -125,11 +125,11 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty)
-                              ? 'TÃ­tulo obligatorio'
+                              ? 'Título obligatorio'
                               : null,
                 ),
                 const SizedBox(height: 16),
-                Text('RepeticiÃ³n', style: textTheme.titleMedium),
+                Text('Repetición', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 DropdownButtonFormField<RepeatRule>(
                   initialValue: _repeatRule,
@@ -155,7 +155,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 ),
                 Tooltip(
                   message:
-                      'Esta opciÃ³n afectarÃ¡ al mÃ³dulo Calendario prÃ³ximamente',
+                      'Esta opción afectará al módulo Calendario próximamente',
                   child: SwitchListTile(
                     value: _isCalendarVisible,
                     onChanged: null,
@@ -191,7 +191,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                                           title: t,
                                         ),
                                 decoration: InputDecoration(
-                                  hintText: 'TÃ­tulo de subtarea',
+                                  hintText: 'Título de subtarea',
                                   filled: true,
                                   fillColor: colorScheme.surface,
                                   border: OutlineInputBorder(
@@ -245,13 +245,13 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                           });
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('AÃ±adir subtarea'),
+                        label: const Text('Añadir subtarea'),
                       ),
                     ),
                   ],
                 ),
 
-                Text('DescripciÃ³n', style: textTheme.titleMedium),
+                Text('Descripción', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _descriptionController,
@@ -259,7 +259,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    hintText: 'Escribe una descripciÃ³nâ€¦',
+                    hintText: 'Escribe una descripciónâ€¦',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -269,12 +269,12 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                Text('CategorÃ­a (opcional)', style: textTheme.titleMedium),
+                Text('Categoría (opcional)', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _categoryController,
                   decoration: InputDecoration(
-                    hintText: 'Introduce una categorÃ­aâ€¦',
+                    hintText: 'Introduce una categoríaâ€¦',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -319,7 +319,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 TextFormField(
                   controller: _tagsController,
                   decoration: InputDecoration(
-                    hintText: 'Ej: urgente, reuniÃ³n, compras',
+                    hintText: 'Ej: urgente, reunión, compras',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -329,7 +329,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                Text('Fecha lÃ­mite', style: textTheme.titleMedium),
+                Text('Fecha límite', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 Row(
                   children: [
@@ -349,7 +349,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                Text('Hora lÃ­mite', style: textTheme.titleMedium),
+                Text('Hora límite', style: textTheme.titleMedium),
                 const SizedBox(height: 5),
                 Row(
                   children: [
@@ -387,7 +387,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                       }
                     });
                   },
-                  title: const Text('AÃ±adir recordatorio'),
+                  title: const Text('Añadir recordatorio'),
                 ),
                 if (_enableReminder) ...[
                   const SizedBox(height: 8),

@@ -28,12 +28,12 @@ class FinanceDashboardScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: FocusModuleHeader(
         title: 'Finanzas',
-        subtitle: 'Patrimonio, gastos y anÃ¡lisis',
+        subtitle: 'Patrimonio, gastos y análisis',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Nueva transacciÃ³n',
+            tooltip: 'Nueva transacción',
             onPressed: () =>
                 Navigator.pushNamed(context, '/finance/transactions/form'),
           ),
@@ -163,7 +163,7 @@ class _MetricsRow extends StatelessWidget {
         icon: Icons.savings_outlined,
         label: 'Ahorro / tasa',
         value: income == 0
-            ? 'â€”'
+            ? '–'
             : '${(income - expense).toStringAsFixed(2)} Â· ${(savings * 100).toStringAsFixed(1)}%',
         subtitle: 'Ingreso - gasto',
         onTap: () => onSelectSection(2),
@@ -264,7 +264,7 @@ class _RecentTransactions extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Ãšltimas transacciones', style: TextStyle(fontWeight: FontWeight.w700)),
+              const Text('Últimas transacciones', style: TextStyle(fontWeight: FontWeight.w700)),
               TextButton(
                 onPressed: () => onSelectSection(1),
                 child: const Text('Ver todas'),

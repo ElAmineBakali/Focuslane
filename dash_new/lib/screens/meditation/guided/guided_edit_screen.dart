@@ -47,7 +47,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
               children: [
                 TextFormField(
                   controller: _title,
-                  decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                  decoration: const InputDecoration(labelText: 'Título'),
                   validator:
                       (v) =>
                           (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -58,7 +58,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                   decoration: const InputDecoration(
                     labelText: 'URL o asset',
                     helperText:
-                        'Ejemplos: https://...  Ã³  assets/audio/guided/mi_audio.mp3',
+                        'Ejemplos: https://...  ó  assets/audio/guided/mi_audio.mp3',
                   ),
                   validator:
                       (v) =>
@@ -67,7 +67,7 @@ class _GuidedEditScreenState extends State<GuidedEditScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('DuraciÃ³n (min)')),
+                    const Expanded(child: Text('Duración (min)')),
                     DropdownButton<int>(
                       value: _minutes,
                       onChanged: (v) => setState(() => _minutes = v ?? 10),

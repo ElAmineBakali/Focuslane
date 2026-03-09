@@ -70,7 +70,7 @@ class _GamesListScreenState extends State<GamesListScreen> {
                 leading: const Icon(Icons.sports_esports),
                 title: Text(g.title),
                 subtitle: Text(
-                  '${g.platform} â€¢ ${g.status.name} â€¢ ${g.progressPct}%',
+                  '${g.platform} • ${g.status.name} • ${g.progressPct}%',
                 ),
                 trailing: Text('${g.hours.toStringAsFixed(1)} h'),
                 onTap:

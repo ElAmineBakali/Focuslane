@@ -45,7 +45,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nuevo Ã¡lbum' : 'Editar Ã¡lbum'),
+        title: Text(editing == null ? 'Nuevo álbum' : 'Editar álbum'),
       ),
       body: TaskFormTheme(
         child: ListView(
@@ -53,7 +53,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+              decoration: const InputDecoration(labelText: 'Título'),
             ),
             TextField(
               controller: _artist,
@@ -62,7 +62,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
             TextField(
               controller: _year,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'AÃ±o'),
+              decoration: const InputDecoration(labelText: 'Año'),
             ),
             TextField(
               controller: _cover,
@@ -95,7 +95,7 @@ class _AlbumEditScreenState extends State<AlbumEditScreen> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('ValoraciÃ³n (0..10)'),
+              title: const Text('Valoración (0..10)'),
               trailing: SizedBox(
                 width: 100,
                 child: TextField(

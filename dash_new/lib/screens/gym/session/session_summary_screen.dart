@@ -67,9 +67,9 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Â¿Eliminar sesiÃ³n?'),
+            title: const Text('¿Eliminar sesión?'),
             content: const Text(
-              'Esta acciÃ³n eliminarÃ¡ la sesiÃ³n del historial y actualizarÃ¡ las estadÃ­sticas. No se puede deshacer.',
+              'Esta acción eliminará la sesión del historial y actualizará las estadísticas. No se puede deshacer.',
             ),
             actions: [
               TextButton(
@@ -93,7 +93,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('âœ… SesiÃ³n eliminada'),
+            content: Text('âœ… Sesión eliminada'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -116,7 +116,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resumen de sesiÃ³n'),
+        title: const Text('Resumen de sesión'),
         leading: FocusModuleHeader.buildLeading(
           context,
           mode: FocusModuleLeadingMode.backToModuleDashboard,
@@ -127,7 +127,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
           if (widget.svc != null)
             IconButton(
               icon: const Icon(Icons.delete_forever_rounded),
-              tooltip: 'Eliminar sesiÃ³n',
+              tooltip: 'Eliminar sesión',
               onPressed: _deleteSession,
             ),
         ],
@@ -136,12 +136,12 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            '${widget.session.routineName} â€” ${widget.session.dayName}',
+            '${widget.session.routineName} – ${widget.session.dayName}',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 4),
           Text(
-            'Fecha: ${widget.session.date} â€¢ DuraciÃ³n: ${widget.session.durationMin ?? 0} min',
+            'Fecha: ${widget.session.date} • Duración: ${widget.session.durationMin ?? 0} min',
           ),
           const SizedBox(height: 12),
           Card(
@@ -160,7 +160,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.emoji_events),
-                title: const Text('Â¡Nuevos PRs!'),
+                title: const Text('¡Nuevos PRs!'),
                 subtitle: Text(widget.session.prList.join(', ')),
               ),
             ),
@@ -191,12 +191,12 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     for (int i = 0; i < e.sets.length; i++)
                       Text(
                         'Set ${i + 1}: ${e.sets[i].weight.toStringAsFixed(1)} kg Ã— ${e.sets[i].reps} reps'
-                        '${e.sets[i].rpe != null ? ' â€¢ RPE ${e.sets[i].rpe}' : ''}',
+                        '${e.sets[i].rpe != null ? ' • RPE ${e.sets[i].rpe}' : ''}',
                       ),
                     const SizedBox(height: 4),
                     Text(
                       'Volumen: ${e.volumeKg.toStringAsFixed(1)} kg'
-                      '${e.bestE1rm != null ? ' â€¢ Mejor E1RM: ${e.bestE1rm!.toStringAsFixed(1)}' : ''}',
+                      '${e.bestE1rm != null ? ' • Mejor E1RM: ${e.bestE1rm!.toStringAsFixed(1)}' : ''}',
                       style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                   ],
@@ -237,7 +237,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Â¿CÃ³mo te sentiste?',
+                                '¿Cómo te sentiste?',
                                 style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -258,7 +258,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     const SizedBox(height: 24),
 
                     _buildFeelingSlider(
-                      'EnergÃ­a',
+                      'Energía',
                       _energyValue,
                       Icons.bolt_rounded,
                       Colors.green,
@@ -267,7 +267,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     const SizedBox(height: 20),
 
                     _buildFeelingSlider(
-                      'Fatiga fÃ­sica',
+                      'Fatiga física',
                       _fatigueValue,
                       Icons.fitness_center_rounded,
                       Colors.orange,
@@ -276,7 +276,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     const SizedBox(height: 20),
 
                     _buildFeelingSlider(
-                      'MotivaciÃ³n',
+                      'Motivación',
                       _motivationValue,
                       Icons.favorite_rounded,
                       Colors.blue,
@@ -324,9 +324,9 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text('EnergÃ­a: $_energyValue/5'),
+                    Text('Energía: $_energyValue/5'),
                     Text('Fatiga: $_fatigueValue/5'),
-                    Text('MotivaciÃ³n: $_motivationValue/5'),
+                    Text('Motivación: $_motivationValue/5'),
                   ],
                 ),
               ),

@@ -9,7 +9,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = CultureFirestoreService.I;
     return Scaffold(
-      appBar: AppBar(title: const Text('AnalÃ­ticas de Cultura')),
+      appBar: AppBar(title: const Text('Analíticas de Cultura')),
       body: FutureBuilder<Map<String, dynamic>>(
         future: svc.quickKpis(),
         builder: (_, s) {
@@ -25,7 +25,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             children: [
               _tile('Libros terminados', '${m['booksDone']}'),
-              _tile('PelÃ­culas vistas', '${m['moviesDone']}'),
+              _tile('Películas vistas', '${m['moviesDone']}'),
               _tile('Series completadas', '${m['seriesDone']}'),
               _tile(
                 'Horas totales de juegos',
@@ -35,7 +35,7 @@ class CultureAnalyticsScreen extends StatelessWidget {
               const ListTile(
                 title: Text('Siguientes ideas'),
                 subtitle: Text(
-                  'â€¢ Racha de lectura diaria\nâ€¢ % de backlog completado\nâ€¢ Tiempo medio por libro / serie / juego',
+                  '• Racha de lectura diaria\n• % de backlog completado\n• Tiempo medio por libro / serie / juego',
                 ),
               ),
             ],

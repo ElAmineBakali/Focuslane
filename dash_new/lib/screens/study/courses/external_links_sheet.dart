@@ -69,7 +69,7 @@ class ExternalLinksSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'Accede rÃ¡pidamente a tus herramientas de estudio',
+              'Accede rápidamente a tus herramientas de estudio',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -176,7 +176,7 @@ class ExternalLinksSheet extends StatelessWidget {
                 _ExternalLinkTile(
                       icon: Icons.code_rounded,
                       title: 'GitHub',
-                      subtitle: 'Repositorios de cÃ³digo',
+                      subtitle: 'Repositorios de código',
                       gradient: LinearGradient(
                         colors: [
                           Colors.purple.shade400,
@@ -218,7 +218,7 @@ class ExternalLinksSheet extends StatelessWidget {
                 _ExternalLinkTile(
                       icon: Icons.library_books_rounded,
                       title: 'Google Scholar',
-                      subtitle: 'ArtÃ­culos acadÃ©micos',
+                      subtitle: 'Artículos académicos',
                       gradient: LinearGradient(
                         colors: [
                           Colors.indigo.shade400,

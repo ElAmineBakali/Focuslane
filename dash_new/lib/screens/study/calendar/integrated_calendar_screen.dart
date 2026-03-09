@@ -23,7 +23,7 @@ class _IntegratedCalendarScreenState extends State<IntegratedCalendarScreen> {
     final svc = widget.svc;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendario acadÃ©mico'),
+        title: const Text('Calendario académico'),
         leading: FocusModuleHeader.buildLeading(
           context,
           mode: FocusModuleLeadingMode.backToModuleDashboard,
@@ -99,7 +99,7 @@ class _DayEventsList extends StatelessWidget {
                         .toList();
                 final items = <Widget>[];
                 if (tasks.isNotEmpty) {
-                  items.add(_SectionHeader(title: 'Tareas/ExÃ¡menes'));
+                  items.add(_SectionHeader(title: 'Tareas/Exámenes'));
                   items.addAll(
                     tasks.map(
                       (t) => ListTile(
@@ -110,7 +110,7 @@ class _DayEventsList extends StatelessWidget {
                         ),
                         title: Text(t.title),
                         subtitle: Text(
-                          'vence: ${t.due} â€¢ prio: ${t.priority.name} â€¢ estado: ${t.status.name}',
+                          'vence: ${t.due} • prio: ${t.priority.name} • estado: ${t.status.name}',
                         ),
                       ),
                     ),
@@ -124,7 +124,7 @@ class _DayEventsList extends StatelessWidget {
                         leading: const Icon(Icons.class_),
                         title: Text('Curso: ${c.courseId}'),
                         subtitle: Text(
-                          '${c.start.format(context)} - ${c.end.format(context)}${c.room != null ? ' â€¢ ${c.room}' : ''}',
+                          '${c.start.format(context)} - ${c.end.format(context)}${c.room != null ? ' • ${c.room}' : ''}',
                         ),
                       ),
                     ),
@@ -137,13 +137,13 @@ class _DayEventsList extends StatelessWidget {
                       (s) => ListTile(
                         leading: const Icon(Icons.timer),
                         title: Text('Curso: ${s.courseId}'),
-                        subtitle: Text('${s.method.name} â€¢ ${s.minutes} min'),
+                        subtitle: Text('${s.method.name} • ${s.minutes} min'),
                       ),
                     ),
                   );
                 }
                 if (items.isEmpty) {
-                  return const Center(child: Text('Sin eventos en este dÃ­a'));
+                  return const Center(child: Text('Sin eventos en este día'));
                 }
                 return ListView(
                   padding: const EdgeInsets.all(12),

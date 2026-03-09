@@ -48,7 +48,7 @@ class OutfitDetailScreen extends StatelessWidget {
                           ),
                 ),
                 title: Text(label),
-                subtitle: Text(p?.nombre ?? 'â€”'),
+                subtitle: Text(p?.nombre ?? '–'),
               );
             }
 
@@ -66,7 +66,7 @@ class OutfitDetailScreen extends StatelessWidget {
                 tile('accessories', 'Accesorios'),
                 const Divider(),
                 Text("Veces usado: ${outfit.vecesUsado}"),
-                Text("Ãšltima vez: ${outfit.ultimaVezUsado ?? 'Nunca'}"),
+                Text("Última vez: ${outfit.ultimaVezUsado ?? 'Nunca'}"),
               ],
             );
           },

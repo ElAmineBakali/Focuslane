@@ -73,7 +73,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'AÃ±adir peso (kg)',
+                          'Añadir peso (kg)',
                           style: theme.textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -96,7 +96,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                                         (s ?? '').replaceAll(',', '.'),
                                       );
                                       if (v == null) {
-                                        return 'Introduce un nÃºmero vÃ¡lido';
+                                        return 'Introduce un número válido';
                                       }
                                       if (v <= 0) return 'Debe ser mayor que 0';
                                       return null;
@@ -152,7 +152,7 @@ class _BodyweightScreenState extends State<BodyweightScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Objetivo (kg) â€¢ lÃ­nea en grÃ¡fica',
+                            'Objetivo (kg) • línea en gráfica',
                             style: theme.textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),

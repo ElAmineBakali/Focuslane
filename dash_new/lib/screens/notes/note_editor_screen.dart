@@ -188,7 +188,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   fontSize: isMobile ? 20 : 24,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'TÃ­tulo',
+                  hintText: 'Título',
                   border: InputBorder.none,
                   hintStyle: TextStyle(color: color.onSurfaceVariant),
                 ),

@@ -21,7 +21,7 @@ class OutfitListScreen extends StatelessWidget {
           }
           final outfits = snapshot.data!;
           if (outfits.isEmpty) {
-            return const Center(child: Text("No tienes outfits aÃºn"));
+            return const Center(child: Text("No tienes outfits aún"));
           }
           return ListView.separated(
             itemCount: outfits.length,
@@ -31,7 +31,7 @@ class OutfitListScreen extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.style),
                 title: Text(o.nombre),
-                subtitle: Text(o.notas.isEmpty ? 'â€”' : o.notas),
+                subtitle: Text(o.notas.isEmpty ? '–' : o.notas),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap:
                     () => Navigator.pushNamed(

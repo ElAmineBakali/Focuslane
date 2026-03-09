@@ -175,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'InformaciÃ³n del perfil',
+                                'Información del perfil',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 12),
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 controller: _nameController,
                                 decoration: const InputDecoration(
                                   labelText: 'Nombre para mostrar',
-                                  hintText: 'Ej: Juan PÃ©rez',
+                                  hintText: 'Ej: Juan Pérez',
                                   prefixIcon: Icon(Icons.badge_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -192,8 +192,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               TextField(
                                 controller: _bioController,
                                 decoration: const InputDecoration(
-                                  labelText: 'Bio / DescripciÃ³n',
-                                  hintText: 'CuÃ©ntanos sobre ti...',
+                                  labelText: 'Bio / Descripción',
+                                  hintText: 'Cuéntanos sobre ti...',
                                   prefixIcon: Icon(Icons.description_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -230,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Datos tÃ©cnicos',
+                                'Datos técnicos',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: scheme.onSurfaceVariant,
                                     ),
@@ -270,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ),
                                     )
                                   : const Icon(Icons.logout),
-                              label: const Text('Cerrar sesiÃ³n'),
+                              label: const Text('Cerrar sesión'),
                               onPressed: _signingOut ? null : _signOut,
                             ),
                           ),
@@ -291,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'DiseÃ±o de color',
+                    'Diseño de color',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -353,7 +353,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 12),
           Text(
-            'Consejo: asegÃºrate de que los botones y textos tengan buen contraste en ambos modos.',
+            'Consejo: asegúrate de que los botones y textos tengan buen contraste en ambos modos.',
             style: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
           ),
           const SizedBox(height: 16),

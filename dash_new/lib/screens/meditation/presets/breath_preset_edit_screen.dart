@@ -66,7 +66,7 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [2, 3, 4, 5, 6, 7, 8, 10],
                 ),
                 _numPicker(
-                  'MantÃ©n (s)',
+                  'Mantén (s)',
                   _hold,
                   (v) => setState(() => _hold = v),
                   [0, 2, 3, 4, 5, 6, 8, 10],
@@ -78,7 +78,7 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [2, 3, 4, 5, 6, 7, 8, 10],
                 ),
                 _numPicker(
-                  'MantÃ©n 2 (s)',
+                  'Mantén 2 (s)',
                   _hold2,
                   (v) => setState(() => _hold2 = v),
                   [0, 2, 3, 4, 5, 6, 8, 10],
@@ -90,14 +90,14 @@ class _BreathPresetEditScreenState extends State<BreathPresetEditScreen> {
                   [3, 4, 5, 6, 7, 8, 10, 12],
                 ),
                 SwitchListTile(
-                  title: const Text('VibraciÃ³n'),
+                  title: const Text('Vibración'),
                   value: _vibration,
                   onChanged: (v) => setState(() => _vibration = v),
                 ),
                 DropdownButtonFormField<String>(
                   initialValue: _visual,
                   items: const [
-                    DropdownMenuItem(value: 'circle', child: Text('CÃ­rculo')),
+                    DropdownMenuItem(value: 'circle', child: Text('Círculo')),
                     DropdownMenuItem(value: 'dot', child: Text('Punto')),
                     DropdownMenuItem(value: 'wave', child: Text('Ola')),
                   ],

@@ -162,8 +162,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   @override
   Widget build(BuildContext context) {
     final subtitle = widget.transaction == null
-      ? 'Nueva transacciÃ³n'
-      : 'Editar transacciÃ³n';
+      ? 'Nueva transacción'
+      : 'Editar transacción';
 
     return FinanceShell(
       selectedIndex: 1,

@@ -32,7 +32,7 @@ class StudyPantryScreen extends StatelessWidget {
           children: [
             const FocusSectionTitle(
               title: 'Notas y asistencia',
-              subtitle: 'Seguimiento acadÃ©mico',
+              subtitle: 'Seguimiento académico',
             ),
             FocusCard(
               onTap: () {

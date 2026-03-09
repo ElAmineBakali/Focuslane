@@ -29,7 +29,7 @@ class SubscriptionsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Nueva suscripciÃ³n',
+            tooltip: 'Nueva suscripción',
             onPressed: () =>
                 Navigator.pushNamed(context, '/finance/subscriptions/form'),
           ),

@@ -67,11 +67,11 @@ class _ReminderEditScreenState extends State<ReminderEditScreen> {
                   reminder,
                 );
 
-                // Programar notificaciÃ³n diaria (simple por ahora)
+                // Programar notificación diaria (simple por ahora)
                 await NotificationService.I.scheduleDaily(
                   id: _notifId(id),
-                  title: 'MeditaciÃ³n',
-                  body: 'TÃ³mate 5â€“10 min para meditar ðŸ§˜',
+                  title: 'Meditación',
+                  body: 'Tómate 5—10 min para meditar ðŸ§˜',
                   at: _parseTime(reminder.timeOfDay),
                   useExact: true,
                 );

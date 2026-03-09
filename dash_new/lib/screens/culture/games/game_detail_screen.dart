@@ -60,9 +60,9 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.sports_esports),
-              title: Text('${g.platform} â€¢ ${g.hours.toStringAsFixed(1)} h'),
+              title: Text('${g.platform} • ${g.hours.toStringAsFixed(1)} h'),
               subtitle: Text(
-                'Estado: ${g.status.name} â€¢ ${g.progressPct}% â€¢ Dificultad: ${g.difficulty ?? "-"} â€¢ Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${g.status.name} • ${g.progressPct}% • Dificultad: ${g.difficulty ?? "-"} • Rating: ${g.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -103,7 +103,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                           controller: _prog,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'Progreso % (despuÃ©s)',
+                            labelText: 'Progreso % (después)',
                           ),
                         ),
                       ),
@@ -133,7 +133,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       _prog.clear();
                       _note.clear();
                     },
-                    child: const Text('AÃ±adir sesiÃ³n'),
+                    child: const Text('Añadir sesión'),
                   ),
                   const Divider(),
                   StreamBuilder<List<GameSession>>(
@@ -157,10 +157,10 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                                               .split('.')
                                               .first +
                                           (x.progressAfter != null
-                                              ? ' â€¢ ${x.progressAfter}%'
+                                              ? ' • ${x.progressAfter}%'
                                               : '') +
                                           (x.notes != null
-                                              ? ' â€¢ ${x.notes}'
+                                              ? ' • ${x.notes}'
                                               : ''),
                                     ),
                                   ),

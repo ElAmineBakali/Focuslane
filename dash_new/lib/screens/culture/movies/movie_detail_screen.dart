@@ -13,7 +13,7 @@ class MovieDetailScreen extends StatelessWidget {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
     if (arg is! Movie) {
-      return const Scaffold(body: Center(child: Text('Sin pelÃ­cula')));
+      return const Scaffold(body: Center(child: Text('Sin película')));
     }
     final m = arg;
 
@@ -44,9 +44,9 @@ class MovieDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.local_movies),
-              title: Text('${m.year ?? "â€”"} â€¢ ${m.minutes ?? "-"} min'),
+              title: Text('${m.year ?? "–"} • ${m.minutes ?? "-"} min'),
               subtitle: Text(
-                'Estado: ${m.status.name} â€¢ Rating: ${m.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${m.status.name} • Rating: ${m.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -69,7 +69,7 @@ class MovieDetailScreen extends StatelessWidget {
           const ListTile(
             title: Text('Sugerencias'),
             subtitle: Text(
-              'â€¢ Marca â€œvistaâ€ cuando la termines\nâ€¢ AÃ±ade a una colecciÃ³n temÃ¡tica',
+              '• Marca “vistaâ€ cuando la termines\n• Añade a una colección temática',
             ),
           ),
         ],

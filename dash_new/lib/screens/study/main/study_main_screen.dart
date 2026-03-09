@@ -63,7 +63,7 @@ class _StudyMainScreenState extends State<StudyMainScreen> {
         index: _selectedIndex,
         children: _screens(),
       ),
-      moduleTitle: 'MÃ³dulo Study',
+      moduleTitle: 'Módulo Study',
       moduleIcon: Icons.school,
     );
   }

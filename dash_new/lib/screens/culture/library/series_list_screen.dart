@@ -68,7 +68,7 @@ class _SeriesListScreenState extends State<SeriesListScreen> {
               return ListTile(
                 leading: const Icon(Icons.tv),
                 title: Text(x.title),
-                subtitle: Text('${x.platform ?? "â€”"} â€¢ ${x.status.name}'),
+                subtitle: Text('${x.platform ?? "–"} • ${x.status.name}'),
                 trailing: Text(x.rating?.toStringAsFixed(1) ?? '-'),
                 onTap:
                     () => Navigator.pushNamed(

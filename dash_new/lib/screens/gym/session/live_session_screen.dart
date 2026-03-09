@@ -226,7 +226,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               FilledButton.icon(
                 onPressed: () => Navigator.pop(context, true),
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('AÃ±adir'),
+                label: const Text('Añadir'),
                 style: FilledButton.styleFrom(
                   backgroundColor: widget.routine.color,
                   padding: const EdgeInsets.symmetric(
@@ -474,7 +474,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'AÃ±ade ejercicios a este dÃ­a para empezar',
+                          'Añade ejercicios a este día para empezar',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: s.onSurfaceVariant),
                         ),
@@ -496,8 +496,8 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         maxLines: 3,
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
-                          labelText: 'Notas de la sesiÃ³n',
-                          hintText: 'CÃ³mo te sentiste, observaciones...',
+                          labelText: 'Notas de la sesión',
+                          hintText: 'Cómo te sentiste, observaciones...',
                           prefixIcon: const Icon(Icons.note_rounded),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -632,7 +632,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              content: Text('Â¿Eliminar "$exName" de este dÃ­a?'),
+                              content: Text('¿Eliminar "$exName" de este día?'),
                               actions: [
                                 TextButton(
                                   onPressed:
@@ -789,7 +789,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  'AÃ±ade tu primera serie',
+                  'Añade tu primera serie',
                   style: TextStyle(
                     fontSize: 14,
                     color: s.onSurfaceVariant,

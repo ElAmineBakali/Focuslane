@@ -282,7 +282,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          '${routine.days.length} dÃ­as/semana',
+                          '${routine.days.length} días/semana',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.grey[600],
@@ -426,7 +426,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                           const SizedBox(height: 24),
 
                           Text(
-                            'Estructura (${routine.days.length} dÃ­as)',
+                            'Estructura (${routine.days.length} días)',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -498,11 +498,11 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
       builder:
           (context) => AlertDialog(
             title: Text(
-              'Â¿Aplicar rutina?',
+              '¿Aplicar rutina?',
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              'Â¿Quieres crear "${routine.name}" como tu nueva rutina? PodrÃ¡s editarla despuÃ©s.',
+              '¿Quieres crear "${routine.name}" como tu nueva rutina? Podrás editarla después.',
               style: GoogleFonts.poppins(),
             ),
             actions: [

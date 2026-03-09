@@ -47,7 +47,7 @@ class TimetablesListScreen extends StatelessWidget {
                 leading: const Icon(Icons.view_week),
                 title: Text(t.name),
                 subtitle: Text(
-                  '${t.days.join(', ')} â€¢ ${t.startHour}â€“${t.endHour} â€¢ ${t.slotMinutes}\'',
+                  '${t.days.join(', ')} • ${t.startHour}—${t.endHour} • ${t.slotMinutes}\'',
                 ),
                 trailing: Icon(t.isDefault ? Icons.star : Icons.chevron_right),
                 onTap:

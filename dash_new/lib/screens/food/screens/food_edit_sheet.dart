@@ -145,7 +145,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                     children: [
                       Expanded(
                         child: FoodCompactTextField(
-                          label: 'TamaÃ±o porciÃ³n',
+                          label: 'Tamaño porción',
                           controller: _servingSizeController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.scale,
@@ -168,7 +168,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'InformaciÃ³n Nutricional',
+                    'Información Nutricional',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -178,7 +178,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                     children: [
                       Expanded(
                         child: FoodCompactTextField(
-                          label: 'CalorÃ­as',
+                          label: 'Calorías',
                           controller: _kcalController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.local_fire_department,
@@ -193,7 +193,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: FoodCompactTextField(
-                          label: 'ProteÃ­na',
+                          label: 'Proteína',
                           controller: _proteinController,
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.fitness_center,
@@ -260,7 +260,7 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
                     onChanged: (value) => setState(() => _isSupp = value),
                     title: const Text('Es suplemento'),
                     subtitle: const Text(
-                      'Marca si es proteÃ­na en polvo, creatina, etc.',
+                      'Marca si es proteína en polvo, creatina, etc.',
                     ),
                     activeThumbColor: colorScheme.primary,
                     dense: true,

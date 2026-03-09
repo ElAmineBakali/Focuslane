@@ -223,7 +223,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                   decoration: deco('market / limit / stop'),
                 ),
                 const SizedBox(height: 12),
-                Text('TamaÃ±o (Size)', style: tt.titleMedium),
+                Text('Tamaño (Size)', style: tt.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _sizeCtrl,
@@ -270,7 +270,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                   decoration: deco('Close price'),
                 ),
                 const SizedBox(height: 12),
-                Text('ComisiÃ³n', style: tt.titleMedium),
+                Text('Comisión', style: tt.titleMedium),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _commissionCtrl,
@@ -313,7 +313,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                 ),
                 const SizedBox(height: 12),
                 SwitchListTile(
-                  title: const Text('Â¿CumplÃ­ la estrategia?'),
+                  title: const Text('¿Cumplí la estrategia?'),
                   value: _strategyOk,
                   onChanged: (v) => setState(() => _strategyOk = v),
                 ),
@@ -325,7 +325,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                 TextFormField(
                   controller: _commentsCtrl,
                   maxLines: 4,
-                  decoration: deco('Ideas, psicologÃ­a, gestiÃ³nâ€¦'),
+                  decoration: deco('Ideas, psicología, gestiónâ€¦'),
                 ),
                 const SizedBox(height: 16),
 
@@ -350,7 +350,7 @@ class _TradingJournalEditScreenState extends State<TradingJournalEditScreen> {
                     TextButton.icon(
                       onPressed: _pickImage,
                       icon: const Icon(Icons.image_outlined),
-                      label: const Text('GalerÃ­a / Archivos'),
+                      label: const Text('Galería / Archivos'),
                     ),
                   ],
                 ),

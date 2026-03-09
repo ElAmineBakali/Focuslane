@@ -62,7 +62,7 @@ class GradesScreen extends StatelessWidget {
                     leading: const Icon(Icons.assignment_turned_in),
                     title: Text('Tarea: ${g.taskId}'),
                     subtitle: Text(
-                      'Nota: ${g.grade.toStringAsFixed(2)} â€¢ ${g.date.toLocal()}',
+                      'Nota: ${g.grade.toStringAsFixed(2)} • ${g.date.toLocal()}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
@@ -100,7 +100,7 @@ class _AddGradeDialogState extends State<_AddGradeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Agregar calificaciÃ³n'),
+      title: const Text('Agregar calificación'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -168,7 +168,7 @@ class _EditGradeDialogState extends State<_EditGradeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Editar calificaciÃ³n'),
+      title: const Text('Editar calificación'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -94,7 +94,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _symbol,
-                        decoration: const InputDecoration(labelText: 'SÃ­mbolo'),
+                        decoration: const InputDecoration(labelText: 'Símbolo'),
                         textCapitalization: TextCapitalization.characters,
                         validator:
                             (v) =>
@@ -148,7 +148,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                         validator:
                             (v) =>
                                 double.tryParse(v ?? '') == null
-                                    ? 'InvÃ¡lido'
+                                    ? 'Inválido'
                                     : null,
                       ),
                     ),
@@ -160,12 +160,12 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                           decimal: true,
                         ),
                         decoration: const InputDecoration(
-                          labelText: 'TamaÃ±o (unidades)',
+                          labelText: 'Tamaño (unidades)',
                         ),
                         validator:
                             (v) =>
                                 double.tryParse(v ?? '') == null
-                                    ? 'InvÃ¡lido'
+                                    ? 'Inválido'
                                     : null,
                       ),
                     ),
@@ -246,7 +246,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event_available),
                   title: Text(
-                    'Salida: ${_exitDate != null ? _exitDate!.toLocal().toString().split(" ").first : "â€”"}',
+                    'Salida: ${_exitDate != null ? _exitDate!.toLocal().toString().split(" ").first : "–"}',
                   ),
                   onTap: () async {
                     final d = await showDatePicker(
@@ -305,7 +305,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: _calcRisk,
-                      child: const Text('Calcular tamaÃ±o'),
+                      child: const Text('Calcular tamaño'),
                     ),
                   ],
                 ),
@@ -313,7 +313,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      'TamaÃ±o sugerido: ${_calcSize?.toStringAsFixed(2) ?? "-"}  â€¢  R esperado: ${_expR?.toStringAsFixed(2) ?? "-"}',
+                      'Tamaño sugerido: ${_calcSize?.toStringAsFixed(2) ?? "-"}  •  R esperado: ${_expR?.toStringAsFixed(2) ?? "-"}',
                     ),
                   ),
 

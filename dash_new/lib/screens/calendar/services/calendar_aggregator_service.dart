@@ -444,7 +444,7 @@ class CalendarAggregatorService {
                 notes: [
                   cat,
                   if (amount != 0) amount.toStringAsFixed(2),
-                ].where((e) => e.isNotEmpty).join(' â€¢ '),
+                ].where((e) => e.isNotEmpty).join(' • '),
               );
             })
             .whereType<CalendarEvent>()

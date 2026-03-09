@@ -124,7 +124,7 @@ class _CourseDetailEditableScreenState
               style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              'Â¿EstÃ¡s seguro de que deseas archivar este curso? PodrÃ¡s restaurarlo mÃ¡s tarde.',
+              '¿Estás seguro de que deseas archivar este curso? Podrás restaurarlo más tarde.',
               style: GoogleFonts.plusJakartaSans(),
             ),
             actions: [
@@ -158,7 +158,7 @@ class _CourseDetailEditableScreenState
               style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
             content: Text(
-              'Â¿EstÃ¡s seguro de que deseas eliminar este curso? Esta acciÃ³n no se puede deshacer.',
+              '¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.',
               style: GoogleFonts.plusJakartaSans(),
             ),
             actions: [
@@ -291,7 +291,7 @@ class _CourseDetailEditableScreenState
                   children: [
                     if (_isEditing) ...[
                       Text(
-                        'InformaciÃ³n del curso',
+                        'Información del curso',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -318,7 +318,7 @@ class _CourseDetailEditableScreenState
                           Expanded(
                             child: _TaskFormTextField(
                               controller: _creditsController,
-                              label: 'CrÃ©ditos',
+                              label: 'Créditos',
                               icon: Icons.star_rounded,
                               keyboardType: TextInputType.number,
                             ),
@@ -396,7 +396,7 @@ class _CourseDetailEditableScreenState
                           Expanded(
                             child: _StatCard(
                               icon: Icons.star_rounded,
-                              label: 'CrÃ©ditos',
+                              label: 'Créditos',
                               value: widget.course.credits?.toString() ?? '-',
                               color: Colors.amber,
                             ),

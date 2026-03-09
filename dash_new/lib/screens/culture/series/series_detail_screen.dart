@@ -61,9 +61,9 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.tv),
-              title: Text(x.platform ?? 'â€”'),
+              title: Text(x.platform ?? '–'),
               subtitle: Text(
-                'Estado: ${x.status.name} â€¢ Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${x.status.name} • Rating: ${x.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -105,7 +105,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                   TextField(
                     controller: _title,
                     decoration: const InputDecoration(
-                      labelText: 'TÃ­tulo (opcional)',
+                      labelText: 'Título (opcional)',
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -123,7 +123,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                       await svc.addEpisode(x.id, ep);
                       _title.clear();
                     },
-                    child: const Text('AÃ±adir episodio'),
+                    child: const Text('Añadir episodio'),
                   ),
                   const Divider(),
                   StreamBuilder<List<Episode>>(
@@ -136,7 +136,7 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      if (data.isEmpty) return const Text('Sin episodios aÃºn');
+                      if (data.isEmpty) return const Text('Sin episodios aún');
                       return Column(
                         children:
                             data

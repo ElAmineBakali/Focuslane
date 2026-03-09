@@ -43,7 +43,7 @@ class _GymMainScreenState extends State<GymMainScreen> {
       const ModuleSidebarItem(icon: Icons.receipt_long, label: 'Diario'),
       const ModuleSidebarItem(icon: Icons.list_alt, label: 'Rutinas'),
       const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
-      const ModuleSidebarItem(icon: Icons.bar_chart, label: 'AnalÃ­ticas'),
+      const ModuleSidebarItem(icon: Icons.bar_chart, label: 'Analíticas'),
       const ModuleSidebarItem(icon: Icons.monitor_weight, label: 'Cuerpo'),
       const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
       const ModuleSidebarItem(icon: Icons.tune, label: 'Objetivos'),
@@ -57,7 +57,7 @@ class _GymMainScreenState extends State<GymMainScreen> {
         index: _selectedIndex,
         children: _screens(),
       ),
-      moduleTitle: 'MÃ³dulo Gym',
+      moduleTitle: 'Módulo Gym',
       moduleIcon: Icons.fitness_center,
     );
   }

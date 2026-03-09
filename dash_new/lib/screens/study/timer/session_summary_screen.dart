@@ -25,7 +25,7 @@ class SessionSummaryScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.bookmark),
             title: Text('Curso: ${session.courseId}'),
-            subtitle: Text('MÃ©todo: ${session.method.name}'),
+            subtitle: Text('Método: ${session.method.name}'),
           ),
           Card(
             child: ListTile(
@@ -35,7 +35,7 @@ class SessionSummaryScreen extends StatelessWidget {
                 [
                   if (session.cycles != null) 'Ciclos: ${session.cycles}',
                   if (session.laps != null) 'Laps: ${session.laps}',
-                ].join(' â€¢ '),
+                ].join(' • '),
               ),
             ),
           ),

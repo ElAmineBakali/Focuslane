@@ -38,7 +38,7 @@ class GymNotificationService {
     final id = 'gym_routine_${routineId}_$dayId';
     await NotificationService.I.scheduleWeeklyReminder(
       id: id,
-      title: 'ðŸ’ª DÃ­a de entrenamiento',
+      title: 'ðŸ’ª Día de entrenamiento',
       body: '$routineName - $dayName',
       weekdays: [_dayIntToEnum(weekday)],
       time: time,
@@ -72,7 +72,7 @@ class GymNotificationService {
     await NotificationService.I.scheduleOnce(
       id: _inactivityId,
       title: 'ðŸ‹ï¸ Vuelve al gym',
-      body: 'Llevas $days dÃ­as sin entrenar. Â¡Hora de una sesiÃ³n!',
+      body: 'Llevas $days días sin entrenar. ¡Hora de una sesión!',
       whenLocal: at,
       useExact: false,
       payload: 'GYM_INACTIVITY',
@@ -142,7 +142,7 @@ class GymNotificationService {
     await NotificationService.I.scheduleWeeklyReminder(
       id: 'gym_weekly_measurements',
       title: 'ðŸ“ Medidas corporales',
-      body: 'Registra tus medidas fÃ­sicas de esta semana',
+      body: 'Registra tus medidas físicas de esta semana',
       weekdays: [_dayIntToEnum(weekday)],
       time: t,
       payload: 'GYM_MEASUREMENTS',

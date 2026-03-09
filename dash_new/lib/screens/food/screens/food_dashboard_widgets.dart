@@ -72,7 +72,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'AÃºn no tienes un plan semanal activo.',
+              'Aún no tienes un plan semanal activo.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -193,7 +193,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
                       }),
                       if (remaining > 0)
                         Text(
-                          '+$remaining mÃ¡s',
+                          '+$remaining más',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 10,
@@ -225,7 +225,7 @@ class FoodWeeklyPlanCard extends StatelessWidget {
   String _formatDayLabel(String key) {
     final parsed = DateTime.tryParse(key);
     if (parsed != null) {
-      final weekdays = ['Lun', 'Mar', 'MiÃ©', 'Jue', 'Vie', 'SÃ¡b', 'Dom'];
+      final weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
       return '${weekdays[parsed.weekday - 1]} ${parsed.day}';
     }
     switch (key) {
@@ -234,13 +234,13 @@ class FoodWeeklyPlanCard extends StatelessWidget {
       case 'Tue':
         return 'Mar';
       case 'Wed':
-        return 'MiÃ©';
+        return 'Mié';
       case 'Thu':
         return 'Jue';
       case 'Fri':
         return 'Vie';
       case 'Sat':
-        return 'SÃ¡b';
+        return 'Sáb';
       case 'Sun':
         return 'Dom';
       default:
@@ -406,7 +406,7 @@ class FoodRecipeCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${protein.toStringAsFixed(0)}g proteÃ­na',
+                '${protein.toStringAsFixed(0)}g proteína',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
@@ -572,7 +572,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                         ),
                         Text(
                           item.total != null
-                              ? '$qtyText â€¢ â‚¬${item.total!.toStringAsFixed(2)}'
+                              ? '$qtyText • â‚¬${item.total!.toStringAsFixed(2)}'
                               : qtyText,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
@@ -590,7 +590,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '+ ${pendingItems.length - 6} productos mÃ¡s',
+                '+ ${pendingItems.length - 6} productos más',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,

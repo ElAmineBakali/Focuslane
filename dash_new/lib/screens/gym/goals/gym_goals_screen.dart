@@ -80,7 +80,7 @@ class GymGoalsScreen extends StatelessWidget {
                                   final v = double.tryParse(
                                     (s ?? '').replaceAll(',', '.'),
                                   );
-                                  if (v == null) return 'NÃºmero vÃ¡lido';
+                                  if (v == null) return 'Número válido';
                                   if (v <= 0) return 'Mayor que 0';
                                   return null;
                                 },
@@ -131,7 +131,7 @@ class GymGoalsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'PrÃ³ximamente: objetivos por ejercicio (peso/reps/volumen)â€¦',
+                'Próximamente: objetivos por ejercicio (peso/reps/volumen)â€¦',
               ),
             ],
           );

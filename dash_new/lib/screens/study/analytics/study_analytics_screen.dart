@@ -19,7 +19,7 @@ class StudyAnalyticsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'AnalÃ­ticas',
+          'Analíticas',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         leading: FocusModuleHeader.buildLeading(
@@ -231,7 +231,7 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
             children: [
               const ListTile(
                 leading: Icon(Icons.calendar_today),
-                title: Text('DÃ­as activos por curso'),
+                title: Text('Días activos por curso'),
               ),
               if (items.isEmpty)
                 const Padding(
@@ -242,7 +242,7 @@ class _ActiveDaysByCourseCard extends StatelessWidget {
                 ...items.map(
                   (e) => ListTile(
                     title: Text(e.key),
-                    trailing: Text('${e.value} dÃ­as'),
+                    trailing: Text('${e.value} días'),
                   ),
                 ),
             ],
@@ -291,7 +291,7 @@ class _StreakCard extends StatelessWidget {
               color: Colors.orange,
             ),
             title: const Text('Racha de estudio'),
-            subtitle: Text('$streak dÃ­as seguidos'),
+            subtitle: Text('$streak días seguidos'),
           ),
         );
       },
@@ -345,7 +345,7 @@ class _MinutesBarCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Minutos Ãºltimos 30 dÃ­as'),
+                const Text('Minutos últimos 30 días'),
                 SizedBox(
                   height: 220,
                   child: BarChart(
@@ -396,12 +396,12 @@ class _MethodDistributionCard extends StatelessWidget {
             children: [
               const ListTile(
                 leading: Icon(Icons.pie_chart),
-                title: Text('DistribuciÃ³n por mÃ©todo'),
+                title: Text('Distribución por método'),
               ),
               if (items.isEmpty)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 12),
-                  child: Text('Sin sesiones todavÃ­a'),
+                  child: Text('Sin sesiones todavía'),
                 )
               else
                 ...items.map(

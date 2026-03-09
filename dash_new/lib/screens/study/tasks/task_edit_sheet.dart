@@ -292,12 +292,12 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
 
                       ModernTextField(
                         controller: _titleController,
-                        label: 'TÃ­tulo*',
+                        label: 'Título*',
                         hint: 'Ej: Entregar ensayo',
                         prefixIcon: Icons.title_rounded,
                         validator: (value) {
                           if (value?.trim().isEmpty ?? true) {
-                            return 'El tÃ­tulo es obligatorio';
+                            return 'El título es obligatorio';
                           }
                           return null;
                         },
@@ -451,7 +451,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                       const SizedBox(height: AppSpacing.lg),
 
                       Text(
-                        'Fecha lÃ­mite',
+                        'Fecha límite',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -497,7 +497,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                                 child: Text(
                                   _dueDate != null
                                       ? '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}'
-                                      : 'Sin fecha lÃ­mite',
+                                      : 'Sin fecha límite',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

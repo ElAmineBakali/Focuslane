@@ -67,9 +67,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     PopupMenuItem(value: 'updated', child: Text('Recientes')),
                     PopupMenuItem(
                       value: 'created',
-                      child: Text('MÃ¡s antiguos'),
+                      child: Text('Más antiguos'),
                     ),
-                    PopupMenuItem(value: 'title', child: Text('Por tÃ­tulo')),
+                    PopupMenuItem(value: 'title', child: Text('Por título')),
                   ],
             ),
           if (!isPhone) ...[
@@ -89,9 +89,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     ),
                     DropdownMenuItem(
                       value: 'created',
-                      child: Text('MÃ¡s antiguos'),
+                      child: Text('Más antiguos'),
                     ),
-                    DropdownMenuItem(value: 'title', child: Text('Por tÃ­tulo')),
+                    DropdownMenuItem(value: 'title', child: Text('Por título')),
                   ],
                   onChanged: (v) {
                     if (v != null) setState(() => _sort = v);
@@ -141,7 +141,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Toca el botÃ³n + para crear una',
+                    'Toca el botón + para crear una',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: color.onSurfaceVariant,
                     ),
@@ -237,7 +237,7 @@ class _NoteTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          note.title.isEmpty ? 'Sin tÃ­tulo' : note.title,
+                          note.title.isEmpty ? 'Sin título' : note.title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: color.onSurface,
@@ -373,7 +373,7 @@ class _NoteCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          note.title.isEmpty ? 'Sin tÃ­tulo' : note.title,
+                          note.title.isEmpty ? 'Sin título' : note.title,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: color.onSurface,
@@ -393,7 +393,7 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    preview.isEmpty ? 'Nota vacÃ­a' : preview,
+                    preview.isEmpty ? 'Nota vacía' : preview,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: color.onSurfaceVariant,
                       fontSize: isMobile ? 12 : 13,

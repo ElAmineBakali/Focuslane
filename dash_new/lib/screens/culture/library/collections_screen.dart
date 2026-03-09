@@ -23,7 +23,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             icon: const Icon(Icons.add),
             onPressed: () async {
               await svc.addCollection(
-                CultureCollection(id: '', name: 'Nueva colecciÃ³n'),
+                CultureCollection(id: '', name: 'Nueva colección'),
               );
             },
           ),
@@ -37,7 +37,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (data.isEmpty) {
-            return const Center(child: Text('Crea tu primera colecciÃ³n'));
+            return const Center(child: Text('Crea tu primera colección'));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
@@ -51,7 +51,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                   title: Text(c.name),
                   subtitle: Text(
                     '${c.items.length} elementos'
-                    '${c.targetDate != null ? " â€¢ objetivo ${c.targetDate!.toLocal().toString().split(" ").first}" : ""}',
+                    '${c.targetDate != null ? " • objetivo ${c.targetDate!.toLocal().toString().split(" ").first}" : ""}',
                   ),
                   onTap: () => _editCollection(context, svc, c),
                 ),
@@ -92,7 +92,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Editar colecciÃ³n',
+                            'Editar colección',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 8),
@@ -106,7 +106,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                           TextField(
                             controller: desc,
                             decoration: const InputDecoration(
-                              labelText: 'DescripciÃ³n',
+                              labelText: 'Descripción',
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -115,7 +115,7 @@ class _CollectionsScreenState extends State<CollectionsScreen> {
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.event),
                             title: Text(
-                              'Fecha objetivo: ${target != null ? target!.toLocal().toString().split(" ").first : "â€”"}',
+                              'Fecha objetivo: ${target != null ? target!.toLocal().toString().split(" ").first : "–"}',
                             ),
                             onTap: () async {
                               final d = await showDatePicker(

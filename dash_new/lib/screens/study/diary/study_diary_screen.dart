@@ -42,7 +42,7 @@ class StudyDiaryScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Iniciar sesiÃ³n'),
+                child: const Text('Iniciar sesión'),
               ),
             ),
             StreamBuilder<List<StudySession>>(

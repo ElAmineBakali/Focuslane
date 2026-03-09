@@ -19,7 +19,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PelÃ­culas'),
+        title: const Text('Películas'),
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Atajos',
@@ -58,7 +58,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin pelÃ­culas'));
+          if (data.isEmpty) return const Center(child: Text('Sin películas'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -68,7 +68,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
                 leading: const Icon(Icons.local_movies_outlined),
                 title: Text(m.title),
                 subtitle: Text(
-                  '${m.year ?? "â€”"} â€¢ ${m.saga ?? ""} â€¢ ${m.status.name}',
+                  '${m.year ?? "–"} • ${m.saga ?? ""} • ${m.status.name}',
                 ),
                 trailing: Text(m.rating?.toStringAsFixed(1) ?? '-'),
                 onTap:

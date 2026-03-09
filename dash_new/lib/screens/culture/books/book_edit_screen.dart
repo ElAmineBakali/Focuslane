@@ -61,7 +61,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Debes iniciar sesiÃ³n para subir PDF')),
+          const SnackBar(content: Text('Debes iniciar sesión para subir PDF')),
         );
         return;
       }
@@ -135,7 +135,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
             children: [
               TextFormField(
                 controller: _title,
-                decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                decoration: const InputDecoration(labelText: 'Título'),
                 validator:
                     (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
@@ -145,17 +145,17 @@ class _BookEditScreenState extends State<BookEditScreen> {
               ),
               TextFormField(
                 controller: _genre,
-                decoration: const InputDecoration(labelText: 'GÃ©nero'),
+                decoration: const InputDecoration(labelText: 'Género'),
               ),
               TextFormField(
                 controller: _year,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'AÃ±o'),
+                decoration: const InputDecoration(labelText: 'Año'),
               ),
               TextFormField(
                 controller: _pages,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'PÃ¡ginas totales'),
+                decoration: const InputDecoration(labelText: 'Páginas totales'),
               ),
               TextFormField(
                 controller: _cover,
@@ -201,7 +201,7 @@ class _BookEditScreenState extends State<BookEditScreen> {
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('ValoraciÃ³n (0..10)'),
+                title: const Text('Valoración (0..10)'),
                 trailing: SizedBox(
                   width: 100,
                   child: TextField(

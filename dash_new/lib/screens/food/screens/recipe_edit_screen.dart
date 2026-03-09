@@ -87,10 +87,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               indicatorColor: FocuslaneUI.accent(context),
               isScrollable: true,
               tabs: const [
-                Tab(icon: Icon(Icons.info), text: 'InformaciÃ³n'),
+                Tab(icon: Icon(Icons.info), text: 'Información'),
                 Tab(icon: Icon(Icons.restaurant), text: 'Ingredientes'),
                 Tab(icon: Icon(Icons.list_alt), text: 'Pasos'),
-                Tab(icon: Icon(Icons.analytics), text: 'NutriciÃ³n'),
+                Tab(icon: Icon(Icons.analytics), text: 'Nutrición'),
               ],
             ),
             Expanded(
@@ -166,7 +166,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           const SizedBox(height: AppSpacing.md),
 
           ModernTextField(
-            label: 'DescripciÃ³n',
+            label: 'Descripción',
             hint: 'Opcional',
             controller: _descController,
             prefixIcon: Icons.description,
@@ -176,7 +176,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           const SizedBox(height: AppSpacing.md),
 
           ModernTextField(
-            label: 'NÃºmero de raciones*',
+            label: 'Número de raciones*',
             hint: '4',
             controller: _servingsController,
             keyboardType: TextInputType.number,
@@ -198,7 +198,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                 ),
               ),
               ModernChip(
-                label: '+ AÃ±adir',
+                label: '+ Añadir',
                 icon: Icons.add,
                 color: FocuslaneUI.accent(context),
                 onTap: _addTag,
@@ -219,8 +219,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               icon: Icons.restaurant_outlined,
               message: 'No hay ingredientes',
               subtitle:
-                  'AÃ±ade ingredientes para calcular automÃ¡ticamente las macros',
-              actionLabel: 'AÃ±adir ingrediente',
+                  'Añade ingredientes para calcular automáticamente las macros',
+              actionLabel: 'Añadir ingrediente',
               onAction: _addIngredient,
             ),
           )
@@ -251,7 +251,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: ModernPrimaryButton(
-            label: 'AÃ±adir Ingrediente',
+            label: 'Añadir Ingrediente',
             icon: Icons.add,
             fullWidth: true,
             color: FocuslaneUI.accent(context),
@@ -270,8 +270,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
             child: ModernEmptyState(
               icon: Icons.list_alt_outlined,
               message: 'No hay pasos',
-              subtitle: 'AÃ±ade los pasos de preparaciÃ³n',
-              actionLabel: 'AÃ±adir paso',
+              subtitle: 'Añade los pasos de preparación',
+              actionLabel: 'Añadir paso',
               onAction: _addStep,
             ),
           )
@@ -302,7 +302,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: ModernPrimaryButton(
-            label: 'AÃ±adir Paso',
+            label: 'Añadir Paso',
             icon: Icons.add,
             fullWidth: true,
             color: FocuslaneUI.accent(context),
@@ -339,13 +339,13 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Auto-cÃ¡lculo de Macros',
+                    'Auto-cálculo de Macros',
                     style: AppTypography.heading3(context),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'AÃ±ade ingredientes con cantidades y presiona el botÃ³n de calcular para obtener automÃ¡ticamente los valores nutricionales',
+                    'Añade ingredientes con cantidades y presiona el botón de calcular para obtener automáticamente los valores nutricionales',
                     style: AppTypography.body(context),
                     textAlign: TextAlign.center,
                   ),
@@ -353,7 +353,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                   ModernPrimaryButton(
                     label:
                         _ingredients.isEmpty
-                            ? 'AÃ±ade ingredientes primero'
+                            ? 'Añade ingredientes primero'
                             : 'Calcular Macros Ahora',
                     icon: Icons.calculate,
                     fullWidth: true,
@@ -369,7 +369,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'InformaciÃ³n Nutricional Total',
+                  'Información Nutricional Total',
                   style: AppTypography.heading3(context),
                 ),
                 ModernBadge(
@@ -419,10 +419,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Text('AÃ±adir Etiqueta', style: AppTypography.heading3(ctx)),
+            title: Text('Añadir Etiqueta', style: AppTypography.heading3(ctx)),
             content: ModernTextField(
               label: 'Etiqueta',
-              hint: 'Ej: vegano, rÃ¡pido, saludable',
+              hint: 'Ej: vegano, rápido, saludable',
               controller: controller,
               prefixIcon: Icons.label,
             ),
@@ -433,7 +433,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-                child: const Text('AÃ±adir'),
+                child: const Text('Añadir'),
               ),
             ],
           ),
@@ -447,7 +447,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
   Future<void> _addIngredient() async {
     FoodFeedback.showInfo(
       context,
-      'AÃ±adir ingrediente estarÃ¡ disponible pronto',
+      'Añadir ingrediente estará disponible pronto',
     );
   }
 
@@ -459,10 +459,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Text('AÃ±adir Paso', style: AppTypography.heading3(ctx)),
+            title: Text('Añadir Paso', style: AppTypography.heading3(ctx)),
             content: ModernTextField(
-              label: 'DescripciÃ³n del paso',
-              hint: 'Ej: Precalentar el horno a 180Â°C',
+              label: 'Descripción del paso',
+              hint: 'Ej: Precalentar el horno a 180°C',
               controller: controller,
               prefixIcon: Icons.edit,
               maxLines: 3,
@@ -474,7 +474,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-                child: const Text('AÃ±adir'),
+                child: const Text('Añadir'),
               ),
             ],
           ),
@@ -493,7 +493,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
           (ctx) => AlertDialog(
             title: Text('Editar Paso', style: AppTypography.heading3(ctx)),
             content: ModernTextField(
-              label: 'DescripciÃ³n del paso',
+              label: 'Descripción del paso',
               controller: controller,
               prefixIcon: Icons.edit,
               maxLines: 3,
@@ -718,7 +718,7 @@ class _NutritionSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Por raciÃ³n',
+                'Por ración',
                 style: AppTypography.heading3(
                   context,
                   color: Theme.of(context).colorScheme.onPrimary,
@@ -754,7 +754,7 @@ class _NutritionSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _MacroDisplay(
-                label: 'ProteÃ­nas',
+                label: 'Proteínas',
                 value: perServing['protein']!.toStringAsFixed(1),
                 unit: 'g',
               ),

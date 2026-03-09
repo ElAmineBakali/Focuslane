@@ -212,7 +212,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   ModernTextField(
                     controller: _nameController,
                     label: 'Nombre del curso*',
-                    hint: 'Ej: Ãlgebra lineal',
+                    hint: 'Ej: Álgebra lineal',
                     prefixIcon: Icons.book_rounded,
                     validator: (value) {
                       if (value?.trim().isEmpty ?? true) {
@@ -238,7 +238,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       Expanded(
                         child: ModernTextField(
                           controller: _creditsController,
-                          label: 'CrÃ©ditos',
+                          label: 'Créditos',
                           hint: 'Ej: 4',
                           keyboardType: TextInputType.number,
                           prefixIcon: Icons.star_rounded,
@@ -293,7 +293,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                     onLinkSelected: (link) {
                       setState(() => _externalLink = link);
                     },
-                    label: 'Enlaces rÃ¡pidos',
+                    label: 'Enlaces rápidos',
                   ),
 
                   const SizedBox(height: AppSpacing.xl),

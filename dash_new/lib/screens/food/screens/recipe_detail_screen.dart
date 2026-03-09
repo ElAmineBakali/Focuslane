@@ -59,7 +59,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'DescripciÃ³n',
+                          'Descripción',
                           style: AppTypography.heading4(context),
                         ),
                       ],
@@ -108,7 +108,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'InformaciÃ³n Nutricional',
+                          'Información Nutricional',
                           style: AppTypography.heading4(context),
                         ),
                       ],
@@ -120,13 +120,13 @@ class RecipeDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     _NutrientRow(
-                      label: 'CalorÃ­as',
+                      label: 'Calorías',
                       value: '${recipe.kcal!.toStringAsFixed(0)} kcal',
                       icon: Icons.local_fire_department,
                       color: colorScheme.primary,
                     ),
                     _NutrientRow(
-                      label: 'ProteÃ­nas',
+                      label: 'Proteínas',
                       value: '${recipe.protein!.toStringAsFixed(1)} g',
                       icon: Icons.fitness_center,
                       color: colorScheme.secondary,
@@ -224,7 +224,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'PreparaciÃ³n',
+                          'Preparación',
                           style: AppTypography.heading4(context),
                         ),
                       ],

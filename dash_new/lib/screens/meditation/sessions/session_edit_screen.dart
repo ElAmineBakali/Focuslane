@@ -47,7 +47,7 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(editing == null ? 'Nueva sesiÃ³n' : 'Editar sesiÃ³n'),
+        title: Text(editing == null ? 'Nueva sesión' : 'Editar sesión'),
       ),
       body: TaskFormTheme(
         child: Padding(
@@ -65,7 +65,7 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
                     ),
                     DropdownMenuItem(
                       value: SessionType.breath,
-                      child: Text('RespiraciÃ³n'),
+                      child: Text('Respiración'),
                     ),
                     DropdownMenuItem(
                       value: SessionType.guided,
@@ -80,13 +80,13 @@ class _SessionEditScreenState extends State<SessionEditScreen> {
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(
-                    labelText: 'TÃ­tulo (opcional)',
+                    labelText: 'Título (opcional)',
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('DuraciÃ³n (min)')),
+                    const Expanded(child: Text('Duración (min)')),
                     DropdownButton<int>(
                       value: _durationMin,
                       onChanged:

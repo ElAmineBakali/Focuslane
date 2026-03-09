@@ -37,7 +37,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tareas y ExÃ¡menes',
+          'Tareas y Exámenes',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         leading: FocusModuleHeader.buildLeading(
@@ -162,7 +162,7 @@ class _StudyTasksScreenState extends State<StudyTasksScreen> {
                                 ),
                                 const SizedBox(height: 24),
                                 Text(
-                                  'Â¡Todo despejado!',
+                                  '¡Todo despejado!',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 28,
                                     fontWeight: FontWeight.w700,
@@ -672,7 +672,7 @@ class _TaskCard extends StatelessWidget {
     final now = DateTime.now();
     final diff = date.difference(now).inDays;
     if (diff == 0) return 'Hoy';
-    if (diff == 1) return 'MaÃ±ana';
+    if (diff == 1) return 'Mañana';
     if (diff < 0) return 'Vencida';
     return '${diff}d';
   }

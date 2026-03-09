@@ -147,7 +147,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
             const [];
         if (seq.isEmpty) {
-          AppToast.error(context, 'Secuencia vacÃ­a');
+          AppToast.error(context, 'Secuencia vacía');
           return;
         }
         final first = seq.first;
@@ -166,7 +166,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         NotificationService.I.showNow(
           id: _N_WORK_START,
           title: 'Estudio',
-          body: 'SesiÃ³n iniciada',
+          body: 'Sesión iniciada',
         );
         break;
     }
@@ -311,7 +311,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     await NotificationService.I.showNow(
       id: _N_SESSION_SAVED,
       title: 'Estudio',
-      body: 'SesiÃ³n guardada ($minutes min)',
+      body: 'Sesión guardada ($minutes min)',
     );
 
     if (!mounted) return;
@@ -407,7 +407,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
                     },
                   ),
                   IconButton(
-                    tooltip: 'AnalÃ­ticas',
+                    tooltip: 'Analíticas',
                     icon: const Icon(Icons.stacked_line_chart_rounded),
                     onPressed: () {
                       Navigator.push(
@@ -612,7 +612,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
               ),
               icon: const Icon(Icons.save_rounded, size: 24),
               label: Text(
-                'Guardar sesiÃ³n',
+                'Guardar sesión',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -638,18 +638,18 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         final short = (_cfg['short'] ?? 5).toString();
         final long = (_cfg['long'] ?? 15).toString();
         final cycles = (_cfg['cycles'] ?? 4).toString();
-        return 'Pomodoro â€¢ $work trabajo / $short descanso (largo $long cada $cycles)';
+        return 'Pomodoro • $work trabajo / $short descanso (largo $long cada $cycles)';
       case StudyMethod.flowtime:
         final ratio = (_cfg['ratio'] ?? 0.2).toString();
-        return 'Flowtime â€¢ Descanso proporcional (ratio $ratio)';
+        return 'Flowtime • Descanso proporcional (ratio $ratio)';
       case StudyMethod.timeboxing:
         final block = (_cfg['block'] ?? 50).toString();
         final rest = (_cfg['rest'] ?? 10).toString();
-        return 'Timeboxing â€¢ $block min bloque / $rest min pausa';
+        return 'Timeboxing • $block min bloque / $rest min pausa';
       case StudyMethod.custom:
-        return 'Secuencia personalizada â€¢ ${(_cfg['sequence'] as List? ?? []).length} bloques';
+        return 'Secuencia personalizada • ${(_cfg['sequence'] as List? ?? []).length} bloques';
       case StudyMethod.simple:
-        return 'CronÃ³metro simple â€¢ cuenta ascendente';
+        return 'Cronómetro simple • cuenta ascendente';
     }
   }
 }
@@ -1099,7 +1099,7 @@ class _HeaderSelectors extends StatelessWidget {
                       initialValue: taskId,
                       hint: const Text('Vincular tarea (opcional)'),
                       items: [
-                        const DropdownMenuItem(value: null, child: Text('â€”')),
+                        const DropdownMenuItem(value: null, child: Text('–')),
                         ...tasks.map(
                           (t) => DropdownMenuItem(
                             value: t.id,

@@ -85,7 +85,7 @@ class _OutfitBuilderScreenState extends State<OutfitBuilderScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Una Ãºnica suscripciÃ³n al stream y luego filtro por categorÃ­a
+          // Una única suscripción al stream y luego filtro por categoría
           StreamBuilder<List<Prenda>>(
             stream: prendaService.prendasStream(uid),
             builder: (context, snapshot) {

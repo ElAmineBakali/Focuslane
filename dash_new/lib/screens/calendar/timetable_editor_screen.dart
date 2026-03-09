@@ -194,7 +194,7 @@ class _SlotsEditor extends StatelessWidget {
                     leading: const Icon(Icons.event),
                     title: Text(x.title),
                     subtitle: Text(
-                      '${x.day} â€¢ ${x.start}â€“${x.end} â€¢ ${x.type.name}',
+                      '${x.day} • ${x.start}—${x.end} • ${x.type.name}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
@@ -254,11 +254,11 @@ class _SlotsEditor extends StatelessWidget {
                                 )
                                 .toList(),
                         onChanged: (v) => setS(() => day = v ?? day),
-                        decoration: const InputDecoration(labelText: 'DÃ­a'),
+                        decoration: const InputDecoration(labelText: 'Día'),
                       ),
                       TextField(
                         controller: title,
-                        decoration: const InputDecoration(labelText: 'TÃ­tulo'),
+                        decoration: const InputDecoration(labelText: 'Título'),
                       ),
                       Row(
                         children: [

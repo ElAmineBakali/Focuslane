@@ -19,7 +19,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
     final svc = CultureFirestoreService.I;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MÃºsica (Ãlbumes)'),
+        title: const Text('Música (Álbumes)'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.link_rounded),
@@ -55,7 +55,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
           if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (data.isEmpty) return const Center(child: Text('Sin Ã¡lbumes'));
+          if (data.isEmpty) return const Center(child: Text('Sin álbumes'));
           return ListView.separated(
             itemCount: data.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
@@ -64,7 +64,7 @@ class _MusicListScreenState extends State<MusicListScreen> {
               return ListTile(
                 leading: const Icon(Icons.album_outlined),
                 title: Text(a.title),
-                subtitle: Text('${a.artist} â€¢ ${a.status.name}'),
+                subtitle: Text('${a.artist} • ${a.status.name}'),
                 trailing: Text(a.rating?.toStringAsFixed(1) ?? '-'),
                 onTap:
                     () => Navigator.pushNamed(

@@ -23,7 +23,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
     return Scaffold(
       appBar: FoodCompactAppBar(
         title: 'Recetas',
-        subtitle: 'CatÃ¡logo',
+        subtitle: 'Catálogo',
         actions: [
           IconButton(
             icon: const Icon(Icons.add, size: 18),
@@ -34,7 +34,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
                     builder: (_) => RecipeEditScreen(svc: widget.svc),
                   ),
                 ),
-            tooltip: 'AÃ±adir receta',
+            tooltip: 'Añadir receta',
           ),
         ],
       ),
@@ -85,10 +85,10 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
                     message:
                         _searchQuery.isNotEmpty
                             ? 'No se encontraron recetas'
-                            : 'No hay recetas en tu catÃ¡logo',
+                            : 'No hay recetas en tu catálogo',
                     subtitle:
                         _searchQuery.isNotEmpty
-                            ? 'Intenta con otro tÃ©rmino de bÃºsqueda'
+                            ? 'Intenta con otro término de búsqueda'
                             : 'Crea tu primera receta para comenzar',
                     actionLabel: _searchQuery.isEmpty ? 'Crear receta' : null,
                     onAction:
@@ -116,7 +116,7 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   Widget _buildListView(List<Recipe> recipes) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // En PC: 6 columnas, tablet: 4, mÃ³vil: 2
+        // En PC: 6 columnas, tablet: 4, móvil: 2
         final crossAxisCount = constraints.maxWidth >= 1200
             ? 6
             : constraints.maxWidth >= 900

@@ -80,10 +80,10 @@ class PlanificadorScreen extends StatelessWidget {
                   DropdownButtonFormField<String>(
                     initialValue: parte,
                     decoration: const InputDecoration(
-                      labelText: 'Parte del dÃ­a (opcional)',
+                      labelText: 'Parte del día (opcional)',
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'maÃ±ana', child: Text('MaÃ±ana')),
+                      DropdownMenuItem(value: 'mañana', child: Text('Mañana')),
                       DropdownMenuItem(value: 'tarde', child: Text('Tarde')),
                       DropdownMenuItem(value: 'noche', child: Text('Noche')),
                     ],
@@ -97,7 +97,7 @@ class PlanificadorScreen extends StatelessWidget {
                       if (data.isEmpty) {
                         return const ListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: Text('No tienes outfits aÃºn'),
+                          title: Text('No tienes outfits aún'),
                           subtitle: Text('Crea uno para poder planificarlo'),
                         );
                       }
@@ -221,7 +221,7 @@ class PlanificadorScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Plan â€¢ ${outfit?.nombre ?? 'Outfit'}',
+                  'Plan • ${outfit?.nombre ?? 'Outfit'}',
                   style: Theme.of(ctx).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
@@ -351,7 +351,7 @@ class PlanificadorScreen extends StatelessWidget {
                           Text(
                             "${plan.fecha.toLocal()}".split(' ')[0] +
                                 (plan.parteDelDia != null
-                                    ? ' â€¢ ${plan.parteDelDia}'
+                                    ? ' • ${plan.parteDelDia}'
                                     : ''),
                           ),
                           if (plan.nota.isNotEmpty)
@@ -399,7 +399,7 @@ class PlanificadorScreen extends StatelessWidget {
                                       (_) => AlertDialog(
                                         title: const Text('Eliminar plan'),
                                         content: Text(
-                                          'Â¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?',
+                                          '¿Eliminar el plan del ${plan.fecha.toLocal().toString().split(' ').first}?',
                                         ),
                                         actions: [
                                           TextButton(

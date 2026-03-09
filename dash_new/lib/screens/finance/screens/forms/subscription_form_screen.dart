@@ -60,8 +60,8 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
   @override
   Widget build(BuildContext context) {
     final subtitle = widget.subscription == null
-      ? 'Nueva suscripciÃ³n'
-      : 'Editar suscripciÃ³n';
+      ? 'Nueva suscripción'
+      : 'Editar suscripción';
 
     return FinanceShell(
       selectedIndex: 3,

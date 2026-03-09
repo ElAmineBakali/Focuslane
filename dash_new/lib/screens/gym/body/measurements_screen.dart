@@ -74,7 +74,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                               .toList(),
                       onChanged: (v) => setState(() => _selected = v!),
                       decoration: const InputDecoration(
-                        labelText: 'MÃºsculo',
+                        labelText: 'Músculo',
                         prefixIcon: Icon(Icons.fitness_center_outlined),
                       ),
                     ),
@@ -93,7 +93,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                         final v = double.tryParse(
                           (s ?? '').replaceAll(',', '.'),
                         );
-                        if (v == null) return 'NÃºmero vÃ¡lido';
+                        if (v == null) return 'Número válido';
                         if (v <= 0) return 'Mayor que 0';
                         return null;
                       },

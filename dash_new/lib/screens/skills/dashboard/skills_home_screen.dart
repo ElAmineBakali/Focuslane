@@ -42,7 +42,7 @@ class SkillsHomeScreen extends StatelessWidget {
           }
           if (data.isEmpty) {
             return const Center(
-              child: Text('Crea tu primera habilidad con el botÃ³n +'),
+              child: Text('Crea tu primera habilidad con el botón +'),
             );
           }
           return ListView.builder(
@@ -57,7 +57,7 @@ class SkillsHomeScreen extends StatelessWidget {
                   ),
                   title: Text(x.name),
                   subtitle: Text(
-                    '${skillLevelLabel(x.currentLevel)} â€¢ ${x.totalHours.toStringAsFixed(1)}h â€¢ racha ${x.streakDays}d',
+                    '${skillLevelLabel(x.currentLevel)} • ${x.totalHours.toStringAsFixed(1)}h • racha ${x.streakDays}d',
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap:

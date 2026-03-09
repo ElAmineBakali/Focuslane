@@ -74,7 +74,7 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                     onChanged:
                         (v) => setState(() => _searchQuery = v.toLowerCase()),
                     decoration: InputDecoration(
-                      hintText: 'Buscar por nombre de rutina o dÃ­a...',
+                      hintText: 'Buscar por nombre de rutina o día...',
                       prefixIcon: const Icon(Icons.search_rounded),
                       filled: true,
                       fillColor: colorScheme.surfaceContainerHighest,

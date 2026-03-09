@@ -11,7 +11,7 @@ import 'widgets/export_data_screen.dart';
 import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import 'package:intl/intl.dart';
 
-/// MÃ³dulo GymHomeScreen rediseÃ±ado - EstÃ©tica profesional estilo Strong/Heavy
+/// Módulo GymHomeScreen rediseñado - Estética profesional estilo Strong/Heavy
 class GymHomeScreen extends StatefulWidget {
   final GymFirestoreService svc;
   const GymHomeScreen({super.key, required this.svc});
@@ -41,7 +41,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _weeklyWeightId,
       title: 'Control semanal',
-      body: 'PÃ©sate y registra tu peso ðŸ‹ï¸',
+      body: 'Pésate y registra tu peso ðŸ‹ï¸',
       whenLocal: nextMon,
       useExact: false,
     );
@@ -50,7 +50,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _weeklyMeasureId,
       title: 'Medidas corporales',
-      body: 'Toca medir perÃ­metros (pecho, brazo, cintura...) ðŸ“',
+      body: 'Toca medir perímetros (pecho, brazo, cintura...) ðŸ“',
       whenLocal: nextMon2,
       useExact: false,
     );
@@ -71,7 +71,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
     await NotificationService.I.scheduleOnce(
       id: _inactivityId,
       title: 'Vuelve al gym',
-      body: 'Llevas $xDays dÃ­as sin entrenar. Â¡Toca sesiÃ³n! ðŸ’ª',
+      body: 'Llevas $xDays días sin entrenar. ¡Toca sesión! ðŸ’ª',
       whenLocal: at,
       useExact: false,
     );
@@ -204,9 +204,9 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
 
                   const SizedBox(height: 24),
 
-                  // SecciÃ³n de acciones rÃ¡pidas
+                  // Sección de acciones rápidas
                   Text(
-                    'Acciones RÃ¡pidas',
+                    'Acciones Rápidas',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -221,7 +221,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
 
                   // Acceso a funciones principales
                   Text(
-                    'GestiÃ³n y AnÃ¡lisis',
+                    'Gestión y Análisis',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -379,7 +379,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
               child: _buildStatCard(
                 'Volumen',
                 '${(totalVolume / 1000).toStringAsFixed(1)} ton',
-                '7 dÃ­as',
+                '7 días',
                 Icons.fitness_center,
                 Colors.orange,
               ),
@@ -471,7 +471,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
           },
         ).animate(delay: 200.ms).fadeIn(duration: 400.ms).scale(),
 
-        _buildActionCard('AnalÃ­ticas', Icons.bar_chart, Colors.green, () {
+        _buildActionCard('Analíticas', Icons.bar_chart, Colors.green, () {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -541,7 +541,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
 
         return Column(
           children: [
-            // Ãšltima sesiÃ³n (si existe)
+            // Última sesión (si existe)
             if (sessions.isNotEmpty) ...[
               _buildLastSessionCard(sessions.first)
                   .animate(delay: 500.ms)
@@ -599,7 +599,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Ãšltima SesiÃ³n',
+                  'Última Sesión',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -734,7 +734,7 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
   }
 }
 
-///Widget de configuraciÃ³n de notificaciones
+///Widget de configuración de notificaciones
 class _NotificationSettingsSheet extends StatefulWidget {
   final VoidCallback onSave;
   const _NotificationSettingsSheet({required this.onSave});
@@ -779,7 +779,7 @@ class _NotificationSettingsSheetState
               ),
             ),
 
-            // TÃ­tulo
+            // Título
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -850,7 +850,7 @@ class _NotificationSettingsSheetState
                                     color: colorScheme.primary,
                                   ),
                                   title: Text(
-                                    'DÃ­a de la semana',
+                                    'Día de la semana',
                                     style: GoogleFonts.poppins(fontSize: 14),
                                   ),
                                   trailing: DropdownButton<int>(
@@ -870,7 +870,7 @@ class _NotificationSettingsSheetState
                                       ),
                                       DropdownMenuItem(
                                         value: DateTime.wednesday,
-                                        child: Text('MiÃ©rcoles'),
+                                        child: Text('Miércoles'),
                                       ),
                                       DropdownMenuItem(
                                         value: DateTime.thursday,
@@ -882,7 +882,7 @@ class _NotificationSettingsSheetState
                                       ),
                                       DropdownMenuItem(
                                         value: DateTime.saturday,
-                                        child: Text('SÃ¡bado'),
+                                        child: Text('Sábado'),
                                       ),
                                       DropdownMenuItem(
                                         value: DateTime.sunday,
@@ -932,7 +932,7 @@ class _NotificationSettingsSheetState
                   // Recordatorio de medidas
                   _buildSection(
                     icon: Icons.straighten,
-                    title: 'Medidas FÃ­sicas Semanales',
+                    title: 'Medidas Físicas Semanales',
                     subtitle: 'Recordatorio para medidas corporales',
                     value: _enableMeasurementsReminder,
                     onChanged:
@@ -986,7 +986,7 @@ class _NotificationSettingsSheetState
                   _buildSection(
                     icon: Icons.notifications_active,
                     title: 'Alerta de Inactividad',
-                    subtitle: 'Aviso cuando llevas dÃ­as sin entrenar',
+                    subtitle: 'Aviso cuando llevas días sin entrenar',
                     value: _enableInactivityReminder,
                     onChanged:
                         (v) => setState(() => _enableInactivityReminder = v),
@@ -1004,7 +1004,7 @@ class _NotificationSettingsSheetState
                                     color: colorScheme.primary,
                                   ),
                                   title: Text(
-                                    'DÃ­as de inactividad',
+                                    'Días de inactividad',
                                     style: GoogleFonts.poppins(fontSize: 14),
                                   ),
                                   subtitle: Slider(
@@ -1012,7 +1012,7 @@ class _NotificationSettingsSheetState
                                     min: 1,
                                     max: 7,
                                     divisions: 6,
-                                    label: '$_inactivityDays dÃ­as',
+                                    label: '$_inactivityDays días',
                                     onChanged:
                                         (v) => setState(
                                           () => _inactivityDays = v.round(),
@@ -1028,7 +1028,7 @@ class _NotificationSettingsSheetState
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '$_inactivityDays dÃ­as',
+                                      '$_inactivityDays días',
                                       style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.w600,
                                         color: colorScheme.primary,

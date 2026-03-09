@@ -13,13 +13,13 @@ class AlbumDetailScreen extends StatelessWidget {
     final svc = CultureFirestoreService.I;
     final arg = ModalRoute.of(context)?.settings.arguments;
     if (arg is! Album) {
-      return const Scaffold(body: Center(child: Text('Sin Ã¡lbum')));
+      return const Scaffold(body: Center(child: Text('Sin álbum')));
     }
     final a = arg;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${a.artist} â€¢ ${a.title}'),
+        title: Text('${a.artist} • ${a.title}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -44,9 +44,9 @@ class AlbumDetailScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.album),
-              title: Text('${a.year ?? "â€”"}'),
+              title: Text('${a.year ?? "–"}'),
               subtitle: Text(
-                'Estado: ${a.status.name} â€¢ Rating: ${a.rating?.toStringAsFixed(1) ?? "-"}',
+                'Estado: ${a.status.name} • Rating: ${a.rating?.toStringAsFixed(1) ?? "-"}',
               ),
             ),
           ),
@@ -55,7 +55,7 @@ class AlbumDetailScreen extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.music_note),
                 title: const Text('Temas favoritos'),
-                subtitle: Text(a.favoriteTracks.join(' â€¢ ')),
+                subtitle: Text(a.favoriteTracks.join(' • ')),
               ),
             ),
           if (a.notes != null && a.notes!.isNotEmpty)

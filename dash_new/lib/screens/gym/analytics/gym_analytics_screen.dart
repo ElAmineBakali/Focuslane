@@ -61,7 +61,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 60),
               title: Text(
-                'AnalÃ­ticas',
+                'Analíticas',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w700,
                   fontSize: 26,
@@ -119,15 +119,15 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                     (context) => [
                       const PopupMenuItem(
                         value: '7',
-                        child: Text('Ãšltimos 7 dÃ­as'),
+                        child: Text('Últimos 7 días'),
                       ),
                       const PopupMenuItem(
                         value: '30',
-                        child: Text('Ãšltimo mes'),
+                        child: Text('Último mes'),
                       ),
                       const PopupMenuItem(
                         value: '90',
-                        child: Text('Ãšltimos 90 dÃ­as'),
+                        child: Text('Últimos 90 días'),
                       ),
                     ],
               ),
@@ -138,7 +138,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
               tabs: const [
                 Tab(icon: Icon(Icons.show_chart), text: 'Resumen'),
                 Tab(icon: Icon(Icons.fitness_center), text: 'Entrenamiento'),
-                Tab(icon: Icon(Icons.monitor_weight), text: 'FÃ­sico'),
+                Tab(icon: Icon(Icons.monitor_weight), text: 'Físico'),
                 Tab(icon: Icon(Icons.psychology), text: 'Sensaciones'),
               ],
             ),
@@ -191,7 +191,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('MÃ©tricas Principales'),
+              _buildSectionTitle('Métricas Principales'),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -219,7 +219,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                 children: [
                   Expanded(
                     child: _buildKpiCard(
-                      'DuraciÃ³n Prom.',
+                      'Duración Prom.',
                       '${avgDuration.toStringAsFixed(0)} min',
                       Icons.timer,
                       Colors.green,
@@ -362,7 +362,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
 
                 const SizedBox(height: 24),
 
-                _buildSectionTitle('EvoluciÃ³n de Peso'),
+                _buildSectionTitle('Evolución de Peso'),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 250,
@@ -417,7 +417,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                       onPressed: () => _quickAddWeight(context),
                       icon: const Icon(Icons.monitor_weight, size: 20),
                       label: Text(
-                        'AÃ±adir Peso',
+                        'Añadir Peso',
                         style: GoogleFonts.poppins(fontSize: 13),
                       ),
                     ),
@@ -428,7 +428,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                       onPressed: () => _quickAddMeasurement(context),
                       icon: const Icon(Icons.straighten, size: 20),
                       label: Text(
-                        'AÃ±adir Medida',
+                        'Añadir Medida',
                         style: GoogleFonts.poppins(fontSize: 13),
                       ),
                     ),
@@ -456,7 +456,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
         final avgMotivation = stats['avgMotivation'] as double;
 
         if (avgEnergy == 0 && avgFatigue == 0 && avgMotivation == 0) {
-          return _buildEmptyState('No hay datos de sensaciones todavÃ­a');
+          return _buildEmptyState('No hay datos de sensaciones todavía');
         }
 
         return SingleChildScrollView(
@@ -467,15 +467,15 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
               _buildSectionTitle('Promedios del Periodo'),
               const SizedBox(height: 16),
 
-              _buildFeelingMeter('EnergÃ­a', avgEnergy, Colors.green),
+              _buildFeelingMeter('Energía', avgEnergy, Colors.green),
               const SizedBox(height: 16),
               _buildFeelingMeter('Fatiga', avgFatigue, Colors.orange),
               const SizedBox(height: 16),
-              _buildFeelingMeter('MotivaciÃ³n', avgMotivation, Colors.blue),
+              _buildFeelingMeter('Motivación', avgMotivation, Colors.blue),
 
               const SizedBox(height: 24),
 
-              _buildSectionTitle('InterpretaciÃ³n'),
+              _buildSectionTitle('Interpretación'),
               const SizedBox(height: 12),
               _buildInterpretationCard(avgEnergy, avgFatigue, avgMotivation),
             ],
@@ -737,21 +737,21 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
 
     if (energy >= 4 && fatigue <= 2 && motivation >= 4) {
       interpretation =
-          'Â¡Excelente estado! Tu cuerpo estÃ¡ respondiendo muy bien al entrenamiento.';
+          '¡Excelente estado! Tu cuerpo está respondiendo muy bien al entrenamiento.';
       icon = Icons.sentiment_very_satisfied;
       color = Colors.green;
     } else if (fatigue >= 4) {
       interpretation =
-          'Fatiga elevada detectada. Considera tomar un dÃ­a de descanso o reducir volumen.';
+          'Fatiga elevada detectada. Considera tomar un día de descanso o reducir volumen.';
       icon = Icons.warning_amber;
       color = Colors.orange;
     } else if (motivation <= 2) {
       interpretation =
-          'MotivaciÃ³n baja. Intenta variar tu rutina o tomarte un descanso.';
+          'Motivación baja. Intenta variar tu rutina o tomarte un descanso.';
       icon = Icons.sentiment_dissatisfied;
       color = Colors.red;
     } else {
-      interpretation = 'Estado normal. ContinÃºa con tu plan de entrenamiento.';
+      interpretation = 'Estado normal. Continúa con tu plan de entrenamiento.';
       icon = Icons.sentiment_satisfied;
       color = Colors.blue;
     }
@@ -1260,8 +1260,8 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
       return 'Hombros';
     } else if (lower.contains('brazo') ||
         lower.contains('curl') ||
-        lower.contains('trÃ­ceps') ||
-        lower.contains('bÃ­ceps')) {
+        lower.contains('tríceps') ||
+        lower.contains('bíceps')) {
       return 'Brazos';
     } else {
       return 'Otros';
@@ -1316,7 +1316,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                                 ),
                               ),
                               Text(
-                                'AÃ±ade tu peso actual',
+                                'Añade tu peso actual',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: colorScheme.onSurfaceVariant,
@@ -1385,9 +1385,9 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                         final v = double.tryParse(
                           (s ?? '').replaceAll(',', '.'),
                         );
-                        if (v == null) return 'Introduce un nÃºmero vÃ¡lido';
+                        if (v == null) return 'Introduce un número válido';
                         if (v <= 0 || v > 300) {
-                          return 'Peso no vÃ¡lido (1-300 kg)';
+                          return 'Peso no válido (1-300 kg)';
                         }
                         return null;
                       },
@@ -1412,7 +1412,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Registra tu peso por la maÃ±ana, antes de desayunar',
+                              'Registra tu peso por la mañana, antes de desayunar',
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 color: colorScheme.onSurfaceVariant,
@@ -1546,7 +1546,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                                 ),
                               ),
                               Text(
-                                'MediciÃ³n corporal',
+                                'Medición corporal',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: colorScheme.onSurfaceVariant,
@@ -1603,7 +1603,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                       validator:
                           (s) =>
                               (s ?? '').trim().isEmpty
-                                  ? 'Escribe el nombre del mÃºsculo'
+                                  ? 'Escribe el nombre del músculo'
                                   : null,
                     ),
                     const SizedBox(height: 16),
@@ -1663,9 +1663,9 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                         final v = double.tryParse(
                           (s ?? '').replaceAll(',', '.'),
                         );
-                        if (v == null) return 'Introduce un nÃºmero vÃ¡lido';
+                        if (v == null) return 'Introduce un número válido';
                         if (v <= 0 || v > 200) {
-                          return 'Medida no vÃ¡lida (1-200 cm)';
+                          return 'Medida no válida (1-200 cm)';
                         }
                         return null;
                       },

@@ -66,8 +66,8 @@ class SubscriptionService {
 
     await NotificationService.I.scheduleOnce(
       id: s.id.hashCode,
-      title: 'PrÃ³ximo pago: ${s.title}',
-      body: 'Vence en ${s.remindDaysBefore} dÃ­as. Monto: ${s.amount}',
+      title: 'Próximo pago: ${s.title}',
+      body: 'Vence en ${s.remindDaysBefore} días. Monto: ${s.amount}',
       whenLocal: notifDate,
       useExact: false,
     );

@@ -130,7 +130,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                         validator: (s) {
                           if ((s ?? '').trim().isEmpty) return 'Pon un nombre';
                           if ((s ?? '').trim().length < 3) {
-                            return 'MÃ­nimo 3 caracteres';
+                            return 'Mínimo 3 caracteres';
                           }
                           return null;
                         },
@@ -202,7 +202,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                 final days = snap.data!;
                 if (days.isEmpty) {
                   return const Center(
-                    child: Text('Crea al menos un dÃ­a en la rutina'),
+                    child: Text('Crea al menos un día en la rutina'),
                   );
                 }
                 return ListView.builder(
@@ -273,7 +273,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                                               'RPE: ${e.targetRPE}',
                                             if (e.targetPercent1RM != null)
                                               '%1RM: ${e.targetPercent1RM}',
-                                          ].join(' â€¢ '),
+                                          ].join(' • '),
                                         ),
                                         trailing: PopupMenuButton<String>(
                                           onSelected: (v) async {
@@ -317,7 +317,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                                   ),
                                   ListTile(
                                     leading: const Icon(Icons.add),
-                                    title: const Text('AÃ±adir ejercicio'),
+                                    title: const Text('Añadir ejercicio'),
                                     onTap: () async {
                                       final picked = await showModalBottomSheet<
                                         RoutineExercise

@@ -53,9 +53,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildRangeChip(7, '7 dÃ­as'),
-              _buildRangeChip(30, '30 dÃ­as'),
-              _buildRangeChip(90, '90 dÃ­as'),
+              _buildRangeChip(7, '7 días'),
+              _buildRangeChip(30, '30 días'),
+              _buildRangeChip(90, '90 días'),
             ],
           ),
 
@@ -138,7 +138,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                       ),
                     ),
                     const SizedBox(width: FocusSpacing.md),
-                    Text('CalorÃ­as', style: FocusTypography.heading3(context)),
+                    Text('Calorías', style: FocusTypography.heading3(context)),
                   ],
                 ),
                   const SizedBox(height: FocusSpacing.md),
@@ -192,7 +192,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                       ),
                     ),
                     const SizedBox(width: FocusSpacing.md),
-                    Text('ProteÃ­nas', style: FocusTypography.heading3(context)),
+                    Text('Proteínas', style: FocusTypography.heading3(context)),
                   ],
                 ),
                   const SizedBox(height: FocusSpacing.md),
@@ -247,7 +247,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                     ),
                     const SizedBox(width: FocusSpacing.md),
                     Text(
-                      'HidrataciÃ³n',
+                      'Hidratación',
                       style: FocusTypography.heading3(context),
                     ),
                   ],
@@ -296,7 +296,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
               children: [
                 Expanded(
                   child: FocusStatCard(
-                    label: 'CalorÃ­as',
+                    label: 'Calorías',
                     value: avgKcal.toStringAsFixed(0),
                     subtitle: 'kcal promedio',
                     icon: Icons.local_fire_department,
@@ -306,7 +306,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                 const SizedBox(width: FocusSpacing.md),
                 Expanded(
                   child: FocusStatCard(
-                    label: 'ProteÃ­nas',
+                    label: 'Proteínas',
                     value: avgProtein.toStringAsFixed(1),
                     subtitle: 'g promedio',
                     icon: Icons.fitness_center,

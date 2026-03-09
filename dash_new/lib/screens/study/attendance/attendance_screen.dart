@@ -171,7 +171,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.check, color: cs.primary),
-                    title: const Text('AsistiÃ³'),
+                    title: const Text('Asistió'),
                     onTap: () {
                       Navigator.pop(context);
                       widget.svc.setAttendance(
@@ -183,7 +183,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ),
                   ListTile(
                     leading: Icon(Icons.close, color: cs.error),
-                    title: const Text('No asistiÃ³'),
+                    title: const Text('No asistió'),
                     onTap: () {
                       Navigator.pop(context);
                       widget.svc.setAttendance(
@@ -261,9 +261,9 @@ class _StatsHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              _chip(context, Icons.check, 'AsistiÃ³', attended, attendColor),
+              _chip(context, Icons.check, 'Asistió', attended, attendColor),
               const SizedBox(width: AppSpacing.sm),
-              _chip(context, Icons.close, 'FaltÃ³', absent, absentColor),
+              _chip(context, Icons.close, 'Faltó', absent, absentColor),
               const SizedBox(width: AppSpacing.sm),
               _chip(context, Icons.remove, 'Sin clase', noClass, freeColor),
             ],
@@ -350,8 +350,8 @@ class _LegendRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _legendChip(attendColor, 'AsistiÃ³'),
-        _legendChip(absentColor, 'FaltÃ³'),
+        _legendChip(attendColor, 'Asistió'),
+        _legendChip(absentColor, 'Faltó'),
         _legendChip(freeColor, 'Sin clase'),
       ],
     );
@@ -504,7 +504,7 @@ class _ActionButtons extends StatelessWidget {
             Expanded(
               child: FilledButton.icon(
                 icon: const Icon(Icons.check),
-                label: const Text('Hoy asistiÃ³'),
+                label: const Text('Hoy asistió'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                   shape: RoundedRectangleBorder(
@@ -518,7 +518,7 @@ class _ActionButtons extends StatelessWidget {
             Expanded(
               child: FilledButton.tonalIcon(
                 icon: const Icon(Icons.close),
-                label: const Text('Hoy no asistiÃ³'),
+                label: const Text('Hoy no asistió'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                   shape: RoundedRectangleBorder(

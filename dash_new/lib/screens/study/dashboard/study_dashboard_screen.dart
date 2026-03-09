@@ -30,7 +30,7 @@ class StudyDashboardScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: FocusModuleHeader(
         title: 'Study',
-        subtitle: 'Sesiones, hÃ¡bitos y productividad',
+        subtitle: 'Sesiones, hábitos y productividad',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: const [],
       ),
@@ -40,7 +40,7 @@ class StudyDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
           FocusSectionTitle(
-            title: 'Resumen del dÃ­a',
+            title: 'Resumen del día',
             subtitle: 'Actualizado $dateLabel',
             action: TextButton(
               onPressed: () {
@@ -51,7 +51,7 @@ class StudyDashboardScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Iniciar sesiÃ³n'),
+              child: const Text('Iniciar sesión'),
             ),
           ),
           StreamBuilder<List<StudySession>>(
@@ -85,27 +85,27 @@ class StudyDashboardScreen extends StatelessWidget {
                           label: 'Horas estudiadas (semana)',
                           value: totalHours > 0
                               ? totalHours.toStringAsFixed(1)
-                              : 'â€”',
-                          subtitle: 'Ãšltimos 7 dÃ­as',
+                              : '–',
+                          subtitle: 'Últimos 7 días',
                         ),
                         FocusMetricCard(
                           icon: Icons.check_circle,
                           label: 'Sesiones completadas',
                           value: totalSessions > 0
                               ? totalSessions.toString()
-                              : 'â€”',
-                          subtitle: 'Ãšltimos 7 dÃ­as',
+                              : '–',
+                          subtitle: 'Últimos 7 días',
                         ),
                         const FocusMetricCard(
                           icon: Icons.bolt,
                           label: 'Racha',
-                          value: 'â€”',
+                          value: '–',
                           subtitle: 'Actual',
                         ),
                         FocusMetricCard(
                           icon: Icons.flag,
-                          label: 'PrÃ³ximo objetivo',
-                          value: nextTask?.title ?? 'â€”',
+                          label: 'Próximo objetivo',
+                          value: nextTask?.title ?? '–',
                           subtitle: 'Tareas de estudio',
                         ),
                       ];
@@ -161,7 +161,7 @@ class StudyDashboardScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'AÃºn no tienes clases programadas',
+                            'Aún no tienes clases programadas',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -169,7 +169,7 @@ class StudyDashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: FocuslaneTokens.spacing8),
                           Text(
-                            'AÃ±ade bloques en el planificador para organizar tu semana.',
+                            'Añade bloques en el planificador para organizar tu semana.',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -182,7 +182,7 @@ class StudyDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'PrÃ³ximas clases',
+                          'Próximas clases',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall
@@ -194,7 +194,7 @@ class StudyDashboardScreen extends StatelessWidget {
                           final days = b.daysOfWeek.join(', ');
                           final time =
                               '${b.start.format(context)} - ${b.end.format(context)}';
-                          final subtitle = 'DÃ­as $days Â· $time';
+                          final subtitle = 'Días $days Â· $time';
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
@@ -223,7 +223,7 @@ class StudyDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const FocusSectionTitle(
-                          title: 'Ãšltimas sesiones',
+                          title: 'Últimas sesiones',
                           subtitle: 'Actividad reciente',
                         ),
                         StreamBuilder<List<Course>>(
@@ -254,7 +254,7 @@ class StudyDashboardScreen extends StatelessWidget {
                                       final subtitle = '$course Â· $date';
                                       final mins = s.minutes > 0
                                           ? '${s.minutes} min'
-                                          : 'â€”';
+                                          : '–';
 
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 8),
@@ -349,7 +349,7 @@ class StudyDashboardScreen extends StatelessWidget {
           const SizedBox(height: FocuslaneTokens.spacing16),
           FocusSectionTitle(
             title: 'Cursos',
-            subtitle: 'Acceso rÃ¡pido a materias',
+            subtitle: 'Acceso rápido a materias',
             action: TextButton(
               onPressed: () {
                 Navigator.push(

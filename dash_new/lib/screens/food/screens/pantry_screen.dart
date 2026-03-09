@@ -35,7 +35,7 @@ class _PantryScreenState extends State<PantryScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.add, size: 18),
-            tooltip: 'AÃ±adir producto',
+            tooltip: 'Añadir producto',
             onPressed: () => _editItem(),
           ),
         ],
@@ -67,12 +67,12 @@ class _PantryScreenState extends State<PantryScreen> {
                       ? Icons.check_circle_outline
                       : Icons.kitchen_outlined,
               message:
-                  _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacÃ­a',
+                  _showLowStockOnly ? 'Sin alertas de stock' : 'Despensa vacía',
               subtitle:
                   _showLowStockOnly
                       ? 'Todos los productos tienen stock suficiente'
-                      : 'AÃ±ade productos a tu despensa',
-              actionLabel: _showLowStockOnly ? null : 'AÃ±adir Producto',
+                      : 'Añade productos a tu despensa',
+              actionLabel: _showLowStockOnly ? null : 'Añadir Producto',
               onAction: _showLowStockOnly ? null : () => _editItem(),
             );
           }
@@ -85,7 +85,7 @@ class _PantryScreenState extends State<PantryScreen> {
                   child: FoodInlineBanner(
                     icon: Icons.warning_amber,
                     title: 'Stock bajo',
-                    subtitle: '$lowStockCount productos necesitan reposiciÃ³n',
+                    subtitle: '$lowStockCount productos necesitan reposición',
                     actionLabel: 'Ver',
                     onAction: () => setState(() => _showLowStockOnly = true),
                   ),
@@ -104,7 +104,7 @@ class _PantryScreenState extends State<PantryScreen> {
         child: FloatingActionButton.extended(
           onPressed: () => _editItem(),
           icon: const Icon(Icons.add),
-          label: const Text('AÃ±adir'),
+          label: const Text('Añadir'),
           backgroundColor: FocuslaneUI.accent(context),
         ),
       ),
@@ -114,7 +114,7 @@ class _PantryScreenState extends State<PantryScreen> {
   Widget _buildListView(List<PantryItem> items) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // En PC: 6 columnas, tablet: 4, mÃ³vil: 2
+        // En PC: 6 columnas, tablet: 4, móvil: 2
         final crossAxisCount = constraints.maxWidth >= 1200
             ? 6
             : constraints.maxWidth >= 900
@@ -202,14 +202,14 @@ class _PantryScreenState extends State<PantryScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      initial == null ? 'AÃ±adir a Despensa' : 'Editar Producto',
+                      initial == null ? 'Añadir a Despensa' : 'Editar Producto',
                       style: AppTypography.heading3(context),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     FoodCompactTextField(
                       controller: nameController,
                       label: 'Nombre del producto',
-                      hint: 'Ej: Arroz, Pasta, AtÃºn...',
+                      hint: 'Ej: Arroz, Pasta, Atún...',
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
@@ -280,8 +280,8 @@ class _PantryScreenState extends State<PantryScreen> {
                     const SizedBox(height: AppSpacing.md),
                     FoodCompactTextField(
                       controller: minQtyController,
-                      label: 'Stock mÃ­nimo (opcional)',
-                      hint: 'Alerta cuando estÃ© por debajo',
+                      label: 'Stock mínimo (opcional)',
+                      hint: 'Alerta cuando esté por debajo',
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -310,7 +310,7 @@ class _PantryScreenState extends State<PantryScreen> {
                             style: FilledButton.styleFrom(
                               backgroundColor: FocuslaneUI.accent(context),
                             ),
-                            child: Text(initial == null ? 'AÃ±adir' : 'Guardar'),
+                            child: Text(initial == null ? 'Añadir' : 'Guardar'),
                           ),
                         ),
                       ],
@@ -349,7 +349,7 @@ class _PantryScreenState extends State<PantryScreen> {
       if (mounted) {
         FoodFeedback.showSuccess(
           context,
-          id == null ? 'Producto aÃ±adido' : 'Producto actualizado',
+          id == null ? 'Producto añadido' : 'Producto actualizado',
         );
       }
     }
@@ -416,7 +416,7 @@ class _PantryScreenState extends State<PantryScreen> {
       builder:
           (context) => AlertDialog(
             title: const Text('Eliminar producto'),
-            content: Text('Â¿Seguro que quieres eliminar "${item.name}"?'),
+            content: Text('¿Seguro que quieres eliminar "${item.name}"?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -527,7 +527,7 @@ class _PantryScreenState extends State<PantryScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   _DetailRow(
                     icon: Icons.warning_amber_outlined,
-                    label: 'Stock mÃ­nimo',
+                    label: 'Stock mínimo',
                     value:
                         '${item.minQty!.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}',
                   ),
@@ -700,7 +700,7 @@ class _PantryGridCard extends StatelessWidget {
           ),
           if (item.minQty != null)
             Text(
-              'MÃ­n: ${item.minQty!.toStringAsFixed(0)}',
+              'Mín: ${item.minQty!.toStringAsFixed(0)}',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 10,
@@ -756,7 +756,7 @@ class _PantryTile extends StatelessWidget {
         ),
         title: item.name,
         subtitle:
-            'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}${item.minQty != null ? ' â€¢ MÃ­n: ${item.minQty!.toStringAsFixed(0)}' : ''}',
+            'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}${item.minQty != null ? ' • Mín: ${item.minQty!.toStringAsFixed(0)}' : ''}',
         trailing: PopupMenuButton<String>(
           padding: EdgeInsets.zero,
           onSelected: (value) {

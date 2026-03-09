@@ -64,7 +64,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       backgroundColor: colorScheme.surface,
       appBar: FoodCompactAppBar(
         title: 'Food',
-        subtitle: 'PlanificaciÃ³n, recetas y seguimiento',
+        subtitle: 'Planificación, recetas y seguimiento',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
           IconButton(
@@ -162,14 +162,14 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                             final cards = [
                               FoodMetricCard(
                                 icon: Icons.local_fire_department,
-                                label: 'CalorÃ­as hoy',
+                                label: 'Calorías hoy',
                                 value: '${kcal.toStringAsFixed(0)} kcal',
                                 subtitle: 'de ${targetKcal.toStringAsFixed(0)} objetivo',
                                 onTap: () => _navigateToDiary(context),
                               ),
                               FoodMetricCard(
                                 icon: Icons.fitness_center,
-                                label: 'ProteÃ­na hoy',
+                                label: 'Proteína hoy',
                                 value: '${protein.toStringAsFixed(0)} g',
                                 subtitle: 'de ${targetProtein.toStringAsFixed(0)}g objetivo',
                                 onTap: () => _navigateToDiary(context),
@@ -250,7 +250,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           cards.add(
             _AlertCard(
               icon: Icons.warning_amber,
-              title: 'ProteÃ­na baja tras entreno',
+              title: 'Proteína baja tras entreno',
               message: 'Faltan ${gap.toStringAsFixed(0)} g para el objetivo de hoy.',
             ),
           );
@@ -260,8 +260,8 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
           cards.add(
             _AlertCard(
               icon: Icons.local_fire_department,
-              title: 'DÃ©ficit extremo con entreno fuerte',
-              message: 'Balance energÃ©tico actual ${deficit.toStringAsFixed(0)} kcal.',
+              title: 'Déficit extremo con entreno fuerte',
+              message: 'Balance energético actual ${deficit.toStringAsFixed(0)} kcal.',
             ),
           );
         }
@@ -406,7 +406,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
             children: [
               FoodSectionHeader(
                 title: 'Recetas recientes',
-                subtitle: 'Favoritas y Ãºltimas',
+                subtitle: 'Favoritas y últimas',
                 icon: Icons.restaurant,
                 actionLabel: 'Ver todas',
                 onActionPressed: () => _navigateToRecipes(context),
@@ -432,7 +432,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                         ),
                         TextButton(
                           onPressed: () => _navigateToRecipes(context),
-                          child: const Text('AÃ±adir primera receta'),
+                          child: const Text('Añadir primera receta'),
                         ),
                       ],
                     ),
@@ -508,7 +508,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     
     if (recipe.name.toLowerCase().contains('pollo') ||
         recipe.name.toLowerCase().contains('pavo')) {
-      tags.add('Alto en proteÃ­na');
+      tags.add('Alto en proteína');
     }
     if (recipe.name.toLowerCase().contains('ensalada') ||
         recipe.name.toLowerCase().contains('vegetal')) {

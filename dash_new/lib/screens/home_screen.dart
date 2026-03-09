@@ -47,7 +47,7 @@ const List<_Module> _defaultModules = [
     'assets/home/notas.jpg',
   ),
   _Module(
-    'HÃ¡bitos',
+    'Hábitos',
     '/habits',
     Icons.checklist_outlined,
     'assets/home/habitos.jpg',
@@ -65,7 +65,7 @@ const List<_Module> _defaultModules = [
     'assets/home/gimnasio.jpg',
   ),
   _Module(
-    'MeditaciÃ³n',
+    'Meditación',
     '/meditation',
     Icons.self_improvement_outlined,
     'assets/home/meditacion.jpg',
