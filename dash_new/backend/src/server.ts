@@ -46,7 +46,8 @@ app.use((req, res, next) => {
     return;
   }
 
-  const allowed = config.corsAllowlist.includes(origin);
+  const allowed = config.corsAllowlist.includes(origin)
+    || (!isProd && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
   if (!allowed) {
     if (isProd) {
       res.status(403).json({ error: 'cors_origin_not_allowed' });
