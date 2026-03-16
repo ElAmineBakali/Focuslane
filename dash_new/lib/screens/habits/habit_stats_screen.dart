@@ -1,12 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
+import 'dart:math' as math;
+
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HabitStatsScreen extends StatefulWidget {
   final Habit habit;
+
   const HabitStatsScreen({super.key, required this.habit});
 
   @override
@@ -17,99 +21,155 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
   late Habit _habit;
   late DateTime _focusedDay;
 
+  String _statsCacheSignature = '';
+  late Map<String, dynamic> _dailyStatsCache;
+  late Map<String, dynamic> _monthlyStatsCache;
+  late List<MapEntry<DateTime, dynamic>> _historyEntriesCache;
+  late List<MapEntry<DateTime, dynamic>> _loggedEntriesCache;
+  late List<MapEntry<DateTime, dynamic>> _completedEntriesCache;
+  late List<MapEntry<DateTime, dynamic>> _missedEntriesCache;
+  late HabitStreakStats _streaksCache;
+  late HabitGoalProgress _goalProgressCache;
+  late double _totalCache;
+  late double _completedCache;
+  late double _completionPercentCache;
+  late double _quantitativeTotalCache;
+  late double _quantitativeAverageCache;
+
   @override
   void initState() {
     super.initState();
     _habit = widget.habit;
-    _focusedDay = DateTime.now();
+    _focusedDay = normalizeHabitDate(DateTime.now());
+    _invalidateStatsCache();
+  }
+
+  void _invalidateStatsCache() {
+    _statsCacheSignature = '';
+  }
+
+  String _buildStatsCacheSignature() {
+    return '${_habit.id}|${identityHashCode(_habit.history)}|${_habit.history.length}|'
+        '${_habit.currentStreak}|${_habit.bestStreak}|${_habit.goalValue}|'
+        '${_habit.goalUnit}|${_habit.isQuantitative}';
+  }
+
+  void _ensureStatsCache() {
+    final signature = _buildStatsCacheSignature();
+    if (_statsCacheSignature == signature) {
+      return;
+    }
+
+    _dailyStatsCache = _getDailyStats();
+    _monthlyStatsCache = _getMonthlyStats();
+
+    final normalizedHistory = normalizeHabitHistory(_habit.history);
+    _historyEntriesCache = normalizedHistory.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    _loggedEntriesCache = _historyEntriesCache
+        .where((entry) => isHabitLoggedValue(_habit, entry.value))
+        .toList(growable: false);
+    _completedEntriesCache = _loggedEntriesCache
+        .where((entry) => isHabitCompletedValue(_habit, entry.value))
+        .toList(growable: false);
+    _missedEntriesCache = _loggedEntriesCache
+        .where((entry) => isHabitMissedValue(entry.value))
+        .toList(growable: false);
+    _streaksCache = computeHabitStreakStats(_habit);
+    _goalProgressCache = computeHabitGoalProgress(_habit);
+
+    _totalCache = _loggedEntriesCache.length.toDouble();
+    _completedCache = _completedEntriesCache.length.toDouble();
+    _completionPercentCache =
+        _totalCache == 0 ? 0.0 : (_completedCache / _totalCache) * 100;
+    _quantitativeTotalCache = _habit.isQuantitative
+        ? _loggedEntriesCache.fold<double>(
+            0,
+            (sum, entry) => sum + parseHabitNumericValue(entry.value),
+          )
+        : 0.0;
+    _quantitativeAverageCache =
+        _totalCache == 0 ? 0.0 : _quantitativeTotalCache / _totalCache;
+
+    _statsCacheSignature = signature;
   }
 
   Map<String, dynamic> _getDailyStats() {
-    final now = DateTime.now();
-    final days = List.generate(
+    final today = normalizeHabitDate(DateTime.now());
+    final days = List<DateTime>.generate(
       7,
-      (i) => DateTime(
-        now.year,
-        now.month,
-        now.day,
-      ).subtract(Duration(days: 6 - i)),
+      (index) => today.subtract(Duration(days: 6 - index)),
+      growable: false,
     );
-    final labels = days.map((d) => DateFormat('yyyy-MM-dd').format(d)).toList();
 
-    final raw = <double>[];
-    for (final k in labels) {
-      final v = _habit.history[k];
-      if (v == null) {
-        raw.add(0);
-      } else if (_habit.isQuantitative) {
-        raw.add(double.tryParse(v.toString()) ?? 0);
-      } else {
-        raw.add(v == '✔️' ? 1 : 0);
+    final rawValues = days.map((day) {
+      final value = habitHistoryValueForDate(_habit.history, day);
+      if (_habit.isQuantitative) {
+        return parseHabitNumericValue(value);
       }
-    }
+      return isHabitCompletedValue(_habit, value) ? 100.0 : 0.0;
+    }).toList(growable: false);
 
-    double maxVal = 1;
-    if (_habit.isQuantitative) {
-      maxVal = raw.fold<double>(0, (m, e) => e > m ? e : m);
-      if (maxVal <= 0) maxVal = 1;
-    }
-    final norm = raw.map((e) => (e / maxVal)).toList();
+    final maxValue = _habit.isQuantitative
+        ? math.max(
+            1.0,
+            rawValues.fold<double>(
+              0,
+              (currentMax, value) => value > currentMax ? value : currentMax,
+            ),
+          )
+        : 100.0;
 
     return {
       'days': days,
-      'labels': labels,
-      'rawValues': raw,
-      'values': norm,
-      'max': maxVal,
+      'rawValues': rawValues,
+      'max': maxValue,
     };
   }
 
   Map<String, dynamic> _getMonthlyStats() {
-    final now = DateTime.now();
-    final months = List.generate(12, (i) {
-      final d = DateTime(now.year, now.month - (11 - i), 1);
-      return DateTime(d.year, d.month, 1);
-    });
+    final now = normalizeHabitDate(DateTime.now());
+    final months = List<DateTime>.generate(12, (index) {
+      final date = DateTime(now.year, now.month - (11 - index), 1);
+      return DateTime(date.year, date.month, 1);
+    }, growable: false);
 
-    final labels = months.map((m) => DateFormat('yyyy-MM').format(m)).toList();
-
-    final vals = <double>[];
-    for (final m in months) {
-      final start = DateTime(m.year, m.month, 1);
-      final end = DateTime(
-        m.year,
-        m.month + 1,
-        1,
-      ).subtract(const Duration(days: 1));
-      final entries =
-          _habit.history.entries.where((e) {
-            final dt = DateTime.tryParse(e.key);
-            return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
-          }).toList();
+    final normalizedHistory = normalizeHabitHistory(_habit.history);
+    final values = months.map((monthStart) {
+      final nextMonth = DateTime(monthStart.year, monthStart.month + 1, 1);
+      final entries = normalizedHistory.entries
+          .where(
+            (entry) =>
+                !entry.key.isBefore(monthStart) && entry.key.isBefore(nextMonth),
+          )
+          .toList(growable: false);
 
       if (entries.isEmpty) {
-        vals.add(0);
-        continue;
+        return 0.0;
       }
 
       if (_habit.isQuantitative) {
-        final sum = entries.fold<double>(
+        return entries.fold<double>(
           0,
-          (a, e) => a + (double.tryParse(e.value.toString()) ?? 0),
+          (sum, entry) => sum + parseHabitNumericValue(entry.value),
         );
-        vals.add(sum);
-      } else {
-        final total = entries.length.toDouble();
-        final ok = entries.where((e) => e.value == '✔️').length.toDouble();
-        vals.add(total == 0 ? 0 : (ok / total) * 100);
       }
-    }
+
+      final loggedCount = entries
+          .where((entry) => isHabitLoggedValue(_habit, entry.value))
+          .length
+          .toDouble();
+      final completedCount = entries
+          .where((entry) => isHabitCompletedValue(_habit, entry.value))
+          .length
+          .toDouble();
+
+      return loggedCount == 0 ? 0.0 : (completedCount / loggedCount) * 100;
+    }).toList(growable: false);
 
     return {
       'months': months,
-      'labels': labels,
-      'values': vals,
-      'isPercent': !_habit.isQuantitative,
+      'values': values,
     };
   }
 
@@ -117,475 +177,946 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
     required DateTime day,
     required dynamic newValue,
   }) async {
-    final key = DateFormat('yyyy-MM-dd').format(day);
+    final key = habitDateKey(day);
 
     await HabitFirestoreService().updateHabitHistory(
       _habit.id,
       day,
-      newValue ?? '-',
+      newValue ?? habitSkippedValue,
     );
 
+    final updatedHistory = Map<String, dynamic>.from(_habit.history);
+    if (newValue == null) {
+      updatedHistory.remove(key);
+    } else {
+      updatedHistory[key] = newValue;
+    }
+
+    final refreshedHabit = _habit.copyWith(history: updatedHistory);
+    final streaks = computeHabitStreakStats(refreshedHabit);
+
+    if (streaks.current != _habit.currentStreak ||
+        streaks.best != _habit.bestStreak) {
+      await HabitFirestoreService.updateHabitFields(_habit.id, {
+        'currentStreak': streaks.current,
+        'bestStreak': streaks.best,
+      });
+    }
+
     setState(() {
-      if (newValue == null) {
-        _habit.history.remove(key);
-      } else {
-        _habit.history[key] = newValue;
-      }
+      _habit = refreshedHabit.copyWith(
+        currentStreak: streaks.current,
+        bestStreak: streaks.best,
+      );
+      _invalidateStatsCache();
     });
+  }
+
+  DateTime get _calendarFirstDay {
+    final dates = normalizeHabitHistory(_habit.history).keys.toList()..sort();
+    if (dates.isEmpty) {
+      final createdAt = normalizeHabitDate(_habit.createdAt);
+      return DateTime(createdAt.year, createdAt.month, 1);
+    }
+    final firstDate = dates.first;
+    return DateTime(firstDate.year, firstDate.month, 1);
+  }
+
+  DateTime get _calendarLastDay {
+    final dates = normalizeHabitHistory(_habit.history).keys.toList()..sort();
+    final today = normalizeHabitDate(DateTime.now());
+    final lastDate = dates.isEmpty
+        ? today
+        : (dates.last.isAfter(today) ? dates.last : today);
+    return DateTime(lastDate.year, lastDate.month + 1, 0);
+  }
+
+  double _axisInterval(double maxValue) {
+    if (maxValue <= 0) {
+      return 1;
+    }
+
+    final roughInterval = maxValue / 4;
+    final magnitude = math.pow(
+      10,
+      (math.log(roughInterval) / math.ln10).floor(),
+    ).toDouble();
+    final scaled = roughInterval / magnitude;
+
+    if (scaled <= 1) {
+      return magnitude;
+    }
+    if (scaled <= 2) {
+      return 2 * magnitude;
+    }
+    if (scaled <= 2.5) {
+      return 2.5 * magnitude;
+    }
+    if (scaled <= 5) {
+      return 5 * magnitude;
+    }
+    return 10 * magnitude;
+  }
+
+  String _formatChartAxisValue(double value, {required bool compact}) {
+    return compact
+        ? formatHabitCompactNumber(value)
+        : formatHabitStatNumber(value);
+  }
+
+  Widget _buildCalendarDayCell(
+    BuildContext context,
+    DateTime day, {
+    bool highlightToday = false,
+  }) {
+    final theme = Theme.of(context);
+    final value = habitHistoryValueForDate(_habit.history, day);
+
+    Color backgroundColor;
+    Color foregroundColor;
+    IconData? icon;
+
+    if (isHabitCompletedValue(_habit, value)) {
+      backgroundColor = theme.colorScheme.secondaryContainer;
+      foregroundColor = theme.colorScheme.onSecondaryContainer;
+      icon = Icons.check_rounded;
+    } else if (isHabitMissedValue(value)) {
+      backgroundColor = theme.colorScheme.errorContainer;
+      foregroundColor = theme.colorScheme.onErrorContainer;
+      icon = Icons.close_rounded;
+    } else if (isHabitSkippedValue(value)) {
+      backgroundColor = theme.colorScheme.tertiaryContainer;
+      foregroundColor = theme.colorScheme.onTertiaryContainer;
+      icon = Icons.remove_rounded;
+    } else if (_habit.isQuantitative && value != null) {
+      backgroundColor = theme.colorScheme.primaryContainer;
+      foregroundColor = theme.colorScheme.onPrimaryContainer;
+      icon = isHabitCompletedValue(_habit, value)
+          ? Icons.check_rounded
+          : Icons.show_chart_rounded;
+    } else {
+      backgroundColor = theme.colorScheme.surfaceContainerHighest;
+      foregroundColor = theme.colorScheme.onSurfaceVariant;
+      icon = null;
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => _EditHabitDayDialog(
+            date: habitDateKey(day),
+            value: value?.toString(),
+            isQuantitative: _habit.isQuantitative,
+            onSave: (newValue) async {
+              Navigator.pop(context);
+              await _saveDayValue(day: day, newValue: newValue);
+            },
+          ),
+        );
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+          border: highlightToday
+              ? Border.all(color: theme.colorScheme.primary, width: 1.5)
+              : null,
+        ),
+        child: Center(
+          child: icon != null
+              ? Icon(icon, size: 18, color: foregroundColor)
+              : Text(
+                  '${day.day}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: foregroundColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final daily = _getDailyStats();
-    final monthly = _getMonthlyStats();
+    final cs = theme.colorScheme;
+    final isMobile = MediaQuery.of(context).size.width < 700;
 
-    int currentStreak = 0, maxStreak = 0, tempStreak = 0;
-    final sortedKeys = _habit.history.keys.toList()..sort();
-    for (final k in sortedKeys) {
-      final v = _habit.history[k];
-      final success =
-          _habit.isQuantitative
-              ? (double.tryParse(v.toString()) ?? 0) > 0
-              : v == '✔️';
-      if (success) {
-        tempStreak++;
-        if (tempStreak > maxStreak) maxStreak = tempStreak;
-      } else {
-        tempStreak = 0;
-      }
-    }
-    tempStreak = 0;
-    for (final k in sortedKeys.reversed) {
-      final v = _habit.history[k];
-      final success =
-          _habit.isQuantitative
-              ? (double.tryParse(v.toString()) ?? 0) > 0
-              : v == '✔️';
-      if (success) {
-        tempStreak++;
-      } else {
-        break;
-      }
-    }
-    currentStreak = tempStreak;
-
-    final total = _habit.history.length;
-    final completados =
-        _habit.isQuantitative
-            ? _habit.history.values
-                .where((v) => (double.tryParse(v.toString()) ?? 0) > 0)
-                .length
-            : _habit.history.values.where((v) => v == '✔️').length;
-    final porcentaje = total == 0 ? 0 : (completados / total * 100).round();
+    _ensureStatsCache();
+    final daily = _dailyStatsCache;
+    final monthly = _monthlyStatsCache;
+    final historyEntries = _historyEntriesCache;
+    final missedEntries = _missedEntriesCache;
+    final streaks = _streaksCache;
+    final total = _totalCache;
+    final completed = _completedCache;
+    final completionPercent = _completionPercentCache;
+    final goalProgress = _goalProgressCache;
+    final quantitativeTotal = _quantitativeTotalCache;
+    final quantitativeAverage = _quantitativeAverageCache;
+    final dailyValues = daily['rawValues'] as List<double>;
+    final monthlyValues = monthly['values'] as List<double>;
+    final dailyMax = _habit.isQuantitative
+        ? ((daily['max'] as double) * 1.15)
+        : 100.0;
+    final monthlyBaseMax = monthlyValues.fold<double>(
+      0,
+      (currentMax, value) => value > currentMax ? value : currentMax,
+    );
+    final monthlyMax = _habit.isQuantitative
+        ? math.max(1.0, monthlyBaseMax) * 1.15
+        : 100.0;
+    final dailyInterval = _habit.isQuantitative ? _axisInterval(dailyMax) : 25.0;
+    final monthlyInterval = _habit.isQuantitative
+        ? _axisInterval(monthlyMax)
+        : 25.0;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Estadísticas')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              title: Text(
-                _habit.name,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle:
-                  _habit.description.isNotEmpty
-                      ? Text(_habit.description)
-                      : null,
-              leading: CircleAvatar(
-                child: Icon(
-                  _habit.isQuantitative
-                      ? Icons.stacked_line_chart
-                      : Icons.check_circle,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.spaceBetween,
+      appBar: AppBar(title: const Text('Estadísticas')),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _StatCard(
-                    icon: Icons.check,
-                    label: 'Completados',
-                    value: '$completados',
-                  ),
-                  _StatCard(
-                    icon: Icons.percent,
-                    label: 'Éxito',
-                    value: '$porcentaje%',
-                  ),
-                  _StatCard(
-                    icon: Icons.local_fire_department,
-                    label: 'Racha',
-                    value: '$currentStreak',
-                  ),
-                  _StatCard(
-                    icon: Icons.star,
-                    label: 'Máx. racha',
-                    value: '$maxStreak',
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            if (_habit.isQuantitative) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'Analytics cuantitativos',
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _QuantitativeAnalytics(habit: _habit),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Text('Últimos 7 días', style: theme.textTheme.titleMedium),
-                  const SizedBox(width: 8),
-                  if (_habit.isQuantitative)
-                    Text('(normalizado)', style: theme.textTheme.bodySmall),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: BarChart(
-                  BarChartData(
-                    barGroups: List.generate(
-                      (daily['values'] as List).length,
-                      (i) => BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: (daily['values'] as List<double>)[i],
-                            width: 18,
-                            borderRadius: BorderRadius.circular(6),
-                            gradient: LinearGradient(
-                              colors: [
-                                theme.colorScheme.secondary.withOpacity(.9),
-                                theme.colorScheme.secondary.withOpacity(.5),
+                  Card(
+                    elevation: 0,
+                    color: cs.surfaceContainerHigh,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: cs.secondaryContainer,
+                            foregroundColor: cs.onSecondaryContainer,
+                            child: Icon(
+                              _habit.isQuantitative
+                                  ? Icons.stacked_line_chart_rounded
+                                  : Icons.check_circle_rounded,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _habit.name,
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                if (_habit.description.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    _habit.description,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: cs.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    Chip(
+                                      avatar: const Icon(
+                                        Icons.event_repeat_rounded,
+                                        size: 16,
+                                      ),
+                                      label: Text(_habit.frequency),
+                                    ),
+                                    Chip(
+                                      avatar: Icon(
+                                        _habit.isQuantitative
+                                            ? Icons.numbers_rounded
+                                            : Icons.rule_folder_rounded,
+                                        size: 16,
+                                      ),
+                                      label: Text(
+                                        _habit.isQuantitative
+                                            ? (_habit.goalDisplayUnit.isEmpty
+                                                ? 'Cuantitativo'
+                                                : _habit.goalDisplayUnit)
+                                            : 'Sí/No',
+                                      ),
+                                    ),
+                                    if (_habit.hasGoal)
+                                      Chip(
+                                        avatar: const Icon(
+                                          Icons.flag_rounded,
+                                          size: 16,
+                                        ),
+                                        label: Text(
+                                          '${formatHabitStatNumber(_habit.goalValue)} ${_habit.goalDisplayUnit}'.trim(),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    titlesData: FlTitlesData(
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, _) {
-                            final idx = value.toInt();
-                            final days = daily['days'] as List<DateTime>;
-                            if (idx >= 0 && idx < days.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(DateFormat('E').format(days[idx])),
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                      leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: true),
-                      ),
-                    ),
-                    gridData: const FlGridData(show: true),
-                    borderData: FlBorderData(show: false),
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        getTooltipItem: (group, _, rod, __) {
-                          final raw =
-                              (daily['rawValues'] as List<double>)[group.x
-                                  .toInt()];
-                          return BarTooltipItem(
-                            _habit.isQuantitative
-                                ? '${raw.toStringAsFixed(2)} ${_habit.unit}'
-                                : (raw >= 0.5 ? '✔️' : '—'),
-                            TextStyle(
-                              color: theme.colorScheme.onSecondaryContainer,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
                   ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                _habit.isQuantitative
-                    ? 'Suma mensual (12 meses)'
-                    : 'Éxito mensual (12 meses)',
-                style: theme.textTheme.titleMedium,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: LineChart(
-                  LineChartData(
-                    titlesData: FlTitlesData(
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: 1,
-                          getTitlesWidget: (value, _) {
-                            final idx = value.toInt();
-                            final labels = monthly['labels'] as List<String>;
-                            if (idx >= 0 && idx < labels.length) {
-                              final m = labels[idx];
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(m.substring(2)),
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
+                  if (goalProgress.hasGoal) ...[
+                    const SizedBox(height: 16),
+                    Card(
+                      elevation: 0,
+                      color: cs.primaryContainer.withOpacity(0.7),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: true),
-                      ),
-                    ),
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: List.generate(
-                          (monthly['values'] as List).length,
-                          (i) => FlSpot(
-                            i.toDouble(),
-                            (monthly['values'] as List<double>)[i],
-                          ),
-                        ),
-                        isCurved: true,
-                        color: theme.colorScheme.secondary,
-                        barWidth: 4,
-                        belowBarData: BarAreaData(
-                          show: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.colorScheme.secondary.withOpacity(.25),
-                              Colors.transparent,
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        dotData: const FlDotData(show: true),
-                      ),
-                    ],
-                    gridData: const FlGridData(show: true),
-                    borderData: FlBorderData(show: false),
-                    lineTouchData: const LineTouchData(enabled: true),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('Calendario', style: theme.textTheme.titleMedium),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: TableCalendar(
-                firstDay: DateTime(_focusedDay.year - 5, 1, 1),
-                lastDay: DateTime(_focusedDay.year + 1, 12, 31),
-                focusedDay: _focusedDay,
-                onPageChanged: (d) => setState(() => _focusedDay = d),
-                calendarFormat: CalendarFormat.month,
-                availableGestures: AvailableGestures.horizontalSwipe,
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  titleTextStyle: theme.textTheme.titleMedium!.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
-                  ),
-                ),
-                calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(
-                    border: Border.all(color: theme.colorScheme.secondary),
-                    shape: BoxShape.circle,
-                  ),
-                  outsideDaysVisible: false,
-                ),
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, _) {
-                    final key = DateFormat('yyyy-MM-dd').format(day);
-                    final value = _habit.history[key];
-
-                    Color? bg;
-                    IconData? icon;
-                    if (value == '✔️' ||
-                        (_habit.isQuantitative &&
-                            (double.tryParse((value ?? '0').toString()) ?? 0) >
-                                0)) {
-                      bg = theme.colorScheme.secondary;
-                      icon = Icons.check;
-                    } else if (value == '❌') {
-                      bg = theme.colorScheme.error;
-                      icon = Icons.close;
-                    } else if (value == null) {
-                      bg = theme.colorScheme.surfaceContainerHighest;
-                      icon = null;
-                    } else {
-                      bg = theme.colorScheme.tertiary;
-                      icon = Icons.remove;
-                    }
-
-                    return GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder:
-                              (_) => _EditHabitDayDialog(
-                                date: key,
-                                value: value?.toString(),
-                                isQuantitative: _habit.isQuantitative,
-                                onSave: (newValue) async {
-                                  Navigator.pop(context);
-                                  await _saveDayValue(
-                                    day: day,
-                                    newValue: newValue,
-                                  );
-                                },
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Meta actual',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: cs.onPrimaryContainer,
+                                fontWeight: FontWeight.w800,
                               ),
-                        );
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: bg,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child:
-                              icon != null
-                                  ? Icon(
-                                    icon,
-                                    size: 18,
-                                    color: theme.colorScheme.onSecondary,
-                                  )
-                                  : Text(
-                                    '${day.day}',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Total registros: $total',
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                  if (_habit.isQuantitative)
-                    Text(
-                      'Promedio por día: '
-                      '${(_habit.history.values.map((v) => double.tryParse(v.toString()) ?? 0).fold(0.0, (a, b) => a + b) / (_habit.history.isEmpty ? 1 : _habit.history.length)).toStringAsFixed(2)} '
-                      '${_habit.unit}',
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                  if (!_habit.isQuantitative)
-                    Text(
-                      '✔️: ${_habit.history.values.where((v) => v == '✔️').length}   '
-                      '❌: ${_habit.history.values.where((v) => v == '❌').length}',
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.history),
-                    label: const Text('Ver historial completo'),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder:
-                            (_) => AlertDialog(
-                              title: const Text('Historial completo'),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: ListView(
-                                  children:
-                                      (_habit.history.entries.toList()..sort(
-                                            (a, b) => b.key.compareTo(a.key),
-                                          ))
-                                          .map(
-                                            (e) => ListTile(
-                                              title: Text(e.key),
-                                              trailing: Text('${e.value}'),
-                                            ),
-                                          )
-                                          .toList(),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${formatHabitStatNumber(goalProgress.current)} / ${formatHabitStatNumber(goalProgress.goal)} ${goalProgress.unit}'.trim(),
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                color: cs.onPrimaryContainer,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(999),
+                              child: LinearProgressIndicator(
+                                minHeight: 12,
+                                value: math.min(goalProgress.percent / 100, 1.0),
+                                backgroundColor:
+                                    cs.onPrimaryContainer.withOpacity(0.12),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  cs.onPrimaryContainer,
                                 ),
                               ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('Cerrar'),
-                                  onPressed: () => Navigator.pop(context),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 12,
+                              runSpacing: 8,
+                              children: [
+                                Text(
+                                  '${formatHabitStatNumber(goalProgress.percent)}% completado',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: cs.onPrimaryContainer,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  'Faltan ${formatHabitStatNumber(goalProgress.remaining)} ${goalProgress.unit}'.trim(),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: cs.onPrimaryContainer,
+                                  ),
                                 ),
                               ],
                             ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final rawWidth = constraints.maxWidth < 720
+                          ? (constraints.maxWidth - 12) / 2
+                          : (constraints.maxWidth - 36) / 4;
+                      final cardWidth = rawWidth.clamp(140.0, 320.0).toDouble();
+
+                      return Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          SizedBox(
+                            width: cardWidth,
+                            child: _StatCard(
+                              icon: Icons.check_circle_outline_rounded,
+                              label: 'Completados',
+                              value: formatHabitStatNumber(completed),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _StatCard(
+                              icon: Icons.percent_rounded,
+                              label: 'Cumplimiento',
+                              value:
+                                  '${formatHabitStatNumber(completionPercent)}%',
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _StatCard(
+                              icon: Icons.local_fire_department_rounded,
+                              label: 'Racha actual',
+                              value: formatHabitStatNumber(streaks.current),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _StatCard(
+                              icon: Icons.star_rounded,
+                              label: 'Mejor racha',
+                              value: formatHabitStatNumber(streaks.best),
+                            ),
+                          ),
+                        ],
                       );
                     },
+                  ),
+                  if (_habit.isQuantitative) ...[
+                    const SizedBox(height: 16),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Analytics cuantitativos',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _QuantitativeAnalytics(habit: _habit),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Últimos 7 días',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _habit.isQuantitative
+                                ? 'Valores diarios reales del hábito.'
+                                : 'Porcentaje diario de cumplimiento.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: isMobile ? 240 : 290,
+                            child: BarChart(
+                              BarChartData(
+                                minY: 0,
+                                maxY: dailyMax,
+                                alignment: BarChartAlignment.spaceAround,
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawVerticalLine: false,
+                                  horizontalInterval: dailyInterval,
+                                  getDrawingHorizontalLine: (value) => FlLine(
+                                    color: cs.outlineVariant.withOpacity(0.35),
+                                    strokeWidth: 1,
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 1,
+                                      reservedSize: isMobile ? 30 : 36,
+                                      getTitlesWidget: (value, meta) {
+                                        if ((value - value.roundToDouble()).abs() >
+                                            0.001) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        final index = value.round();
+                                        final days = daily['days'] as List<DateTime>;
+                                        if (index < 0 || index >= days.length) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        if (isMobile && index.isOdd) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            DateFormat(isMobile ? 'EE' : 'EEE')
+                                                .format(days[index]),
+                                            style: theme.textTheme.labelSmall,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: isMobile ? 46 : 56,
+                                      interval: dailyInterval,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          _formatChartAxisValue(
+                                            value,
+                                            compact: _habit.isQuantitative,
+                                          ),
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            color: cs.onSurfaceVariant,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                barGroups: List.generate(
+                                  dailyValues.length,
+                                  (index) => BarChartGroupData(
+                                    x: index,
+                                    barRods: [
+                                      BarChartRodData(
+                                        toY: dailyValues[index],
+                                        width: isMobile ? 14 : 18,
+                                        borderRadius: BorderRadius.circular(8),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            cs.secondary,
+                                            cs.secondary.withOpacity(0.45),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                barTouchData: BarTouchData(
+                                  enabled: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    tooltipRoundedRadius: 12,
+                                    getTooltipItem: (group, _, rod, __) {
+                                      final day =
+                                          (daily['days'] as List<DateTime>)[group.x.toInt()];
+                                      final rawValue = dailyValues[group.x.toInt()];
+                                      final valueLabel = _habit.isQuantitative
+                                          ? '${formatHabitStatNumber(rawValue)} ${_habit.goalDisplayUnit}'.trim()
+                                          : '${formatHabitStatNumber(rawValue)}%';
+                                      return BarTooltipItem(
+                                        '${DateFormat('EEE dd MMM').format(day)}\n$valueLabel',
+                                        theme.textTheme.bodyMedium?.copyWith(
+                                              color: cs.onInverseSurface,
+                                              fontWeight: FontWeight.w700,
+                                            ) ??
+                                            TextStyle(
+                                              color: cs.onInverseSurface,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _habit.isQuantitative
+                                ? 'Evolución mensual'
+                                : 'Éxito mensual',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _habit.isQuantitative
+                                ? 'Suma de valores registrados en los últimos 12 meses.'
+                                : 'Porcentaje de días cumplidos por mes.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: isMobile ? 240 : 290,
+                            child: LineChart(
+                              LineChartData(
+                                minX: 0,
+                                maxX: (monthlyValues.length - 1).toDouble(),
+                                minY: 0,
+                                maxY: monthlyMax,
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawVerticalLine: false,
+                                  horizontalInterval: monthlyInterval,
+                                  getDrawingHorizontalLine: (value) => FlLine(
+                                    color: cs.outlineVariant.withOpacity(0.35),
+                                    strokeWidth: 1,
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 1,
+                                      reservedSize: 32,
+                                      getTitlesWidget: (value, meta) {
+                                        if ((value - value.roundToDouble()).abs() >
+                                            0.001) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        final index = value.round();
+                                        final months = monthly['months'] as List<DateTime>;
+                                        if (index < 0 || index >= months.length) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        if (isMobile && index.isOdd) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            DateFormat('MMM').format(months[index]),
+                                            style: theme.textTheme.labelSmall,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: isMobile ? 46 : 56,
+                                      interval: monthlyInterval,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          _formatChartAxisValue(
+                                            value,
+                                            compact: _habit.isQuantitative,
+                                          ),
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            color: cs.onSurfaceVariant,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots: List.generate(
+                                      monthlyValues.length,
+                                      (index) => FlSpot(
+                                        index.toDouble(),
+                                        monthlyValues[index],
+                                      ),
+                                    ),
+                                    isCurved: true,
+                                    color: cs.secondary,
+                                    barWidth: 4,
+                                    belowBarData: BarAreaData(
+                                      show: true,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          cs.secondary.withOpacity(0.22),
+                                          Colors.transparent,
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                    dotData: FlDotData(show: !isMobile),
+                                  ),
+                                ],
+                                lineTouchData: LineTouchData(
+                                  enabled: true,
+                                  touchTooltipData: LineTouchTooltipData(
+                                    tooltipRoundedRadius: 12,
+                                    getTooltipItems: (spots) {
+                                      final months = monthly['months'] as List<DateTime>;
+                                      return spots.map((spot) {
+                                        final month = months[spot.x.toInt()];
+                                        final valueLabel = _habit.isQuantitative
+                                            ? '${formatHabitStatNumber(spot.y)} ${_habit.goalDisplayUnit}'.trim()
+                                            : '${formatHabitStatNumber(spot.y)}%';
+                                        return LineTooltipItem(
+                                          '${DateFormat('MMM yyyy').format(month)}\n$valueLabel',
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                                color: cs.onInverseSurface,
+                                                fontWeight: FontWeight.w700,
+                                              ) ??
+                                              TextStyle(
+                                                color: cs.onInverseSurface,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        );
+                                      }).toList();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Calendario',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Todo el historial disponible del hábito.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 8,
+                            children: [
+                              _CalendarLegendItem(
+                                color: cs.secondaryContainer,
+                                icon: Icons.check_rounded,
+                                label: 'Completado',
+                              ),
+                              _CalendarLegendItem(
+                                color: cs.errorContainer,
+                                icon: Icons.close_rounded,
+                                label: 'No completado',
+                              ),
+                              _CalendarLegendItem(
+                                color: cs.tertiaryContainer,
+                                icon: Icons.remove_rounded,
+                                label: 'Saltado',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          TableCalendar(
+                            firstDay: _calendarFirstDay,
+                            lastDay: _calendarLastDay,
+                            focusedDay: _focusedDay,
+                            onPageChanged: (day) => setState(() => _focusedDay = day),
+                            calendarFormat: CalendarFormat.month,
+                            availableCalendarFormats: const {
+                              CalendarFormat.month: 'Mes',
+                            },
+                            availableGestures: AvailableGestures.horizontalSwipe,
+                            startingDayOfWeek: StartingDayOfWeek.monday,
+                            headerStyle: HeaderStyle(
+                              formatButtonVisible: false,
+                              titleCentered: true,
+                              decoration: BoxDecoration(
+                                color: cs.secondaryContainer,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              titleTextStyle: theme.textTheme.titleMedium!.copyWith(
+                                color: cs.onSecondaryContainer,
+                                fontWeight: FontWeight.w800,
+                              ),
+                              leftChevronIcon: Icon(
+                                Icons.chevron_left_rounded,
+                                color: cs.onSecondaryContainer,
+                              ),
+                              rightChevronIcon: Icon(
+                                Icons.chevron_right_rounded,
+                                color: cs.onSecondaryContainer,
+                              ),
+                            ),
+                            calendarStyle: const CalendarStyle(
+                              outsideDaysVisible: false,
+                              todayDecoration: BoxDecoration(
+                                color: Colors.transparent,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            calendarBuilders: CalendarBuilders(
+                              defaultBuilder: (context, day, _) =>
+                                  _buildCalendarDayCell(context, day),
+                              todayBuilder: (context, day, _) =>
+                                  _buildCalendarDayCell(
+                                    context,
+                                    day,
+                                    highlightToday: true,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Resumen',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Total registros: ${formatHabitStatNumber(total)}',
+                            style: theme.textTheme.bodyLarge,
+                          ),
+                          if (_habit.isQuantitative) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              'Promedio por registro: ${formatHabitStatNumber(quantitativeAverage)} ${_habit.goalDisplayUnit}'.trim(),
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Total acumulado: ${formatHabitStatNumber(quantitativeTotal)} ${_habit.goalDisplayUnit}'.trim(),
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                          ] else ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              'No completados: ${formatHabitStatNumber(missedEntries.length)}',
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.history_rounded),
+                            label: const Text('Ver historial completo'),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text('Historial completo'),
+                                  content: SizedBox(
+                                    width: double.maxFinite,
+                                    child: ListView(
+                                      children: historyEntries.reversed.map((entry) {
+                                        final trailingText = _habit.isQuantitative
+                                            ? '${formatHabitStatNumber(parseHabitNumericValue(entry.value))} ${_habit.goalDisplayUnit}'.trim()
+                                            : isHabitCompletedValue(_habit, entry.value)
+                                                ? 'Completado'
+                                                : isHabitMissedValue(entry.value)
+                                                    ? 'No completado'
+                                                    : isHabitSkippedValue(entry.value)
+                                                        ? 'Saltado'
+                                                        : '${entry.value}';
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(DateFormat('dd/MM/yyyy').format(entry.key)),
+                                          trailing: Text(trailingText),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cerrar'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );
@@ -596,6 +1127,7 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+
   const _StatCard({
     required this.icon,
     required this.label,
@@ -606,18 +1138,20 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      elevation: 1,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        width: 150,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, color: theme.colorScheme.secondary, size: 20),
             const SizedBox(height: 6),
             Text(
               value,
+              textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -630,6 +1164,37 @@ class _StatCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CalendarLegendItem extends StatelessWidget {
+  final Color color;
+  final IconData icon;
+  final String label;
+
+  const _CalendarLegendItem({
+    required this.color,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 6),
+          Text(label),
+        ],
       ),
     );
   }
@@ -668,53 +1233,52 @@ class _EditHabitDayDialogState extends State<_EditHabitDayDialog> {
 
     return AlertDialog(
       title: Text('Editar ${widget.date}'),
-      content:
-          widget.isQuantitative
-              ? TextFormField(
-                initialValue: _value?.toString(),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-                onChanged: (v) => _value = v,
-              )
-              : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  RadioListTile(
-                    value: '✔️',
-                    groupValue: _value,
-                    title: const Text('Completado'),
-                    activeColor: sec,
-                    onChanged: (v) => setState(() => _value = v),
-                  ),
-                  RadioListTile(
-                    value: '❌',
-                    groupValue: _value,
-                    title: const Text('No completado'),
-                    activeColor: sec,
-                    onChanged: (v) => setState(() => _value = v),
-                  ),
-                  RadioListTile(
-                    value: null,
-                    groupValue: _value,
-                    title: const Text('Sin registro'),
-                    activeColor: sec,
-                    onChanged: (v) => setState(() => _value = v),
-                  ),
-                ],
-              ),
+      content: widget.isQuantitative
+          ? TextFormField(
+              initialValue: _value?.toString(),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Cantidad'),
+              onChanged: (value) => _value = value,
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile(
+                  value: habitCompletedValue,
+                  groupValue: _value,
+                  title: const Text('Completado'),
+                  activeColor: sec,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                RadioListTile(
+                  value: habitMissedValue,
+                  groupValue: _value,
+                  title: const Text('No completado'),
+                  activeColor: sec,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+                RadioListTile(
+                  value: null,
+                  groupValue: _value,
+                  title: const Text('Sin registro'),
+                  activeColor: sec,
+                  onChanged: (value) => setState(() => _value = value),
+                ),
+              ],
+            ),
       actions: [
         TextButton(
           style: TextButton.styleFrom(foregroundColor: sec),
-          child: const Text('Cancelar'),
           onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: sec,
             foregroundColor: theme.colorScheme.onSecondary,
           ),
-          child: const Text('Guardar'),
           onPressed: () => widget.onSave(_value),
+          child: const Text('Guardar'),
         ),
       ],
     );
@@ -723,12 +1287,12 @@ class _EditHabitDayDialogState extends State<_EditHabitDayDialog> {
 
 class _QuantitativeAnalytics extends StatelessWidget {
   final Habit habit;
+
   const _QuantitativeAnalytics({required this.habit});
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-
+    final now = normalizeHabitDate(DateTime.now());
     final weekStart = now.subtract(Duration(days: now.weekday - 1));
     final weekEnd = weekStart.add(
       const Duration(days: 6, hours: 23, minutes: 59),
@@ -752,37 +1316,39 @@ class _QuantitativeAnalytics extends StatelessWidget {
     );
 
     final monthChange = monthData.total - prevMonthData.total;
-    final monthChangePercent =
-        prevMonthData.total > 0
-            ? ((monthChange / prevMonthData.total) * 100).toStringAsFixed(0)
-            : '∞';
+    final monthChangePercent = prevMonthData.total > 0
+        ? formatHabitStatNumber((monthChange / prevMonthData.total) * 100)
+        : (monthData.total > 0 ? '100.00' : '0.00');
 
     return Column(
       children: [
         _AnalyticsCard(
           title: 'Esta semana',
-          value: '${weekData.total.toStringAsFixed(1)} ${habit.unit}',
+          value:
+              '${formatHabitStatNumber(weekData.total)} ${habit.goalDisplayUnit}'.trim(),
           subtitle:
-              'Promedio diario: ${weekData.average.toStringAsFixed(1)} ${habit.unit}',
-          icon: Icons.calendar_view_week,
+              'Promedio diario: ${formatHabitStatNumber(weekData.average)} ${habit.goalDisplayUnit}'.trim(),
+          icon: Icons.calendar_view_week_rounded,
           color: Colors.blue,
         ),
         const SizedBox(height: 8),
         _AnalyticsCard(
           title: 'Este mes',
-          value: '${monthData.total.toStringAsFixed(1)} ${habit.unit}',
+          value:
+              '${formatHabitStatNumber(monthData.total)} ${habit.goalDisplayUnit}'.trim(),
           subtitle:
-              'Promedio: ${monthData.average.toStringAsFixed(1)} • ${monthChange >= 0 ? '+' : ''}${monthChange.toStringAsFixed(0)} ($monthChangePercent%)',
-          icon: Icons.calendar_today,
+              'Promedio: ${formatHabitStatNumber(monthData.average)} ${habit.goalDisplayUnit} • ${monthChange >= 0 ? '+' : ''}${formatHabitStatNumber(monthChange)} ($monthChangePercent%)'.trim(),
+          icon: Icons.calendar_today_rounded,
           color: Colors.green,
         ),
         const SizedBox(height: 8),
         _AnalyticsCard(
           title: 'Este año',
-          value: '${yearData.total.toStringAsFixed(1)} ${habit.unit}',
+          value:
+              '${formatHabitStatNumber(yearData.total)} ${habit.goalDisplayUnit}'.trim(),
           subtitle:
-              'Mejor mes: ${_bestMonth(habit.history, now.year)} ${habit.unit}',
-          icon: Icons.calendar_month,
+              'Mejor mes: ${_bestMonth(habit.history, now.year)} ${habit.goalDisplayUnit}'.trim(),
+          icon: Icons.calendar_month_rounded,
           color: Colors.orange,
         ),
       ],
@@ -794,46 +1360,49 @@ class _QuantitativeAnalytics extends StatelessWidget {
     DateTime start,
     DateTime end,
   ) {
-    final entries =
-        history.entries.where((e) {
-          final dt = DateTime.tryParse(e.key);
-          return dt != null && !dt.isBefore(start) && !dt.isAfter(end);
-        }).toList();
+    final entries = normalizeHabitHistory(history).entries
+        .where((entry) => !entry.key.isBefore(start) && !entry.key.isAfter(end))
+        .toList(growable: false);
 
-    if (entries.isEmpty) return _PeriodData(0, 0);
+    if (entries.isEmpty) {
+      return const _PeriodData(0, 0);
+    }
 
     final sum = entries.fold<double>(
       0,
-      (a, e) => a + (double.tryParse(e.value.toString()) ?? 0),
+      (currentSum, entry) => currentSum + parseHabitNumericValue(entry.value),
     );
-    final avg = sum / entries.length;
-    return _PeriodData(sum, avg);
+    final average = sum / entries.length;
+    return _PeriodData(sum, average);
   }
 
   String _bestMonth(Map<String, dynamic> history, int year) {
     final monthTotals = <int, double>{};
 
-    for (final e in history.entries) {
-      final dt = DateTime.tryParse(e.key);
-      if (dt == null || dt.year != year) continue;
-
-      final val = double.tryParse(e.value.toString()) ?? 0;
-      monthTotals[dt.month] = (monthTotals[dt.month] ?? 0) + val;
+    for (final entry in normalizeHabitHistory(history).entries) {
+      if (entry.key.year != year) {
+        continue;
+      }
+      monthTotals[entry.key.month] = (monthTotals[entry.key.month] ?? 0) +
+          parseHabitNumericValue(entry.value);
     }
 
-    if (monthTotals.isEmpty) return '0';
+    if (monthTotals.isEmpty) {
+      return formatHabitStatNumber(0);
+    }
 
-    final best = monthTotals.entries.reduce(
-      (a, b) => a.value > b.value ? a : b,
+    final bestMonth = monthTotals.entries.reduce(
+      (left, right) => left.value > right.value ? left : right,
     );
-    return best.value.toStringAsFixed(1);
+    return formatHabitStatNumber(bestMonth.value);
   }
 }
 
 class _PeriodData {
   final double total;
   final double average;
-  _PeriodData(this.total, this.average);
+
+  const _PeriodData(this.total, this.average);
 }
 
 class _AnalyticsCard extends StatelessWidget {
@@ -854,10 +1423,11 @@ class _AnalyticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               backgroundColor: color.withOpacity(0.2),
@@ -872,12 +1442,19 @@ class _AnalyticsCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     value,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    subtitle,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ],
               ),
             ),

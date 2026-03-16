@@ -72,8 +72,10 @@ class Habit {
   List<HabitReminder> reminders;
   int currentStreak;
   int bestStreak;
-  var values;
-  var textColor;
+  double? goalValue;
+  String? goalUnit;
+  dynamic values;
+  Color? textColor;
 
   Habit({
     required this.id,
@@ -97,10 +99,20 @@ class Habit {
     List<HabitReminder>? reminders,
     this.currentStreak = 0,
     this.bestStreak = 0,
+    this.goalValue,
+    this.goalUnit,
   }) : tags = tags ?? [],
        reminders = reminders ?? [];
 
   Color get color => Color(int.parse(colorHex));
+  bool get hasGoal => goalValue != null && goalValue! > 0;
+  String get goalDisplayUnit {
+    final trimmedGoalUnit = goalUnit?.trim() ?? '';
+    if (trimmedGoalUnit.isNotEmpty) {
+      return trimmedGoalUnit;
+    }
+    return unit.trim();
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -124,6 +136,8 @@ class Habit {
       'reminders': reminders.map((r) => r.toMap()).toList(),
       'currentStreak': currentStreak,
       'bestStreak': bestStreak,
+      'goalValue': goalValue,
+      'goalUnit': goalUnit,
     };
   }
 
@@ -171,6 +185,8 @@ class Habit {
       reminders: parseReminders(map['reminders']),
       currentStreak: (map['currentStreak'] as num?)?.toInt() ?? 0,
       bestStreak: (map['bestStreak'] as num?)?.toInt() ?? 0,
+      goalValue: (map['goalValue'] as num?)?.toDouble(),
+      goalUnit: map['goalUnit']?.toString(),
     );
   }
 
@@ -203,6 +219,8 @@ class Habit {
       reminders: const [],
       currentStreak: 0,
       bestStreak: 0,
+      goalValue: null,
+      goalUnit: null,
     );
   }
 
@@ -228,6 +246,8 @@ class Habit {
     List<HabitReminder>? reminders,
     int? currentStreak,
     int? bestStreak,
+    double? goalValue,
+    String? goalUnit,
   }) {
     return Habit(
       id: id ?? this.id,
@@ -251,6 +271,8 @@ class Habit {
       reminders: reminders ?? this.reminders,
       currentStreak: currentStreak ?? this.currentStreak,
       bestStreak: bestStreak ?? this.bestStreak,
+      goalValue: goalValue ?? this.goalValue,
+      goalUnit: goalUnit ?? this.goalUnit,
     );
   }
 }

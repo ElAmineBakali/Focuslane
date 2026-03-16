@@ -7,6 +7,7 @@ import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/emoji_icon_picker.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/tag_selector.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final Habit habit;
@@ -22,6 +23,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _reminderController;
+  late TextEditingController _goalValueController;
+  late TextEditingController _goalUnitController;
   late String _frequency;
   late bool _isQuantitative;
   late String _unit;
@@ -38,6 +41,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     _nameController = TextEditingController(text: habit.name);
     _descriptionController = TextEditingController(text: habit.description);
     _reminderController = TextEditingController(text: habit.reminderTime);
+    _goalValueController = TextEditingController(
+      text: habit.goalValue == null ? '' : formatHabitStatNumber(habit.goalValue),
+    );
+    _goalUnitController = TextEditingController(text: habit.goalUnit ?? '');
     _frequency = habit.frequency;
     _isQuantitative = habit.isQuantitative;
     _unit = habit.unit;
@@ -55,6 +62,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _reminderController.dispose();
+    _goalValueController.dispose();
+    _goalUnitController.dispose();
     super.dispose();
   }
 
@@ -128,26 +137,43 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   String _asHex(Color c) =>
       '0x${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
+  double? _parseGoalValue() {
+    final raw = _goalValueController.text.trim();
+    if (raw.isEmpty) {
+      return null;
+    }
+
+    final parsed = parseHabitNumericValue(raw);
+    return parsed > 0 ? parsed : null;
+  }
+
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final updatedHabit = widget.habit.copyWith(
-      name: _nameController.text.trim(),
-      description: _descriptionController.text.trim(),
-      frequency: _frequency,
-      reminderTime: _reminderController.text.trim(),
-      isQuantitative: _isQuantitative,
-      unit: _unit,
-      colorHex: _asHex(_selectedColor),
-      isActive: _isActive,
-      emoji: _emoji,
-      iconCode: _iconCode,
-      tags: _tags,
-      reminders: _reminders,
-      lastUpdated: DateTime.now(),
-    );
+    final goalValue = _isQuantitative ? _parseGoalValue() : null;
+    final goalUnit = _isQuantitative
+        ? _goalUnitController.text.trim().isEmpty
+            ? null
+            : _goalUnitController.text.trim()
+        : null;
 
-    await HabitFirestoreService.updateHabit(updatedHabit);
+    await HabitFirestoreService.updateHabitFields(widget.habit.id, {
+      'name': _nameController.text.trim(),
+      'description': _descriptionController.text.trim(),
+      'frequency': _frequency,
+      'reminderTime': _reminderController.text.trim(),
+      'isQuantitative': _isQuantitative,
+      'unit': _isQuantitative ? _unit.trim() : '',
+      'goalValue': goalValue,
+      'goalUnit': goalUnit,
+      'colorHex': _asHex(_selectedColor),
+      'isActive': _isActive,
+      'emoji': _emoji,
+      'iconCode': _iconCode,
+      'tags': _tags,
+      'reminders': _reminders.map((r) => r.toMap()).toList(),
+      'lastUpdated': DateTime.now(),
+    });
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -156,6 +182,19 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
+    final currentGoalValue = _isQuantitative ? _parseGoalValue() : null;
+    final currentGoalUnit = _goalUnitController.text.trim().isEmpty
+      ? (_unit.trim().isEmpty ? '' : _unit.trim())
+      : _goalUnitController.text.trim();
+    final currentValue = parseHabitNumericValue(
+      habitHistoryValueForDate(widget.habit.history, DateTime.now()),
+    );
+    final remainingValue = currentGoalValue == null
+      ? 0.0
+      : (currentGoalValue - currentValue).clamp(0.0, double.infinity);
+    final currentPercent = currentGoalValue == null || currentGoalValue <= 0
+      ? 0.0
+      : ((currentValue / currentGoalValue) * 100).clamp(0.0, 999999.0);
 
     return Scaffold(
       appBar: AppBar(
@@ -398,14 +437,119 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   value: _isQuantitative,
                   onChanged: (val) => setState(() => _isQuantitative = val),
                 ),
-                if (_isQuantitative)
+                if (_isQuantitative) ...[
                   TextFormField(
                     initialValue: _unit,
                     decoration: const InputDecoration(
                       labelText: 'Unidad (opcional)',
                     ),
-                    onChanged: (val) => _unit = val,
+                    onChanged: (val) => setState(() => _unit = val),
                   ),
+                  const SizedBox(height: 12),
+                  Card(
+                    elevation: 0,
+                    color: cs.surfaceContainerHigh,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        isMobile ? 14 : 16,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(isMobile ? 14 : 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Meta opcional',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Puedes añadirla ahora o modificar la existente.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _goalValueController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: 'Valor objetivo',
+                              hintText: 'Ej: 2000',
+                            ),
+                            validator: (value) {
+                              final raw = value?.trim() ?? '';
+                              if (raw.isEmpty) {
+                                return null;
+                              }
+
+                              final parsed = parseHabitNumericValue(raw);
+                              if (parsed <= 0) {
+                                return 'Introduce una meta válida';
+                              }
+                              return null;
+                            },
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _goalUnitController,
+                            decoration: InputDecoration(
+                              labelText: 'Unidad de meta',
+                              hintText: _unit.trim().isEmpty
+                                  ? 'Ej: ml, páginas, pasos'
+                                  : 'Ej: ${_unit.trim()}',
+                            ),
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          if (currentGoalValue != null) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: cs.primaryContainer.withOpacity(0.55),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Progreso actual',
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      color: cs.onPrimaryContainer,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${formatHabitStatNumber(currentValue)} / ${formatHabitStatNumber(currentGoalValue)} ${currentGoalUnit.trim()}'.trim(),
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: cs.onPrimaryContainer,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${formatHabitStatNumber(currentPercent)}% completado · faltan ${formatHabitStatNumber(remainingValue)} ${currentGoalUnit.trim()}'.trim(),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: cs.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 ListTile(
                   title: const Text('Color'),

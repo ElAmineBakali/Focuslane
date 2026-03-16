@@ -1,9 +1,12 @@
 ﻿import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/confetti_animation.dart';
 import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
@@ -21,10 +24,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   bool _editMode = false;
   bool _showArchived = false;
 
-  late final List<DateTime> _dates = List.generate(
-    30,
-    (i) => DateTime.now().subtract(Duration(days: i)),
-  );
+  List<DateTime> _dates = const [];
 
   static const double _nameColWidth = 140;
   static const double _cellWidth = 64;
@@ -34,12 +34,135 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
 
   static const double _bottomSafeGap = 100;
 
+  static const int _timelineInitialDays = 180;
+  static const int _timelineChunkDays = 120;
+  static const double _timelinePrefetchPx = 500;
+  static const int _timelineExtraPastDays = 3650;
+
   List<Habit>? _orderedHabits;
+  final Map<String, Map<String, dynamic>> _historyIndexByHabit = {};
+  DateTime? _earliestTimelineDate;
+  int _loadedTimelineDays = 0;
+  int _maxTimelineDays = 0;
+  bool _isAppendingTimeline = false;
 
   final ScrollController _leftV = ScrollController();
   final ScrollController _rightV = ScrollController();
+  final ScrollController _horizontal = ScrollController();
   bool _syncingL = false;
   bool _syncingR = false;
+
+  void _syncTimeline(List<Habit> habits) {
+    final today = normalizeHabitDate(DateTime.now());
+    final earliestTimelineDate = resolveEarliestHabitDate(
+      habits,
+      extraPastDays: _timelineExtraPastDays,
+    );
+    final maxTimelineDays = today.difference(earliestTimelineDate).inDays + 1;
+    final timelineChanged =
+        _earliestTimelineDate != earliestTimelineDate ||
+        _maxTimelineDays != maxTimelineDays;
+
+    if (timelineChanged) {
+      _earliestTimelineDate = earliestTimelineDate;
+      _maxTimelineDays = maxTimelineDays;
+    }
+
+    if (_loadedTimelineDays == 0 || timelineChanged) {
+      _loadedTimelineDays = math.min(
+        _maxTimelineDays,
+        math.max(_loadedTimelineDays, _timelineInitialDays),
+      );
+    }
+
+    if (_loadedTimelineDays > _maxTimelineDays) {
+      _loadedTimelineDays = _maxTimelineDays;
+    }
+
+    final expectedLastDate =
+        today.subtract(Duration(days: _loadedTimelineDays - 1));
+    final shouldRebuildDates = _dates.isEmpty ||
+        _dates.length != _loadedTimelineDays ||
+        _dates.first != today ||
+        _dates.last != expectedLastDate;
+
+    if (shouldRebuildDates) {
+      _dates = _buildTimelineDates(today);
+    }
+  }
+
+  List<DateTime> _buildTimelineDates(DateTime today) {
+    return List<DateTime>.generate(
+      _loadedTimelineDays,
+      (index) => today.subtract(Duration(days: index)),
+      growable: false,
+    );
+  }
+
+  void _appendTimelineChunkIfNeeded() {
+    if (!_horizontal.hasClients || _isAppendingTimeline) {
+      return;
+    }
+
+    if (_loadedTimelineDays >= _maxTimelineDays) {
+      return;
+    }
+
+    final remaining =
+        _horizontal.position.maxScrollExtent - _horizontal.position.pixels;
+    if (remaining > _timelinePrefetchPx) {
+      return;
+    }
+
+    _isAppendingTimeline = true;
+    setState(() {
+      _loadedTimelineDays = math.min(
+        _maxTimelineDays,
+        _loadedTimelineDays + _timelineChunkDays,
+      );
+      _dates = _buildTimelineDates(normalizeHabitDate(DateTime.now()));
+    });
+    _isAppendingTimeline = false;
+  }
+
+  void _buildHistoryIndexes(List<Habit> habits) {
+    _historyIndexByHabit.clear();
+    for (final habit in habits) {
+      _historyIndexByHabit[habit.id] = buildHabitHistoryKeyIndex(habit.history);
+    }
+  }
+
+  void _handleHorizontalPointerSignal(PointerSignalEvent event) {
+    if (!_horizontal.hasClients || event is! PointerScrollEvent) {
+      return;
+    }
+
+    final supportsDesktopPointer = kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux;
+    if (!supportsDesktopPointer) {
+      return;
+    }
+
+    final step = event.scrollDelta.dx != 0
+        ? event.scrollDelta.dx
+        : event.scrollDelta.dy;
+    if (step == 0) {
+      return;
+    }
+
+    final targetOffset = (_horizontal.offset + step).clamp(
+      0.0,
+      _horizontal.position.maxScrollExtent,
+    );
+    if (targetOffset == _horizontal.offset) {
+      return;
+    }
+
+    _horizontal.jumpTo(targetOffset);
+    _appendTimelineChunkIfNeeded();
+  }
 
   @override
   void initState() {
@@ -70,38 +193,62 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       if ((_leftV.offset - t).abs() > 0.5) _leftV.jumpTo(t);
       _syncingR = false;
     });
+
+    _horizontal.addListener(_appendTimelineChunkIfNeeded);
   }
 
   @override
   void dispose() {
     _leftV.dispose();
     _rightV.dispose();
+    _horizontal.dispose();
     super.dispose();
   }
 
   Color _cellBg(dynamic value, ThemeData theme) {
+    final status = normalizeHabitStatus(value);
+    if (status == habitCompletedValue) {
+      return theme.colorScheme.secondaryContainer.withOpacity(0.72);
+    }
+    if (status == habitMissedValue) {
+      return theme.colorScheme.errorContainer.withOpacity(0.82);
+    }
+    if (status == habitSkippedValue) {
+      return theme.colorScheme.tertiaryContainer.withOpacity(0.78);
+    }
+
     final isLight = theme.brightness == Brightness.light;
-    final hasValue = value != null && value != '-';
+    final hasValue = value != null;
     final base = theme.colorScheme.surfaceContainerHighest;
-    final op = isLight ? (hasValue ? .35 : .18) : (hasValue ? .40 : .22);
-    return base.withOpacity(op);
+    final opacity = isLight ? (hasValue ? .35 : .18) : (hasValue ? .40 : .22);
+    return base.withOpacity(opacity);
   }
 
   Widget _valueContent(Habit habit, dynamic value, ThemeData theme) {
-    if (value == 'âœ”ï¸') {
+    if (isHabitCompletedValue(habit, value) && !habit.isQuantitative) {
       return Icon(Icons.check_rounded, color: habit.color, size: 22);
     }
-    if (value == 'âŒ') {
+    if (isHabitMissedValue(value)) {
       return Icon(Icons.close_rounded, color: habit.color, size: 22);
     }
-    final s = value?.toString();
-    final isNum = s != null && int.tryParse(s) != null;
-    if (habit.isQuantitative && isNum) {
+    if (isHabitSkippedValue(value)) {
+      return Icon(
+        Icons.remove_rounded,
+        color: theme.colorScheme.onTertiaryContainer,
+        size: 20,
+      );
+    }
+
+    if (habit.isQuantitative && value != null) {
+      final numericValue = parseHabitNumericValue(value);
+      final displayValue = numericValue.abs() >= 1000
+          ? formatHabitCompactNumber(numericValue)
+          : formatHabitStatNumber(numericValue);
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            s,
+            displayValue,
             style: TextStyle(color: habit.color, fontWeight: FontWeight.bold),
           ),
           if (habit.unit.isNotEmpty) const SizedBox(height: 2),
@@ -125,7 +272,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   Future<void> _updateHistoryValue(Habit habit, DateTime date) async {
     final theme = Theme.of(context);
     final sec = theme.colorScheme.secondary;
-    final key = DateFormat('yyyy-MM-dd').format(date);
+    final key = habitDateKey(date);
 
     if (!habit.isQuantitative) {
       final result = await showDialog<String>(
@@ -135,17 +282,17 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               title: const Text('¿Qué quieres marcar?'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, 'âœ”ï¸'),
+                  onPressed: () => Navigator.pop(context, habitCompletedValue),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Icon(Icons.check_rounded),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context, 'âŒ'),
+                  onPressed: () => Navigator.pop(context, habitMissedValue),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Icon(Icons.close_rounded),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context, '-'),
+                  onPressed: () => Navigator.pop(context, habitSkippedValue),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Text('Saltar'),
                 ),
@@ -156,24 +303,18 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         await _habitService.updateHabitHistory(habit.id, date, result);
         habit.history[key] = result;
 
-        if (result == 'âœ”ï¸' && _isToday(date)) {
-          await _updateStreak(habit, true);
+        await _updateStreak(habit);
 
-          if (mounted) {
-            final allHabits = _orderedHabits ?? [];
-            final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-            final allCompleted = allHabits.every(
-              (h) => h.history[todayKey] == 'âœ”ï¸',
-            );
+        if (isHabitCompletedValue(habit, result) && _isToday(date) && mounted) {
+          final allHabits = _orderedHabits ?? [];
+          final allCompleted = allHabits.every(
+            (trackedHabit) => isHabitCompletedValue(
+              trackedHabit,
+              habitHistoryValueForDate(trackedHabit.history, DateTime.now()),
+            ),
+          );
 
-            if (allCompleted && allHabits.isNotEmpty) {
-              _showConfetti(habit: habit, isPerfectDay: true);
-            } else {
-              _showConfetti(habit: habit, isPerfectDay: false);
-            }
-          }
-        } else if (result == 'âŒ' && _isToday(date)) {
-          await _updateStreak(habit, false);
+          _showConfetti(habit: habit, isPerfectDay: allCompleted && allHabits.isNotEmpty);
         }
 
         setState(() {});
@@ -202,7 +343,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   child: const Text('Guardar'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context, '-'),
+                  onPressed: () => Navigator.pop(context, habitSkippedValue),
                   style: TextButton.styleFrom(foregroundColor: sec),
                   child: const Text('Saltar'),
                 ),
@@ -213,29 +354,18 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         await _habitService.updateHabitHistory(habit.id, date, result);
         habit.history[key] = result;
 
-        if (result != '-' && _isToday(date)) {
-          final value = int.tryParse(result) ?? 0;
-          final goalMet = value > 0;
-          await _updateStreak(habit, goalMet);
+        await _updateStreak(habit);
 
-          if (goalMet && mounted) {
-            final allHabits = _orderedHabits ?? [];
-            final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-            final allCompleted = allHabits.every((h) {
-              final val = h.history[todayKey];
-              if (h.isQuantitative) {
-                final v = int.tryParse(val?.toString() ?? '0') ?? 0;
-                return v > 0;
-              }
-              return val == 'âœ”ï¸';
-            });
+        if (isHabitCompletedValue(habit, result) && _isToday(date) && mounted) {
+          final allHabits = _orderedHabits ?? [];
+          final allCompleted = allHabits.every(
+            (trackedHabit) => isHabitCompletedValue(
+              trackedHabit,
+              habitHistoryValueForDate(trackedHabit.history, DateTime.now()),
+            ),
+          );
 
-            if (allCompleted && allHabits.isNotEmpty) {
-              _showConfetti(habit: habit, isPerfectDay: true);
-            } else {
-              _showConfetti(habit: habit, isPerfectDay: false);
-            }
-          }
+          _showConfetti(habit: habit, isPerfectDay: allCompleted && allHabits.isNotEmpty);
         }
 
         setState(() {});
@@ -250,26 +380,19 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         date.day == now.day;
   }
 
-  Future<void> _updateStreak(Habit habit, bool completed) async {
-    if (completed) {
-      final newStreak = habit.currentStreak + 1;
-      final newBest = math.max(habit.bestStreak, newStreak);
-
-      await HabitFirestoreService.updateHabitFields(habit.id, {
-        'currentStreak': newStreak,
-        'bestStreak': newBest,
-      });
-
-      habit.currentStreak = newStreak;
-      habit.bestStreak = newBest;
-    } else {
-      if (habit.currentStreak > 0) {
-        await HabitFirestoreService.updateHabitFields(habit.id, {
-          'currentStreak': 0,
-        });
-        habit.currentStreak = 0;
-      }
+  Future<void> _updateStreak(Habit habit) async {
+    final streaks = computeHabitStreakStats(habit);
+    if (streaks.current == habit.currentStreak && streaks.best == habit.bestStreak) {
+      return;
     }
+
+    await HabitFirestoreService.updateHabitFields(habit.id, {
+      'currentStreak': streaks.current,
+      'bestStreak': streaks.best,
+    });
+
+    habit.currentStreak = streaks.current;
+    habit.bestStreak = streaks.best;
   }
 
   void _showConfetti({required Habit habit, required bool isPerfectDay}) {
@@ -287,6 +410,13 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             ],
           ),
     );
+  }
+
+  void _enterEditMode(Habit habit) {
+    setState(() {
+      _editMode = true;
+      _selectedHabit = habit;
+    });
   }
 
   Future<void> _onReorder(int oldIndex, int newIndex) async {
@@ -350,9 +480,13 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
     _selectedHabit = null;
   });
 
-  Widget _cell(Habit habit, DateTime date, ThemeData theme) {
-    final key = DateFormat('yyyy-MM-dd').format(date);
-    final value = habit.history[key];
+  Widget _cell(
+    Habit habit,
+    Map<String, dynamic> historyIndex,
+    DateTime date,
+    ThemeData theme,
+  ) {
+    final value = habitHistoryIndexedValue(historyIndex, date);
     return GestureDetector(
       onTap: () => _updateHistoryValue(habit, date),
       child: Container(
@@ -377,9 +511,6 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             ? HabitFirestoreService.getArchivedHabits()
             : HabitFirestoreService.getHabits();
 
-    final double gridWidth =
-        _dates.length * (_cellWidth + _cellMargin.horizontal);
-
     return Scaffold(
       backgroundColor:
           Theme.of(context).brightness == Brightness.light
@@ -401,27 +532,25 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   await NotificationService.I.scheduleHabitDailyReminder(
                     picked,
                   );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          'ðŸ‘Œ Te avisaré todos los días a la hora elegida para revisar hábitos.',
-                        ),
-                      ),
-                    );
-                  }
-                }
-              } else if (value == 'cancel') {
-                await NotificationService.I.cancelHabitDailyReminder();
-                if (mounted) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       behavior: SnackBarBehavior.floating,
-                      content: Text('â° Recordatorio diario cancelado.'),
+                      content: Text(
+                        'Te avisare todos los dias a la hora elegida para revisar habitos.',
+                      ),
                     ),
                   );
                 }
+              } else if (value == 'cancel') {
+                await NotificationService.I.cancelHabitDailyReminder();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('Recordatorio diario cancelado.'),
+                  ),
+                );
               }
             },
             itemBuilder:
@@ -476,6 +605,15 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               ...snap.data!..sort((a, b) => a.order.compareTo(b.order)),
             ];
             _orderedHabits = habits;
+            _buildHistoryIndexes(habits);
+            _syncTimeline(habits);
+
+            final double gridWidth =
+                _dates.length * (_cellWidth + _cellMargin.horizontal);
+
+            if (habits.isEmpty) {
+              return const Center(child: Text('No hay hábitos para mostrar.'));
+            }
 
             return Row(
               children: [
@@ -533,9 +671,15 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                                   itemCount: habits.length,
                                   itemBuilder: (context, index) {
                                     final habit = habits[index];
+                                    final todayValue = habitHistoryIndexedValue(
+                                      _historyIndexByHabit[habit.id] ??
+                                          const <String, dynamic>{},
+                                      DateTime.now(),
+                                    );
                                     return _NameRow(
                                       habit: habit,
                                       editMode: false,
+                                      todayValue: todayValue,
                                       onTap:
                                           () => Navigator.pushNamed(
                                             context,
@@ -554,68 +698,92 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   child: LayoutBuilder(
                     builder: (context, cons) {
                       final bodyHeight = cons.maxHeight - _rowHeight - 2;
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SizedBox(
-                          width: gridWidth,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: _rowHeight,
-                                child: Row(
-                                  children:
-                                      _dates.map((d) {
-                                        return Container(
-                                          width: _cellWidth,
-                                          height: _cellHeight,
-                                          margin: _cellMargin,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color: theme
-                                                .colorScheme
-                                                .surfaceContainerHighest
-                                                .withOpacity(.25),
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            DateFormat('E\ndd').format(d),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(.8),
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
+                      return Listener(
+                        onPointerSignal: _handleHorizontalPointerSignal,
+                        child: ScrollConfiguration(
+                          behavior: const _HabitsTableScrollBehavior(),
+                          child: Scrollbar(
+                            controller: _horizontal,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            interactive: true,
+                            notificationPredicate: (notification) =>
+                                notification.metrics.axis == Axis.horizontal,
+                            child: SingleChildScrollView(
+                              controller: _horizontal,
+                              scrollDirection: Axis.horizontal,
+                              child: SizedBox(
+                                width: gridWidth,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: _rowHeight,
+                                      child: Row(
+                                        children:
+                                            _dates.map((d) {
+                                              return Container(
+                                                width: _cellWidth,
+                                                height: _cellHeight,
+                                                margin: _cellMargin,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .surfaceContainerHighest
+                                                      .withOpacity(.25),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Text(
+                                                  DateFormat('E\ndd').format(d),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: theme
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withOpacity(.8),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    SizedBox(
+                                      height: bodyHeight,
+                                      child: ListView.builder(
+                                        controller: _rightV,
+                                        padding: const EdgeInsets.only(
+                                          bottom: _bottomSafeGap,
+                                        ),
+                                        physics: const ClampingScrollPhysics(),
+                                        itemExtent: _rowHeight,
+                                        itemCount: habits.length,
+                                        itemBuilder: (context, row) {
+                                          final habit = habits[row];
+                                          final historyIndex =
+                                              _historyIndexByHabit[habit.id] ??
+                                              const <String, dynamic>{};
+                                          return Row(
+                                            children:
+                                                _dates
+                                                    .map(
+                                                      (d) => _cell(
+                                                        habit,
+                                                        historyIndex,
+                                                        d,
+                                                        theme,
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              SizedBox(
-                                height: bodyHeight,
-                                child: ListView.builder(
-                                  controller: _rightV,
-                                  padding: const EdgeInsets.only(
-                                    bottom: _bottomSafeGap,
-                                  ),
-                                  physics: const ClampingScrollPhysics(),
-                                  itemExtent: _rowHeight,
-                                  itemCount: habits.length,
-                                  itemBuilder: (context, row) {
-                                    final habit = habits[row];
-                                    return Row(
-                                      children:
-                                          _dates
-                                              .map(
-                                                (d) => _cell(habit, d, theme),
-                                              )
-                                              .toList(),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       );
@@ -634,6 +802,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
 class _NameRow extends StatelessWidget {
   final Habit habit;
   final bool editMode;
+  final dynamic todayValue;
   final VoidCallback onTap;
   final Widget? trailing;
 
@@ -641,6 +810,7 @@ class _NameRow extends StatelessWidget {
     super.key,
     required this.habit,
     required this.editMode,
+    this.todayValue,
     required this.onTap,
     this.trailing,
   });
@@ -660,8 +830,7 @@ class _NameRow extends StatelessWidget {
                       context
                           .findAncestorStateOfType<_HabitsTableScreenState>();
                   if (state != null) {
-                    state._editMode = true;
-                    state._selectedHabit = habit;
+                    state._enterEditMode(habit);
                   }
                 }
               },
@@ -698,6 +867,10 @@ class _NameRow extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (!editMode) ...[
+                      const SizedBox(width: 4),
+                      _TodayStatusBadge(habit: habit, todayValue: todayValue),
+                    ],
                   ],
                 ),
               ),
@@ -717,5 +890,82 @@ class _NameRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TodayStatusBadge extends StatelessWidget {
+  final Habit habit;
+  final dynamic todayValue;
+
+  const _TodayStatusBadge({required this.habit, required this.todayValue});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final value = todayValue;
+
+    if (!isHabitLoggedValue(habit, value)) {
+      return const SizedBox.shrink();
+    }
+
+    if (isHabitCompletedValue(habit, value)) {
+      return Tooltip(
+        message: 'Completado hoy',
+        child: Icon(
+          Icons.check_circle_rounded,
+          size: 16,
+          color: theme.colorScheme.secondary,
+        ),
+      );
+    }
+
+    if (isHabitMissedValue(value)) {
+      return Tooltip(
+        message: 'No completado',
+        child: Icon(
+          Icons.cancel_rounded,
+          size: 16,
+          color: theme.colorScheme.error,
+        ),
+      );
+    }
+
+    if (isHabitSkippedValue(value)) {
+      return Tooltip(
+        message: 'Saltado',
+        child: Icon(
+          Icons.remove_circle_rounded,
+          size: 16,
+          color: theme.colorScheme.tertiary,
+        ),
+      );
+    }
+
+    final progress = computeHabitGoalProgress(habit, value: value);
+    return Tooltip(
+      message: progress.hasGoal
+          ? '${formatHabitStatNumber(progress.percent)}% de la meta de hoy'
+          : 'Registro cuantitativo guardado',
+      child: Icon(
+        isHabitCompletedValue(habit, value)
+            ? Icons.check_circle_rounded
+            : Icons.radio_button_checked_rounded,
+        size: 16,
+        color: isHabitCompletedValue(habit, value)
+            ? theme.colorScheme.secondary
+            : habit.color,
+      ),
+    );
+  }
+}
+
+class _HabitsTableScrollBehavior extends MaterialScrollBehavior {
+  const _HabitsTableScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    ...super.dragDevices,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }
 

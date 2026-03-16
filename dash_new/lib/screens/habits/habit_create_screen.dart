@@ -8,6 +8,7 @@ import 'package:mi_dashboard_personal/screens/habits/widgets/tag_selector.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/template_selector.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.dart';
 import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
+import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
 
 class HabitCreateScreen extends StatefulWidget {
   final Habit? habit;
@@ -22,6 +23,8 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _reminderController = TextEditingController();
+  final _goalValueController = TextEditingController();
+  final _goalUnitController = TextEditingController();
 
   String _frequency = 'Diario';
   bool _isQuantitative = false;
@@ -51,6 +54,9 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
       _iconCode = h.iconCode;
       _tags = List.from(h.tags);
       _reminders = List.from(h.reminders);
+      _goalValueController.text =
+          h.goalValue == null ? '' : formatHabitStatNumber(h.goalValue);
+      _goalUnitController.text = h.goalUnit ?? '';
     }
   }
 
@@ -59,14 +65,33 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _reminderController.dispose();
+    _goalValueController.dispose();
+    _goalUnitController.dispose();
     super.dispose();
   }
 
   String _asHex(Color c) =>
       '0x${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
+  double? _parseGoalValue() {
+    final raw = _goalValueController.text.trim();
+    if (raw.isEmpty) {
+      return null;
+    }
+
+    final parsed = parseHabitNumericValue(raw);
+    return parsed > 0 ? parsed : null;
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final goalValue = _isQuantitative ? _parseGoalValue() : null;
+    final goalUnit = _isQuantitative
+        ? _goalUnitController.text.trim().isEmpty
+            ? null
+            : _goalUnitController.text.trim()
+        : null;
 
     if (_isEditing) {
       await HabitFirestoreService.updateHabitFields(widget.habit!.id, {
@@ -76,6 +101,8 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         'reminderTime': _reminderController.text.trim(),
         'isQuantitative': _isQuantitative,
         'unit': _isQuantitative ? _unit : '',
+        'goalValue': goalValue,
+        'goalUnit': goalUnit,
         'colorHex': _asHex(_selectedColor),
         'emoji': _emoji,
         'iconCode': _iconCode,
@@ -105,6 +132,8 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         iconCode: _iconCode,
         tags: _tags,
         reminders: _reminders,
+        goalValue: goalValue,
+        goalUnit: goalUnit,
       );
       await HabitFirestoreService().addHabit(habit);
     }
@@ -490,6 +519,70 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                             _isQuantitative && (v == null || v.trim().isEmpty)
                                 ? 'Campo requerido'
                                 : null,
+                  ),
+                  const SizedBox(height: 12),
+                  Card(
+                    elevation: 0,
+                    color: cs.surfaceContainerHigh,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        isMobile ? 14 : 16,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(isMobile ? 14 : 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Meta opcional',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Ejemplos: 2000 ml, 30 páginas, 10000 pasos',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _goalValueController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: 'Valor objetivo',
+                              hintText: 'Ej: 2000',
+                            ),
+                            validator: (value) {
+                              final raw = value?.trim() ?? '';
+                              if (raw.isEmpty) {
+                                return null;
+                              }
+
+                              final parsed = parseHabitNumericValue(raw);
+                              if (parsed <= 0) {
+                                return 'Introduce una meta válida';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _goalUnitController,
+                            decoration: InputDecoration(
+                              labelText: 'Unidad de meta',
+                              hintText: _unit.isEmpty
+                                  ? 'Ej: ml, páginas, pasos'
+                                  : 'Ej: $_unit',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'habit_model.dart';
+import 'habit_utils.dart';
 
 class HabitFirestoreService {
   static final _db = FirebaseFirestore.instance;
@@ -99,7 +100,7 @@ class HabitFirestoreService {
   ) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final key = date.toIso8601String().split('T')[0];
+    final key = habitDateKey(date);
     await _col(uid).doc(id).set({
       'history': {key: value},
       'lastUpdated': Timestamp.now(),
