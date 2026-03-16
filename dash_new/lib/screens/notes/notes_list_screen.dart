@@ -13,28 +13,40 @@ class NotesListScreen extends StatefulWidget {
 class _NotesListScreenState extends State<NotesListScreen> {
   bool _grid = false;
   final Set<String> _tagFilter = {};
-  String _sort = 'updated';
+  NotesSortField _sortField = NotesSortField.lastEditedAt;
+  NotesSortDirection _sortDirection = NotesSortDirection.descending;
+
+  bool get _isDescending => _sortDirection == NotesSortDirection.descending;
+
+  int _compareBySortField(Note a, Note b) {
+    switch (_sortField) {
+      case NotesSortField.createdAt:
+        return a.createdAt.compareTo(b.createdAt);
+      case NotesSortField.title:
+        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      case NotesSortField.lastEditedAt:
+        return a.lastEditedAt.compareTo(b.lastEditedAt);
+    }
+  }
+
   List<Note> _applyFilters(List<Note> notes) {
-    var list = notes.toList();
+    var list = notes.toList(growable: false);
     if (_tagFilter.isNotEmpty) {
       list =
           list
               .where((n) => _tagFilter.every((t) => n.tags.contains(t)))
-              .toList();
+              .toList(growable: false);
     }
-    switch (_sort) {
-      case 'created':
-        list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        break;
-      case 'title':
-        list.sort((a, b) => a.title.compareTo(b.title));
-        break;
-      case 'updated':
-      default:
-        list.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    }
-    final pinned = list.where((n) => n.isPinned).toList();
-    final unpinned = list.where((n) => !n.isPinned).toList();
+
+    list.sort((a, b) {
+      final base = _compareBySortField(a, b);
+      if (base != 0) return _isDescending ? -base : base;
+      final tie = a.createdAt.compareTo(b.createdAt);
+      return _isDescending ? -tie : tie;
+    });
+
+    final pinned = list.where((n) => n.isPinned).toList(growable: false);
+    final unpinned = list.where((n) => !n.isPinned).toList(growable: false);
     return [...pinned, ...unpinned];
   }
 
@@ -50,70 +62,84 @@ class _NotesListScreenState extends State<NotesListScreen> {
         title: const Text('Notas'),
         actions: [
           if (isPhone)
-            IconButton(
-              icon: Icon(
-                _grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined,
-              ),
-              onPressed: () => setState(() => _grid = !_grid),
-              tooltip: _grid ? 'Vista lista' : 'Vista grid',
+            PopupMenuButton<NotesSortField>(
+            icon: const Icon(Icons.sort_rounded),
+            tooltip: 'Ordenar por',
+            onSelected: (value) => setState(() => _sortField = value),
+            itemBuilder:
+                (context) => const [
+                  PopupMenuItem(
+                    value: NotesSortField.lastEditedAt,
+                    child: Text('Última edición'),
+                  ),
+                  PopupMenuItem(
+                    value: NotesSortField.createdAt,
+                    child: Text('Fecha de creación'),
+                  ),
+                  PopupMenuItem(
+                    value: NotesSortField.title,
+                    child: Text('Alfabético'),
+                  ),
+                ],
+          ),
+          IconButton(
+            icon: Icon(
+              _isDescending ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
             ),
-          if (isPhone)
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.sort_rounded),
-              tooltip: 'Ordenar',
-              onSelected: (v) => setState(() => _sort = v),
-              itemBuilder:
-                  (context) => const [
-                    PopupMenuItem(value: 'updated', child: Text('Recientes')),
-                    PopupMenuItem(
-                      value: 'created',
-                      child: Text('Más antiguos'),
-                    ),
-                    PopupMenuItem(value: 'title', child: Text('Por título')),
-                  ],
-            ),
-          if (!isPhone) ...[
+            onPressed:
+                () => setState(
+                  () =>
+                      _sortDirection =
+                          _isDescending
+                              ? NotesSortDirection.ascending
+                              : NotesSortDirection.descending,
+                ),
+            tooltip: _isDescending ? 'Descendente' : 'Ascendente',
+          ),
+          if (!isPhone)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: SizedBox(
-                width: 120,
-                child: AppDropdown<String>(
-                  value: _sort,
+                width: 180,
+                child: AppDropdown<NotesSortField>(
+                  value: _sortField,
                   hint: 'Ordenar',
                   icon: Icons.sort_rounded,
                   isCompact: true,
                   items: const [
                     DropdownMenuItem(
-                      value: 'updated',
-                      child: Text('Recientes'),
+                      value: NotesSortField.lastEditedAt,
+                      child: Text('Última edición'),
                     ),
                     DropdownMenuItem(
-                      value: 'created',
-                      child: Text('Más antiguos'),
+                      value: NotesSortField.createdAt,
+                      child: Text('Fecha de creación'),
                     ),
-                    DropdownMenuItem(value: 'title', child: Text('Por título')),
+                    DropdownMenuItem(
+                      value: NotesSortField.title,
+                      child: Text('Alfabético'),
+                    ),
                   ],
                   onChanged: (v) {
-                    if (v != null) setState(() => _sort = v);
+                    if (v != null) setState(() => _sortField = v);
                   },
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                icon: Icon(
-                  _grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined,
-                ),
-                onPressed: () => setState(() => _grid = !_grid),
-                tooltip: _grid ? 'Vista lista' : 'Vista grid',
-              ),
+          IconButton(
+            icon: Icon(
+              _grid ? Icons.view_agenda_outlined : Icons.grid_view_outlined,
             ),
-          ],
+            onPressed: () => setState(() => _grid = !_grid),
+            tooltip: _grid ? 'Vista lista' : 'Vista grid',
+          ),
         ],
       ),
       body: StreamBuilder<List<Note>>(
-        stream: NoteFirestoreService.getNotes(),
+        stream: NoteFirestoreService.getNotes(
+          sortField: _sortField,
+          direction: _sortDirection,
+        ),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -161,14 +187,16 @@ class _NotesListScreenState extends State<NotesListScreen> {
                 mainAxisSpacing: 12,
               ),
               itemCount: notes.length,
-              itemBuilder: (c, i) => _NoteCard(note: notes[i]),
+              itemBuilder:
+                  (c, i) => _NoteCard(key: ValueKey(notes[i].id), note: notes[i]),
             );
           }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: notes.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (c, i) => _NoteTile(note: notes[i]),
+            itemBuilder:
+                (c, i) => _NoteTile(key: ValueKey(notes[i].id), note: notes[i]),
           );
         },
       ),
@@ -183,7 +211,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
 
 class _NoteTile extends StatelessWidget {
   final Note note;
-  const _NoteTile({required this.note});
+  const _NoteTile({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +223,7 @@ class _NoteTile extends StatelessWidget {
         .where((l) => l.trim().isNotEmpty)
         .take(3)
         .join('\n');
-    final lastUpdate = DateFormat('dd MMM, HH:mm').format(note.updatedAt);
+    final lastUpdate = DateFormat('dd MMM yyyy · HH:mm').format(note.lastEditedAt);
 
     return Card(
       elevation: 0,
@@ -279,7 +307,7 @@ class _NoteTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        lastUpdate,
+                        'Edited: $lastUpdate',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: color.onSurfaceVariant,
                           fontSize: isMobile ? 12 : 13,
@@ -319,7 +347,7 @@ class _NoteTile extends StatelessWidget {
 
 class _NoteCard extends StatelessWidget {
   final Note note;
-  const _NoteCard({required this.note});
+  const _NoteCard({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +359,7 @@ class _NoteCard extends StatelessWidget {
         .where((l) => l.trim().isNotEmpty)
         .take(4)
         .join('\n');
-    final lastUpdate = DateFormat('dd MMM').format(note.updatedAt);
+    final lastUpdate = DateFormat('dd MMM · HH:mm').format(note.lastEditedAt);
 
     return Card(
       elevation: 0,
@@ -403,7 +431,7 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    lastUpdate,
+                    'Edited: $lastUpdate',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: color.onSurfaceVariant,
                       fontSize: isMobile ? 11 : 12,
@@ -435,7 +463,7 @@ Widget _buildFallbackCover(ColorScheme color, double height) {
         child: Icon(
           Icons.note_outlined,
           size: 48,
-          color: color.onPrimaryContainer.withOpacity(0.3),
+          color: color.onPrimaryContainer.withValues(alpha: 0.3),
         ),
       ),
     ),

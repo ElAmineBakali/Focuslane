@@ -72,7 +72,7 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
                       Align(
                         alignment: Alignment.bottomRight,
                         child: Text(
-                          DateFormat('dd MMM yyyy').format(note.updatedAt),
+                          'Edited: ${DateFormat('dd MMM yyyy · HH:mm').format(note.lastEditedAt)}',
                           style: theme.textTheme.labelSmall,
                         ),
                       ),

@@ -33,6 +33,7 @@ class _NoteCreateScreenState extends State<NoteCreateScreen> {
       content: _contentController.text.trim(),
       createdAt: now,
       updatedAt: now,
+      lastEditedAt: now,
       order: 0,
     );
     await NoteFirestoreService.add(note);

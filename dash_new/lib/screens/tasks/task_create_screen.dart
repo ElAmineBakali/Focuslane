@@ -264,7 +264,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    hintText: 'Escribe una descripciónâ€¦',
+                    hintText: 'Escribe una descripción',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -279,7 +279,7 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                 TextFormField(
                   controller: _categoryController,
                   decoration: InputDecoration(
-                    hintText: 'Ej: Trabajo, Personalâ€¦',
+                    hintText: 'Ej: Trabajo, Personal',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(

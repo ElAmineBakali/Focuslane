@@ -259,7 +259,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
-                    hintText: 'Escribe una descripciónâ€¦',
+                    hintText: 'Escribe una descripción ',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -274,7 +274,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 TextFormField(
                   controller: _categoryController,
                   decoration: InputDecoration(
-                    hintText: 'Introduce una categoríaâ€¦',
+                    hintText: 'Introduce una categoría ',
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(

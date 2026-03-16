@@ -27,6 +27,7 @@ class Note {
   final List<NoteAttachment> attachments;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime lastEditedAt;
   final DateTime? date;
   final List<String> linkedTaskIds;
   final int order;
@@ -45,6 +46,7 @@ class Note {
     this.attachments = const [],
     required this.createdAt,
     required this.updatedAt,
+    required this.lastEditedAt,
     this.date,
     this.linkedTaskIds = const [],
     this.order = 0,
@@ -64,6 +66,7 @@ class Note {
     List<NoteAttachment>? attachments,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? lastEditedAt,
     DateTime? date,
     List<String>? linkedTaskIds,
     int? order,
@@ -81,6 +84,7 @@ class Note {
     attachments: attachments ?? this.attachments,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    lastEditedAt: lastEditedAt ?? this.lastEditedAt,
     date: date ?? this.date,
     linkedTaskIds: linkedTaskIds ?? this.linkedTaskIds,
     order: order ?? this.order,
@@ -99,6 +103,7 @@ class Note {
     'attachments': attachments.map((a) => a.toMap()).toList(),
     'createdAt': Timestamp.fromDate(createdAt),
     'updatedAt': Timestamp.fromDate(updatedAt),
+    'lastEditedAt': Timestamp.fromDate(lastEditedAt),
     'date': date != null ? Timestamp.fromDate(date!) : null,
     'linkedTaskIds': linkedTaskIds,
     'order': order,
@@ -133,6 +138,15 @@ class Note {
                 .toList()
             : <NoteAttachment>[];
 
+    final createdAt =
+        data.containsKey('createdAt') ? tsToDate(data['createdAt']) : DateTime.now();
+    final updatedAt =
+        data.containsKey('updatedAt') ? tsToDate(data['updatedAt']) : createdAt;
+    final lastEditedAt =
+        data.containsKey('lastEditedAt')
+            ? tsToDate(data['lastEditedAt'])
+            : updatedAt;
+
     return Note(
       id: doc.id,
       title: (data['title'] ?? '') as String,
@@ -147,8 +161,9 @@ class Note {
       coverUrl: data['coverUrl'] as String?,
       style: data['style'] as String?,
       attachments: attachments,
-      createdAt: tsToDate(data['createdAt']),
-      updatedAt: tsToDate(data['updatedAt']),
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      lastEditedAt: lastEditedAt,
       date: data['date'] != null ? tsToDate(data['date']) : null,
       linkedTaskIds:
           (data['linkedTaskIds'] as List?)?.map((e) => e.toString()).toList() ??
