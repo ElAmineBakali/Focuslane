@@ -4,6 +4,136 @@ enum CalendarType { task, study, gym, finance, food, other }
 
 enum CalendarPriority { low, normal, high }
 
+enum CalendarSourceModule { planner, task, study, gym, food, finance, habit }
+
+class CalendarDeepLink {
+  final String routeName;
+  final Map<String, dynamic> arguments;
+
+  const CalendarDeepLink({required this.routeName, this.arguments = const {}});
+}
+
+class CalendarItemEditPolicy {
+  final bool editable;
+  final bool movable;
+  final bool resizable;
+  final bool deletable;
+
+  const CalendarItemEditPolicy({
+    required this.editable,
+    required this.movable,
+    required this.resizable,
+    required this.deletable,
+  });
+
+  static const planner = CalendarItemEditPolicy(
+    editable: true,
+    movable: true,
+    resizable: true,
+    deletable: true,
+  );
+
+  static const readOnly = CalendarItemEditPolicy(
+    editable: false,
+    movable: false,
+    resizable: false,
+    deletable: false,
+  );
+}
+
+class CalendarItem {
+  final String id;
+  final CalendarSourceModule sourceModule;
+  final String title;
+  final String? description;
+  final DateTime startAt;
+  final DateTime? endAt;
+  final bool isAllDay;
+  final String timezone;
+  final String displayColorKey;
+  final CalendarDeepLink deepLink;
+  final CalendarItemEditPolicy editPolicy;
+  final CalendarType type;
+  final CalendarPriority priority;
+  final bool? completed;
+  final String? relatedActionId;
+  final String? relatedTxId;
+  final String? dedupeKey;
+
+  const CalendarItem({
+    required this.id,
+    required this.sourceModule,
+    required this.title,
+    required this.startAt,
+    required this.deepLink,
+    this.description,
+    this.endAt,
+    this.isAllDay = false,
+    this.timezone = 'local',
+    this.displayColorKey = 'primary',
+    this.editPolicy = CalendarItemEditPolicy.readOnly,
+    this.type = CalendarType.other,
+    this.priority = CalendarPriority.normal,
+    this.completed,
+    this.relatedActionId,
+    this.relatedTxId,
+    this.dedupeKey,
+  });
+
+  bool get isEditable => editPolicy.editable;
+
+  CalendarEvent toEvent() {
+    return CalendarEvent(
+      id: id,
+      title: title,
+      type: type,
+      priority: priority,
+      start: startAt,
+      end: endAt,
+      allDay: isAllDay,
+      notes: description,
+      relatedActionId: relatedActionId,
+      relatedTxId: relatedTxId,
+      dedupeKey: dedupeKey,
+      completed: completed,
+    );
+  }
+
+  static CalendarItem fromEvent(
+    CalendarEvent event, {
+    CalendarSourceModule sourceModule = CalendarSourceModule.planner,
+    CalendarDeepLink? deepLink,
+    CalendarItemEditPolicy editPolicy = CalendarItemEditPolicy.planner,
+    String timezone = 'local',
+    String displayColorKey = 'primary',
+  }) {
+    return CalendarItem(
+      id: event.id,
+      sourceModule: sourceModule,
+      title: event.title,
+      description: event.notes,
+      startAt: event.start,
+      endAt: event.end,
+      isAllDay: event.allDay,
+      timezone: timezone,
+      displayColorKey: displayColorKey,
+      deepLink:
+          deepLink ??
+          CalendarDeepLink(
+            routeName: '/calendar',
+            arguments: {'eventId': event.id},
+          ),
+      editPolicy: editPolicy,
+      type: event.type,
+      priority: event.priority,
+      completed: event.completed,
+      relatedActionId: event.relatedActionId,
+      relatedTxId: event.relatedTxId,
+      dedupeKey: event.dedupeKey,
+    );
+  }
+}
+
 class CalendarEvent {
   final String id;
   final String title;

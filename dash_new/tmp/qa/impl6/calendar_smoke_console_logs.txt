@@ -1,0 +1,88 @@
+[debug] Injecting <script> tag. Using callback.
+[warning] WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost
+[info] DDC is about to load 1/2 scripts with pool size = 1000
+[info] DDC is about to load 1808/1808 scripts with pool size = 1000
+[log] Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+[log] supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[log] [NotificationService] iOS permissions granted: null
+[log] [NotificationService] Initialized
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_core
+[debug] Initializing Firebase firebase_core
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_firestore
+[debug] Initializing Firebase firebase_firestore
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_app_check
+[debug] Initializing Firebase firebase_app_check
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_auth
+[debug] Initializing Firebase firebase_auth
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_messaging
+[debug] Initializing Firebase firebase_messaging
+[debug] TrustedTypes available. Creating policy: flutterfire-firebase_storage
+[debug] Initializing Firebase firebase_storage
+[log] [NotificationService] scheduleDaily id=habit_daily_reminder @ 00:00
+[warning] [.WebGL-0x268c1f2ae200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] [.WebGL-0x268c1f2ae200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] [.WebGL-0x268c1f2ae200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[log] [CoreSync][debugAuth] signed uid=calendar-smoke-user
+[log] [CoreSync] ══════════════════════════════════════
+[log] [CoreSync] start() uid=calendar-smoke-user — launching all listeners
+[log] [CoreSync][gymToday] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][gymToday] query range=2026-03-18T00:00:00.000 → 2026-03-18T23:59:59.999
+[log] [CoreSync][studyTasks] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][tasks] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][financeBudgets] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][financeTransactions] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][financeSubscriptions] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync][financeRecurring] LISTENER STARTED uid=calendar-smoke-user
+[log] [CoreSync] start() — all 6 listeners launched
+[log] [CoreSync] ══════════════════════════════════════
+[log] [CoreSync] start() SKIPPED — already active uid=calendar-smoke-user
+[log] [CoreSync] start() SKIPPED — already active uid=calendar-smoke-user
+[warning] [.WebGL-0x268c1f2ae200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[log] [CoreSync][financeTransactions] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][financeTransactions] STACK 
+[log] [CoreSync][financeBudgets] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][financeBudgets] STACK 
+[error] Failed to load resource: net::ERR_CONNECTION_REFUSED
+[log] [AI] healthz failed: ClientException: Failed to fetch, uri=http://localhost:8080/healthz
+[log] [CoreSync][financeRecurring] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][financeRecurring] STACK 
+[log] [CoreSync][gymToday] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][gymToday] STACK 
+[log] [CoreSync][studyTasks] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][studyTasks] STACK 
+[log] [CoreSync][financeSubscriptions] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][financeSubscriptions] STACK 
+[log] [CoreSync][tasks] ERROR [cloud_firestore/permission-denied] Missing or insufficient permissions.
+[log] [CoreSync][tasks] STACK 
+[log] ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+[log] The following assertion was thrown during layout:
+[log] A RenderFlex overflowed by 1.00 pixels on the bottom.
+[log] 
+[log] The relevant error-causing widget was:
+[log]   Column
+[log]   Column:file:///C:/Users/bakal/bakali/visualcode/github/Focuslane/dash_new/lib/screens/calendar/widgets/calendar_month_view.dart:172:20
+[log] 
+[log] The overflowing RenderFlex has an orientation of Axis.vertical.
+[log] The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+[log] black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+[log] Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+[log] RenderFlex to fit within the available space instead of being sized to their natural size.
+[log] This is considered an error condition because it indicates that there is content that cannot be
+[log] seen. If the content is legitimately bigger than the available space, consider clipping it with a
+[log] ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+[log] like a ListView.
+[log] The specific RenderFlex in question is: RenderFlex#3faaa relayoutBoundary=up8 OVERFLOWING:
+[log]   creator: Column ← Semantics ← DefaultTextStyle ← AnimatedDefaultTextStyle ←
+[log]     _InkFeatures-[GlobalKey#45998 ink renderer] ← NotificationListener<LayoutChangedNotification> ←
+[log]     CustomPaint ← _ShapeBorderPaint ← PhysicalShape ← _MaterialInterior ← Material ← Padding ← ⋯
+[log]   parentData: <none> (can use size)
+[log]   constraints: BoxConstraints(0.0<=w<=1576.0, h=238.0)
+[log]   size: Size(1576.0, 238.0)
+[log]   direction: vertical
+[log]   mainAxisAlignment: start
+[log]   mainAxisSize: max
+[log]   crossAxisAlignment: center
+[log]   verticalDirection: down
+[log]   spacing: 0.0
+[log] ◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+[log] ════════════════════════════════════════════════════════════════════════════════════════════════════
