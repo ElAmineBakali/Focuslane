@@ -154,9 +154,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _onSelectTextColor(Color color) {
-    _quillController.formatSelection(ColorAttribute(_toQuillHex(color)));
     setState(() => _currentTextColor = color);
-    _applyCurrentTextColorToFutureInput(notifyDraftChange: false);
+    // Apply to current selection if any text is selected
+    final selection = _quillController.selection;
+    if (selection != null && selection.baseOffset != selection.extentOffset) {
+      _quillController.formatSelection(ColorAttribute(_toQuillHex(color)));
+    } else {
+      // No selection - just apply to future input
+      _applyCurrentTextColorToFutureInput(notifyDraftChange: false);
+    }
     _onDraftChanged();
   }
 

@@ -572,7 +572,7 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
                         ),
                         Text(
                           item.total != null
-                              ? '$qtyText • â‚¬${item.total!.toStringAsFixed(2)}'
+                              ? '$qtyText • €${item.total!.toStringAsFixed(2)}'
                               : qtyText,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,

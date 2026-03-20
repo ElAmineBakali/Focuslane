@@ -459,7 +459,7 @@ class _ShoppingListTile extends StatelessWidget {
     );
     final purchased = list.items.where((i) => i.checked).length;
     final subtitle =
-        '${list.items.length} productos • ${_getScopeLabel(list.scope)} • $purchased/${list.items.length} comprados${total > 0 ? ' • â‚¬${total.toStringAsFixed(2)}' : ''}';
+        '${list.items.length} productos • ${_getScopeLabel(list.scope)} • $purchased/${list.items.length} comprados${total > 0 ? ' • €${total.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -588,7 +588,7 @@ class _HistoryListCard extends StatelessWidget {
         ),
         title: list.name,
         subtitle:
-            'Completada el $completedDate • ${list.items.length} productos${total > 0 ? ' • â‚¬${total.toStringAsFixed(2)}' : ''}',
+            'Completada el $completedDate • ${list.items.length} productos${total > 0 ? ' • €${total.toStringAsFixed(2)}' : ''}',
         trailing: PopupMenuButton<String>(
           padding: EdgeInsets.zero,
           onSelected: (value) {

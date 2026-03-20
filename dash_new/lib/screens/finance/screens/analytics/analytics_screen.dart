@@ -69,7 +69,7 @@ class AnalyticsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
-          Text('${value.toStringAsFixed(2)}â‚¬', style: TextStyle(color: color, fontWeight: FontWeight.w700)),
+          Text('${value.toStringAsFixed(2)} €', style: TextStyle(color: color, fontWeight: FontWeight.w700)),
         ],
       ),
     );

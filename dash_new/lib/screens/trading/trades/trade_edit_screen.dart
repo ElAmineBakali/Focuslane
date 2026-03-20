@@ -494,7 +494,7 @@ class _TradeEditScreenState extends State<TradeEditScreen> {
       return;
     }
 
-    // riesgo en â‚¬ = capital * %; riesgo por unidad = |entry - stop|
+    // riesgo en € = capital * %; riesgo por unidad = |entry - stop|
     final riskCash = capital * riskPct;
     final riskPerUnit = (entry - stop).abs();
     final size = riskPerUnit > 0 ? (riskCash / riskPerUnit) : 0;

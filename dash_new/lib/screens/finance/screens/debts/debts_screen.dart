@@ -69,7 +69,7 @@ class DebtsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${d.balance.toStringAsFixed(2)}â‚¬',
+                                '${d.balance.toStringAsFixed(2)} €',
                                 style: const TextStyle(fontWeight: FontWeight.w700),
                               ),
                               Text(

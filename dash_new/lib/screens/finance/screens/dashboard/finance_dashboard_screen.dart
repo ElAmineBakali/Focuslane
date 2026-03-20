@@ -11,6 +11,7 @@ import '../../../../design/ui/components/focus_card.dart';
 import '../../../../design/ui/components/focus_metric_card.dart';
 import '../../../../design/ui/components/focus_module_header.dart';
 import '../../../../design/ui/tokens/focuslane_tokens.dart';
+import '../../../../design/ui/components/responsive_kpi_grid.dart';
 
 class FinanceDashboardScreen extends StatelessWidget {
   const FinanceDashboardScreen({super.key, required this.onSelectSection});
@@ -164,39 +165,15 @@ class _MetricsRow extends StatelessWidget {
         label: 'Ahorro / tasa',
         value: income == 0
             ? '–'
-            : '${(income - expense).toStringAsFixed(2)} Â· ${(savings * 100).toStringAsFixed(1)}%',
+            : '${(income - expense).toStringAsFixed(2)} € • ${(savings * 100).toStringAsFixed(1)}%',
         subtitle: 'Ingreso - gasto',
         onTap: () => onSelectSection(2),
       ),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cross = constraints.maxWidth >= 1200
-            ? 4
-            : constraints.maxWidth >= 720
-                ? 2
-                : 1;
-        if (cross == 1) {
-          return Column(
-            children: cards
-                .map((c) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: c,
-                    ))
-                .toList(),
-          );
-        }
-        return GridView.count(
-          crossAxisCount: cross,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 1.9,
-          children: cards,
-        );
-      },
+    return ResponsiveKpiGrid(
+      children: cards,
+      childAspectRatio: 1.9,
     );
   }
 }
@@ -439,7 +416,7 @@ class _SubsCard extends StatelessWidget {
   }
 }
 
-String _currency(double v) => '${v.toStringAsFixed(2)}â‚¬';
+String _currency(double v) => '${v.toStringAsFixed(2)} €';
 
 
 

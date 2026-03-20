@@ -15,6 +15,7 @@ import '../../../design/ui/components/focus_empty_state.dart';
 import '../../../design/ui/components/focus_list_tile_compact.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
 import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/components/responsive_kpi_grid.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
@@ -138,6 +139,7 @@ class GymDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
           _buildAlerts(context),
+          const SizedBox(height: FocuslaneTokens.spacing12),
           FocusSectionTitle(
             title: 'Resumen del día',
             subtitle: 'Actualizado $dateLabel',
@@ -153,6 +155,7 @@ class GymDashboardScreen extends StatelessWidget {
               child: const Text('Ver historial'),
             ),
           ),
+          const SizedBox(height: FocuslaneTokens.spacing8),
           FutureBuilder<Map<String, dynamic>>(
             future: svc.getStatsForDateRange(start, now),
             builder: (context, snap) {
@@ -190,12 +193,6 @@ class GymDashboardScreen extends StatelessWidget {
 
                       return LayoutBuilder(
                         builder: (context, constraints) {
-                          final crossAxisCount = constraints.maxWidth >= 1200
-                              ? 4
-                              : constraints.maxWidth >= 600
-                                  ? 2
-                                  : 1;
-
                           final cards = [
                             FocusMetricCard(
                               icon: Icons.fitness_center,
@@ -247,14 +244,9 @@ class GymDashboardScreen extends StatelessWidget {
                             ),
                           ];
 
-                          return GridView.count(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: crossAxisCount,
-                            mainAxisSpacing: FocuslaneTokens.spacing12,
-                            crossAxisSpacing: FocuslaneTokens.spacing12,
-                            childAspectRatio: constraints.maxWidth >= 600 ? 3.2 : 2.8,
+                          return ResponsiveKpiGrid(
                             children: cards,
+                            childAspectRatio: constraints.maxWidth >= 600 ? 3.2 : 2.8,
                           );
                         },
                       );

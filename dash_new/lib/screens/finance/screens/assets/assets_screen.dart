@@ -62,7 +62,7 @@ class AssetsScreen extends StatelessWidget {
                           title: Text(a.name),
                           subtitle: Text(a.type),
                           trailing: Text(
-                            '${a.currentValue.toStringAsFixed(2)}â‚¬',
+                            '${a.currentValue.toStringAsFixed(2)} €',
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                           onTap: () => Navigator.pushNamed(

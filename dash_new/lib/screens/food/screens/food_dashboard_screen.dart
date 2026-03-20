@@ -16,6 +16,7 @@ import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../design/theme/focuslane_ui.dart';
 import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/components/responsive_kpi_grid.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -151,70 +152,37 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                     return Column(
                       children: [
                         alerts,
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final crossAxisCount = constraints.maxWidth >= 1200
-                                ? 4
-                                : constraints.maxWidth >= 600
-                                    ? 2
-                                    : 1;
-
-                            final cards = [
-                              FoodMetricCard(
-                                icon: Icons.local_fire_department,
-                                label: 'Calorías hoy',
-                                value: '${kcal.toStringAsFixed(0)} kcal',
-                                subtitle: 'de ${targetKcal.toStringAsFixed(0)} objetivo',
-                                onTap: () => _navigateToDiary(context),
-                              ),
-                              FoodMetricCard(
-                                icon: Icons.fitness_center,
-                                label: 'Proteína hoy',
-                                value: '${protein.toStringAsFixed(0)} g',
-                                subtitle: 'de ${targetProtein.toStringAsFixed(0)}g objetivo',
-                                onTap: () => _navigateToDiary(context),
-                              ),
-                              FoodMetricCard(
-                                icon: Icons.restaurant_menu,
-                                label: 'Recetas guardadas',
-                                value: '$recipesCount',
-                                subtitle: 'en tu biblioteca',
-                                onTap: () => _navigateToRecipes(context),
-                              ),
-                              FoodMetricCard(
-                                icon: Icons.shopping_cart,
-                                label: 'Lista de compra',
-                                value: '$shoppingItems productos',
-                                subtitle: 'pendientes',
-                                onTap: () => _navigateToShopping(context),
-                              ),
-                            ];
-
-                            if (crossAxisCount == 1) {
-                              return Column(
-                                children: cards
-                                    .map(
-                                      (card) => Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 10.0,
-                                        ),
-                                        child: card,
-                                      ),
-                                    )
-                                    .toList(),
-                              );
-                            } else {
-                              return GridView.count(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 10.0,
-                                mainAxisSpacing: 10.0,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                childAspectRatio: 1.8,
-                                children: cards,
-                              );
-                            }
-                          },
+                        ResponsiveKpiGrid(
+                          children: [
+                            FoodMetricCard(
+                              icon: Icons.local_fire_department,
+                              label: 'Calorías hoy',
+                              value: '${kcal.toStringAsFixed(0)} kcal',
+                              subtitle: 'de ${targetKcal.toStringAsFixed(0)} objetivo',
+                              onTap: () => _navigateToDiary(context),
+                            ),
+                            FoodMetricCard(
+                              icon: Icons.fitness_center,
+                              label: 'Proteína hoy',
+                              value: '${protein.toStringAsFixed(0)} g',
+                              subtitle: 'de ${targetProtein.toStringAsFixed(0)}g objetivo',
+                              onTap: () => _navigateToDiary(context),
+                            ),
+                            FoodMetricCard(
+                              icon: Icons.restaurant_menu,
+                              label: 'Recetas guardadas',
+                              value: '$recipesCount',
+                              subtitle: 'en tu biblioteca',
+                              onTap: () => _navigateToRecipes(context),
+                            ),
+                            FoodMetricCard(
+                              icon: Icons.shopping_cart,
+                              label: 'Lista de compra',
+                              value: '$shoppingItems productos',
+                              subtitle: 'pendientes',
+                              onTap: () => _navigateToShopping(context),
+                            ),
+                          ],
                         ),
                       ],
                     );

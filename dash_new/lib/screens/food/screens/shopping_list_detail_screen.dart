@@ -177,7 +177,7 @@ class _ShoppingListDetailScreenState
                               _SummaryItem(
                                 icon: Icons.euro,
                                 label: 'Total',
-                                value: 'â‚¬${total.toStringAsFixed(2)}',
+                                value: '€${total.toStringAsFixed(2)}',
                               ),
                             ],
                           ),
@@ -206,7 +206,7 @@ class _ShoppingListDetailScreenState
                           if (totalPurchased > 0) ...[
                             const SizedBox(height: AppSpacing.sm),
                             Text(
-                              'Gastado hasta ahora: â‚¬${totalPurchased.toStringAsFixed(2)}',
+                              'Gastado hasta ahora: €${totalPurchased.toStringAsFixed(2)}',
                               style: AppTypography.caption(context),
                             ),
                           ],
@@ -857,7 +857,7 @@ class _ShoppingItemCard extends StatelessWidget {
     final qtyText =
         '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${_getUnitShort(item.unit)}';
     final subtitle =
-        '$qtyText${item.total != null ? ' • â‚¬${item.total!.toStringAsFixed(2)}' : ''}';
+        '$qtyText${item.total != null ? ' • €${item.total!.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
