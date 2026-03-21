@@ -327,7 +327,7 @@ class StudyDashboardScreen extends StatelessWidget {
                                       final course = courseMap[s.courseId] ?? 'Curso';
                                       final date = DateFormat('d MMM', 'es')
                                           .format(s.date);
-                                      final subtitle = '$course Â· $date';
+                                        final subtitle = '$course - $date';
                                       final mins = s.minutes > 0
                                           ? '${s.minutes} min'
                                           : '–';

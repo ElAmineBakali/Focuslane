@@ -103,11 +103,10 @@ class CourseDetailScreen extends StatelessWidget {
               subtitle: Text(
                 course.attendanceRequired != null
                     ? 'Requerida: ${course.attendanceRequired!.toStringAsFixed(0)}%'
-                    : 'Define el % requerido en “Editarâ€ (opcional)',
+                  : 'Define el % requerido en "Editar" (opcional)',
               ),
               onTap: () {
-                Navigator.push(
-                  context,
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) => AttendanceScreen(svc: svc, course: course),
                   ),

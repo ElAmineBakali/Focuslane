@@ -387,54 +387,59 @@ class CalendarTimedItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = CalendarItemVisuals.colorForItem(context, item);
 
-    final card = Material(
-      borderRadius: BorderRadius.circular(10),
-      color: color.withValues(alpha: .14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                CalendarItemVisuals.timeLabel(item),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 11),
-              ),
-              if (canResize) ...[
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CalendarMiniActionIcon(
-                      icon: Icons.remove,
-                      onTap: () => onResize(-30),
+    final card = LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxHeight < 74;
+        return Material(
+          borderRadius: BorderRadius.circular(10),
+          color: color.withValues(alpha: .14),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
                     ),
-                    const SizedBox(width: 4),
-                    CalendarMiniActionIcon(
-                      icon: Icons.add,
-                      onTap: () => onResize(30),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    CalendarItemVisuals.timeLabel(item),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  if (canResize && !isCompact) ...[
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CalendarMiniActionIcon(
+                          icon: Icons.remove,
+                          onTap: () => onResize(-30),
+                        ),
+                        const SizedBox(width: 4),
+                        CalendarMiniActionIcon(
+                          icon: Icons.add,
+                          onTap: () => onResize(30),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     if (!canMove) return card;

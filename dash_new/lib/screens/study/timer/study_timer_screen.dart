@@ -317,7 +317,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => SessionSummaryScreen(session: session)),
+      MaterialPageRoute(
+        builder: (_) => SessionSummaryScreen(session: session, svc: widget.svc),
+      ),
     );
   }
 

@@ -86,8 +86,7 @@ class StudyPantryScreen extends StatelessWidget {
                           subtitle: c.teacher ?? 'Curso sin profesor',
                           trailing: TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
+                              Navigator.of(context, rootNavigator: true).push(
                                 MaterialPageRoute(
                                   builder: (_) => AttendanceScreen(
                                     svc: svc,

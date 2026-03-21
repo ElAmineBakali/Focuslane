@@ -60,7 +60,7 @@ class StudyDiaryScreen extends StatelessWidget {
                   child: Column(
                     children: sessions.map((s) {
                       final date = DateFormat('d MMM', 'es').format(s.date);
-                      final subtitle = '$date Â· ${s.minutes} min';
+                      final subtitle = '$date - ${s.minutes} min';
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: FocusListTileCompact(

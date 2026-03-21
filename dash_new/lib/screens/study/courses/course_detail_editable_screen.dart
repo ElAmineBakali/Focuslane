@@ -3,6 +3,7 @@ import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
+import '../attendance/attendance_screen.dart';
 import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 
@@ -384,6 +385,24 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                     ] else ...[
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.event_available),
+                          title: const Text('Asistencia'),
+                          subtitle: const Text('Abrir registro de asistencia'),
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                builder: (_) => AttendanceScreen(
+                                  svc: widget.svc,
+                                  course: widget.course,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       _StatCard(
                         icon: Icons.school_rounded,
                         label: 'Profesor',

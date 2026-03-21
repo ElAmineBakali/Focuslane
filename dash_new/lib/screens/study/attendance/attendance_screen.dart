@@ -18,10 +18,13 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   late DateTime _focusedDay;
+  DateTime? _selectedDay;
+
   @override
   void initState() {
     super.initState();
     _focusedDay = DateTime.now();
+    _selectedDay = DateTime.now();
   }
 
   @override
@@ -111,6 +114,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             focusedDay: _focusedDay,
                             onFocusedChanged:
                                 (d) => setState(() => _focusedDay = d),
+                            selectedDay: _selectedDay,
+                            onSelectedChanged:
+                              (d) => setState(() => _selectedDay = d),
                             map: map,
                             onEdit: _editDay,
                             attendColor: attendColor,
@@ -375,6 +381,8 @@ class _LegendRow extends StatelessWidget {
 class _CalendarCard extends StatelessWidget {
   final DateTime focusedDay;
   final ValueChanged<DateTime> onFocusedChanged;
+  final DateTime? selectedDay;
+  final ValueChanged<DateTime> onSelectedChanged;
   final Map<String, String> map;
   final void Function(DateTime, String?) onEdit;
   final Color attendColor;
@@ -384,6 +392,8 @@ class _CalendarCard extends StatelessWidget {
   const _CalendarCard({
     required this.focusedDay,
     required this.onFocusedChanged,
+    required this.selectedDay,
+    required this.onSelectedChanged,
     required this.map,
     required this.onEdit,
     required this.attendColor,
@@ -406,9 +416,17 @@ class _CalendarCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: TableCalendar(
-          firstDay: DateTime(focusedDay.year - 1, 1, 1),
-          lastDay: DateTime(focusedDay.year + 1, 12, 31),
+          firstDay: DateTime(2000, 1, 1),
+          lastDay: DateTime(2100, 12, 31),
           focusedDay: focusedDay,
+          selectedDayPredicate:
+              selectedDay == null
+                  ? null
+                  : (day) => isSameDay(day, selectedDay),
+          onDaySelected: (selected, focused) {
+            onSelectedChanged(selected);
+            onFocusedChanged(focused);
+          },
           onPageChanged: onFocusedChanged,
           calendarFormat: CalendarFormat.month,
           startingDayOfWeek: StartingDayOfWeek.monday,
@@ -422,6 +440,10 @@ class _CalendarCard extends StatelessWidget {
             titleTextStyle: AppTypography.label(context),
           ),
           calendarStyle: CalendarStyle(
+            selectedDecoration: BoxDecoration(
+              color: cs.primary.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
             todayDecoration: BoxDecoration(
               border: Border.all(color: cs.primary),
               shape: BoxShape.circle,

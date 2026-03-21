@@ -236,7 +236,23 @@ class StudyFirestoreService {
         .collection('attendance')
         .doc(courseId)
         .snapshots()
-        .map((d) => Map<String, String>.from((d.data() ?? const {}) as Map));
+        .map((d) {
+          final raw = d.data() ?? const <String, dynamic>{};
+          final parsed = <String, String>{};
+          for (final entry in raw.entries) {
+            final key = entry.key;
+            if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(key)) {
+              continue;
+            }
+            final status = entry.value is String
+                ? (entry.value as String).trim().toUpperCase()
+                : '';
+            if (status == 'A' || status == 'X' || status == '-') {
+              parsed[key] = status;
+            }
+          }
+          return parsed;
+        });
   }
 
   Future<void> setAttendance({
