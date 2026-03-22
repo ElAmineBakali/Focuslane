@@ -183,6 +183,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                               onTap: () => _navigateToShopping(context),
                             ),
                           ],
+                          childAspectRatio: 1.9,
                         ),
                       ],
                     );

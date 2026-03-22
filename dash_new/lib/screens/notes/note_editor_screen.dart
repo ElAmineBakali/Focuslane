@@ -9,195 +9,58 @@ import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
 import 'note_firestore_service.dart';
 import 'note_model.dart';
 
-class _NoteEditorFormatController extends ChangeNotifier {
-  _NoteEditorFormatController({
-    required this.quillController,
-    required this.editorFocusNode,
-    required Color initialColor,
-  }) : _activeTextColor = initialColor;
+class _NoteEditorContentState {
+  Note? note;
+  bool isPinned = false;
+  bool hydrating = false;
+  String lastSavedSnapshot = '';
+  DateTime? lastSavedAt;
 
-  final QuillController quillController;
-  final FocusNode editorFocusNode;
+  DateTime? get editedAt => note?.lastEditedAt ?? lastSavedAt;
 
-  Color _activeTextColor;
-  TextSelection? _lastKnownSelection;
-
-  Color get activeTextColor => _activeTextColor;
-
-  void captureSelection() {
-    final selection = quillController.selection;
-    if (_isValidSelection(selection)) {
-      _lastKnownSelection = selection;
-    }
+  void applyLoadedNote(Note? value) {
+    note = value;
+    isPinned = value?.isPinned ?? false;
+    lastSavedAt = value?.lastEditedAt ?? value?.updatedAt;
   }
 
-  void onEditorChanged() {
-    final selection = quillController.selection;
-    if (_isValidSelection(selection)) {
-      _lastKnownSelection = selection;
-    }
-
-    final selectedColor = _readSelectionColor();
-    if (selectedColor != null &&
-        selectedColor.toARGB32() != _activeTextColor.toARGB32()) {
-      _activeTextColor = selectedColor;
-      notifyListeners();
-    }
-  }
-
-  void applyColor(Color color) {
-    _activeTextColor = color;
-    final safeSelection = _resolveSelection();
-
-    if (!editorFocusNode.hasFocus) {
-      editorFocusNode.requestFocus();
-    }
-
-    if (safeSelection != null) {
-      quillController.updateSelection(safeSelection, ChangeSource.local);
-    }
-
-    final colorAttr = ColorAttribute(_toQuillHex(color));
-    quillController.formatSelection(colorAttr);
-
-    if (safeSelection != null) {
-      quillController.updateSelection(safeSelection, ChangeSource.local);
-    }
-
-    onEditorChanged();
-    notifyListeners();
-  }
-
-  Color? _readSelectionColor() {
-    final attr =
-        quillController.getSelectionStyle().attributes[Attribute.color.key];
-    final value = attr?.value;
-    if (value is! String || value.isEmpty) return null;
-
-    final clean = value.replaceAll('#', '').trim();
-    try {
-      if (clean.length == 6) {
-        return Color(int.parse('FF$clean', radix: 16));
-      }
-      if (clean.length == 8) {
-        return Color(int.parse(clean, radix: 16));
-      }
-    } catch (_) {
-      return null;
-    }
-    return null;
-  }
-
-  TextSelection? _resolveSelection() {
-    final current = quillController.selection;
-    if (_isValidSelection(current)) return current;
-    if (_lastKnownSelection != null && _isValidSelection(_lastKnownSelection!)) {
-      return _lastKnownSelection;
-    }
-
-    final length = quillController.document.length;
-    if (length <= 0) return null;
-    final collapsed = TextSelection.collapsed(offset: length - 1);
-    return _isValidSelection(collapsed) ? collapsed : null;
-  }
-
-  bool _isValidSelection(TextSelection selection) {
-    return selection.start >= 0 && selection.end >= 0;
-  }
-
-  static String _toQuillHex(Color color) {
-    final rgb = color.toARGB32() & 0x00FFFFFF;
-    return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
+  void markSaved({required Note savedNote, required String snapshot, required DateTime savedAt}) {
+    note = savedNote;
+    lastSavedSnapshot = snapshot;
+    lastSavedAt = savedAt;
   }
 }
 
-class _ColorPaletteBar extends StatelessWidget {
-  const _ColorPaletteBar({
-    required this.palette,
-    required this.activeColor,
-    required this.onColorTapDown,
-    required this.onColorTap,
-    required this.isMobile,
-  });
+class _NoteEditorEngine {
+  _NoteEditorEngine();
 
-  final List<Color> palette;
-  final Color activeColor;
-  final VoidCallback onColorTapDown;
-  final ValueChanged<Color> onColorTap;
-  final bool isMobile;
+  final QuillController quillController = QuillController.basic();
+  final FocusNode focusNode = FocusNode();
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+  StreamSubscription? _docChangesSub;
+  VoidCallback? _onContentMutated;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(isMobile ? 10 : 12, 10, isMobile ? 10 : 12, 10),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: scheme.outlineVariant.withOpacity(0.55)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.palette_outlined, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                'Color activo',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: activeColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: scheme.outlineVariant,
-                    width: 1,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final swatch in palette)
-                Focus(
-                  canRequestFocus: false,
-                  child: GestureDetector(
-                    onTapDown: (_) => onColorTapDown(),
-                    onTap: () => onColorTap(swatch),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 140),
-                      width: isMobile ? 28 : 30,
-                      height: isMobile ? 28 : 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: swatch,
-                        border: Border.all(
-                          color: activeColor.toARGB32() == swatch.toARGB32()
-                              ? scheme.primary
-                              : scheme.outlineVariant,
-                          width:
-                              activeColor.toARGB32() == swatch.toARGB32() ? 2.5 : 1.2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
+  void attach({required VoidCallback onContentMutated}) {
+    _onContentMutated = onContentMutated;
+    _bindDocumentChangesListener();
+  }
+
+  void loadDocument(Document document) {
+    quillController.document = document;
+    _bindDocumentChangesListener();
+  }
+
+  void dispose() {
+    _docChangesSub?.cancel();
+    quillController.dispose();
+    focusNode.dispose();
+  }
+
+  void _bindDocumentChangesListener() {
+    _docChangesSub?.cancel();
+    _docChangesSub = quillController.document.changes.listen((_) {
+      _onContentMutated?.call();
+    });
   }
 }
 
@@ -214,57 +77,23 @@ class NoteEditorScreen extends StatefulWidget {
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   static const Duration _autoSaveDelay = Duration(milliseconds: 900);
 
-  static const List<Color> _textColorPalette = <Color>[
-    Colors.black87,
-    Colors.grey,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.deepPurple,
-    Colors.pink,
-    Colors.teal,
-    Colors.cyan,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.amber,
-    Colors.orange,
-    Colors.deepOrange,
-    Colors.red,
-    Colors.redAccent,
-    Colors.brown,
-  ];
-
   late final TextEditingController _titleCtrl;
-  late final FocusNode _editorFocusNode;
-  late final _NoteEditorFormatController _formatController;
-  final QuillController _quillController = QuillController.basic();
+  late final _NoteEditorEngine _editor;
+  final _NoteEditorContentState _contentState = _NoteEditorContentState();
 
-  StreamSubscription? _docChangesSub;
   Timer? _autoSaveDebounce;
 
-  Note? _current;
   bool _focusMode = false;
-  bool _isPinned = false;
   bool _saving = false;
-  bool _hydratingEditor = false;
-
-  String _lastSavedSnapshot = '';
-  DateTime? _lastSavedAt;
 
   @override
   void initState() {
     super.initState();
     _titleCtrl = TextEditingController();
-    _editorFocusNode = FocusNode();
-    _formatController = _NoteEditorFormatController(
-      quillController: _quillController,
-      editorFocusNode: _editorFocusNode,
-      initialColor: Colors.black87,
-    );
+    _editor = _NoteEditorEngine();
+    _editor.attach(onContentMutated: _onDraftChanged);
 
     _titleCtrl.addListener(_onDraftChanged);
-    _quillController.addListener(_onQuillControllerChanged);
 
     _applyNoteToEditor(widget.note);
 
@@ -274,35 +103,22 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _applyNoteToEditor(Note? note) {
-    _hydratingEditor = true;
-    _current = note;
+    _contentState.hydrating = true;
+    _contentState.applyLoadedNote(note);
     _titleCtrl.text = note?.title ?? '';
 
     try {
       if (note?.delta != null) {
-        _quillController.document = Document.fromJson(note!.delta!);
+        _editor.loadDocument(Document.fromJson(note!.delta!));
       } else {
-        _quillController.document = Document()..insert(0, note?.content ?? '');
+        _editor.loadDocument(Document()..insert(0, note?.content ?? ''));
       }
     } catch (_) {
-      _quillController.document = Document()..insert(0, note?.content ?? '');
+      _editor.loadDocument(Document()..insert(0, note?.content ?? ''));
     }
 
-    _isPinned = note?.isPinned ?? false;
-    _lastSavedAt = note?.lastEditedAt ?? note?.updatedAt;
-
-    _bindDocumentChangesListener();
-    _formatController.onEditorChanged();
-
-    _lastSavedSnapshot = _buildSnapshot();
-    _hydratingEditor = false;
-  }
-
-  void _bindDocumentChangesListener() {
-    _docChangesSub?.cancel();
-    _docChangesSub = _quillController.document.changes.listen((_) {
-      _onDraftChanged();
-    });
+    _contentState.lastSavedSnapshot = _buildSnapshot();
+    _contentState.hydrating = false;
   }
 
   Future<void> _loadById(String id) async {
@@ -315,37 +131,66 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   void _onDraftChanged() {
-    if (_hydratingEditor) return;
+    if (_contentState.hydrating) return;
     _autoSaveDebounce?.cancel();
     _autoSaveDebounce = Timer(_autoSaveDelay, () {
       _persist(popAfterSave: false, showError: false);
     });
   }
 
-  void _onQuillControllerChanged() {
-    if (_hydratingEditor) return;
-    _formatController.onEditorChanged();
-  }
+  Future<void> _confirmDeleteNote() async {
+    final noteId = _contentState.note?.id ?? '';
+    if (noteId.isEmpty) {
+      if (mounted) {
+        AppToast.error(context, 'Primero guarda la nota para poder borrarla');
+      }
+      return;
+    }
 
-  void _onColorSelected(Color color) {
-    _formatController.applyColor(color);
-    _onDraftChanged();
-  }
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar nota'),
+          content: const Text('Esta accion no se puede deshacer. ¿Eliminar esta nota?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
 
-  void _captureSelectionBeforeColorTap() {
-    _formatController.captureSelection();
+    if (shouldDelete != true) return;
+
+    try {
+      await NoteFirestoreService.delete(noteId);
+      if (!mounted) return;
+      AppToast.success(context, 'Nota eliminada');
+      Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        AppToast.error(context, 'Error eliminando la nota');
+      }
+    }
   }
 
   String _buildSnapshot() {
     final payload = <String, dynamic>{
       'title': _titleCtrl.text.trim(),
-      'isPinned': _isPinned,
-      'delta': _quillController.document.toDelta().toJson(),
+      'isPinned': _contentState.isPinned,
+      'delta': _editor.quillController.document.toDelta().toJson(),
     };
     return jsonEncode(payload);
   }
 
-  DateTime? get _editedAt => _current?.lastEditedAt ?? _lastSavedAt;
+  DateTime? get _editedAt => _contentState.editedAt;
 
   String _formatEditedAt(DateTime value) {
     return DateFormat('dd MMM yyyy • HH:mm').format(value);
@@ -356,7 +201,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     bool showError = true,
   }) async {
     final snapshot = _buildSnapshot();
-    if (snapshot == _lastSavedSnapshot) {
+    if (snapshot == _contentState.lastSavedSnapshot) {
       if (popAfterSave && mounted) {
         Navigator.pop(context);
       }
@@ -368,28 +213,28 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     final now = DateTime.now();
     final note = Note(
-      id: _current?.id ?? '',
+      id: _contentState.note?.id ?? '',
       title: _titleCtrl.text.trim(),
-      content: _quillController.document.toPlainText().trimRight(),
-      spans: _current?.spans ?? const [],
-      delta: _quillController.document.toDelta().toJson(),
-      tags: _current?.tags ?? const [],
-      isPinned: _isPinned,
-      colorHex: _current?.colorHex,
-      coverUrl: _current?.coverUrl,
-      style: _current?.style,
-      attachments: _current?.attachments ?? const [],
-      createdAt: _current?.createdAt ?? now,
+      content: _editor.quillController.document.toPlainText().trimRight(),
+      spans: _contentState.note?.spans ?? const [],
+      delta: _editor.quillController.document.toDelta().toJson(),
+      tags: _contentState.note?.tags ?? const [],
+      isPinned: _contentState.isPinned,
+      colorHex: _contentState.note?.colorHex,
+      coverUrl: _contentState.note?.coverUrl,
+      style: _contentState.note?.style,
+      attachments: _contentState.note?.attachments ?? const [],
+      createdAt: _contentState.note?.createdAt ?? now,
       updatedAt: now,
       lastEditedAt: now,
-      date: _current?.date,
-      linkedTaskIds: _current?.linkedTaskIds ?? const [],
-      order: _current?.order ?? 0,
+      date: _contentState.note?.date,
+      linkedTaskIds: _contentState.note?.linkedTaskIds ?? const [],
+      order: _contentState.note?.order ?? 0,
     );
 
     try {
       Note saved = note;
-      if (_current == null || (_current?.id.isEmpty ?? true)) {
+      if (_contentState.note == null || (_contentState.note?.id.isEmpty ?? true)) {
         final newId = await NoteFirestoreService.add(note);
         if (newId == null) {
           throw StateError('Could not create note without authenticated user');
@@ -399,14 +244,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         await NoteFirestoreService.update(note);
       }
 
-      _lastSavedSnapshot = snapshot;
-      _lastSavedAt = now;
+      _contentState.markSaved(savedNote: saved, snapshot: snapshot, savedAt: now);
       if (mounted) {
-        setState(() {
-          _current = saved;
-        });
-      } else {
-        _current = saved;
+        setState(() {});
       }
 
       if (popAfterSave && mounted) {
@@ -424,13 +264,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   void dispose() {
     _autoSaveDebounce?.cancel();
-    _docChangesSub?.cancel();
     _titleCtrl.removeListener(_onDraftChanged);
-    _quillController.removeListener(_onQuillControllerChanged);
     _titleCtrl.dispose();
-    _editorFocusNode.dispose();
-    _formatController.dispose();
-    _quillController.dispose();
+    _editor.dispose();
     super.dispose();
   }
 
@@ -455,9 +291,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           title: const Text('Editar nota'),
           actions: [
             IconButton(
-              icon: Icon(_isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+              icon: Icon(
+                _contentState.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+              ),
               onPressed: () {
-                setState(() => _isPinned = !_isPinned);
+                setState(() => _contentState.isPinned = !_contentState.isPinned);
                 _onDraftChanged();
               },
               tooltip: 'Fijar',
@@ -471,6 +309,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               icon: const Icon(Icons.check),
               onPressed: () => _persist(popAfterSave: true, showError: true),
               tooltip: 'Guardar',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _confirmDeleteNote,
+              tooltip: 'Eliminar nota',
             ),
             if (_saving)
               const Padding(
@@ -548,7 +391,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   child: Column(
                     children: [
                       QuillSimpleToolbar(
-                        controller: _quillController,
+                        controller: _editor.quillController,
                         config: QuillSimpleToolbarConfig(
                           buttonOptions: QuillSimpleToolbarButtonOptions(
                             base: QuillToolbarBaseButtonOptions(
@@ -564,19 +407,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           showBackgroundColorButton: false,
                           showColorButton: false,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      AnimatedBuilder(
-                        animation: _formatController,
-                        builder: (context, _) {
-                          return _ColorPaletteBar(
-                            palette: _textColorPalette,
-                            activeColor: _formatController.activeTextColor,
-                            onColorTapDown: _captureSelectionBeforeColorTap,
-                            onColorTap: _onColorSelected,
-                            isMobile: isMobile,
-                          );
-                        },
                       ),
                     ],
                   ),
@@ -599,8 +429,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     ],
                   ),
                   child: QuillEditor.basic(
-                    controller: _quillController,
-                    focusNode: _editorFocusNode,
+                    controller: _editor.quillController,
+                    focusNode: _editor.focusNode,
                     config: QuillEditorConfig(
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 6 : 8,

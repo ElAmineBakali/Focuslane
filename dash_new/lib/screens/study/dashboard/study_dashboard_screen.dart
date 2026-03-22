@@ -194,7 +194,7 @@ class StudyDashboardScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                        childAspectRatio: constraints.maxWidth >= 600 ? 3.2 : 2.8,
+                        childAspectRatio: 1.9,
                       );
                     },
                   );
