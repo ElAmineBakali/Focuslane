@@ -84,19 +84,6 @@ class AiBackendClient {
     );
   }
 
-  Future<Map<String, dynamic>> explainOrDebugSync({
-    required String input,
-    Map<String, dynamic>? context,
-  }) {
-    return _post(
-      '/v1/ai/sync/explain_or_debug',
-      {
-        'input': input,
-        'context': context,
-      },
-    );
-  }
-
   Future<Map<String, dynamic>> _post(
     String path,
     Map<String, dynamic> payload,

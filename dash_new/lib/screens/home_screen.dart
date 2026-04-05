@@ -65,12 +65,6 @@ const List<_Module> _defaultModules = [
     'assets/home/gimnasio.jpg',
   ),
   _Module(
-    'Meditación',
-    '/meditation',
-    Icons.self_improvement_outlined,
-    'assets/home/meditacion.jpg',
-  ),
-  _Module(
     'Food',
     AppRoutes.foodDashboard,
     Icons.restaurant_outlined,
@@ -82,21 +76,6 @@ const List<_Module> _defaultModules = [
     Icons.account_balance_wallet_outlined,
     'assets/home/finanzas.jpg',
   ),
-  _Module(
-    'Trading',
-    '/trading',
-    Icons.candlestick_chart,
-    'assets/home/trading.jpg',
-  ),
-  _Module(
-    'Cultura',
-    '/culture',
-    Icons.smart_display,
-    'assets/home/cultura.jpg',
-  ),
-  _Module('Hobbies', '/skills', Icons.interests, 'assets/home/hobbies.jpg'),
-  _Module('Ropa', '/ropa', Icons.checkroom, 'assets/home/ropa.jpg'),
-  _Module('Metas', '/goals', Icons.sports_score, 'assets/home/metas.jpg'),
 ];
 
 class _ModulePrefs {

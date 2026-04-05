@@ -2,7 +2,7 @@
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../design/widgets/global_ui_components.dart';
+import '../../design/ui/components/focus_card.dart';
 import 'courses/courses_list_screen.dart';
 import 'tasks/study_tasks_screen.dart';
 import 'timer/study_timer_screen.dart';
@@ -14,6 +14,7 @@ import 'services/study_notifications.dart';
 import 'models/study_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../design/ui/components/focus_module_header.dart';
+import '../../design/ui/tokens/focuslane_tokens.dart';
 
 /// ðŸ“š STUDY HOME SCREEN - Rediseñado
 /// Dashboard principal del módulo de estudio con diseño moderno
@@ -311,7 +312,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
       crossAxisSpacing: 12,
       childAspectRatio: 1.3,
       children: [
-        FocusActionCard(
+        _ActionCard(
           title: 'Cursos',
           icon: Icons.school,
           color: colorScheme.primary,
@@ -325,7 +326,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           },
           animationDelay: 100.ms,
         ),
-        FocusActionCard(
+        _ActionCard(
           title: 'Tareas',
           icon: Icons.checklist,
           color: Colors.orange,
@@ -339,7 +340,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           },
           animationDelay: 150.ms,
         ),
-        FocusActionCard(
+        _ActionCard(
           title: 'Timer',
           icon: Icons.timer,
           color: Colors.green,
@@ -353,7 +354,7 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
           },
           animationDelay: 200.ms,
         ),
-        FocusActionCard(
+        _ActionCard(
           title: 'Horario',
           icon: Icons.schedule,
           color: Colors.purple,
@@ -417,6 +418,54 @@ class _StudyHomeScreenState extends State<StudyHomeScreen> {
         ),
       ],
     );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final Duration animationDelay;
+
+  const _ActionCard({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    required this.animationDelay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(FocuslaneTokens.spacing16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: animationDelay).slideY(begin: 0.12, end: 0);
   }
 }
 

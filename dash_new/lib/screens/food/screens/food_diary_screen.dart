@@ -1,7 +1,11 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_badge.dart';
+import '../../../design/ui/components/focus_list_card.dart';
+import '../../../design/ui/components/focus_primary_button.dart';
+import '../../../design/ui/components/focus_progress_bar.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
@@ -127,7 +131,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
 
   Widget _buildMealSections(List<IntakeEntry> entries, String dayId) {
     if (entries.isEmpty) {
-      return ModernEmptyState(
+      return FocusEmptyState(
         icon: Icons.restaurant_outlined,
         message: 'No hay entradas para este día',
         subtitle: 'Toca el botón + para añadir tu primera comida',
@@ -273,7 +277,7 @@ class _ModernDaySelector extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       if (isToday)
-                        ModernBadge(
+                        FocusBadge(
                           label: 'HOY',
                           color: FocuslaneUI.accent(context),
                         ),
@@ -292,7 +296,7 @@ class _ModernDaySelector extends StatelessWidget {
           ),
           if (!isToday) ...[
             const SizedBox(height: AppSpacing.xs),
-            ModernPrimaryButton(
+            FocusPrimaryButton(
               label: 'Ir a hoy',
               icon: Icons.today,
               onPressed: onToday,
@@ -667,6 +671,7 @@ class _MealOption {
   const _MealOption(this.slot, this.label);
 }
 
+// ignore: unused_element
 class _MacrosSummary extends StatelessWidget {
   final DailyIntakeDoc day;
   final Map<String, double?> mergedTargets;
@@ -728,7 +733,7 @@ class _MacrosSummary extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 if (g['kcal'] != null)
-                  ModernProgressBar(
+                  FocusProgressBar(
                     value: _pct(t['kcal'] ?? 0, g['kcal']),
                     color: colorScheme.primary,
                     backgroundColor: colorScheme.outlineVariant,
@@ -857,7 +862,7 @@ class _MacroCard extends StatelessWidget {
             ],
           ),
           if (target != null)
-            ModernProgressBar(value: pct, color: color, height: 3),
+            FocusProgressBar(value: pct, color: color, height: 3),
         ],
       ),
     );
@@ -934,7 +939,7 @@ class _ModernWaterCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
-            ModernProgressBar(
+                FocusProgressBar(
               value: _pct(),
               color: Theme.of(context).colorScheme.primary,
               height: 6,
@@ -1283,7 +1288,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
 
           const SizedBox(height: AppSpacing.md),
 
-          ModernPrimaryButton(
+          FocusPrimaryButton(
             label: 'Añadir entrada rápida',
             icon: Icons.check,
             fullWidth: true,
@@ -1734,7 +1739,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
 
               const SizedBox(height: AppSpacing.xxl),
 
-              ModernPrimaryButton(
+              FocusPrimaryButton(
                 label: 'Guardar Objetivos',
                 icon: Icons.check,
                 fullWidth: true,
@@ -1813,7 +1818,7 @@ class _FavList extends StatelessWidget {
         }
 
         if (list.isEmpty) {
-          return ModernEmptyState(
+          return FocusEmptyState(
             icon: Icons.star_border,
             message: 'No hay favoritos',
             subtitle:
@@ -1827,7 +1832,7 @@ class _FavList extends StatelessWidget {
           itemBuilder: (_, i) {
             final f = list[i];
             final colorScheme = Theme.of(context).colorScheme;
-            return ModernListCard(
+            return FocusListCard(
               title: f.alias ?? '${f.type.name} • ${f.refId}',
               subtitle:
                   'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
@@ -1873,7 +1878,7 @@ class _FoodList extends StatelessWidget {
         final list = snap.data!;
 
         if (list.isEmpty) {
-          return ModernEmptyState(
+          return FocusEmptyState(
             icon: Icons.restaurant_outlined,
             message: 'No se encontraron alimentos',
             subtitle:
@@ -1888,8 +1893,7 @@ class _FoodList extends StatelessWidget {
           itemCount: list.length,
           itemBuilder: (_, i) {
             final f = list[i];
-            final colorScheme = Theme.of(context).colorScheme;
-            return ModernListCard(
+            return FocusListCard(
               title: f.name,
               subtitle:
                   '${f.kcal.toStringAsFixed(0)} kcal por ${f.unitSize.toStringAsFixed(0)} ${f.perUnit.name}',
@@ -1932,7 +1936,7 @@ class _RecipeList extends StatelessWidget {
         }
 
         if (list.isEmpty) {
-          return ModernEmptyState(
+          return FocusEmptyState(
             icon: Icons.menu_book_outlined,
             message: 'No se encontraron recetas',
             subtitle:
@@ -1951,9 +1955,8 @@ class _RecipeList extends StatelessWidget {
                 r.kcal != null
                     ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
                     : '${r.servings} raciones';
-            final colorScheme = Theme.of(context).colorScheme;
 
-            return ModernListCard(
+            return FocusListCard(
               title: r.name,
               subtitle: macrosText,
               leadingIcon: Icons.menu_book,

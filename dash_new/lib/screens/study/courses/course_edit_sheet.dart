@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_tokens.dart';
+import 'package:mi_dashboard_personal/design/ui/components/focus_primary_button.dart';
+import 'package:mi_dashboard_personal/design/ui/components/focus_text_field.dart';
 import 'package:mi_dashboard_personal/design/widgets/external_link_picker_widget.dart';
 import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
 import '../models/study_models.dart';
@@ -209,7 +211,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
 
                   const SizedBox(height: AppSpacing.xl),
 
-                  ModernTextField(
+                  FocusTextField(
                     controller: _nameController,
                     label: 'Nombre del curso*',
                     hint: 'Ej: Álgebra lineal',
@@ -224,7 +226,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  ModernTextField(
+                  FocusTextField(
                     controller: _teacherController,
                     label: 'Profesor',
                     hint: 'Opcional',
@@ -236,7 +238,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: ModernTextField(
+                        child: FocusTextField(
                           controller: _creditsController,
                           label: 'Créditos',
                           hint: 'Ej: 4',
@@ -246,7 +248,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: ModernTextField(
+                        child: FocusTextField(
                           controller: _goalHoursController,
                           label: 'Horas meta',
                           hint: 'Ej: 40',
@@ -259,7 +261,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  ModernTextField(
+                  FocusTextField(
                     controller: _attendancePctController,
                     label: 'Asistencia requerida (%)',
                     hint: 'Ej: 80',
@@ -320,7 +322,7 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         flex: 2,
-                        child: ModernPrimaryButton(
+                        child: FocusPrimaryButton(
                           label: isEdit ? 'Guardar cambios' : 'Crear curso',
                           icon: Icons.check,
                           fullWidth: true,

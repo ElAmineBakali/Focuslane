@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../design/ui/shared/app_card.dart';
-import '../../../design/ui/shared/app_feedback.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/feedback/focus_feedback.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import '../models/food_notification_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -160,11 +160,9 @@ class _FoodSettingsNotificationsScreenState
     setState(() => _masterEnabled = value);
     await _persistAndSchedule();
     if (mounted) {
-      AppFeedback.showSuccess(
+      FocusFeedback.showSuccess(
         context,
-        value
-            ? 'Notificaciones activadas'
-            : 'Notificaciones desactivadas',
+        value ? 'Notificaciones activadas' : 'Notificaciones desactivadas',
       );
     }
   }
@@ -209,7 +207,7 @@ class _FoodSettingsNotificationsScreenState
     });
     await _persistAndSchedule();
     if (mounted) {
-      AppFeedback.showSuccess(context, 'Recordatorios restablecidos');
+      FocusFeedback.showSuccess(context, 'Recordatorios restablecidos');
     }
   }
 
@@ -218,7 +216,7 @@ class _FoodSettingsNotificationsScreenState
     setState(() => _masterEnabled = false);
     await _persistAndSchedule();
     if (mounted) {
-      AppFeedback.showInfo(context, 'Notificaciones del módulo canceladas');
+      FocusFeedback.showInfo(context, 'Notificaciones del módulo canceladas');
     }
   }
 

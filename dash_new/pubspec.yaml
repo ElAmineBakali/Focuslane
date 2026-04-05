@@ -57,6 +57,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   async: any
+  collection: ^1.18.0
   image_picker: ^1.2.0
   supabase_flutter: ^2.8.1
   url_launcher: ^6.3.2

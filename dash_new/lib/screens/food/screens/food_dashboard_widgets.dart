@@ -537,7 +537,6 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
           ),
           const SizedBox(height: 8),
           ...pendingItems.take(6).toList().asMap().entries.map((entry) {
-            final index = entry.key;
             final item = entry.value;
             final qtyText =
                 '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${item.unit.name}';

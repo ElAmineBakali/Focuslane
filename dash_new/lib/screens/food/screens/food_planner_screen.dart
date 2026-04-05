@@ -1,10 +1,11 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/components/focus_badge.dart';
+import '../../../design/ui/components/focus_primary_button.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -512,7 +513,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                     ),
                                   ],
                                 ),
-                                ModernBadge(
+                                FocusBadge(
                                   label: _getScopeLabel(_scope),
                                   color: FocuslaneUI.accent(context),
                                 ),
@@ -1559,7 +1560,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   flex: 2,
-                  child: ModernPrimaryButton(
+                  child: FocusPrimaryButton(
                     label: 'Guardar',
                     icon: Icons.check,
                     fullWidth: true,

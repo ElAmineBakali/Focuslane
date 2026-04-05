@@ -57,7 +57,7 @@ class FinanceAiNormalizer {
     'cursos': 'educacion',
     'compras': 'compras',
     'shopping': 'compras',
-    'ropa': 'compras',
+    'vestimenta': 'compras',
     'tecnologia': 'compras',
     'salario': 'salario',
     'nomina': 'salario',

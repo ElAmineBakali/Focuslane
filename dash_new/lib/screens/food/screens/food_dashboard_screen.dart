@@ -14,7 +14,7 @@ import 'recipe_detail_screen.dart';
 import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 import '../../../design/ui/components/responsive_kpi_grid.dart';
 

@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -61,7 +61,7 @@ class _PantryScreenState extends State<PantryScreen> {
               }).length;
 
           if (items.isEmpty) {
-            return ModernEmptyState(
+            return FocusEmptyState(
               icon:
                   _showLowStockOnly
                       ? Icons.check_circle_outline
@@ -712,6 +712,7 @@ class _PantryGridCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _PantryTile extends StatelessWidget {
   final PantryItem item;
   final bool isLowStock;

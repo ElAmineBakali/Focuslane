@@ -7,7 +7,7 @@ class HabitIcons {
     'bike': Icons.directions_bike_rounded,
     'walk': Icons.directions_walk_rounded,
     'yoga': Icons.self_improvement_rounded,
-    'meditation': Icons.spa_rounded,
+    'mindfulness': Icons.spa_rounded,
     'sleep': Icons.bedtime_rounded,
     'water': Icons.local_drink_rounded,
     'nutrition': Icons.restaurant_rounded,
@@ -102,7 +102,7 @@ class HabitTemplates {
     HabitTemplate(
       name: 'Meditar',
       emoji: '🧘',
-      iconCode: 'meditation',
+      iconCode: 'mindfulness',
       description: 'Cuida tu mente con meditación',
       suggestedTags: ['Salud', 'Mental'],
       isQuantitative: true,

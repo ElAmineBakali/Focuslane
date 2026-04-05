@@ -2,9 +2,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
-import '../../../design/widgets/global_ui_components.dart';
-import '../../../design/theme/focuslane_ui.dart';
 import '../../../design/ui/components/focus_module_header.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_badge.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
 import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
@@ -118,8 +118,8 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
             side: BorderSide(
-              color: FocuslaneUI.borderColor(context),
-              width: FocuslaneUI.borderW,
+              color: FocuslaneTokens.borderColor(context),
+              width: FocuslaneTokens.borderW,
             ),
           ),
           child: Padding(
@@ -172,8 +172,8 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
             side: BorderSide(
-              color: FocuslaneUI.borderColor(context),
-              width: FocuslaneUI.borderW,
+              color: FocuslaneTokens.borderColor(context),
+              width: FocuslaneTokens.borderW,
             ),
           ),
           child: Padding(
@@ -226,8 +226,8 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
             side: BorderSide(
-              color: FocuslaneUI.borderColor(context),
-              width: FocuslaneUI.borderW,
+              color: FocuslaneTokens.borderColor(context),
+              width: FocuslaneTokens.borderW,
             ),
           ),
           child: Padding(
@@ -295,7 +295,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
             Row(
               children: [
                 Expanded(
-                  child: FocusStatCard(
+                  child: _StatCard(
                     label: 'Calorías',
                     value: avgKcal.toStringAsFixed(0),
                     subtitle: 'kcal promedio',
@@ -305,7 +305,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                 ),
                 const SizedBox(width: FocusSpacing.md),
                 Expanded(
-                  child: FocusStatCard(
+                  child: _StatCard(
                     label: 'Proteínas',
                     value: avgProtein.toStringAsFixed(1),
                     subtitle: 'g promedio',
@@ -316,7 +316,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
               ],
             ),
             const SizedBox(height: FocusSpacing.md),
-            FocusStatCard(
+            _StatCard(
               label: 'Agua',
               value: avgWater.toStringAsFixed(0),
               subtitle: 'ml promedio',
@@ -589,8 +589,8 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(FocusSpacing.radiusMd),
         side: BorderSide(
-          color: FocuslaneUI.borderColor(context),
-          width: FocuslaneUI.borderW,
+          color: FocuslaneTokens.borderColor(context),
+          width: FocuslaneTokens.borderW,
         ),
       ),
       child: ExpansionTile(
@@ -712,6 +712,60 @@ class _FoodHistoryAppBar extends StatelessWidget implements PreferredSizeWidget 
           ),
         ),
       ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+        side: BorderSide(
+          color: FocuslaneTokens.borderColor(context),
+          width: FocuslaneTokens.borderW,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(FocusSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: color),
+                const SizedBox(width: 8),
+                Text(label, style: FocusTypography.label(context)),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: FocusTypography.heading2(context).copyWith(
+                color: cs.onSurface,
+              ),
+            ),
+            Text(subtitle, style: FocusTypography.caption(context)),
+          ],
+        ),
+      ),
     );
   }
 }

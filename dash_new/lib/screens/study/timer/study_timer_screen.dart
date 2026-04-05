@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
 import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
-import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_tokens.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import '../analytics/study_analytics_screen.dart';

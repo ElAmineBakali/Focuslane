@@ -1,1 +1,24 @@
-{"storage":{"rules":"storage.rules"},"flutter":{"platforms":{"android":{"default":{"projectId":"maestro-592cd","appId":"1:685961389524:android:2292189ea121358a98a241","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"maestro-592cd","configurations":{"android":"1:685961389524:android:2292189ea121358a98a241"}}}}}}
+{
+    "storage": {
+        "rules": "storage.rules"
+    },
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "maestro-592cd",
+                    "appId": "1:685961389524:android:2292189ea121358a98a241",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "maestro-592cd",
+                    "configurations": {
+                        "android": "1:685961389524:android:2292189ea121358a98a241"
+                    }
+                }
+            }
+        }
+    }
+}

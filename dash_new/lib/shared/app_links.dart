@@ -10,7 +10,7 @@ class AppLinks {
         openStore: true,
         appStoreLink: 'market://details?id=$package',
       );
-      return result == true;
+    return result != 0;
     } catch (_) {
       return false;
     }

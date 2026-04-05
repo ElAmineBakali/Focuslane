@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_tokens.dart';
+import 'package:mi_dashboard_personal/design/ui/components/focus_primary_button.dart';
+import 'package:mi_dashboard_personal/design/ui/components/focus_text_field.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 
@@ -290,7 +292,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
 
                       const SizedBox(height: AppSpacing.lg),
 
-                      ModernTextField(
+                      FocusTextField(
                         controller: _titleController,
                         label: 'Título*',
                         hint: 'Ej: Entregar ensayo',
@@ -521,7 +523,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
 
                       const SizedBox(height: AppSpacing.lg),
 
-                      ModernTextField(
+                      FocusTextField(
                         controller: _notesController,
                         label: 'Notas (opcional)',
                         hint: 'Especificaciones, enlaces, entregables',
@@ -555,7 +557,7 @@ class _TaskEditSheetState extends State<TaskEditSheet> {
                           const SizedBox(width: AppSpacing.md),
                           Expanded(
                             flex: 2,
-                            child: ModernPrimaryButton(
+                            child: FocusPrimaryButton(
                               label: isEdit ? 'Guardar cambios' : 'Crear tarea',
                               icon: Icons.check,
                               fullWidth: true,

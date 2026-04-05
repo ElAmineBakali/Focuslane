@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
-import 'package:rxdart/rxdart.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
 
 class TransactionService {

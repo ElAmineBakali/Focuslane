@@ -1,9 +1,0 @@
-{
-  "name": "impl5-qa-evidence",
-  "version": "1.0.0",
-  "private": true,
-  "description": "QA evidence scripts for Implementation 5 – Receipt Scanner (Phase 1)",
-  "dependencies": {
-    "playwright": "^1.40.0"
-  }
-}

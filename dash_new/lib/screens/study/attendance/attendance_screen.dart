@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/design/theme/global_ui_theme.dart';
+import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_tokens.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../study/models/study_models.dart';
 import '../../study/services/study_firestore_service.dart';

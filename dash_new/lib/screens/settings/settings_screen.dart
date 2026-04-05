@@ -29,7 +29,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _signingOut = false;
-  DateTime? _lastSync;
   String _displayName = '';
   String _bio = '';
   bool _loadingProfile = true;

@@ -1,7 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_progress_bar.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -198,7 +199,7 @@ class _ShoppingListDetailScreenState
                             ],
                           ),
                           const SizedBox(height: AppSpacing.xs),
-                          ModernProgressBar(
+                          FocusProgressBar(
                             value: progress,
                             color: colorScheme.primary,
                             backgroundColor: colorScheme.outlineVariant,
@@ -219,7 +220,7 @@ class _ShoppingListDetailScreenState
               Expanded(
                 child:
                     visibleItems.isEmpty
-                        ? ModernEmptyState(
+                        ? FocusEmptyState(
                           icon: Icons.shopping_cart_outlined,
                           message:
                               _hideCompleted ? 'Todo comprado' : 'Lista vacía',

@@ -1,5 +1,3 @@
-import '../core/constants/core_routes.dart';
-
 class AppRoutes {
   static const String home = '/';
   static const String foodDashboard = '/food';

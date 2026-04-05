@@ -78,67 +78,6 @@ class StudyDashboardScreen extends StatelessWidget {
 
                   return LayoutBuilder(
                     builder: (context, constraints) {
-                      final crossAxisCount = constraints.maxWidth >= 1200
-                          ? 4
-                          : constraints.maxWidth >= 600
-                              ? 2
-                              : 1;
-
-                      final cards = [
-                        FocusMetricCard(
-                          icon: Icons.timer,
-                          label: 'Horas estudiadas (semana)',
-                          value: totalHours > 0
-                              ? totalHours.toStringAsFixed(1)
-                              : '–',
-                          subtitle: 'Últimos 7 días',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StudyTimerScreen(svc: svc),
-                            ),
-                          ),
-                        ),
-                        FocusMetricCard(
-                          icon: Icons.check_circle,
-                          label: 'Sesiones completadas',
-                          value: totalSessions > 0
-                              ? totalSessions.toString()
-                              : '–',
-                          subtitle: 'Últimos 7 días',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StudyDiaryScreen(svc: svc),
-                            ),
-                          ),
-                        ),
-                        FocusMetricCard(
-                          icon: Icons.bolt,
-                          label: 'Racha',
-                          value: '–',
-                          subtitle: 'Actual',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StudyPlannerScreen(svc: svc),
-                            ),
-                          ),
-                        ),
-                        FocusMetricCard(
-                          icon: Icons.flag,
-                          label: 'Próximo objetivo',
-                          value: nextTask?.title ?? '–',
-                          subtitle: 'Tareas de estudio',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => StudyListsScreen(svc: svc),
-                            ),
-                          ),
-                        ),
-                      ];
-
                       return ResponsiveKpiGrid(
                         children: [
                           FocusMetricCard(

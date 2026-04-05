@@ -1,7 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter/services.dart';
-import '../../../design/theme/global_ui_theme.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';

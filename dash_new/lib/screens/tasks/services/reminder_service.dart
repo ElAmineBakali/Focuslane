@@ -1,10 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/core/services/notification_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show Day;
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
-import 'package:mi_dashboard_personal/screens/meditation/models/meditation_models.dart';
 import 'package:mi_dashboard_personal/screens/gym/models/gym_models.dart';
 
 class ReminderService {
@@ -99,56 +96,6 @@ class ReminderService {
     return t.remindAt;
   }
 
-  Future<void> scheduleMeditationReminder(
-    MeditationReminder reminder, {
-    MeditationReminder? previous,
-    bool globalEnabled = true,
-    bool meditationEnabled = true,
-  }) async {
-    final baseId = 'meditation_${reminder.id}';
-    if (!globalEnabled || !meditationEnabled || !reminder.enabled) {
-      await NotificationService.I.cancelNotificationById(baseId);
-      return;
-    }
-
-    final time = _parseHHmm(reminder.timeOfDay);
-    if (time == null) {
-      await NotificationService.I.cancelNotificationById(baseId);
-      return;
-    }
-
-    final changed =
-        previous == null ||
-        previous.timeOfDay != reminder.timeOfDay ||
-        !_listEquals(previous.daysOfWeek, reminder.daysOfWeek) ||
-        previous.enabled != reminder.enabled;
-
-    if (!changed) return;
-
-    await NotificationService.I.cancelNotificationById(baseId);
-
-    final days = reminder.daysOfWeek.map(_dayFromInt).whereType<Day>().toList();
-    if (days.isEmpty) {
-      await NotificationService.I.cancelNotificationById(baseId);
-      return;
-    }
-
-    await NotificationService.I.scheduleWeeklyReminder(
-      id: baseId,
-      title: 'Meditación',
-      body: 'Respira y medita',
-      weekdays: days,
-      time: time,
-      payload: '/meditation/${reminder.id}',
-    );
-  }
-
-  Future<void> cancelMeditationReminder(String reminderId) async {
-    await NotificationService.I.cancelNotificationById(
-      'meditation_$reminderId',
-    );
-  }
-
   Future<void> scheduleGymReminder(
     Routine routine, {
     Routine? previous,
@@ -194,40 +141,10 @@ class ReminderService {
     return TimeOfDay(hour: h, minute: m);
   }
 
-  bool _listEquals(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
-  Day? _dayFromInt(int d) {
-    switch (d) {
-      case DateTime.monday:
-        return Day.monday;
-      case DateTime.tuesday:
-        return Day.tuesday;
-      case DateTime.wednesday:
-        return Day.wednesday;
-      case DateTime.thursday:
-        return Day.thursday;
-      case DateTime.friday:
-        return Day.friday;
-      case DateTime.saturday:
-        return Day.saturday;
-      case DateTime.sunday:
-        return Day.sunday;
-    }
-    return null;
-  }
-
   Future<void> cancelAllHabits() =>
       NotificationService.I.cancelAllNotificationsForModule('habit');
   Future<void> cancelAllTasks() =>
       NotificationService.I.cancelAllNotificationsForModule('task');
-  Future<void> cancelAllMeditation() =>
-      NotificationService.I.cancelAllNotificationsForModule('meditation');
   Future<void> cancelAllGym() =>
       NotificationService.I.cancelAllNotificationsForModule('gym');
 }

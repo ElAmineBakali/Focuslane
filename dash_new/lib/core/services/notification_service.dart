@@ -35,12 +35,6 @@ class NotificationService {
       description: 'Recordatorios de tareas',
       importance: Importance.high,
     ),
-    'meditation': const AndroidNotificationChannel(
-      'meditation_channel',
-      'Meditaci├│n',
-      description: 'Recordatorios de meditaci├│n',
-      importance: Importance.defaultImportance,
-    ),
     'gym': const AndroidNotificationChannel(
       'gym_channel',
       'Gym',

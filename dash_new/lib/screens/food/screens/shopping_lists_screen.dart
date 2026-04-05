@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
 import '../../../design/ui/shared/app_section_tabs.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
@@ -95,7 +95,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
         final activeLists = lists;
 
         if (activeLists.isEmpty) {
-          return ModernEmptyState(
+          return FocusEmptyState(
             icon: Icons.shopping_cart_outlined,
             message: 'Sin listas de compra',
             subtitle: 'Crea tu primera lista para comenzar',
@@ -142,7 +142,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
               ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
 
         if (completedLists.isEmpty) {
-          return const ModernEmptyState(
+          return const FocusEmptyState(
             icon: Icons.history,
             message: 'Sin historial',
             subtitle: 'Las listas completadas aparecerán aquí',

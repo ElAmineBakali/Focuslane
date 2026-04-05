@@ -1,6 +1,10 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/theme/focuslane_ui.dart';
-import '../../../design/theme/global_ui_theme.dart';
+import '../../../design/ui/tokens/focuslane_tokens.dart';
+import '../../../design/ui/components/focus_badge.dart';
+import '../../../design/ui/components/focus_chip.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_primary_button.dart';
+import '../../../design/ui/components/focus_text_field.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
@@ -130,7 +134,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     flex: 2,
-                    child: ModernPrimaryButton(
+                    child: FocusPrimaryButton(
                       label: isEdit ? 'Guardar Cambios' : 'Crear Receta',
                       icon: Icons.check,
                       fullWidth: true,
@@ -154,7 +158,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ModernTextField(
+          FocusTextField(
             label: 'Nombre de la receta*',
             hint: 'Ej: Pollo al horno con verduras',
             controller: _nameController,
@@ -165,7 +169,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
           const SizedBox(height: AppSpacing.md),
 
-          ModernTextField(
+          FocusTextField(
             label: 'Descripción',
             hint: 'Opcional',
             controller: _descController,
@@ -175,7 +179,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
           const SizedBox(height: AppSpacing.md),
 
-          ModernTextField(
+          FocusTextField(
             label: 'Número de raciones*',
             hint: '4',
             controller: _servingsController,
@@ -192,12 +196,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
             spacing: AppSpacing.sm,
             children: [
               ..._tags.map(
-                (tag) => ModernChip(
+                (tag) => FocusChip(
                   label: tag,
                   onDelete: () => setState(() => _tags.remove(tag)),
                 ),
               ),
-              ModernChip(
+              FocusChip(
                 label: '+ Añadir',
                 icon: Icons.add,
                 color: FocuslaneUI.accent(context),
@@ -215,7 +219,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       children: [
         if (_ingredients.isEmpty)
           Expanded(
-            child: ModernEmptyState(
+            child: FocusEmptyState(
               icon: Icons.restaurant_outlined,
               message: 'No hay ingredientes',
               subtitle:
@@ -250,7 +254,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: ModernPrimaryButton(
+          child: FocusPrimaryButton(
             label: 'Añadir Ingrediente',
             icon: Icons.add,
             fullWidth: true,
@@ -267,7 +271,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       children: [
         if (_steps.isEmpty)
           Expanded(
-            child: ModernEmptyState(
+            child: FocusEmptyState(
               icon: Icons.list_alt_outlined,
               message: 'No hay pasos',
               subtitle: 'Añade los pasos de preparación',
@@ -301,7 +305,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
 
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: ModernPrimaryButton(
+          child: FocusPrimaryButton(
             label: 'Añadir Paso',
             icon: Icons.add,
             fullWidth: true,
@@ -350,7 +354,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  ModernPrimaryButton(
+                  FocusPrimaryButton(
                     label:
                         _ingredients.isEmpty
                             ? 'Añade ingredientes primero'
@@ -372,7 +376,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
                   'Información Nutricional Total',
                   style: AppTypography.heading3(context),
                 ),
-                ModernBadge(
+                FocusBadge(
                   label: 'AUTO-CALCULADO',
                   color: FocuslaneUI.accent2(context),
                 ),
@@ -420,7 +424,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       builder:
           (ctx) => AlertDialog(
             title: Text('Añadir Etiqueta', style: AppTypography.heading3(ctx)),
-            content: ModernTextField(
+            content: FocusTextField(
               label: 'Etiqueta',
               hint: 'Ej: vegano, rápido, saludable',
               controller: controller,
@@ -460,7 +464,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       builder:
           (ctx) => AlertDialog(
             title: Text('Añadir Paso', style: AppTypography.heading3(ctx)),
-            content: ModernTextField(
+            content: FocusTextField(
               label: 'Descripción del paso',
               hint: 'Ej: Precalentar el horno a 180°C',
               controller: controller,
@@ -492,7 +496,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen>
       builder:
           (ctx) => AlertDialog(
             title: Text('Editar Paso', style: AppTypography.heading3(ctx)),
-            content: ModernTextField(
+            content: FocusTextField(
               label: 'Descripción del paso',
               controller: controller,
               prefixIcon: Icons.edit,
@@ -724,7 +728,7 @@ class _NutritionSummaryCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
-              ModernBadge(
+              FocusBadge(
                 label: '1/$servings',
                 color: Theme.of(context).colorScheme.onPrimary,
                 textColor: FocuslaneUI.accent(context),

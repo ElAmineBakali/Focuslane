@@ -4,6 +4,7 @@ import '../tokens/focuslane_tokens.dart';
 class FocusEmptyState extends StatelessWidget {
   final IconData icon;
   final String message;
+  final String? subtitle;
   final String? actionLabel;
   final VoidCallback? onAction;
   final Color? color;
@@ -12,6 +13,7 @@ class FocusEmptyState extends StatelessWidget {
     super.key,
     required this.icon,
     required this.message,
+    this.subtitle,
     this.actionLabel,
     this.onAction,
     this.color,
@@ -38,6 +40,17 @@ class FocusEmptyState extends StatelessWidget {
                   ?.copyWith(color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
+            if (subtitle != null) ...[
+              const SizedBox(height: FocuslaneTokens.spacing8),
+              Text(
+                subtitle!,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: cs.onSurfaceVariant.withOpacity(0.8)),
+                textAlign: TextAlign.center,
+              ),
+            ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: FocuslaneTokens.spacing12),
               FilledButton.icon(
