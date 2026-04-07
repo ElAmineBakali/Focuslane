@@ -1,58 +1,17 @@
-﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
-import 'package:mi_dashboard_personal/screens/gym/models/gym_models.dart';
 
 class ReminderService {
   ReminderService._();
   static final ReminderService I = ReminderService._();
-
-  Future<void> scheduleHabitReminder(
-    Habit habit, {
-    Habit? previous,
-    bool globalEnabled = true,
-    bool habitsEnabled = true,
-  }) async {
-    final id = 'habit_${habit.id}';
-    final timeStr = habit.reminderTime.trim();
-
-    if (!globalEnabled ||
-        !habitsEnabled ||
-        !habit.isActive ||
-        timeStr.isEmpty) {
-      await NotificationService.I.cancelNotificationById(id);
-      return;
-    }
-
-    final changed =
-        previous != null && previous.reminderTime != habit.reminderTime;
-    if (changed) {
-      await NotificationService.I.cancelNotificationById(id);
-    }
-
-    if (!changed && previous != null) {
-      return;
-    }
-
-    final time = _parseHHmm(timeStr);
-    if (time == null) {
-      await NotificationService.I.cancelNotificationById(id);
-      return;
-    }
-
-    await NotificationService.I.scheduleDailyReminder(
-      id: id,
-      title: habit.name.isEmpty ? 'Hábito' : habit.name,
-      body: 'Registra tu progreso',
-      time: time,
-      payload: '/habits/${habit.id}',
-    );
-  }
-
-  Future<void> cancelHabitReminder(String habitId) async {
-    await NotificationService.I.cancelNotificationById('habit_$habitId');
-  }
 
   Future<void> scheduleTaskReminder(
     Task task, {
@@ -60,92 +19,77 @@ class ReminderService {
     bool globalEnabled = true,
     bool tasksEnabled = true,
   }) async {
-    final id = 'task_${task.id}';
+    final entity = NotificationEntityRef(
+      module: NotificationModule.tasks,
+      kind: 'task',
+      id: task.id,
+    );
+
     if (!globalEnabled || !tasksEnabled || task.completed != false) {
-      await NotificationService.I.cancelNotificationById(id);
+      await NotificationsFacade.I.cancelByEntity(entity);
       return;
     }
 
-    DateTime? target = task.remindAt;
+    final target = task.remindAt;
 
     if (target == null || target.isBefore(DateTime.now())) {
-      await NotificationService.I.cancelNotificationById(id);
+      await NotificationsFacade.I.cancelByEntity(entity);
       return;
     }
 
     final prevTarget = _extractTaskPrevTarget(previous);
     final changed = prevTarget == null || prevTarget != target;
     if (changed) {
-      await NotificationService.I.cancelNotificationById(id);
-      await NotificationService.I.scheduleOneTimeNotification(
-        id: id,
-        title: task.title.isEmpty ? 'Tarea' : task.title,
-        body: 'Revisa esta tarea pendiente',
-        scheduledTime: target,
-        payload: '/tasks/${task.id}',
+      await NotificationsFacade.I.cancelByEntity(entity);
+
+      final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
+      final epoch = target.toUtc().millisecondsSinceEpoch;
+      final intent = NotificationIntent(
+        module: NotificationModule.tasks,
+        type: 'TASK_REMINDER',
+        entity: entity,
+        content: NotificationContent(
+          title: task.title.isEmpty ? 'Tarea' : task.title,
+          body: 'Revisa esta tarea pendiente',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/tasks',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: target.toUtc(),
+          timezone: target.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.tasksReminders,
+          priority: NotificationPriority.high,
+        ),
+        dedupeKey: 'tasks:${task.id}:$epoch',
+        userId: uid,
+        source: 'tasks.reminder_service',
+        notificationId: 'ntf_tasks_${task.id}_$epoch',
       );
+      await NotificationsFacade.I.scheduleIntent(intent);
     }
   }
 
   Future<void> cancelTaskReminder(String taskId) async {
-    await NotificationService.I.cancelNotificationById('task_$taskId');
+    await NotificationsFacade.I.cancelByEntity(
+      NotificationEntityRef(
+        module: NotificationModule.tasks,
+        kind: 'task',
+        id: taskId,
+      ),
+    );
   }
 
   DateTime? _extractTaskPrevTarget(Task? t) {
     if (t == null) return null;
     return t.remindAt;
   }
-
-  Future<void> scheduleGymReminder(
-    Routine routine, {
-    Routine? previous,
-    TimeOfDay? previousTime,
-    TimeOfDay? time,
-    bool globalEnabled = true,
-    bool gymEnabled = true,
-  }) async {
-    final id = 'gym_${routine.id}';
-    if (!globalEnabled || !gymEnabled || time == null) {
-      await NotificationService.I.cancelNotificationById(id);
-      return;
-    }
-
-    final timeChanged =
-        previousTime == null ||
-        (previousTime.hour != time.hour || previousTime.minute != time.minute);
-    final changed =
-        previous == null || previous.name != routine.name || timeChanged;
-    if (!changed) return;
-
-    await NotificationService.I.cancelNotificationById(id);
-    await NotificationService.I.scheduleDailyReminder(
-      id: id,
-      title: 'Gym: ${routine.name}',
-      body: 'Hora de entrenar',
-      time: time,
-      payload: '/gym/routines',
-    );
-  }
-
-  Future<void> cancelGymReminder(String routineId) async {
-    await NotificationService.I.cancelNotificationById('gym_$routineId');
-  }
-
-  TimeOfDay? _parseHHmm(String raw) {
-    final parts = raw.split(':');
-    if (parts.length != 2) return null;
-    final h = int.tryParse(parts[0]);
-    final m = int.tryParse(parts[1]);
-    if (h == null || m == null) return null;
-    if (h < 0 || h > 23 || m < 0 || m > 59) return null;
-    return TimeOfDay(hour: h, minute: m);
-  }
-
-  Future<void> cancelAllHabits() =>
-      NotificationService.I.cancelAllNotificationsForModule('habit');
   Future<void> cancelAllTasks() =>
-      NotificationService.I.cancelAllNotificationsForModule('task');
-  Future<void> cancelAllGym() =>
-      NotificationService.I.cancelAllNotificationsForModule('gym');
+      NotificationsFacade.I.cancelByModule(NotificationModule.tasks);
 }
 

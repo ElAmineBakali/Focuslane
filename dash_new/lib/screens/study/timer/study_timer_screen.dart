@@ -1,5 +1,14 @@
 ﻿import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,7 +21,6 @@ import '../analytics/study_analytics_screen.dart';
 import 'presets_sheet.dart';
 import 'session_summary_screen.dart';
 import 'circular_timer_widget.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 
 class StudyTimerScreen extends StatefulWidget {
@@ -51,9 +59,9 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
 
   static const int _N_WORK_START = 41010;
   static const int _N_REST_START = 41011;
-  static const int _N_WORK_END = 41020;
-  static const int _N_REST_END = 41021;
   static const int _N_SESSION_SAVED = 41030;
+
+  String get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
 
   @override
   void initState() {
@@ -74,36 +82,174 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
   }
 
   Future<void> _cancelStudyPhaseNotifs() async {
-    await NotificationService.I.cancel(_N_WORK_END);
-    await NotificationService.I.cancel(_N_REST_END);
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.study,
+        kind: 'timer_phase_end',
+        id: 'work',
+      ),
+    );
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.study,
+        kind: 'timer_phase_end',
+        id: 'rest',
+      ),
+    );
   }
 
   Future<void> _notifyPhaseStart(String phase, int seconds) async {
     if (phase == 'work') {
-      await NotificationService.I.showNow(
-        id: _N_WORK_START,
-        title: 'Estudio',
-        body: 'Trabajo iniciado (${(seconds / 60).round()} min)',
+      final now = DateTime.now();
+      await NotificationsFacade.I.scheduleIntent(
+        NotificationIntent(
+          module: NotificationModule.study,
+          type: 'TIMER_WORK_STARTED',
+          entity: const NotificationEntityRef(
+            module: NotificationModule.study,
+            kind: 'timer_phase_start',
+            id: 'work',
+          ),
+          content: NotificationContent(
+            title: 'Estudio',
+            body: 'Trabajo iniciado (${(seconds / 60).round()} min)',
+          ),
+          action: const NotificationAction(
+            kind: NotificationActionKind.openRoute,
+            route: '/study',
+          ),
+          schedule: NotificationSchedule(
+            kind: NotificationScheduleKind.immediate,
+            scheduledAtUtc: now.toUtc(),
+            timezone: now.timeZoneName,
+          ),
+          delivery: const NotificationDelivery(
+            kind: NotificationDeliveryKind.localOnly,
+            channel: AndroidChannelCatalog.studyReminders,
+            priority: NotificationPriority.normal,
+          ),
+          dedupeKey: 'study:timer:work_start:${now.millisecondsSinceEpoch}',
+          userId: _uid,
+          source: 'study.timer',
+          notificationId: 'ntf_study_timer_work_start_${now.millisecondsSinceEpoch}',
+        ),
       );
-      await NotificationService.I.scheduleOnce(
-        id: _N_WORK_END,
-        title: 'Fin del trabajo',
-        body: 'Toca descanso',
-        whenLocal: DateTime.now().add(Duration(seconds: seconds)),
-        useExact: true,
+      final end = now.add(Duration(seconds: seconds));
+      await NotificationsFacade.I.cancelByEntity(
+        const NotificationEntityRef(
+          module: NotificationModule.study,
+          kind: 'timer_phase_end',
+          id: 'work',
+        ),
+      );
+      await NotificationsFacade.I.scheduleIntent(
+        NotificationIntent(
+          module: NotificationModule.study,
+          type: 'TIMER_WORK_ENDED',
+          entity: const NotificationEntityRef(
+            module: NotificationModule.study,
+            kind: 'timer_phase_end',
+            id: 'work',
+          ),
+          content: const NotificationContent(
+            title: 'Fin del trabajo',
+            body: 'Toca descanso',
+          ),
+          action: const NotificationAction(
+            kind: NotificationActionKind.openRoute,
+            route: '/study',
+          ),
+          schedule: NotificationSchedule(
+            kind: NotificationScheduleKind.oneShot,
+            scheduledAtUtc: end.toUtc(),
+            timezone: end.timeZoneName,
+          ),
+          delivery: const NotificationDelivery(
+            kind: NotificationDeliveryKind.localOnly,
+            channel: AndroidChannelCatalog.studyReminders,
+            priority: NotificationPriority.high,
+          ),
+          dedupeKey: 'study:timer:work_end',
+          userId: _uid,
+          source: 'study.timer',
+          notificationId: 'ntf_study_timer_work_end',
+        ),
       );
     } else if (phase == 'rest') {
-      await NotificationService.I.showNow(
-        id: _N_REST_START,
-        title: 'Estudio',
-        body: 'Descanso iniciado (${(seconds / 60).round()} min)',
+      final now = DateTime.now();
+      await NotificationsFacade.I.scheduleIntent(
+        NotificationIntent(
+          module: NotificationModule.study,
+          type: 'TIMER_REST_STARTED',
+          entity: const NotificationEntityRef(
+            module: NotificationModule.study,
+            kind: 'timer_phase_start',
+            id: 'rest',
+          ),
+          content: NotificationContent(
+            title: 'Estudio',
+            body: 'Descanso iniciado (${(seconds / 60).round()} min)',
+          ),
+          action: const NotificationAction(
+            kind: NotificationActionKind.openRoute,
+            route: '/study',
+          ),
+          schedule: NotificationSchedule(
+            kind: NotificationScheduleKind.immediate,
+            scheduledAtUtc: now.toUtc(),
+            timezone: now.timeZoneName,
+          ),
+          delivery: const NotificationDelivery(
+            kind: NotificationDeliveryKind.localOnly,
+            channel: AndroidChannelCatalog.studyReminders,
+            priority: NotificationPriority.normal,
+          ),
+          dedupeKey: 'study:timer:rest_start:${now.millisecondsSinceEpoch}',
+          userId: _uid,
+          source: 'study.timer',
+          notificationId: 'ntf_study_timer_rest_start_${now.millisecondsSinceEpoch}',
+        ),
       );
-      await NotificationService.I.scheduleOnce(
-        id: _N_REST_END,
-        title: 'Fin del descanso',
-        body: 'Vuelve al trabajo',
-        whenLocal: DateTime.now().add(Duration(seconds: seconds)),
-        useExact: true,
+      final end = now.add(Duration(seconds: seconds));
+      await NotificationsFacade.I.cancelByEntity(
+        const NotificationEntityRef(
+          module: NotificationModule.study,
+          kind: 'timer_phase_end',
+          id: 'rest',
+        ),
+      );
+      await NotificationsFacade.I.scheduleIntent(
+        NotificationIntent(
+          module: NotificationModule.study,
+          type: 'TIMER_REST_ENDED',
+          entity: const NotificationEntityRef(
+            module: NotificationModule.study,
+            kind: 'timer_phase_end',
+            id: 'rest',
+          ),
+          content: const NotificationContent(
+            title: 'Fin del descanso',
+            body: 'Vuelve al trabajo',
+          ),
+          action: const NotificationAction(
+            kind: NotificationActionKind.openRoute,
+            route: '/study',
+          ),
+          schedule: NotificationSchedule(
+            kind: NotificationScheduleKind.oneShot,
+            scheduledAtUtc: end.toUtc(),
+            timezone: end.timeZoneName,
+          ),
+          delivery: const NotificationDelivery(
+            kind: NotificationDeliveryKind.localOnly,
+            channel: AndroidChannelCatalog.studyReminders,
+            priority: NotificationPriority.high,
+          ),
+          dedupeKey: 'study:timer:rest_end',
+          userId: _uid,
+          source: 'study.timer',
+          notificationId: 'ntf_study_timer_rest_end',
+        ),
       );
     }
   }
@@ -163,10 +309,39 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           });
         });
         setState(() {});
-        NotificationService.I.showNow(
-          id: _N_WORK_START,
-          title: 'Estudio',
-          body: 'Sesión iniciada',
+        final now = DateTime.now();
+        NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.study,
+            type: 'TIMER_SESSION_STARTED',
+            entity: const NotificationEntityRef(
+              module: NotificationModule.study,
+              kind: 'timer_session',
+              id: 'simple',
+            ),
+            content: const NotificationContent(
+              title: 'Estudio',
+              body: 'Sesion iniciada',
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/study',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.immediate,
+              scheduledAtUtc: now.toUtc(),
+              timezone: now.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.studyReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'study:timer:simple_start:${now.millisecondsSinceEpoch}',
+            userId: _uid,
+            source: 'study.timer',
+            notificationId: 'ntf_study_timer_simple_start_${now.millisecondsSinceEpoch}',
+          ),
         );
         break;
     }
@@ -196,10 +371,39 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     _ticker = Timer.periodic(const Duration(minutes: 1), (_) {
       setState(() => _timeLeft += 60);
     });
-    NotificationService.I.showNow(
-      id: _N_WORK_START,
-      title: 'Estudio',
-      body: 'Trabajo iniciado (Flowtime)',
+    final now = DateTime.now();
+    NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.study,
+        type: 'TIMER_FLOWTIME_STARTED',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.study,
+          kind: 'timer_session',
+          id: 'flowtime',
+        ),
+        content: const NotificationContent(
+          title: 'Estudio',
+          body: 'Trabajo iniciado (Flowtime)',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/study',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.immediate,
+          scheduledAtUtc: now.toUtc(),
+          timezone: now.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.studyReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'study:timer:flowtime_start:${now.millisecondsSinceEpoch}',
+        userId: _uid,
+        source: 'study.timer',
+        notificationId: 'ntf_study_timer_flowtime_start_${now.millisecondsSinceEpoch}',
+      ),
     );
     _cancelStudyPhaseNotifs();
   }
@@ -308,10 +512,39 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     await widget.svc.addSession(session);
 
     _cancelStudyPhaseNotifs();
-    await NotificationService.I.showNow(
-      id: _N_SESSION_SAVED,
-      title: 'Estudio',
-      body: 'Sesión guardada ($minutes min)',
+    final now = DateTime.now();
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.study,
+        type: 'TIMER_SESSION_SAVED',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.study,
+          kind: 'timer_session',
+          id: 'saved',
+        ),
+        content: NotificationContent(
+          title: 'Estudio',
+          body: 'Sesion guardada ($minutes min)',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/study',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.immediate,
+          scheduledAtUtc: now.toUtc(),
+          timezone: now.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.studyReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'study:timer:session_saved:${now.millisecondsSinceEpoch}',
+        userId: _uid,
+        source: 'study.timer',
+        notificationId: 'ntf_study_timer_session_saved_${now.millisecondsSinceEpoch}',
+      ),
     );
 
     if (!mounted) return;

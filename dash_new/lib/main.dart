@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/design/theme/theme.dart';
 import 'package:mi_dashboard_personal/design/theme/prefs.dart';
 import 'package:mi_dashboard_personal/screens/food/services/food_firestore_service.dart';
@@ -51,8 +51,6 @@ class _MyAppState extends State<MyApp> {
   GymFirestoreService? _gymService;
   StudyFirestoreService? _studySvc;
 
-  StreamSubscription<String>? _notifSub;
-
   @override
   void initState() {
     super.initState();
@@ -78,24 +76,11 @@ class _MyAppState extends State<MyApp> {
     }
     _loadPrefs();
     _askNotifPermission();
-    NotificationService.I.scheduleHabitDailyReminder(
-      const TimeOfDay(hour: 0, minute: 0),
-    );
-
-    _notifSub = NotificationService.I.onPayload.listen((p) {
-      if (p == 'OPEN_HABITS') {
-        appNavigatorKey.currentState?.pushNamed('/habits');
-      } else if (p == 'OPEN_CALENDAR') {
-        appNavigatorKey.currentState?.pushNamed('/calendar');
-      } else if (p == 'OPEN_TASKS') {
-        appNavigatorKey.currentState?.pushNamed('/tasks');
-      }
-    });
+    NotificationsFacade.I.attachNavigatorKey(appNavigatorKey);
   }
 
   @override
   void dispose() {
-    _notifSub?.cancel();
     CoreSyncService.I.dispose();
     super.dispose();
   }
@@ -107,7 +92,7 @@ class _MyAppState extends State<MyApp> {
       await messaging.getToken();
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[NotificationService] permission request skipped: $e');
+        debugPrint('[Notifications] permission request skipped: $e');
       }
     }
   }

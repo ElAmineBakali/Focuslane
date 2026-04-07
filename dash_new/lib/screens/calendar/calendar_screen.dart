@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import 'package:mi_dashboard_personal/screens/calendar/controllers/calendar_controller.dart';
 import 'package:mi_dashboard_personal/screens/calendar/controllers/calendar_interaction_controller.dart';
 import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
@@ -110,7 +109,7 @@ class _CalendarScreenState extends State<CalendarScreen>
       },
       onDelete: (currentEvent) async {
         await CalendarService.I.deleteEvent(currentEvent.id);
-        await NotificationService.I.cancel(currentEvent.id.hashCode);
+        await _interactionController.cancelPlannerNotification(currentEvent.id);
       },
     );
   }
@@ -142,7 +141,7 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   Future<void> _handlePlannerDelete(String id) async {
     await CalendarService.I.deleteEvent(id);
-    await NotificationService.I.cancel(id.hashCode);
+    await _interactionController.cancelPlannerNotification(id);
   }
 
   Future<void> _moveItemToSlot(CalendarItem item, DateTime slot) async {

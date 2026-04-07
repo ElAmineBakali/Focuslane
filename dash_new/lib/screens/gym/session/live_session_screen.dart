@@ -1,12 +1,19 @@
 ﻿import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import '../services/gym_firestore_service.dart';
-import '../services/gym_notification_service.dart';
 import 'session_summary_screen.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 
 class LiveSessionScreen extends StatefulWidget {
@@ -32,8 +39,8 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   final _notesCtrl = TextEditingController();
   late final DateTime _startAt;
 
-  int _restNotifId(String exName) =>
-      ('gym_rest_${widget.routine.id}_${widget.day.id}_$exName').hashCode;
+    String _restNotificationId(String exName) =>
+      'ntf_gym_rest_${widget.routine.id}_${widget.day.id}_$exName';
 
   @override
   void initState() {
@@ -51,18 +58,45 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   void _startRest(String exName, int seconds) async {
-    await NotificationService.I.cancel(_restNotifId(exName));
+    await NotificationsFacade.I.cancelByNotificationId(_restNotificationId(exName));
 
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = seconds);
 
     final when = DateTime.now().add(Duration(seconds: seconds));
-    await NotificationService.I.scheduleOnce(
-      id: _restNotifId(exName),
-      title: 'Descanso terminado',
-      body: 'Siguiente serie: $exName',
-      whenLocal: when,
-      useExact: true,
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.gym,
+        type: 'REST_TIMER_FINISHED',
+        entity: NotificationEntityRef(
+          module: NotificationModule.gym,
+          kind: 'rest_timer',
+          id: '${widget.routine.id}_${widget.day.id}_$exName',
+        ),
+        content: NotificationContent(
+          title: 'Descanso terminado',
+          body: 'Siguiente serie: $exName',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/gym',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: when.toUtc(),
+          timezone: when.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.gymReminders,
+          priority: NotificationPriority.high,
+        ),
+        dedupeKey: 'gym:rest:${widget.routine.id}:${widget.day.id}:$exName',
+        userId: uid,
+        source: 'gym.live_session',
+        notificationId: _restNotificationId(exName),
+      ),
     );
 
     _timers[exName] = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -79,7 +113,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   void _stopRest(String exName) async {
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = 0);
-    await NotificationService.I.cancel(_restNotifId(exName));
+    await NotificationsFacade.I.cancelByNotificationId(_restNotificationId(exName));
   }
 
   Future<void> _addSetDialog(String exName) async {
@@ -302,7 +336,50 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     await widget.svc.saveSession(doc);
     await widget.svc.markDayCompleted(widget.routine.id, widget.day.id);
 
-    await GymNotificationService.I.scheduleInactivityReminder();
+    const xDays = 3;
+    final base = DateTime.now().add(const Duration(days: xDays));
+    final at = DateTime(base.year, base.month, base.day, 10, 0);
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.gym,
+        kind: 'inactivity_home',
+        id: 'home',
+      ),
+    );
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.gym,
+        type: 'INACTIVITY_REMINDER',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.gym,
+          kind: 'inactivity_home',
+          id: 'home',
+        ),
+        content: const NotificationContent(
+          title: 'Vuelve al gym',
+          body: 'Llevas 3 dias sin entrenar. Toca sesion.',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/gym',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: at.toUtc(),
+          timezone: at.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.gymReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'gym:home:inactivity:$xDays',
+        userId: uid,
+        source: 'gym.live_session',
+        notificationId: 'ntf_gym_home_inactivity',
+      ),
+    );
 
     if (!mounted) return;
     Navigator.pushReplacement(
@@ -659,8 +736,8 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                           _performed.remove(exName);
                           _restLeft.remove(exName);
                         });
-                        await NotificationService.I.cancel(
-                          _restNotifId(exName),
+                        await NotificationsFacade.I.cancelByNotificationId(
+                          _restNotificationId(exName),
                         );
                       }
                     }

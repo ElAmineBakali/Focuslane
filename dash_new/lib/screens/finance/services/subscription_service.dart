@@ -1,7 +1,14 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class SubscriptionService {
   static final SubscriptionService I = SubscriptionService._();
@@ -57,19 +64,57 @@ class SubscriptionService {
 
   Future<void> delete(String id) async {
     await _col.doc(id).delete();
-    await NotificationService.I.cancel(id.hashCode);
+    await NotificationsFacade.I.cancelByEntity(
+      NotificationEntityRef(
+        module: NotificationModule.finance,
+        kind: 'subscription',
+        id: id,
+      ),
+    );
   }
 
   Future<void> _scheduleReminder(Subscription s) async {
+    if (s.id.isEmpty) return;
     final notifDate = s.nextDue.subtract(Duration(days: s.remindDaysBefore));
     if (notifDate.isBefore(DateTime.now())) return;
 
-    await NotificationService.I.scheduleOnce(
-      id: s.id.hashCode,
-      title: 'Próximo pago: ${s.title}',
-      body: 'Vence en ${s.remindDaysBefore} días. Monto: ${s.amount}',
-      whenLocal: notifDate,
-      useExact: false,
+    final uid = _uid ?? 'local';
+    final epoch = notifDate.toUtc().millisecondsSinceEpoch;
+    final entity = NotificationEntityRef(
+      module: NotificationModule.finance,
+      kind: 'subscription',
+      id: s.id,
+    );
+
+    await NotificationsFacade.I.cancelByEntity(entity);
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.finance,
+        type: 'SUBSCRIPTION_DUE_SOON',
+        entity: entity,
+        content: NotificationContent(
+          title: 'Próximo pago: ${s.title}',
+          body: 'Vence en ${s.remindDaysBefore} días. Monto: ${s.amount}',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/finance',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: notifDate.toUtc(),
+          timezone: notifDate.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.financeReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'finance:subscription:${s.id}:$epoch',
+        userId: uid,
+        source: 'finance.subscription_service',
+        notificationId: 'ntf_finance_subscription_${s.id}_$epoch',
+      ),
     );
   }
 

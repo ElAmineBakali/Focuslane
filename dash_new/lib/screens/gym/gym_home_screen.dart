@@ -1,6 +1,15 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
 import 'routines/routines_list_screen.dart';
 import 'routines/routine_detail_screen.dart';
@@ -8,7 +17,6 @@ import 'routines/preset_routines_screen.dart';
 import 'analytics/gym_analytics_screen.dart';
 import 'session/session_history_screen.dart';
 import 'widgets/export_data_screen.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 import 'package:intl/intl.dart';
 
 /// Módulo GymHomeScreen rediseñado - Estética profesional estilo Strong/Heavy
@@ -21,9 +29,7 @@ class GymHomeScreen extends StatefulWidget {
 }
 
 class _GymHomeScreenState extends State<GymHomeScreen> {
-  static const int _weeklyWeightId = 22010;
-  static const int _weeklyMeasureId = 22011;
-  static const int _inactivityId = 22001;
+  String get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
 
   Future<void> _scheduleGymReminders() async {
     DateTime nextWeekday(int weekday, {int hour = 9, int minute = 0}) {
@@ -34,29 +40,99 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       return DateTime(d.year, d.month, d.day, hour, minute);
     }
 
-    await NotificationService.I.cancel(_weeklyWeightId);
-    await NotificationService.I.cancel(_weeklyMeasureId);
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.gym,
+        kind: 'weekly_weight',
+        id: 'home',
+      ),
+    );
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.gym,
+        kind: 'weekly_measurements',
+        id: 'home',
+      ),
+    );
 
     final nextMon = nextWeekday(DateTime.monday, hour: 9);
-    await NotificationService.I.scheduleOnce(
-      id: _weeklyWeightId,
-      title: 'Control semanal',
-      body: 'Pésate y registra tu peso ðŸ‹ï¸',
-      whenLocal: nextMon,
-      useExact: false,
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.gym,
+        type: 'WEEKLY_WEIGHT_REMINDER',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.gym,
+          kind: 'weekly_weight',
+          id: 'home',
+        ),
+        content: const NotificationContent(
+          title: 'Control semanal',
+          body: 'Pesate y registra tu peso',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/gym',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: nextMon.toUtc(),
+          timezone: nextMon.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.gymReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'gym:home:weekly_weight',
+        userId: _uid,
+        source: 'gym.home',
+        notificationId: 'ntf_gym_home_weekly_weight',
+      ),
     );
 
     final nextMon2 = nextWeekday(DateTime.monday, hour: 9, minute: 5);
-    await NotificationService.I.scheduleOnce(
-      id: _weeklyMeasureId,
-      title: 'Medidas corporales',
-      body: 'Toca medir perímetros (pecho, brazo, cintura...) ðŸ“',
-      whenLocal: nextMon2,
-      useExact: false,
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.gym,
+        type: 'WEEKLY_MEASUREMENTS_REMINDER',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.gym,
+          kind: 'weekly_measurements',
+          id: 'home',
+        ),
+        content: const NotificationContent(
+          title: 'Medidas corporales',
+          body: 'Toca medir perimetros (pecho, brazo, cintura...)',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/gym',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: nextMon2.toUtc(),
+          timezone: nextMon2.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.gymReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'gym:home:weekly_measurements',
+        userId: _uid,
+        source: 'gym.home',
+        notificationId: 'ntf_gym_home_weekly_measurements',
+      ),
     );
 
     const xDays = 3;
-    await NotificationService.I.cancel(_inactivityId);
+    await NotificationsFacade.I.cancelByEntity(
+      const NotificationEntityRef(
+        module: NotificationModule.gym,
+        kind: 'inactivity_home',
+        id: 'home',
+      ),
+    );
     final last = await widget.svc.lastSessionDate();
     DateTime base;
     if (last == null) {
@@ -68,12 +144,38 @@ class _GymHomeScreenState extends State<GymHomeScreen> {
       }
     }
     final at = DateTime(base.year, base.month, base.day, 10, 0);
-    await NotificationService.I.scheduleOnce(
-      id: _inactivityId,
-      title: 'Vuelve al gym',
-      body: 'Llevas $xDays días sin entrenar. ¡Toca sesión! ðŸ’ª',
-      whenLocal: at,
-      useExact: false,
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.gym,
+        type: 'INACTIVITY_REMINDER',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.gym,
+          kind: 'inactivity_home',
+          id: 'home',
+        ),
+        content: NotificationContent(
+          title: 'Vuelve al gym',
+          body: 'Llevas $xDays dias sin entrenar. Toca sesion.',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/gym',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: at.toUtc(),
+          timezone: at.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.gymReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'gym:home:inactivity:$xDays',
+        userId: _uid,
+        source: 'gym.home',
+        notificationId: 'ntf_gym_home_inactivity',
+      ),
     );
   }
 

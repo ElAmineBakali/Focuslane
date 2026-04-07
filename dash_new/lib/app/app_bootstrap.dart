@@ -6,8 +6,16 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mi_dashboard_personal/core/config/firebase_options.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
 import 'package:mi_dashboard_personal/core/config/supabase_config.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_bootstrap.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -20,7 +28,7 @@ Future<void> bootstrapApp() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
-  await NotificationService.I.init();
+  await NotificationsBootstrap.instance.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
@@ -28,11 +36,37 @@ Future<void> bootstrapApp() async {
     if (notification == null) {
       return;
     }
-    await NotificationService.I.showNow(
-      id: (notification.title ?? 'msg').hashCode ^
-          (notification.body ?? '').hashCode,
-      title: notification.title ?? 'Mensaje',
-      body: notification.body ?? '',
+    final now = DateTime.now();
+    final epoch = now.toUtc().millisecondsSinceEpoch;
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.system,
+        type: 'FCM_FOREGROUND_MESSAGE',
+        entity: const NotificationEntityRef(
+          module: NotificationModule.system,
+          kind: 'fcm_message',
+          id: 'foreground',
+        ),
+        content: NotificationContent(
+          title: notification.title ?? 'Mensaje',
+          body: notification.body ?? '',
+        ),
+        action: const NotificationAction(kind: NotificationActionKind.none),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.immediate,
+          scheduledAtUtc: now.toUtc(),
+          timezone: now.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.defaultChannel,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'system:fcm:foreground:$epoch',
+        userId: 'system',
+        source: 'app.bootstrap.onMessage',
+        notificationId: 'ntf_system_fcm_foreground_$epoch',
+      ),
     );
   });
 

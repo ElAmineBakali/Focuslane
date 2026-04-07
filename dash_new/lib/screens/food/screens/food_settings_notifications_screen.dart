@@ -1,8 +1,14 @@
-﻿import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
-import '../../../core/services/notification_service.dart';
+import '../../../core/notifications/local/android_channel_catalog.dart';
+import '../../../core/notifications/models/notification_action.dart';
+import '../../../core/notifications/models/notification_content.dart';
+import '../../../core/notifications/models/notification_delivery.dart';
+import '../../../core/notifications/models/notification_entity_ref.dart';
+import '../../../core/notifications/models/notification_intent.dart';
+import '../../../core/notifications/models/notification_schedule.dart';
+import '../../../core/notifications/notifications_facade.dart';
 import '../../../design/ui/shared/app_card.dart';
 import '../../../design/ui/feedback/focus_feedback.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
@@ -32,7 +38,7 @@ class _FoodSettingsNotificationsScreenState
   final _scrollController = ScrollController();
   final _notifKey = GlobalKey();
   final _configKey = GlobalKey();
-  final _scheduler = FoodReminderScheduler(NotificationService.I);
+  final _scheduler = FoodReminderScheduler();
 
   bool _loading = true;
   bool _masterEnabled = true;
@@ -212,7 +218,7 @@ class _FoodSettingsNotificationsScreenState
   }
 
   Future<void> _cancelAll() async {
-    await NotificationService.I.cancelAllNotificationsForModule('food');
+    await NotificationsFacade.I.cancelByModule(NotificationModule.food);
     setState(() => _masterEnabled = false);
     await _persistAndSchedule();
     if (mounted) {
@@ -338,36 +344,67 @@ class _FoodSettingsNotificationsScreenState
 }
 
 class FoodReminderScheduler {
-  final NotificationService _service;
-
-  FoodReminderScheduler(this._service);
+  String get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
 
   Future<void> applyReminders({
     required bool masterEnabled,
     required List<FoodReminderDefinition> reminders,
   }) async {
     if (!masterEnabled) {
-      await _service.cancelAllNotificationsForModule('food');
+      await NotificationsFacade.I.cancelByModule(NotificationModule.food);
       return;
     }
 
     for (final reminder in reminders) {
+      final entity = NotificationEntityRef(
+        module: NotificationModule.food,
+        kind: 'food_reminder',
+        id: reminder.id,
+      );
+
       if (!reminder.enabled) {
-        await _service.cancelNotificationById(reminder.id);
+        await NotificationsFacade.I.cancelByEntity(entity);
         continue;
       }
 
       final time = reminder.trigger.timeOfDay;
       if (reminder.trigger.type == 'daily_time' && time != null) {
-        await _service.rescheduleNotification(
-          id: reminder.id,
-          title: reminder.title,
-          body: reminder.description,
-          dailyTime: time,
-          payload: jsonEncode(reminder.payload),
+        final now = DateTime.now();
+        final start = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+        await NotificationsFacade.I.cancelByEntity(entity);
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.food,
+            type: 'FOOD_DAILY_REMINDER',
+            entity: entity,
+            content: NotificationContent(
+              title: reminder.title,
+              body: reminder.description,
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/food',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.daily,
+              scheduledAtUtc: start.toUtc(),
+              timezone: start.timeZoneName,
+              hour: time.hour,
+              minute: time.minute,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.foodReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'food:reminder:${reminder.id}:daily:${time.hour}:${time.minute}',
+            userId: _uid,
+            source: 'food.settings_notifications',
+            notificationId: 'ntf_food_reminder_${reminder.id}',
+          ),
         );
       } else {
-        await _service.cancelNotificationById(reminder.id);
+        await NotificationsFacade.I.cancelByEntity(entity);
       }
     }
   }

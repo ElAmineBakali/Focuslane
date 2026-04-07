@@ -2,7 +2,14 @@ import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
 import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
 import 'package:mi_dashboard_personal/screens/study/services/study_tasks_sync_service.dart';
@@ -51,6 +58,16 @@ class CalendarInteractionController {
 
   Future<void> syncPlannerNotification(CalendarEvent event) {
     return _syncPlannerNotification(event);
+  }
+
+  Future<void> cancelPlannerNotification(String eventId) async {
+    await NotificationsFacade.I.cancelByEntity(
+      NotificationEntityRef(
+        module: NotificationModule.calendar,
+        kind: 'planner_event',
+        id: eventId,
+      ),
+    );
   }
 
   Future<bool> moveItemToSlot(
@@ -588,17 +605,45 @@ class CalendarInteractionController {
       'nextPaymentDate': Timestamp.fromDate(nextDue),
     });
 
-    await NotificationService.I.cancel(subId.hashCode);
+    final entity = NotificationEntityRef(
+      module: NotificationModule.finance,
+      kind: 'subscription',
+      id: subId,
+    );
+    await NotificationsFacade.I.cancelByEntity(entity);
     if (reminderEnabled && remindDaysBefore > 0) {
       final when = nextDue.subtract(Duration(days: remindDaysBefore));
       if (when.isAfter(DateTime.now())) {
-        await NotificationService.I.scheduleOnce(
-          id: subId.hashCode,
-          title: 'Proximo pago: $title',
-          body:
-              'Vence en $remindDaysBefore dias. Monto: ${amount.toStringAsFixed(2)}',
-          whenLocal: when,
-          useExact: false,
+        final epoch = when.toUtc().millisecondsSinceEpoch;
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.finance,
+            type: 'SUBSCRIPTION_DUE_SOON',
+            entity: entity,
+            content: NotificationContent(
+              title: 'Proximo pago: $title',
+              body:
+                  'Vence en $remindDaysBefore dias. Monto: ${amount.toStringAsFixed(2)}',
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/finance',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.oneShot,
+              scheduledAtUtc: when.toUtc(),
+              timezone: when.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.financeReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'finance:subscription:$subId:$epoch',
+            userId: uid,
+            source: 'calendar.subscription_sync',
+            notificationId: 'ntf_finance_subscription_${subId}_$epoch',
+          ),
         );
       }
     }
@@ -606,19 +651,46 @@ class CalendarInteractionController {
   }
 
   Future<void> _syncPlannerNotification(CalendarEvent event) async {
-    final notifId = event.id.hashCode;
-    await NotificationService.I.cancel(notifId);
+    final entity = NotificationEntityRef(
+      module: NotificationModule.calendar,
+      kind: 'planner_event',
+      id: event.id,
+    );
+    await NotificationsFacade.I.cancelByEntity(entity);
     if (event.allDay) return;
     if (!event.start.isAfter(DateTime.now().add(const Duration(seconds: 1)))) {
       return;
     }
-    await NotificationService.I.scheduleOnce(
-      id: notifId,
-      title: event.title,
-      body: event.notes ?? 'Recordatorio',
-      whenLocal: event.start,
-      useExact: true,
-      payload: 'OPEN_CALENDAR',
+    final uid = _currentUid() ?? 'local';
+    final epoch = event.start.toUtc().millisecondsSinceEpoch;
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.calendar,
+        type: 'PLANNER_EVENT_REMINDER',
+        entity: entity,
+        content: NotificationContent(
+          title: event.title,
+          body: event.notes ?? 'Recordatorio',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/calendar',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.oneShot,
+          scheduledAtUtc: event.start.toUtc(),
+          timezone: event.start.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.calendarReminders,
+          priority: NotificationPriority.normal,
+        ),
+        dedupeKey: 'calendar:event:${event.id}:$epoch',
+        userId: uid,
+        source: 'calendar.planner_sync',
+        notificationId: 'ntf_calendar_event_${event.id}_$epoch',
+      ),
     );
   }
 }

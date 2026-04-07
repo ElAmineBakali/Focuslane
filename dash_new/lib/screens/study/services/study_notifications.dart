@@ -1,11 +1,20 @@
-﻿import 'study_firestore_service.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
+import 'study_firestore_service.dart';
 import '../models/study_models.dart';
-import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class StudyNotifications {
   final StudyFirestoreService svc;
   StudyNotifications(this.svc);
+
+  String get _uid => fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
 
   Future<void> scheduleTodayClasses() async {
     final now = DateTime.now();
@@ -22,13 +31,43 @@ class StudyNotifications {
       );
       final when = startToday.subtract(const Duration(minutes: 15));
       if (when.isAfter(now)) {
-        await NotificationService.I.scheduleOnce(
-          id: _id('CLASS', b, when),
-          title: 'Clase próxima',
-          body:
-              'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
-          whenLocal: when,
-          useExact: true,
+        final key = '${b.courseId}-${b.start.hour}:${b.start.minute}';
+        final epoch = when.toUtc().millisecondsSinceEpoch;
+        final entity = NotificationEntityRef(
+          module: NotificationModule.study,
+          kind: 'class_block',
+          id: key,
+        );
+        await NotificationsFacade.I.cancelByEntity(entity);
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.study,
+            type: 'CLASS_STARTING_SOON',
+            entity: entity,
+            content: NotificationContent(
+              title: 'Clase próxima',
+              body:
+                  'Clase de ${b.courseId} en 15 minutos${b.room != null ? ' (${b.room})' : ''}',
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/study',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.oneShot,
+              scheduledAtUtc: when.toUtc(),
+              timezone: when.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.studyReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'study:class:$key:$epoch',
+            userId: _uid,
+            source: 'study.schedule_today_classes',
+            notificationId: 'ntf_study_class_${key}_$epoch',
+          ),
         );
       }
     }
@@ -41,32 +80,78 @@ class StudyNotifications {
       final due = DateTime(t.due!.year, t.due!.month, t.due!.day);
       final oneDayBefore = due.subtract(const Duration(days: 1));
       final sameDay = DateTime(due.year, due.month, due.day, 8, 0);
+      final entity = NotificationEntityRef(
+        module: NotificationModule.study,
+        kind: 'study_task',
+        id: t.id,
+      );
 
       if (oneDayBefore.isAfter(DateTime.now())) {
-        await NotificationService.I.scheduleOnce(
-          id: _hash('TASK1', t.id, oneDayBefore),
-          title: 'Tarea próxima',
-          body: 'Entrega de ${t.title} mañana',
-          whenLocal: oneDayBefore,
-          useExact: false,
+        final epoch = oneDayBefore.toUtc().millisecondsSinceEpoch;
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.study,
+            type: 'TASK_DUE_TOMORROW',
+            entity: entity,
+            content: NotificationContent(
+              title: 'Tarea próxima',
+              body: 'Entrega de ${t.title} mañana',
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/study',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.oneShot,
+              scheduledAtUtc: oneDayBefore.toUtc(),
+              timezone: oneDayBefore.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.studyReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'study:task:${t.id}:day_before:$epoch',
+            userId: _uid,
+            source: 'study.schedule_due_tasks',
+            notificationId: 'ntf_study_task_day_before_${t.id}_$epoch',
+          ),
         );
       }
       if (sameDay.isAfter(DateTime.now())) {
-        await NotificationService.I.scheduleOnce(
-          id: _hash('TASK2', t.id, sameDay),
-          title: 'Entrega hoy',
-          body: 'Hoy vence ${t.title}',
-          whenLocal: sameDay,
-          useExact: false,
+        final epoch = sameDay.toUtc().millisecondsSinceEpoch;
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.study,
+            type: 'TASK_DUE_TODAY',
+            entity: entity,
+            content: NotificationContent(
+              title: 'Entrega hoy',
+              body: 'Hoy vence ${t.title}',
+            ),
+            action: const NotificationAction(
+              kind: NotificationActionKind.openRoute,
+              route: '/study',
+            ),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.oneShot,
+              scheduledAtUtc: sameDay.toUtc(),
+              timezone: sameDay.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.studyReminders,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'study:task:${t.id}:same_day:$epoch',
+            userId: _uid,
+            source: 'study.schedule_due_tasks',
+            notificationId: 'ntf_study_task_same_day_${t.id}_$epoch',
+          ),
         );
       }
     }
   }
-
-  int _id(String prefix, StudyClassBlock b, DateTime when) =>
-      _hash(prefix, '${b.courseId}-${b.start.hour}:${b.start.minute}', when);
-  int _hash(String prefix, String key, DateTime when) =>
-      (prefix + key + DateFormat('yyyyMMddHHmm').format(when)).hashCode;
 
   Future<void> scheduleAll({bool classes = true, bool tasks = true}) async {
     if (classes) {

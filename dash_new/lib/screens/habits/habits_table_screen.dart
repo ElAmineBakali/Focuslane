@@ -1,14 +1,22 @@
 ﻿import 'dart:math' as math;
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
 import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
 import 'package:mi_dashboard_personal/screens/habits/widgets/confetti_animation.dart';
-import 'package:mi_dashboard_personal/core/services/notification_service.dart';
 
 class HabitsTableScreen extends StatefulWidget {
   const HabitsTableScreen({super.key});
@@ -529,8 +537,54 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   initialTime: const TimeOfDay(hour: 21, minute: 0),
                 );
                 if (picked != null) {
-                  await NotificationService.I.scheduleHabitDailyReminder(
-                    picked,
+                  final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
+                  final now = DateTime.now();
+                  final first = DateTime(
+                    now.year,
+                    now.month,
+                    now.day,
+                    picked.hour,
+                    picked.minute,
+                  );
+                  final entity = const NotificationEntityRef(
+                    module: NotificationModule.habits,
+                    kind: 'daily_review',
+                    id: 'master',
+                  );
+
+                  await NotificationsFacade.I.cancelByEntity(entity);
+                  await NotificationsFacade.I.scheduleIntent(
+                    NotificationIntent(
+                      module: NotificationModule.habits,
+                      type: 'HABITS_DAILY_REVIEW',
+                      entity: entity,
+                      content: const NotificationContent(
+                        title: 'Recordatorio de habitos',
+                        body: 'Toca para revisar tus habitos de hoy',
+                      ),
+                      action: const NotificationAction(
+                        kind: NotificationActionKind.openRoute,
+                        route: '/habits',
+                      ),
+                      schedule: NotificationSchedule(
+                        kind: NotificationScheduleKind.daily,
+                        scheduledAtUtc: first.toUtc(),
+                        timezone: first.timeZoneName,
+                        hour: picked.hour,
+                        minute: picked.minute,
+                      ),
+                      delivery: const NotificationDelivery(
+                        kind: NotificationDeliveryKind.localOnly,
+                        channel: AndroidChannelCatalog.habitsReminders,
+                        priority: NotificationPriority.high,
+                      ),
+                      dedupeKey:
+                          'habits:daily_review:${picked.hour}:${picked.minute}',
+                      userId: uid,
+                      source: 'habits.menu',
+                      notificationId:
+                          'ntf_habits_daily_review_${picked.hour}_${picked.minute}',
+                    ),
                   );
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -543,7 +597,13 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                   );
                 }
               } else if (value == 'cancel') {
-                await NotificationService.I.cancelHabitDailyReminder();
+                await NotificationsFacade.I.cancelByEntity(
+                  const NotificationEntityRef(
+                    module: NotificationModule.habits,
+                    kind: 'daily_review',
+                    id: 'master',
+                  ),
+                );
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
