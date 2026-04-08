@@ -114,21 +114,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData _safe(ThemeData candidate) {
-    final seed = candidate.colorScheme.primary;
-    final bright = candidate.brightness;
-    final fixed = ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: seed, brightness: bright),
-      textTheme: candidate.textTheme,
-    );
-    return fixed.copyWith(
-      appBarTheme: candidate.appBarTheme,
-      cardTheme: candidate.cardTheme,
-      chipTheme: candidate.chipTheme,
-      elevatedButtonTheme: candidate.elevatedButtonTheme,
-      inputDecorationTheme: candidate.inputDecorationTheme,
-      iconTheme: candidate.iconTheme,
-    );
+    return candidate;
   }
 
   @override

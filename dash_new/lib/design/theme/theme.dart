@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../ui/tokens/focuslane_tokens.dart';
+import '../ui/tokens/focuslane_semantic_tokens.dart';
 
 enum ThemePreset { ocean, forest, sunset, orchid, tealCarbon, graphite }
 
@@ -46,10 +47,7 @@ class AppTheme {
   }
 
   static ThemeData _buildLight(ThemePreset p) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: _seed(p),
-      brightness: Brightness.light,
-    );
+    final scheme = FocuslaneSemanticTokens.lightScheme();
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -96,8 +94,14 @@ class AppTheme {
         hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
       ),
       cardTheme: CardThemeData(
-        elevation: 1.5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          side: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
       ),
       chipTheme: ChipThemeData(
         selectedColor: scheme.secondaryContainer,
@@ -110,10 +114,7 @@ class AppTheme {
   }
 
   static ThemeData _buildDark(ThemePreset p) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: _seed(p),
-      brightness: Brightness.dark,
-    );
+    final scheme = FocuslaneSemanticTokens.darkScheme();
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -160,8 +161,14 @@ class AppTheme {
         hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
       ),
       cardTheme: CardThemeData(
-        elevation: 1.5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          side: BorderSide(
+            color: FocuslaneTokens.borderColorFromScheme(scheme),
+            width: FocuslaneTokens.borderW,
+          ),
+        ),
       ),
       chipTheme: ChipThemeData(
         selectedColor: scheme.secondaryContainer,

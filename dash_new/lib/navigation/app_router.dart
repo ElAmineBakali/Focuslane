@@ -5,6 +5,7 @@ import 'package:mi_dashboard_personal/design/theme/theme.dart';
 import 'package:mi_dashboard_personal/design/theme/prefs.dart';
 import 'package:mi_dashboard_personal/navigation/app_routes.dart';
 import 'package:mi_dashboard_personal/screens/auth/login_screen.dart';
+import 'package:mi_dashboard_personal/screens/auth/register_screen.dart';
 import 'package:mi_dashboard_personal/screens/calendar/calendar_screen.dart';
 import 'package:mi_dashboard_personal/screens/finance/main/finance_routes.dart';
 import 'package:mi_dashboard_personal/screens/food/main/food_main_screen.dart';
@@ -62,6 +63,8 @@ class AppRouterDependencies {
 
 Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
   return {
+    AppRoutes.login: (_) => const LoginScreen(),
+    AppRoutes.register: (_) => const RegisterScreen(),
     AppRoutes.home: (_) => AuthGate(
       authenticated: HomeScreen(
         toggleTheme: (isDark) {

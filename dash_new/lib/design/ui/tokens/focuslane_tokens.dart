@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'focuslane_semantic_tokens.dart';
 
 class FocuslaneTokens {
   static const double spacing8 = 8.0;
@@ -26,21 +27,21 @@ class FocuslaneTokens {
   }
 
   static Color accent(BuildContext c) {
-    return isDark(c) ? pastelTealSuavizado : pastelTeal;
+    return FocuslaneSemanticTokens.primary(c);
   }
 
   static Color accent2(BuildContext c) {
-    return isDark(c) ? pastelTealClaroSuavizado : pastelTealClaro;
+    return FocuslaneSemanticTokens.secondary(c);
   }
 
   static Color borderColor(BuildContext c) {
-    return isDark(c) ? Colors.grey.shade600 : Colors.grey.shade400;
+    return FocuslaneSemanticTokens.border(c);
   }
 
   static Color borderColorFromScheme(ColorScheme scheme) {
     return scheme.brightness == Brightness.dark
-        ? Colors.grey.shade600
-        : Colors.grey.shade400;
+      ? FocuslaneSemanticTokens.darkBorder
+      : FocuslaneSemanticTokens.lightBorder;
   }
 
   static Color dividerColor(BuildContext c) {
@@ -50,11 +51,11 @@ class FocuslaneTokens {
   }
 
   static Color surfaceColor(BuildContext c) {
-    return Theme.of(c).colorScheme.surface;
+    return FocuslaneSemanticTokens.cardBackground(c);
   }
 
   static Color mutedTextColor(BuildContext c) {
-    return Theme.of(c).colorScheme.onSurfaceVariant;
+    return FocuslaneSemanticTokens.textSecondary(c);
   }
 
   static LinearGradient primaryGradient(BuildContext c) {
@@ -62,8 +63,8 @@ class FocuslaneTokens {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        accent(c).withOpacity(0.9),
-        accent2(c).withOpacity(0.8),
+        accent(c),
+        accent(c),
       ],
     );
   }
@@ -73,14 +74,7 @@ class FocuslaneTokens {
   }
 
   static List<BoxShadow> cardShadow(BuildContext c) {
-    final cs = Theme.of(c).colorScheme;
-    return [
-      BoxShadow(
-        color: cs.shadow.withOpacity(isDark(c) ? 0.2 : 0.08),
-        blurRadius: 12,
-        offset: const Offset(0, 4),
-      ),
-    ];
+    return const [];
   }
 }
 
