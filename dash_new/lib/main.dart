@@ -17,6 +17,7 @@ import 'navigation/app_routes.dart';
 import 'navigation/app_router.dart';
 import 'core/services/core_sync_service.dart';
 import 'core/services/ai_backend_client.dart';
+import 'core/notifications/push/fcm_token_sync_service.dart';
 import 'app/app_bootstrap.dart';
 import 'package:mi_dashboard_personal/screens/study/services/study_firestore_service.dart';
 
@@ -74,6 +75,7 @@ class _MyAppState extends State<MyApp> {
     if (kDebugMode && AiBackendClient.isDevEnv) {
       unawaited(AiBackendClient().debugPing());
     }
+    unawaited(FcmTokenSyncService.I.start());
     _loadPrefs();
     _askNotifPermission();
     NotificationsFacade.I.attachNavigatorKey(appNavigatorKey);
@@ -82,6 +84,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     CoreSyncService.I.dispose();
+    FcmTokenSyncService.I.dispose();
     super.dispose();
   }
 

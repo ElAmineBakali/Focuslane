@@ -48,3 +48,4 @@ app.*.map.json
 backend/node_modules/
 backend/.env
 backend/service-account.json
+backend/dist/

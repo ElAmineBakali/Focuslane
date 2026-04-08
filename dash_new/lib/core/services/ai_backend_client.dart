@@ -25,7 +25,7 @@ class AiBackendClient {
     );
     const prodUrl = String.fromEnvironment(
       'AI_BACKEND_BASE_URL_PROD',
-      defaultValue: 'https://replace-with-cloud-run-url',
+      defaultValue: 'https://focuslane-ai-backend-jajf6p3puq-ew.a.run.app',
     );
     final raw = _env == 'prod' ? prodUrl : devUrl;
     return raw.endsWith('/') ? raw.substring(0, raw.length - 1) : raw;

@@ -42,7 +42,7 @@ export async function verifyAppCheckIfPresent(req: AuthenticatedRequest, res: Re
   const appCheckToken = req.header('X-Firebase-AppCheck') ?? req.header('x-firebase-appcheck');
 
   if (!appCheckToken) {
-    if (isProd) {
+    if (config.requireAppCheck) {
       log('warn', {
         event: 'app_check.missing',
         uid: req.auth?.uid,

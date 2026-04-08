@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_core/firebase_core.dart';
@@ -22,6 +24,12 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 }
 
+Future<void> _handlePushTap(RemoteMessage msg) async {
+  if (msg.data.isEmpty) return;
+  final payload = jsonEncode(msg.data);
+  await NotificationsBootstrap.instance.manager.handleTapPayload(payload);
+}
+
 Future<void> bootstrapApp() async {
   await Supabase.initialize(
     url: SupabaseConfig.url,
@@ -31,6 +39,16 @@ Future<void> bootstrapApp() async {
   await NotificationsBootstrap.instance.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage msg) async {
+    await _handlePushTap(msg);
+  });
+
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    await _handlePushTap(initialMessage);
+  }
+
   FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
     final notification = msg.notification;
     if (notification == null) {

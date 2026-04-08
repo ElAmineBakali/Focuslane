@@ -82,6 +82,10 @@ app.get('/healthz', (_req, res) => {
   res.status(200).json({ ok: true, env: config.env });
 });
 
+app.get('/v1/healthz', (_req, res) => {
+  res.status(200).json({ ok: true, env: config.env });
+});
+
 app.use(aiRouter);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

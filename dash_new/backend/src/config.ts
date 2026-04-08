@@ -27,6 +27,7 @@ export const config = {
   openAiApiKey: process.env.OPENAI_API_KEY ?? '',
   firebaseProjectId: process.env.FIREBASE_PROJECT_ID ?? process.env.GOOGLE_CLOUD_PROJECT ?? '',
   corsAllowlist: parseAllowlist(process.env.CORS_ALLOWLIST),
+  requireAppCheck: (process.env.REQUIRE_APP_CHECK ?? (env === 'prod' || env === 'production' ? 'true' : 'false')) === 'true',
 } as const;
 
 export const isProd = config.env === 'prod' || config.env === 'production';
