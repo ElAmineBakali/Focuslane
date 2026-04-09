@@ -1,10 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/design/blocks/toast/app_toast.dart';
+import 'package:focuslane/design/blocks/toast/app_toast.dart';
 
 import 'note_firestore_service.dart';
 import 'note_model.dart';
@@ -152,7 +152,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar nota'),
-          content: const Text('Esta accion no se puede deshacer. ¿Eliminar esta nota?'),
+          content: const Text('Esta accion no se puede deshacer. Â¿Eliminar esta nota?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -193,7 +193,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   DateTime? get _editedAt => _contentState.editedAt;
 
   String _formatEditedAt(DateTime value) {
-    return DateFormat('dd MMM yyyy • HH:mm').format(value);
+    return DateFormat('dd MMM yyyy â€¢ HH:mm').format(value);
   }
 
   Future<void> _persist({
@@ -447,3 +447,4 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     );
   }
 }
+

@@ -1,9 +1,9 @@
-import 'package:flutter/widgets.dart';
-import 'package:mi_dashboard_personal/core/notifications/notification_manager.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_bootstrap.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_result.dart';
+﻿import 'package:flutter/widgets.dart';
+import 'package:focuslane/core/notifications/notification_manager.dart';
+import 'package:focuslane/core/notifications/notifications_bootstrap.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_result.dart';
 
 class NotificationsFacade {
   NotificationsFacade._();
@@ -42,3 +42,4 @@ class NotificationsFacade {
     _manager.attachNavigatorKey(navigatorKey);
   }
 }
+

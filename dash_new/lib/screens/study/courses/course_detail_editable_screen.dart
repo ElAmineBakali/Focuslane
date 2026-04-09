@@ -1,10 +1,10 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 import '../attendance/attendance_screen.dart';
-import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
+import 'package:focuslane/design/widgets/global_color_picker_widget.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 
 class CourseDetailEditableScreen extends StatefulWidget {
@@ -555,4 +555,5 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
+
 

@@ -1,6 +1,6 @@
-import 'package:flutter/gestures.dart';
+﻿import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 
 class CalendarItemVisuals {
   static Color colorForItem(BuildContext context, CalendarItem item) {
@@ -74,7 +74,7 @@ class CalendarItemVisuals {
       sourceLabel(item.sourceModule),
       if ((item.description ?? '').trim().isNotEmpty) item.description!.trim(),
     ];
-    return parts.join(' • ');
+    return parts.join(' â€¢ ');
   }
 }
 
@@ -293,7 +293,7 @@ class CalendarDayItemList extends StatelessWidget {
               timeLabel,
               CalendarItemVisuals.sourceLabel(item.sourceModule),
               if ((item.description ?? '').isNotEmpty) item.description!,
-            ].join(' • '),
+            ].join(' â€¢ '),
           ),
           trailing:
               item.isEditable
@@ -453,3 +453,4 @@ class CalendarTimedItemCard extends StatelessWidget {
     );
   }
 }
+

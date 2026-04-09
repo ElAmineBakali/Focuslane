@@ -2,8 +2,8 @@
 import 'package:intl/intl.dart';
 import 'task_model.dart';
 import 'task_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/tasks/services/reminder_service.dart';
-import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
+import 'package:focuslane/screens/tasks/services/reminder_service.dart';
+import 'package:focuslane/design/widgets/ui_scaffold.dart';
 
 class TaskEditScreen extends StatefulWidget {
   final Task task;
@@ -530,4 +530,5 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
     );
   }
 }
+
 

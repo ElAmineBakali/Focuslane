@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mi_dashboard_personal/navigation/app_route_observer.dart';
+import 'package:focuslane/navigation/app_route_observer.dart';
 import '../services/food_firestore_service.dart';
 import '../services/food_photo_ai_service.dart';
 import '../models/food_models.dart';
@@ -959,5 +959,6 @@ class _AlertCard extends StatelessWidget {
     );
   }
 }
+
 
 

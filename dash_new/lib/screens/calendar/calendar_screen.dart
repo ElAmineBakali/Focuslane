@@ -1,18 +1,18 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mi_dashboard_personal/screens/calendar/controllers/calendar_controller.dart';
-import 'package:mi_dashboard_personal/screens/calendar/controllers/calendar_interaction_controller.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_agenda_view.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_day_view.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_event_editor.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_month_view.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_week_view.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_year_view.dart';
+import 'package:focuslane/screens/calendar/controllers/calendar_controller.dart';
+import 'package:focuslane/screens/calendar/controllers/calendar_interaction_controller.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_service.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_agenda_view.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_day_view.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_event_editor.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_month_view.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_week_view.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_year_view.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -421,3 +421,4 @@ class _CalendarShiftVisibleIntent extends Intent {
 
   final int delta;
 }
+

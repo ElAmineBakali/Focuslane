@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../../gym/services/gym_firestore_service.dart';
 import '../../gym/session/session_history_screen.dart';
 import '../../../design/ui/components/focus_empty_state.dart';
@@ -38,4 +38,5 @@ class GymDiaryScreen extends StatelessWidget {
     );
   }
 }
+
 

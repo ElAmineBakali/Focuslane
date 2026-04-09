@@ -1,5 +1,5 @@
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/notification_manager.dart';
+﻿import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/notification_manager.dart';
 
 class CancelNotificationUseCase {
   const CancelNotificationUseCase(this._manager);
@@ -14,3 +14,4 @@ class CancelNotificationUseCase {
     await _manager.cancelByNotificationId(notificationId);
   }
 }
+

@@ -35,6 +35,10 @@ class CoreSyncService {
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _cachedFinanceDocs = const [];
   bool _recalcBudgetBusy = false;
 
+  void debugPrint(String message) {
+    _log(message);
+  }
+
   void start(String uid) {
     final trimmed = uid.trim();
     if (trimmed.isEmpty) {

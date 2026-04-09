@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
-import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
+import 'package:focuslane/screens/finance/models/budget_model.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/screens/finance/models/transaction_model.dart';
 
 class BudgetService {
   static final BudgetService I = BudgetService._();
@@ -116,4 +116,5 @@ class BudgetWithProgress {
   bool get isOverBudget => spent > budget.amount;
   bool get isNearLimit => progress >= 0.8;
 }
+
 

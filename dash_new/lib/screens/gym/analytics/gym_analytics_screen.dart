@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1773,4 +1773,5 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
     }
   }
 }
+
 

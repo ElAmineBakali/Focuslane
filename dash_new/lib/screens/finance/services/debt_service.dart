@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
-import 'package:mi_dashboard_personal/screens/finance/models/debt_model.dart';
+import 'package:focuslane/screens/finance/models/debt_model.dart';
 
 class DebtService {
   static final DebtService I = DebtService._();
@@ -68,4 +68,5 @@ class DebtService {
     return bal;
   }
 }
+
 

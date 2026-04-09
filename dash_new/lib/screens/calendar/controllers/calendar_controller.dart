@@ -1,9 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_aggregator_service.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_aggregator_service.dart';
+import 'package:focuslane/screens/calendar/services/calendar_service.dart';
 
 class CalendarController extends ChangeNotifier {
   CalendarController({
@@ -278,7 +278,7 @@ class CalendarController extends ChangeNotifier {
     if (allDay) return '${humanDate(d)} (todo el dia)';
     final hh = d.hour.toString().padLeft(2, '0');
     final mm = d.minute.toString().padLeft(2, '0');
-    return '${humanDate(d)} • $hh:$mm';
+    return '${humanDate(d)} â€¢ $hh:$mm';
   }
 
   List<CalendarYearMonthStat> yearStats(int year) {
@@ -428,3 +428,4 @@ class CalendarYearMonthStat {
     required this.doneTasks,
   });
 }
+

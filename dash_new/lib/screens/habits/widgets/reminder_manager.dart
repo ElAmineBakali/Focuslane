@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
 
 class ReminderManager extends StatefulWidget {
   final List<HabitReminder> reminders;
@@ -293,3 +293,4 @@ class _ReminderManagerState extends State<ReminderManager> {
     );
   }
 }
+

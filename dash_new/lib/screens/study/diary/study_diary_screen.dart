@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/models/study_models.dart';
 import '../../study/timer/study_timer_screen.dart';
@@ -79,4 +79,5 @@ class StudyDiaryScreen extends StatelessWidget {
     );
   }
 }
+
 

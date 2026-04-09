@@ -1,16 +1,16 @@
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_clock.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_logger.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/flutter_local_notification_gateway.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/local_id_generator.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/local_scheduler.dart';
-import 'package:mi_dashboard_personal/core/notifications/mapping/intent_to_envelope_mapper.dart';
-import 'package:mi_dashboard_personal/core/notifications/notification_manager.dart';
-import 'package:mi_dashboard_personal/core/notifications/policies/dedupe_policy.dart';
-import 'package:mi_dashboard_personal/core/notifications/policies/notification_policy_engine.dart';
-import 'package:mi_dashboard_personal/core/notifications/registry/hive_notification_registry_repository.dart';
-import 'package:mi_dashboard_personal/core/notifications/router/notification_router.dart';
-import 'package:mi_dashboard_personal/core/notifications/router/route_resolver.dart';
+﻿import 'package:hive_flutter/hive_flutter.dart';
+import 'package:focuslane/core/notifications/contracts/notification_clock.dart';
+import 'package:focuslane/core/notifications/contracts/notification_logger.dart';
+import 'package:focuslane/core/notifications/local/flutter_local_notification_gateway.dart';
+import 'package:focuslane/core/notifications/local/local_id_generator.dart';
+import 'package:focuslane/core/notifications/local/local_scheduler.dart';
+import 'package:focuslane/core/notifications/mapping/intent_to_envelope_mapper.dart';
+import 'package:focuslane/core/notifications/notification_manager.dart';
+import 'package:focuslane/core/notifications/policies/dedupe_policy.dart';
+import 'package:focuslane/core/notifications/policies/notification_policy_engine.dart';
+import 'package:focuslane/core/notifications/registry/hive_notification_registry_repository.dart';
+import 'package:focuslane/core/notifications/router/notification_router.dart';
+import 'package:focuslane/core/notifications/router/route_resolver.dart';
 
 class NotificationsBootstrap {
   NotificationsBootstrap._internal();
@@ -62,3 +62,4 @@ class NotificationsBootstrap {
     return;
   }
 }
+

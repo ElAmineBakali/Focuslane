@@ -1,10 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_repository.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_registry_entry.dart';
+import 'package:focuslane/core/notifications/contracts/notification_repository.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_registry_entry.dart';
 
 class HiveNotificationRegistryRepository implements NotificationRegistryRepository {
   HiveNotificationRegistryRepository(this._box);
@@ -106,3 +106,4 @@ class HiveNotificationRegistryRepository implements NotificationRegistryReposito
     );
   }
 }
+

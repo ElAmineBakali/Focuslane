@@ -1,5 +1,5 @@
-name: mi_dashboard_personal
-description: "A new Flutter project."
+name: focuslane
+description: "FocusLane productivity platform."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -114,6 +114,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    - assets/app_icon.png
     - assets/audio/ambience/rain.mp3
     - assets/audio/ambience/forest.mp3
     - assets/audio/ambience/fireplace.mp3

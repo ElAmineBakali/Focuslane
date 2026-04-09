@@ -1,6 +1,6 @@
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/router/route_intent.dart';
+﻿import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/router/route_intent.dart';
 
 abstract class RouteResolver {
   RouteIntent resolve(NotificationEnvelope envelope);
@@ -27,3 +27,4 @@ class DefaultRouteResolver implements RouteResolver {
     }
   }
 }
+

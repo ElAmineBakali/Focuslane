@@ -1,6 +1,6 @@
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_repository.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_registry_entry.dart';
+﻿import 'package:focuslane/core/notifications/contracts/notification_repository.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/models/notification_registry_entry.dart';
 
 class DedupePolicy {
   DedupePolicy(this._registry);
@@ -14,3 +14,4 @@ class DedupePolicy {
         e.status == NotificationLifecycleStatus.scheduled);
   }
 }
+

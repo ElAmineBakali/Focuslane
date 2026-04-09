@@ -1,18 +1,18 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_aggregator_service.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
-import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/notes/note_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/notes/note_model.dart';
-import 'package:mi_dashboard_personal/screens/study/models/study_models.dart';
-import 'package:mi_dashboard_personal/screens/study/services/study_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/tasks/task_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_aggregator_service.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/notes/note_firestore_service.dart';
+import 'package:focuslane/screens/notes/note_model.dart';
+import 'package:focuslane/screens/study/models/study_models.dart';
+import 'package:focuslane/screens/study/services/study_firestore_service.dart';
+import 'package:focuslane/screens/tasks/task_firestore_service.dart';
+import 'package:focuslane/screens/tasks/task_model.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'models/dashboard_summary_model.dart';
@@ -116,7 +116,7 @@ class HomeDashboardController {
     pieces.add('${summary.pendingTasksToday} tareas pendientes');
     pieces.add('${summary.completedHabitsToday}/${summary.activeHabitsCount} habitos');
     pieces.add('${summary.upcomingEvents.length} eventos proximos');
-    return pieces.join(' · ');
+    return pieces.join(' Â· ');
   }
 
   static bool _isSameDay(DateTime? a, DateTime b) {
@@ -140,3 +140,4 @@ class HomeDashboardController {
     return false;
   }
 }
+

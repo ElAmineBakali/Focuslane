@@ -1,11 +1,11 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
+import 'package:focuslane/screens/habits/habit_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/habits/habit_utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HabitStatsScreen extends StatefulWidget {
@@ -376,7 +376,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
         : 25.0;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Estadísticas')),
+      appBar: AppBar(title: const Text('EstadÃ­sticas')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -452,7 +452,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                                             ? (_habit.goalDisplayUnit.isEmpty
                                                 ? 'Cuantitativo'
                                                 : _habit.goalDisplayUnit)
-                                            : 'Sí/No',
+                                            : 'SÃ­/No',
                                       ),
                                     ),
                                     if (_habit.hasGoal)
@@ -627,7 +627,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Últimos 7 días',
+                            'Ãšltimos 7 dÃ­as',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
                             ),
@@ -635,7 +635,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           const SizedBox(height: 4),
                           Text(
                             _habit.isQuantitative
-                                ? 'Valores diarios reales del hábito.'
+                                ? 'Valores diarios reales del hÃ¡bito.'
                                 : 'Porcentaje diario de cumplimiento.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: cs.onSurfaceVariant,
@@ -781,8 +781,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                         children: [
                           Text(
                             _habit.isQuantitative
-                                ? 'Evolución mensual'
-                                : 'Éxito mensual',
+                                ? 'EvoluciÃ³n mensual'
+                                : 'Ã‰xito mensual',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
                             ),
@@ -790,8 +790,8 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           const SizedBox(height: 4),
                           Text(
                             _habit.isQuantitative
-                                ? 'Suma de valores registrados en los últimos 12 meses.'
-                                : 'Porcentaje de días cumplidos por mes.',
+                                ? 'Suma de valores registrados en los Ãºltimos 12 meses.'
+                                : 'Porcentaje de dÃ­as cumplidos por mes.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: cs.onSurfaceVariant,
                             ),
@@ -948,7 +948,7 @@ class _HabitStatsScreenState extends State<HabitStatsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Todo el historial disponible del hábito.',
+                            'Todo el historial disponible del hÃ¡bito.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: cs.onSurfaceVariant,
                             ),
@@ -1337,13 +1337,13 @@ class _QuantitativeAnalytics extends StatelessWidget {
           value:
               '${formatHabitStatNumber(monthData.total)} ${habit.goalDisplayUnit}'.trim(),
           subtitle:
-              'Promedio: ${formatHabitStatNumber(monthData.average)} ${habit.goalDisplayUnit} • ${monthChange >= 0 ? '+' : ''}${formatHabitStatNumber(monthChange)} ($monthChangePercent%)'.trim(),
+              'Promedio: ${formatHabitStatNumber(monthData.average)} ${habit.goalDisplayUnit} â€¢ ${monthChange >= 0 ? '+' : ''}${formatHabitStatNumber(monthChange)} ($monthChangePercent%)'.trim(),
           icon: Icons.calendar_today_rounded,
           color: Colors.green,
         ),
         const SizedBox(height: 8),
         _AnalyticsCard(
-          title: 'Este año',
+          title: 'Este aÃ±o',
           value:
               '${formatHabitStatNumber(yearData.total)} ${habit.goalDisplayUnit}'.trim(),
           subtitle:

@@ -1,4 +1,4 @@
-package com.example.dash
+package com.example.focuslane
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

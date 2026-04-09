@@ -1,7 +1,7 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+﻿import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/local_notification_gateway.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/local/local_notification_gateway.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -274,3 +274,4 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
     return hash & 0x7FFFFFFF;
   }
 }
+

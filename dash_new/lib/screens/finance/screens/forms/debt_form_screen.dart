@@ -2,8 +2,8 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mi_dashboard_personal/screens/finance/models/loan_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/debt_service_loans.dart';
+import 'package:focuslane/screens/finance/models/loan_model.dart';
+import 'package:focuslane/screens/finance/services/debt_service_loans.dart';
 
 import '../../widgets/finance_shell.dart';
 import '../../../../design/ui/components/focus_card.dart';
@@ -455,4 +455,5 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     super.dispose();
   }
 }
+
 

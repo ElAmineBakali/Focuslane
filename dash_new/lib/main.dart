@@ -1,4 +1,5 @@
 ﻿import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,11 +7,11 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
-import 'package:mi_dashboard_personal/design/theme/theme.dart';
-import 'package:mi_dashboard_personal/design/theme/prefs.dart';
-import 'package:mi_dashboard_personal/screens/food/services/food_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/design/theme/theme.dart';
+import 'package:focuslane/design/theme/prefs.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
+import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'design/widgets/app_background.dart';
 import 'navigation/app_route_observer.dart';
 import 'navigation/app_routes.dart';
@@ -19,7 +20,7 @@ import 'core/services/core_sync_service.dart';
 import 'core/services/ai_backend_client.dart';
 import 'core/notifications/push/fcm_token_sync_service.dart';
 import 'app/app_bootstrap.dart';
-import 'package:mi_dashboard_personal/screens/study/services/study_firestore_service.dart';
+import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 const double kFabAvoidHeight = 84.0;
@@ -31,9 +32,38 @@ const String _coreSyncCustomToken = String.fromEnvironment(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await bootstrapApp();
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+  };
 
-  runApp(const MyApp());
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stack,
+        library: 'root_zone',
+        context: ErrorDescription('uncaught platform dispatcher error'),
+      ),
+    );
+    return true;
+  };
+
+  await runZonedGuarded(
+    () async {
+      await bootstrapApp();
+      runApp(const MyApp());
+    },
+    (Object error, StackTrace stack) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'runZonedGuarded',
+          context: ErrorDescription('uncaught asynchronous error'),
+        ),
+      );
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -141,7 +171,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       navigatorKey: appNavigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'Mi Dashboard Personal',
+      title: 'FocusLane',
       theme: light,
       darkTheme: dark,
       themeMode: _themeMode,
@@ -207,4 +237,5 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
 

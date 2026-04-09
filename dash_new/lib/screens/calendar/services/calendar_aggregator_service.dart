@@ -1,14 +1,14 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mi_dashboard_personal/core/constants/core_routes.dart';
-import 'package:mi_dashboard_personal/core/models/core_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/models/core_recommendation.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/core/constants/core_routes.dart';
+import 'package:focuslane/core/models/core_entity_ref.dart';
+import 'package:focuslane/core/models/core_recommendation.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_service.dart';
+import 'package:focuslane/screens/finance/models/transaction_model.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
 
 class CalendarAggregatorService {
   CalendarAggregatorService._();
@@ -381,7 +381,7 @@ class CalendarAggregatorService {
               if (start == null) return null;
               final minutes = (m['minutes'] as num?)?.toInt() ?? 45;
               final courseName =
-                  (m['courseName'] ?? 'Sesión de estudio').toString();
+                  (m['courseName'] ?? 'SesiÃ³n de estudio').toString();
               return _buildItem(
                 id: 'study-session-${d.id}',
                 sourceModule: CalendarSourceModule.study,
@@ -490,7 +490,7 @@ class CalendarAggregatorService {
               final note = <String>[
                 '${entries.length} items',
                 if (kcal > 0) '${kcal.toStringAsFixed(0)} kcal',
-              ].join(' • ');
+              ].join(' â€¢ ');
               return _buildItem(
                 id: d.id,
                 sourceModule: CalendarSourceModule.food,
@@ -557,7 +557,7 @@ class CalendarAggregatorService {
               final note = <String>[
                 if (category.isNotEmpty) category,
                 if (amount != 0) amount.toStringAsFixed(2),
-              ].join(' • ');
+              ].join(' â€¢ ');
 
               return _buildItem(
                 id: d.id,
@@ -613,7 +613,7 @@ class CalendarAggregatorService {
                   _dateFromPayload(m['nextPaymentDate']);
               if (nextDue == null) return null;
               final title =
-                  (m['title'] ?? m['name'] ?? 'Suscripción').toString();
+                  (m['title'] ?? m['name'] ?? 'SuscripciÃ³n').toString();
               final amount = (m['amount'] as num?)?.toDouble() ?? 0;
               final daysLeft =
                   _day0(nextDue).difference(_day0(DateTime.now())).inDays;
@@ -663,7 +663,7 @@ class CalendarAggregatorService {
         final items = <CalendarItem>[];
         for (final d in s.docs) {
           final m = d.data();
-          final name = (m['name'] ?? 'Hábito').toString();
+          final name = (m['name'] ?? 'HÃ¡bito').toString();
           final completedDates =
               (m['completedDates'] as List?)
                   ?.map((e) => e.toString())
@@ -1030,3 +1030,4 @@ class CalendarAggregatorService {
         });
   }
 }
+

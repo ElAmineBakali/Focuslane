@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 
 class ModulesScreen extends StatefulWidget {
   const ModulesScreen({super.key});
@@ -44,7 +44,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
       (AppRoutes.calendarDashboard, 'Calendario', Icons.calendar_month),
       (AppRoutes.tasksDashboard, 'Tareas', Icons.check_circle_outlined),
       (AppRoutes.notesDashboard, 'Notas', Icons.notes_outlined),
-      ('/habits', 'Hábitos', Icons.checklist_outlined),
+      ('/habits', 'HÃ¡bitos', Icons.checklist_outlined),
       (AppRoutes.studyDashboard, 'Estudio', Icons.school_outlined),
       (AppRoutes.gymDashboard, 'Gimnasio', Icons.fitness_center_outlined),
       (AppRoutes.foodDashboard, 'Food', Icons.restaurant_outlined),
@@ -83,7 +83,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text('Módulos guardados'),
+          content: Text('MÃ³dulos guardados'),
         ),
       );
     }
@@ -93,7 +93,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Módulos de inicio'),
+        title: const Text('MÃ³dulos de inicio'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -155,7 +155,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Tip: mantén pulsado un módulo en la Home para abrir esta pantalla.',
+                      'Tip: mantÃ©n pulsado un mÃ³dulo en la Home para abrir esta pantalla.',
                     ),
                   ],
                 ),
@@ -163,3 +163,4 @@ class _ModulesScreenState extends State<ModulesScreen> {
     );
   }
 }
+

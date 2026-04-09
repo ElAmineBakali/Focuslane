@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/core/constants/app_strings.dart';
-import 'package:mi_dashboard_personal/design/ui/layouts/module_scaffold.dart';
-import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_semantic_tokens.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
-import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/study/services/study_firestore_service.dart';
+import 'package:focuslane/core/constants/app_strings.dart';
+import 'package:focuslane/design/ui/layouts/module_scaffold.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
+import 'package:focuslane/navigation/app_routes.dart';
+import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
+import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 
 import 'home_dashboard_controller.dart';
 import 'models/dashboard_summary_model.dart';
@@ -544,7 +544,7 @@ class _PortalHero extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '$greeting · $dateLabel',
+          '$greeting Â· $dateLabel',
           style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context)),
         ),
         const SizedBox(height: 4),
@@ -863,7 +863,7 @@ class _HighlightsCard extends StatelessWidget {
         _highlight(
           context,
           title: summary.defaultGymRoutineName ?? AppStrings.sinRutinaActiva,
-          subtitle: summary.latestGymSession == null ? AppStrings.sinSesionesGym : DateFormat('d MMM • HH:mm', 'es_ES').format(summary.latestGymSession!),
+          subtitle: summary.latestGymSession == null ? AppStrings.sinSesionesGym : DateFormat('d MMM â€¢ HH:mm', 'es_ES').format(summary.latestGymSession!),
           chip: AppStrings.ultimaSesionGym,
           progress: summary.latestGymSession == null ? 0.2 : 0.72,
         ),
@@ -1082,3 +1082,4 @@ class _NavItem {
   final IconData icon;
   final String route;
 }
+

@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/services/study_notifications.dart';
 import '../../../design/ui/components/focus_card.dart';
@@ -116,4 +116,5 @@ class _StudyNotificationsScreenState extends State<StudyNotificationsScreen> {
     );
   }
 }
+
 

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_text_field.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/components/focus_text_field.dart';
 
 class AuthTextField extends StatelessWidget {
   const AuthTextField({
@@ -34,3 +34,4 @@ class AuthTextField extends StatelessWidget {
     );
   }
 }
+

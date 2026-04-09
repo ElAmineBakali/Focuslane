@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_card.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_section_title.dart';
-import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_semantic_tokens.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_section_title.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
 
 class DashboardSectionCard extends StatelessWidget {
   const DashboardSectionCard({
@@ -39,3 +39,4 @@ class DashboardSectionCard extends StatelessWidget {
     );
   }
 }
+

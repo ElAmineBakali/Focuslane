@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 // V2 Redesigned screens
 import '../main/finance_main_screen.dart';
@@ -9,11 +9,11 @@ import '../screens/forms/debt_form_screen.dart';
 import '../screens/forms/asset_form_screen.dart';
 
 // Models for argument passing
-import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/loan_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/asset_model.dart';
+import 'package:focuslane/screens/finance/models/transaction_model.dart';
+import 'package:focuslane/screens/finance/models/budget_model.dart';
+import 'package:focuslane/screens/finance/models/subscription_model.dart';
+import 'package:focuslane/screens/finance/models/loan_model.dart';
+import 'package:focuslane/screens/finance/models/asset_model.dart';
 
 Map<String, WidgetBuilder> financeRoutes = {
   '/finance': (_) => const FinanceMainScreen(initialIndex: 0),
@@ -50,4 +50,5 @@ Map<String, WidgetBuilder> financeRoutes = {
     return AssetFormScreen(asset: asset);
   },
 };
+
 

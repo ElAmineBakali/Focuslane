@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_primary_button.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/components/focus_primary_button.dart';
 
 class AuthPrimaryButton extends StatelessWidget {
   const AuthPrimaryButton({
@@ -26,3 +26,4 @@ class AuthPrimaryButton extends StatelessWidget {
     );
   }
 }
+

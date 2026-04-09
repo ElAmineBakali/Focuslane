@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/habits/habit_constants.dart';
 
 class EmojiIconPicker extends StatefulWidget {
   final String? selectedEmoji;
@@ -24,14 +24,14 @@ class _EmojiIconPickerState extends State<EmojiIconPicker>
   String? _tempIconCode;
 
   static const Map<String, List<String>> emojiCategories = {
-    'Salud': ['💪', '🏃', '🧘', '💧', '🥗', '😴', '❤️', '🩺', '💊'],
-    'Educación': ['📚', '📖', '✍️', '🎓', '📝', '🗣️', '🧠', '💡', '🔬'],
-    'Deporte': ['⚽', '🏀', '🎾', '🏐', '🏊', '🚴', '🏋️', '🧗', '🤸'],
-    'Arte': ['🎨', '🎭', '🎬', '🎵', '🎸', '🎹', '🎤', '📷', '🖼️'],
-    'Casa': ['🏠', '🧹', '🧺', '🛁', '🛏️', '🍳', '🌿', '🔧', '🔨'],
-    'Trabajo': ['💼', '💻', '📊', '📈', '⚙️', '🔨', '✉️', '📞', '🎯'],
-    'Social': ['👨‍👩‍👧‍👦', '👫', '🤝', '💬', '📱', '🎉', '☕', '🍕', '🎂'],
-    'Otros': ['⭐', '🏆', '🎯', '🔔', '⏰', '📅', '✅', '🚀', '🌟'],
+    'Salud': ['ðŸ’ª', 'ðŸƒ', 'ðŸ§˜', 'ðŸ’§', 'ðŸ¥—', 'ðŸ˜´', 'â¤ï¸', 'ðŸ©º', 'ðŸ’Š'],
+    'EducaciÃ³n': ['ðŸ“š', 'ðŸ“–', 'âœï¸', 'ðŸŽ“', 'ðŸ“', 'ðŸ—£ï¸', 'ðŸ§ ', 'ðŸ’¡', 'ðŸ”¬'],
+    'Deporte': ['âš½', 'ðŸ€', 'ðŸŽ¾', 'ðŸ', 'ðŸŠ', 'ðŸš´', 'ðŸ‹ï¸', 'ðŸ§—', 'ðŸ¤¸'],
+    'Arte': ['ðŸŽ¨', 'ðŸŽ­', 'ðŸŽ¬', 'ðŸŽµ', 'ðŸŽ¸', 'ðŸŽ¹', 'ðŸŽ¤', 'ðŸ“·', 'ðŸ–¼ï¸'],
+    'Casa': ['ðŸ ', 'ðŸ§¹', 'ðŸ§º', 'ðŸ›', 'ðŸ›ï¸', 'ðŸ³', 'ðŸŒ¿', 'ðŸ”§', 'ðŸ”¨'],
+    'Trabajo': ['ðŸ’¼', 'ðŸ’»', 'ðŸ“Š', 'ðŸ“ˆ', 'âš™ï¸', 'ðŸ”¨', 'âœ‰ï¸', 'ðŸ“ž', 'ðŸŽ¯'],
+    'Social': ['ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦', 'ðŸ‘«', 'ðŸ¤', 'ðŸ’¬', 'ðŸ“±', 'ðŸŽ‰', 'â˜•', 'ðŸ•', 'ðŸŽ‚'],
+    'Otros': ['â­', 'ðŸ†', 'ðŸŽ¯', 'ðŸ””', 'â°', 'ðŸ“…', 'âœ…', 'ðŸš€', 'ðŸŒŸ'],
   };
 
   @override
@@ -70,7 +70,7 @@ class _EmojiIconPickerState extends State<EmojiIconPicker>
                 children: [
                   Expanded(
                     child: Text(
-                      'Selecciona un ícono',
+                      'Selecciona un Ã­cono',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -264,3 +264,4 @@ class _EmojiIconPickerState extends State<EmojiIconPicker>
     );
   }
 }
+

@@ -8,13 +8,13 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mi_dashboard_personal/core/services/ai_backend_client.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_normalizer.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_ai_preferences.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_receipt_ai_service.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/core/services/ai_backend_client.dart';
+import 'package:focuslane/screens/finance/models/transaction_model.dart';
+import 'package:focuslane/screens/finance/services/finance_category_labels.dart';
+import 'package:focuslane/screens/finance/services/finance_ai_normalizer.dart';
+import 'package:focuslane/screens/finance/services/finance_ai_preferences.dart';
+import 'package:focuslane/screens/finance/services/finance_receipt_ai_service.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
 
 import '../../widgets/finance_shell.dart';
 import '../../../../design/ui/components/focus_card.dart';
@@ -1398,4 +1398,5 @@ class _AiSuggestion {
     );
   }
 }
+
 

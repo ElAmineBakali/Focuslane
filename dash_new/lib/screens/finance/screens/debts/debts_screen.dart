@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/loan_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/debt_service_loans.dart';
+import 'package:focuslane/screens/finance/models/loan_model.dart';
+import 'package:focuslane/screens/finance/services/debt_service_loans.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
 import '../../../../design/ui/components/focus_module_header.dart';
@@ -96,6 +96,7 @@ class DebtsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

@@ -2,7 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:mi_dashboard_personal/design/theme/prefs.dart';
+import 'package:focuslane/design/theme/prefs.dart';
 import '../../design/theme/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -420,4 +420,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+
 

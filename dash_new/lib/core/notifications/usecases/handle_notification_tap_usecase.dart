@@ -1,4 +1,4 @@
-import 'package:mi_dashboard_personal/core/notifications/notification_manager.dart';
+﻿import 'package:focuslane/core/notifications/notification_manager.dart';
 
 class HandleNotificationTapUseCase {
   const HandleNotificationTapUseCase(this._manager);
@@ -9,3 +9,4 @@ class HandleNotificationTapUseCase {
     return _manager.handleTapPayload(rawPayload);
   }
 }
+

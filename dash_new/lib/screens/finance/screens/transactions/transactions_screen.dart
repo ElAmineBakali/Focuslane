@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/transaction_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/screens/finance/models/transaction_model.dart';
+import 'package:focuslane/screens/finance/services/finance_category_labels.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
 import '../../../../design/ui/components/focus_module_header.dart';
@@ -128,6 +128,7 @@ class TransactionsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

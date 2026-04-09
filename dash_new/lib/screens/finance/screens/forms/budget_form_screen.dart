@@ -2,9 +2,9 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mi_dashboard_personal/screens/finance/models/budget_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/finance_category_labels.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/budget_service.dart';
+import 'package:focuslane/screens/finance/models/budget_model.dart';
+import 'package:focuslane/screens/finance/services/finance_category_labels.dart';
+import 'package:focuslane/screens/finance/services/budget_service.dart';
 
 import '../../widgets/finance_shell.dart';
 import '../../../../design/ui/components/focus_card.dart';
@@ -374,4 +374,5 @@ class _BudgetFormScreenState extends State<BudgetFormScreen> {
     super.dispose();
   }
 }
+
 

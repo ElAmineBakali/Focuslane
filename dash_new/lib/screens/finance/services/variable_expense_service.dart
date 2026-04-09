@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
-import 'package:mi_dashboard_personal/screens/finance/models/variable_expense_model.dart';
+import 'package:focuslane/screens/finance/models/variable_expense_model.dart';
 
 class VariableExpenseService {
   static final VariableExpenseService I = VariableExpenseService._();
@@ -39,4 +39,5 @@ class VariableExpenseService {
     await _col.doc(id).update({'status': 'done', 'relatedTxId': txId});
   }
 }
+
 

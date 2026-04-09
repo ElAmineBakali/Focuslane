@@ -1,8 +1,8 @@
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+﻿import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 
 class NotificationIntent {
   const NotificationIntent({
@@ -33,3 +33,4 @@ class NotificationIntent {
   final String? traceId;
   final String? notificationId;
 }
+

@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 
 class NotificationEnvelope {
   const NotificationEnvelope({
@@ -103,3 +103,4 @@ class NotificationEnvelope {
     );
   }
 }
+

@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/design/blocks/dropdown/app_dropdown.dart';
+import 'package:focuslane/design/blocks/dropdown/app_dropdown.dart';
 import 'note_model.dart';
 import 'note_firestore_service.dart';
 
@@ -469,4 +469,5 @@ Widget _buildFallbackCover(ColorScheme color, double height) {
     ),
   );
 }
+
 

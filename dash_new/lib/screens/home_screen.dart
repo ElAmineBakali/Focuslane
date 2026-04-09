@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mi_dashboard_personal/core/services/core_sync_service.dart';
-import 'package:mi_dashboard_personal/screens/home/home_dashboard_screen.dart';
+import 'package:focuslane/core/services/core_sync_service.dart';
+import 'package:focuslane/screens/home/home_dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -35,3 +35,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

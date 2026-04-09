@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:csv/csv.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/transaction_service.dart';
+import 'package:focuslane/screens/finance/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 
 class FinanceSettingsService {
@@ -37,7 +37,7 @@ class FinanceSettingsService {
 
     // Create CSV
     final rows = [
-      ['Fecha', 'Tipo', 'Título', 'Importe', 'Categoría', 'Subcategoría', 'Cuenta', 'Etiquetas', 'Notas'],
+      ['Fecha', 'Tipo', 'TÃ­tulo', 'Importe', 'CategorÃ­a', 'SubcategorÃ­a', 'Cuenta', 'Etiquetas', 'Notas'],
       ...txs.map((tx) => [
             DateFormat('yyyy-MM-dd HH:mm:ss').format(tx.date),
             tx.type.name,
@@ -77,4 +77,5 @@ class FinanceSettingsService {
     await batch.commit();
   }
 }
+
 

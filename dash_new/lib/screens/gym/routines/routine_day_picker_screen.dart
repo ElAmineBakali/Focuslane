@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
@@ -228,4 +228,5 @@ class _LastDoneMini extends StatelessWidget {
     );
   }
 }
+
 

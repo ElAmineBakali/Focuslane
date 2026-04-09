@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/habits/habit_constants.dart';
 
 class TemplateSelector extends StatelessWidget {
   final Function(HabitTemplate) onSelect;
@@ -32,14 +32,14 @@ class TemplateSelector extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Plantillas de hábitos',
+                          'Plantillas de hÃ¡bitos',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Elige una plantilla para empezar rápido',
+                          'Elige una plantilla para empezar rÃ¡pido',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: cs.onSurfaceVariant,
                           ),
@@ -190,3 +190,4 @@ class TemplateSelector extends StatelessWidget {
     );
   }
 }
+

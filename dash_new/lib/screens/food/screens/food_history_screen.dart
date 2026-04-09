@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 import '../../../design/ui/components/focus_empty_state.dart';
 import '../../../design/ui/components/focus_badge.dart';
@@ -769,4 +769,5 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
+
 

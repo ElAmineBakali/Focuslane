@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_semantic_tokens.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
 
 class AuthHeader extends StatelessWidget {
   const AuthHeader({
@@ -40,3 +40,4 @@ class AuthHeader extends StatelessWidget {
     );
   }
 }
+

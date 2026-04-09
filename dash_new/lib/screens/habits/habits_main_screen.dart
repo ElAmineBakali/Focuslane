@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/habits/habit_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_constants.dart';
 
 class HabitsMainScreen extends StatefulWidget {
   const HabitsMainScreen({super.key});
@@ -22,7 +22,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Hábitos'),
+        title: const Text('Mis HÃ¡bitos'),
         actions: [
           if (_selectedTagFilter != null)
             IconButton(
@@ -54,7 +54,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
           }
 
           if (_habits.isEmpty) {
-            return const Center(child: Text('No tienes hábitos aún.'));
+            return const Center(child: Text('No tienes hÃ¡bitos aÃºn.'));
           }
 
           return Column(
@@ -109,7 +109,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'No hay hábitos con esta etiqueta',
+                                'No hay hÃ¡bitos con esta etiqueta',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   color: cs.onSurfaceVariant,
                                 ),
@@ -308,7 +308,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                                     ),
                                                     const SizedBox(width: 4),
                                                     Text(
-                                                      '${habit.currentStreak} ${habit.currentStreak == 1 ? 'día' : 'días'}',
+                                                      '${habit.currentStreak} ${habit.currentStreak == 1 ? 'dÃ­a' : 'dÃ­as'}',
                                                       style: TextStyle(
                                                         fontSize:
                                                             isMobile ? 11 : 12,
@@ -375,3 +375,4 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
     );
   }
 }
+

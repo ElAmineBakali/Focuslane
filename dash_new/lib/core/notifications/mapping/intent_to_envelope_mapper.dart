@@ -1,6 +1,6 @@
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_clock.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
+﻿import 'package:focuslane/core/notifications/contracts/notification_clock.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
 
 abstract class IntentToEnvelopeMapper {
   NotificationEnvelope map(NotificationIntent intent);
@@ -35,3 +35,4 @@ class DefaultIntentToEnvelopeMapper implements IntentToEnvelopeMapper {
     );
   }
 }
+

@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/core/constants/app_strings.dart';
+import 'package:focuslane/core/constants/app_strings.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -140,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           _label(AppStrings.authContrasena),
                                           _field(
                                             controller: _pass,
-                                            hint: '••••••••',
+                                            hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
                                             obscureText: true,
                                             validator: (v) => (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
                                           ),
@@ -148,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           _label(AppStrings.authConfirmar),
                                           _field(
                                             controller: _confirm,
-                                            hint: '••••••••',
+                                            hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
                                             obscureText: true,
                                             validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
                                           ),
@@ -164,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 _label(AppStrings.authContrasena),
                                                 _field(
                                                   controller: _pass,
-                                                  hint: '••••••••',
+                                                  hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
                                                   obscureText: true,
                                                   validator: (v) =>
                                                       (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
@@ -180,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 _label(AppStrings.authConfirmar),
                                                 _field(
                                                   controller: _confirm,
-                                                  hint: '••••••••',
+                                                  hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
                                                   obscureText: true,
                                                   validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
                                                 ),
@@ -300,3 +300,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+

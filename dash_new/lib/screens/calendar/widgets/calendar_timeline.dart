@@ -1,9 +1,9 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_item_widget.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_item_widget.dart';
 
 class CalendarWeekHeader extends StatelessWidget {
   const CalendarWeekHeader({
@@ -466,3 +466,4 @@ class _CalendarTimelineDayColumn extends StatelessWidget {
     );
   }
 }
+

@@ -1,10 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_dashboard_personal/design/ui/tokens/focuslane_tokens.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_primary_button.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_text_field.dart';
-import 'package:mi_dashboard_personal/design/widgets/external_link_picker_widget.dart';
-import 'package:mi_dashboard_personal/design/widgets/global_color_picker_widget.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_primary_button.dart';
+import 'package:focuslane/design/ui/components/focus_text_field.dart';
+import 'package:focuslane/design/widgets/external_link_picker_widget.dart';
+import 'package:focuslane/design/widgets/global_color_picker_widget.dart';
 import '../models/study_models.dart';
 import '../services/study_firestore_service.dart';
 
@@ -342,4 +342,5 @@ class _CourseEditSheetState extends State<CourseEditSheet> {
     );
   }
 }
+
 

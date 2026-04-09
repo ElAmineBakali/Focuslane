@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../../../design/ui/components/focus_module_header.dart';
@@ -140,4 +140,5 @@ class GymGoalsScreen extends StatelessWidget {
     );
   }
 }
+
 

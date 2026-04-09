@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/router/route_resolver.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/router/route_resolver.dart';
 
 enum NotificationTapSource {
   local,
@@ -82,3 +82,4 @@ class AppNotificationRouter implements NotificationRouter {
     nav.pushNamed(intent.route, arguments: intent.arguments);
   }
 }
+

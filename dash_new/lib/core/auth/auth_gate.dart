@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mi_dashboard_personal/core/services/core_sync_service.dart';
+import 'package:focuslane/core/services/core_sync_service.dart';
 
 const String _coreSyncUidOverride = String.fromEnvironment(
   'CORE_SYNC_UID',
@@ -51,10 +51,11 @@ class AuthGate extends StatelessWidget {
             CoreSyncService.I.start(user.uid);
           }
 
-          // ── TEMPORARY DIAGNOSTIC ──
+          // â”€â”€ TEMPORARY DIAGNOSTIC â”€â”€
           return authenticated;
         }
       },
     );
   }
 }
+

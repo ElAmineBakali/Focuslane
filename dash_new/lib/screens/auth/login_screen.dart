@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/core/constants/app_strings.dart';
+import 'package:focuslane/core/constants/app_strings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     _field(
                                       controller: _pass,
-                                      hint: '••••••••',
+                                      hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
                                       obscureText: true,
                                       validator: (value) {
                                         final v = value ?? '';
@@ -350,3 +350,4 @@ class _LabelText extends StatelessWidget {
     );
   }
 }
+

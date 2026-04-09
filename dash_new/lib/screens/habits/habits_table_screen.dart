@@ -4,19 +4,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
-import 'package:mi_dashboard_personal/screens/habits/widgets/confetti_animation.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/habits/habit_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_constants.dart';
+import 'package:focuslane/screens/habits/habit_utils.dart';
+import 'package:focuslane/screens/habits/widgets/confetti_animation.dart';
 
 class HabitsTableScreen extends StatefulWidget {
   const HabitsTableScreen({super.key});
@@ -1028,4 +1028,5 @@ class _HabitsTableScrollBehavior extends MaterialScrollBehavior {
     PointerDeviceKind.trackpad,
   };
 }
+
 

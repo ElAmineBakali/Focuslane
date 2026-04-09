@@ -1,19 +1,19 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_clock.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_logger.dart';
-import 'package:mi_dashboard_personal/core/notifications/contracts/notification_repository.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/local_scheduler.dart';
-import 'package:mi_dashboard_personal/core/notifications/mapping/intent_to_envelope_mapper.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_registry_entry.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_result.dart';
-import 'package:mi_dashboard_personal/core/notifications/policies/dedupe_policy.dart';
-import 'package:mi_dashboard_personal/core/notifications/policies/notification_policy_engine.dart';
-import 'package:mi_dashboard_personal/core/notifications/router/notification_router.dart';
+import 'package:focuslane/core/notifications/contracts/notification_clock.dart';
+import 'package:focuslane/core/notifications/contracts/notification_logger.dart';
+import 'package:focuslane/core/notifications/contracts/notification_repository.dart';
+import 'package:focuslane/core/notifications/local/local_scheduler.dart';
+import 'package:focuslane/core/notifications/mapping/intent_to_envelope_mapper.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_registry_entry.dart';
+import 'package:focuslane/core/notifications/models/notification_result.dart';
+import 'package:focuslane/core/notifications/policies/dedupe_policy.dart';
+import 'package:focuslane/core/notifications/policies/notification_policy_engine.dart';
+import 'package:focuslane/core/notifications/router/notification_router.dart';
 
 class NotificationManager {
   NotificationManager({
@@ -214,3 +214,4 @@ class NotificationManager {
     _router.attachNavigatorKey(navigatorKey);
   }
 }
+

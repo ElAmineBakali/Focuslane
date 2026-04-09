@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
-import 'package:mi_dashboard_personal/screens/gym/services/gym_firestore_service.dart';
+import 'package:focuslane/navigation/app_routes.dart';
+import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import '../models/gym_models.dart';
 import '../widgets/exercise_picker_sheet.dart';
 import '../../../design/ui/components/focus_module_header.dart';
@@ -459,4 +459,5 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     }
   }
 }
+
 

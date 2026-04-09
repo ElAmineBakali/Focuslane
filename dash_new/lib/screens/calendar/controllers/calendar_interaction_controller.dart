@@ -1,18 +1,18 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/services/calendar_service.dart';
-import 'package:mi_dashboard_personal/screens/study/services/study_tasks_sync_service.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_service.dart';
+import 'package:focuslane/screens/study/services/study_tasks_sync_service.dart';
 
 class CalendarInteractionController {
   CalendarInteractionController({
@@ -694,3 +694,4 @@ class CalendarInteractionController {
     );
   }
 }
+

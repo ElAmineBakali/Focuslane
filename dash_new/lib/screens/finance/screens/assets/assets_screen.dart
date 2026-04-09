@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/finance/models/asset_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/asset_service.dart';
+import 'package:focuslane/screens/finance/models/asset_model.dart';
+import 'package:focuslane/screens/finance/services/asset_service.dart';
 
 import '../../../../design/ui/components/focus_card.dart';
 import '../../../../design/ui/components/focus_module_header.dart';
@@ -83,6 +83,7 @@ class AssetsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

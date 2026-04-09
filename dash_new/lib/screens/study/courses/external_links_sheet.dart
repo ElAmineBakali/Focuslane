@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:mi_dashboard_personal/shared/app_links.dart';
+import 'package:focuslane/shared/app_links.dart';
 
 class ExternalLinksSheet extends StatelessWidget {
   const ExternalLinksSheet({super.key});
@@ -345,4 +345,5 @@ class _ExternalLinkTile extends StatelessWidget {
     );
   }
 }
+
 

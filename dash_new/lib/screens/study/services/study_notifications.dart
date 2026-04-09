@@ -1,12 +1,12 @@
 ﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
-import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'study_firestore_service.dart';
 import '../models/study_models.dart';
 
@@ -162,4 +162,5 @@ class StudyNotifications {
     }
   }
 }
+
 

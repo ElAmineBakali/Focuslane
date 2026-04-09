@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../../study/services/study_firestore_service.dart';
 import '../../study/models/study_models.dart';
 import '../../study/grades/grades_screen.dart';
@@ -110,4 +110,5 @@ class StudyPantryScreen extends StatelessWidget {
     );
   }
 }
+
 

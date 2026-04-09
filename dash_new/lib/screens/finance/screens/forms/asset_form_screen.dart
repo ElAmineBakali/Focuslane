@@ -4,8 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 
-import 'package:mi_dashboard_personal/screens/finance/models/asset_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/asset_service.dart';
+import 'package:focuslane/screens/finance/models/asset_model.dart';
+import 'package:focuslane/screens/finance/services/asset_service.dart';
 
 import '../../widgets/finance_shell.dart';
 import '../../../../design/ui/components/focus_card.dart';
@@ -391,4 +391,5 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
     super.dispose();
   }
 }
+
 

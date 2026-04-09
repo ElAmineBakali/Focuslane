@@ -1,4 +1,4 @@
-package com.example.dash  // <- tu package
+package com.example.focuslane
 
 import android.app.AlarmManager
 import android.app.PendingIntent

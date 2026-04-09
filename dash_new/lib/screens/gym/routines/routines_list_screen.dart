@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/gym_firestore_service.dart';
@@ -784,4 +784,5 @@ String _rgbToHex(int argb) {
   final rgb = argb & 0x00FFFFFF;
   return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 }
+
 

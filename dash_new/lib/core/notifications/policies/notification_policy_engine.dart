@@ -1,4 +1,4 @@
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
+﻿import 'package:focuslane/core/notifications/models/notification_envelope.dart';
 
 class PolicyDecision {
   const PolicyDecision({
@@ -26,3 +26,4 @@ class AllowAllNotificationPolicyEngine implements NotificationPolicyEngine {
     );
   }
 }
+

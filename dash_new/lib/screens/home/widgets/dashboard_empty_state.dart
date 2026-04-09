@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/design/ui/components/focus_empty_state.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/components/focus_empty_state.dart';
 
 class DashboardEmptyState extends StatelessWidget {
   const DashboardEmptyState({
@@ -26,3 +26,4 @@ class DashboardEmptyState extends StatelessWidget {
     );
   }
 }
+

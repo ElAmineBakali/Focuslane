@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_firestore_service.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_constants.dart';
-import 'package:mi_dashboard_personal/screens/habits/widgets/emoji_icon_picker.dart';
-import 'package:mi_dashboard_personal/screens/habits/widgets/tag_selector.dart';
-import 'package:mi_dashboard_personal/screens/habits/widgets/template_selector.dart';
-import 'package:mi_dashboard_personal/screens/habits/widgets/reminder_manager.dart';
-import 'package:mi_dashboard_personal/design/widgets/ui_scaffold.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_utils.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/habits/habit_firestore_service.dart';
+import 'package:focuslane/screens/habits/habit_constants.dart';
+import 'package:focuslane/screens/habits/widgets/emoji_icon_picker.dart';
+import 'package:focuslane/screens/habits/widgets/tag_selector.dart';
+import 'package:focuslane/screens/habits/widgets/template_selector.dart';
+import 'package:focuslane/screens/habits/widgets/reminder_manager.dart';
+import 'package:focuslane/design/widgets/ui_scaffold.dart';
+import 'package:focuslane/screens/habits/habit_utils.dart';
 
 class HabitCreateScreen extends StatefulWidget {
   final Habit? habit;
@@ -637,4 +637,5 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     );
   }
 }
+
 

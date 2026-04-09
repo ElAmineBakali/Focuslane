@@ -2,8 +2,8 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mi_dashboard_personal/screens/finance/models/subscription_model.dart';
-import 'package:mi_dashboard_personal/screens/finance/services/subscription_service.dart';
+import 'package:focuslane/screens/finance/models/subscription_model.dart';
+import 'package:focuslane/screens/finance/services/subscription_service.dart';
 
 import '../../widgets/finance_shell.dart';
 import '../../../../design/ui/components/focus_card.dart';
@@ -330,4 +330,5 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
     super.dispose();
   }
 }
+
 

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/screens/calendar/controllers/calendar_controller.dart';
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/calendar/widgets/calendar_item_widget.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/calendar/controllers/calendar_controller.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/widgets/calendar_item_widget.dart';
 
 class CalendarAgendaView extends StatelessWidget {
   const CalendarAgendaView({
@@ -132,3 +132,4 @@ class CalendarAgendaView extends StatelessWidget {
     );
   }
 }
+

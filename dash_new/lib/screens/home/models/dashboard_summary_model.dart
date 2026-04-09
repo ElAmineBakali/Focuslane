@@ -1,8 +1,8 @@
-import 'package:mi_dashboard_personal/screens/calendar/models/calendar_models.dart';
-import 'package:mi_dashboard_personal/screens/habits/habit_model.dart';
-import 'package:mi_dashboard_personal/screens/notes/note_model.dart';
-import 'package:mi_dashboard_personal/screens/study/models/study_models.dart';
-import 'package:mi_dashboard_personal/screens/tasks/task_model.dart';
+﻿import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/notes/note_model.dart';
+import 'package:focuslane/screens/study/models/study_models.dart';
+import 'package:focuslane/screens/tasks/task_model.dart';
 
 class DashboardSummaryModel {
   const DashboardSummaryModel({
@@ -66,3 +66,4 @@ class DashboardSummaryModel {
         monthIncome > 0;
   }
 }
+

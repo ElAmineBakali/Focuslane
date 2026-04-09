@@ -1,4 +1,4 @@
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
+﻿import 'package:focuslane/core/notifications/models/notification_envelope.dart';
 
 enum NotificationLifecycleStatus {
   created,
@@ -26,3 +26,4 @@ class NotificationRegistryEntry {
   final NotificationEnvelope envelope;
   final String? reason;
 }
+

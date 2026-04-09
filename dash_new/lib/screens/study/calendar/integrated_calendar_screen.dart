@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:mi_dashboard_personal/navigation/app_routes.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import '../services/study_firestore_service.dart';
 import '../models/study_models.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -179,4 +179,5 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+
 

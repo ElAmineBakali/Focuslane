@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/app_env.dart';
+
 class AiBackendClient {
   AiBackendClient({
     http.Client? httpClient,
@@ -15,19 +17,16 @@ class AiBackendClient {
   final http.Client _httpClient;
   final String _baseUrl;
 
-  static const _env = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
-  static bool get isDevEnv => _env != 'prod';
+  static bool get isDevEnv => !AppEnv.isProd;
 
   static String _resolveBaseUrl() {
-    const devUrl = String.fromEnvironment(
-      'AI_BACKEND_BASE_URL_DEV',
-      defaultValue: 'http://localhost:8080',
-    );
-    const prodUrl = String.fromEnvironment(
-      'AI_BACKEND_BASE_URL_PROD',
-      defaultValue: 'https://focuslane-ai-backend-jajf6p3puq-ew.a.run.app',
-    );
-    final raw = _env == 'prod' ? prodUrl : devUrl;
+    final raw = AppEnv.backendBaseUrl;
+    if (AppEnv.isProd && raw.contains('localhost')) {
+      throw const AiBackendException(
+        message: 'invalid_production_backend_url',
+        statusCode: 500,
+      );
+    }
     return raw.endsWith('/') ? raw.substring(0, raw.length - 1) : raw;
   }
 

@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
-import 'package:mi_dashboard_personal/core/notifications/local/local_id_generator.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/local_notification_gateway.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_envelope.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/local/local_id_generator.dart';
+import 'package:focuslane/core/notifications/local/local_notification_gateway.dart';
+import 'package:focuslane/core/notifications/models/notification_envelope.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 
 abstract class LocalScheduler {
   Future<void> initializeChannels();
@@ -136,3 +136,4 @@ class DefaultLocalScheduler implements LocalScheduler {
     return ids;
   }
 }
+

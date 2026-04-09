@@ -1,23 +1,24 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:mi_dashboard_personal/core/config/firebase_options.dart';
-import 'package:mi_dashboard_personal/core/notifications/local/android_channel_catalog.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_action.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_content.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_delivery.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_entity_ref.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_intent.dart';
-import 'package:mi_dashboard_personal/core/notifications/models/notification_schedule.dart';
-import 'package:mi_dashboard_personal/core/config/supabase_config.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_facade.dart';
-import 'package:mi_dashboard_personal/core/notifications/notifications_bootstrap.dart';
+import 'package:focuslane/core/config/firebase_options.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/config/supabase_config.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/core/notifications/notifications_bootstrap.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -38,6 +39,11 @@ Future<void> bootstrapApp() async {
 
   await NotificationsBootstrap.instance.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAppCheck.instance.activate(
+    androidProvider:
+        kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    appleProvider: AppleProvider.deviceCheck,
+  );
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage msg) async {
@@ -103,8 +109,8 @@ Future<void> bootstrapApp() async {
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
     } else {
-      await FirebaseFirestore.instance.enablePersistence();
       FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
     }
