@@ -10,6 +10,37 @@ import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../widgets/food_compact_widgets.dart';
 
+IconData _iconFromCodePoint(int codePoint) {
+  switch (codePoint) {
+    case 0xe430:
+      return Icons.wb_sunny;
+    case 0xe57d:
+      return Icons.cookie;
+    case 0xe56c:
+      return Icons.restaurant;
+    case 0xe56a:
+      return Icons.lunch_dining;
+    case 0xf6c4:
+      return Icons.dinner_dining;
+    case 0xe23c:
+      return Icons.local_cafe;
+    case 0xf0762:
+      return Icons.bakery_dining;
+    case 0xe57a:
+      return Icons.fastfood;
+    case 0xf1f4:
+      return Icons.ramen_dining;
+    case 0xe52e:
+      return Icons.icecream;
+    case 0xe1e4:
+      return Icons.apple;
+    case 0xe28f:
+      return Icons.egg;
+    default:
+      return Icons.restaurant;
+  }
+}
+
 class FoodPlannerScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   const FoodPlannerScreen({super.key, required this.svc});
@@ -114,9 +145,8 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
       (s) => s['slot'] == slotKey,
       orElse: () => {'icon': _getSlotIcon(slot).codePoint},
     );
-    return IconData(
+    return _iconFromCodePoint(
       config['icon'] ?? _getSlotIcon(slot).codePoint,
-      fontFamily: 'MaterialIcons',
     );
   }
 
@@ -1285,6 +1315,37 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         return Icons.dinner_dining;
     }
   }
+
+  IconData _iconFromCodePoint(int codePoint) {
+    switch (codePoint) {
+      case 0xe430:
+        return Icons.wb_sunny;
+      case 0xe57d:
+        return Icons.cookie;
+      case 0xe56c:
+        return Icons.restaurant;
+      case 0xe56a:
+        return Icons.lunch_dining;
+      case 0xf6c4:
+        return Icons.dinner_dining;
+      case 0xe23c:
+        return Icons.local_cafe;
+      case 0xf0762:
+        return Icons.bakery_dining;
+      case 0xe57a:
+        return Icons.fastfood;
+      case 0xf1f4:
+        return Icons.ramen_dining;
+      case 0xe52e:
+        return Icons.icecream;
+      case 0xe1e4:
+        return Icons.apple;
+      case 0xe28f:
+        return Icons.egg;
+      default:
+        return Icons.restaurant;
+    }
+  }
 }
 
 class _MealSlotsConfigSheet extends StatefulWidget {
@@ -1485,7 +1546,7 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                       ),
                       trailing: PopupMenuButton<int>(
                         icon: Icon(
-                          IconData(slot['icon'], fontFamily: 'MaterialIcons'),
+                          _iconFromCodePoint(slot['icon']),
                           color:
                               slot['enabled']
                                   ? colorScheme.primary

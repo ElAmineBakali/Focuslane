@@ -46,7 +46,7 @@
     </queries>
 
     <application
-        android:label="FocusLane"
+        android:label="${appLabel}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="false">

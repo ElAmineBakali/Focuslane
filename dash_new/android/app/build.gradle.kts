@@ -22,6 +22,7 @@ plugins {
 android {
     namespace = "com.example.focuslane"
     compileSdk = 36
+    flavorDimensions += "environment"
 
     defaultConfig {
         applicationId = "com.example.focuslane"
@@ -30,6 +31,20 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
+        manifestPlaceholders["appLabel"] = "FocusLane"
+    }
+
+    productFlavors {
+        create("prod") {
+            dimension = "environment"
+            manifestPlaceholders["appLabel"] = "FocusLane"
+        }
+        create("beta") {
+            dimension = "environment"
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta"
+            manifestPlaceholders["appLabel"] = "FocusLane Beta"
+        }
     }
 
     compileOptions {
@@ -51,22 +66,22 @@ android {
             }
         }
     }
-buildTypes {
-    release {
-        isMinifyEnabled = true
-        isShrinkResources = true
-        proguardFiles(
-            getDefaultProguardFile("proguard-android-optimize.txt"),
-            "proguard-rules.pro"
-        )
-        signingConfig = if (keystorePropsFile.exists()) {
-            signingConfigs.getByName("release")
-        } else {
-            signingConfigs.getByName("debug")
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = if (keystorePropsFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
+        debug { }
     }
-    debug { }
-}
 
 }
 
