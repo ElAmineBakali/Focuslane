@@ -1,8 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 
 import 'package:focuslane/core/auth/auth_gate.dart';
-import 'package:focuslane/design/theme/theme.dart';
-import 'package:focuslane/design/theme/prefs.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/auth/login_screen.dart';
 import 'package:focuslane/screens/auth/register_screen.dart';
@@ -39,26 +37,17 @@ import 'package:focuslane/screens/tasks/tasks_main_screen.dart';
 
 class AppRouterDependencies {
   const AppRouterDependencies({
-    required this.preset,
-    required this.themeMode,
-    required this.backgroundStyle,
-    required this.onChangePreset,
-    required this.onChangeMode,
-    required this.onChangeBackground,
     required this.foodService,
     required this.gymService,
     required this.studyService,
+    required this.themeMode,
+    required this.onThemeModeChanged,
   });
-
-  final ThemePreset preset;
-  final ThemeMode themeMode;
-  final BackgroundStyle backgroundStyle;
-  final ValueChanged<ThemePreset> onChangePreset;
-  final ValueChanged<ThemeMode> onChangeMode;
-  final ValueChanged<BackgroundStyle> onChangeBackground;
   final FoodFirestoreService Function() foodService;
   final GymFirestoreService Function() gymService;
   final StudyFirestoreService Function() studyService;
+  final ThemeMode Function() themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
 }
 
 Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
@@ -66,21 +55,12 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
     AppRoutes.login: (_) => const LoginScreen(),
     AppRoutes.register: (_) => const RegisterScreen(),
     AppRoutes.home: (_) => AuthGate(
-      authenticated: HomeScreen(
-        toggleTheme: (isDark) {
-          deps.onChangeMode(isDark ? ThemeMode.dark : ThemeMode.light);
-        },
-        themeMode: deps.themeMode,
-      ),
+      authenticated: const HomeScreen(),
       unauthenticated: const LoginScreen(),
     ),
     '/settings': (_) => SettingsScreen(
-      currentPreset: deps.preset,
-      currentMode: deps.themeMode,
-      currentBackground: deps.backgroundStyle,
-      onChangePreset: deps.onChangePreset,
-      onChangeMode: deps.onChangeMode,
-      onChangeBackground: deps.onChangeBackground,
+      currentThemeMode: deps.themeMode(),
+      onThemeModeChanged: deps.onThemeModeChanged,
     ),
     '/modules': (_) => const ModulesScreen(),
     AppRoutes.tasksDashboard: (_) => const TasksMainScreen(),

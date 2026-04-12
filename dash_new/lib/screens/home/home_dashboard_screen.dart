@@ -1,9 +1,13 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:focuslane/core/constants/app_strings.dart';
 import 'package:focuslane/design/ui/layouts/module_scaffold.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
 import 'package:focuslane/navigation/app_routes.dart';
+import 'package:focuslane/screens/habits/habit_utils.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 
@@ -11,14 +15,7 @@ import 'home_dashboard_controller.dart';
 import 'models/dashboard_summary_model.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
-  const HomeDashboardScreen({
-    super.key,
-    required this.toggleTheme,
-    required this.themeMode,
-  });
-
-  final void Function(bool isDark) toggleTheme;
-  final ThemeMode themeMode;
+  const HomeDashboardScreen({super.key});
 
   @override
   State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
@@ -45,6 +42,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       child: LayoutBuilder(
         builder: (context, rootConstraints) {
           final isMobile = rootConstraints.maxWidth < _mobileMax;
+          final isTablet =
+              rootConstraints.maxWidth >= _mobileMax &&
+              rootConstraints.maxWidth < _tabletMax;
 
           return Scaffold(
             backgroundColor: FocuslaneSemanticTokens.backgroundMain(context),
@@ -55,7 +55,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     scrolledUnderElevation: 0,
                   )
                 : null,
-            drawer: isMobile
+            drawer: (isMobile || isTablet)
                 ? Drawer(
                     backgroundColor: FocuslaneSemanticTokens.backgroundMain(context),
                     child: SafeArea(
@@ -106,6 +106,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           summary: summary,
                           controller: _controller,
                           onRoute: _openRoute,
+                          onOpenMenu: () => Scaffold.maybeOf(context)?.openDrawer(),
                         );
                       }
 
@@ -113,7 +114,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         summary: summary,
                         controller: _controller,
                         onRoute: _openRoute,
-                        toggleTheme: widget.toggleTheme,
                       );
                     },
                   );
@@ -136,14 +136,11 @@ class _DesktopDashboard extends StatelessWidget {
     required this.summary,
     required this.controller,
     required this.onRoute,
-    required this.toggleTheme,
   });
 
   final DashboardSummaryModel summary;
   final HomeDashboardController controller;
   final void Function(String route) onRoute;
-  final void Function(bool isDark) toggleTheme;
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -154,7 +151,6 @@ class _DesktopDashboard extends StatelessWidget {
             children: [
               _PortalTopBar(
                 title: AppStrings.dashboard,
-                toggleTheme: toggleTheme,
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -165,6 +161,7 @@ class _DesktopDashboard extends StatelessWidget {
                       _PortalHero(
                         greeting: controller.greetingFor(summary.today),
                         dateLabel: controller.dayLabel(summary.today),
+                        phrase: controller.motivationalPhraseFor(summary.today),
                       ),
                       const SizedBox(height: 16),
                       _KpiGrid(summary: summary, onRoute: onRoute, columns: 4),
@@ -178,10 +175,7 @@ class _DesktopDashboard extends StatelessWidget {
                               child: _TodayTasksCard(summary: summary, onRoute: onRoute),
                             ),
                             const SizedBox(width: 16),
-                            Expanded(
-                              flex: 1,
-                              child: _QuickActionsCard(onRoute: onRoute),
-                            ),
+                            Expanded(flex: 1, child: _UpcomingCard(summary: summary)),
                           ],
                         ),
                       ),
@@ -191,44 +185,16 @@ class _DesktopDashboard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Expanded(
-                              flex: 4,
+                              flex: 7,
                               child: _HabitsCard(summary: summary),
                             ),
                             const SizedBox(width: 16),
-                            Expanded(
-                              flex: 3,
-                              child: _UpcomingCard(summary: summary),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              flex: 3,
-                              child: _HighlightsCard(summary: summary),
-                            ),
+                            Expanded(flex: 3, child: _RecentActivityCard(summary: summary, onRoute: onRoute)),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
-                      IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: _WeeklyProgressCard(summary: summary),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              flex: 3,
-                              child: _RecentActivityCard(summary: summary, onRoute: onRoute),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              flex: 3,
-                              child: _ModuleLinksCard(onRoute: onRoute),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _WeeklyProgressCard(summary: summary),
                     ],
                   ),
                 ),
@@ -246,17 +212,19 @@ class _TabletDashboard extends StatelessWidget {
     required this.summary,
     required this.controller,
     required this.onRoute,
+    required this.onOpenMenu,
   });
 
   final DashboardSummaryModel summary;
   final HomeDashboardController controller;
   final void Function(String route) onRoute;
+  final VoidCallback onOpenMenu;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const _TabletHeader(),
+        _TabletHeader(onOpenMenu: onOpenMenu),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -266,6 +234,7 @@ class _TabletDashboard extends StatelessWidget {
                 _PortalHero(
                   greeting: controller.greetingFor(summary.today),
                   dateLabel: controller.dayLabel(summary.today),
+                  phrase: controller.motivationalPhraseFor(summary.today),
                   compact: true,
                 ),
                 const SizedBox(height: 16),
@@ -277,7 +246,7 @@ class _TabletDashboard extends StatelessWidget {
                     children: [
                       Expanded(child: _TodayTasksCard(summary: summary, onRoute: onRoute)),
                       const SizedBox(width: 16),
-                      Expanded(child: _QuickActionsCard(onRoute: onRoute)),
+                      Expanded(child: _UpcomingCard(summary: summary)),
                     ],
                   ),
                 ),
@@ -288,32 +257,12 @@ class _TabletDashboard extends StatelessWidget {
                     children: [
                       Expanded(flex: 2, child: _HabitsCard(summary: summary)),
                       const SizedBox(width: 16),
-                      Expanded(flex: 1, child: _UpcomingCard(summary: summary)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(child: _HighlightsCard(summary: summary)),
-                      const SizedBox(width: 16),
-                      Expanded(child: _ModuleLinksCard(onRoute: onRoute)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 2, child: _WeeklyProgressCard(summary: summary)),
-                      const SizedBox(width: 16),
                       Expanded(flex: 1, child: _RecentActivityCard(summary: summary, onRoute: onRoute)),
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
+                _WeeklyProgressCard(summary: summary),
               ],
             ),
           ),
@@ -342,26 +291,21 @@ class _MobileDashboard extends StatelessWidget {
         _PortalHero(
           greeting: controller.greetingFor(summary.today),
           dateLabel: controller.dayLabel(summary.today),
+          phrase: controller.motivationalPhraseFor(summary.today),
           compact: true,
         ),
         const SizedBox(height: 16),
-        _KpiGrid(summary: summary, onRoute: onRoute, columns: 2),
+        _KpiGrid(summary: summary, onRoute: onRoute, columns: 1),
         const SizedBox(height: 16),
         _TodayTasksCard(summary: summary, onRoute: onRoute),
-        const SizedBox(height: 16),
-        _QuickActionsCard(onRoute: onRoute),
         const SizedBox(height: 16),
         _HabitsCard(summary: summary),
         const SizedBox(height: 16),
         _UpcomingCard(summary: summary),
         const SizedBox(height: 16),
-        _HighlightsCard(summary: summary),
-        const SizedBox(height: 16),
         _WeeklyProgressCard(summary: summary),
         const SizedBox(height: 16),
         _RecentActivityCard(summary: summary, onRoute: onRoute),
-        const SizedBox(height: 16),
-        _ModuleLinksCard(onRoute: onRoute),
       ],
     );
   }
@@ -376,15 +320,20 @@ class _PortalSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      _NavItem(AppStrings.moduloTareas, Icons.task_alt_outlined, AppRoutes.tasksDashboard),
-      _NavItem(AppStrings.moduloHabitos, Icons.repeat, '/habits'),
-      _NavItem(AppStrings.moduloNotas, Icons.note_alt_outlined, AppRoutes.notesDashboard),
       _NavItem(AppStrings.moduloCalendario, Icons.calendar_today_outlined, AppRoutes.calendarDashboard),
+      _NavItem(AppStrings.moduloTareas, Icons.task_alt_outlined, AppRoutes.tasksDashboard),
+      _NavItem(AppStrings.moduloNotas, Icons.note_alt_outlined, AppRoutes.notesDashboard),
+      _NavItem(AppStrings.moduloHabitos, Icons.repeat, '/habits'),
+      _NavItem(AppStrings.moduloEstudio, Icons.school_outlined, AppRoutes.studyDashboard),
       _NavItem(AppStrings.moduloGym, Icons.fitness_center_outlined, AppRoutes.gymDashboard),
       _NavItem(AppStrings.moduloNutricion, Icons.restaurant_outlined, AppRoutes.foodDashboard),
       _NavItem(AppStrings.moduloFinanzas, Icons.account_balance_wallet_outlined, AppRoutes.financeDashboard),
-      _NavItem(AppStrings.moduloEstudio, Icons.school_outlined, AppRoutes.studyDashboard),
     ];
+
+    final user = FirebaseAuth.instance.currentUser;
+    final profileRef = user == null
+        ? null
+        : FirebaseFirestore.instance.collection('users').doc(user.uid).collection('profile').doc('info');
 
     return Container(
       width: asDrawer ? double.infinity : 210,
@@ -399,43 +348,45 @@ class _PortalSidebar extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircleAvatar(radius: 15, child: Icon(Icons.person, size: 16)),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: profileRef?.snapshots(),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.data() ?? const <String, dynamic>{};
+              final displayName = ((data['displayName'] as String?) ?? '').trim();
+              final photoUrl = ((data['photoUrl'] as String?) ?? '').trim();
+              final resolvedName = displayName.isNotEmpty ? displayName : (user?.displayName?.trim().isNotEmpty == true ? user!.displayName!.trim() : 'FocusLane');
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(AppStrings.usuario, style: TextStyle(color: FocuslaneSemanticTokens.primary(context), fontWeight: FontWeight.w700)),
-                  Text(AppStrings.portalProductividad, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
+                  CircleAvatar(
+                    radius: 15,
+                    backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                    child: photoUrl.isEmpty ? const Icon(Icons.person, size: 16) : null,
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(resolvedName, style: TextStyle(color: FocuslaneSemanticTokens.primary(context), fontWeight: FontWeight.w700)),
+                      Text(AppStrings.portalProductividad, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
+                    ],
+                  ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
           const SizedBox(height: 14),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => onRoute('/tasks/create'),
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text(AppStrings.nuevaEntrada),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
           for (final item in items)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
               child: ListTile(
                 dense: true,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                tileColor: item.label == AppStrings.moduloTareas ? FocuslaneSemanticTokens.sidebarActiveBackground(context) : Colors.transparent,
+                tileColor: Colors.transparent,
                 onTap: () => onRoute(item.route),
-                leading: Icon(item.icon, size: 18, color: item.label == AppStrings.moduloTareas ? FocuslaneSemanticTokens.primary(context) : FocuslaneSemanticTokens.textSecondary(context)),
-                title: Text(item.label, style: TextStyle(color: item.label == AppStrings.moduloTareas ? FocuslaneSemanticTokens.primary(context) : FocuslaneSemanticTokens.textSecondary(context), fontSize: 14)),
+                leading: Icon(item.icon, size: 18, color: FocuslaneSemanticTokens.textSecondary(context)),
+                title: Text(item.label, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 14)),
               ),
             ),
           const Spacer(),
@@ -456,14 +407,12 @@ class _PortalSidebar extends StatelessWidget {
 }
 
 class _PortalTopBar extends StatelessWidget {
-  const _PortalTopBar({required this.title, required this.toggleTheme});
+  const _PortalTopBar({required this.title});
 
   final String title;
-  final void Function(bool isDark) toggleTheme;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -472,26 +421,12 @@ class _PortalTopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(AppStrings.buenasTardes, style: TextStyle(color: FocuslaneSemanticTokens.primary(context), fontWeight: FontWeight.w700, letterSpacing: 1)),
+          Text(AppStrings.saludoSegunHora(), style: TextStyle(color: FocuslaneSemanticTokens.primary(context), fontWeight: FontWeight.w700, letterSpacing: 1)),
           const SizedBox(width: 10),
           Text('/ $title', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context))),
           const Spacer(),
-          SizedBox(
-            width: 240,
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: AppStrings.buscarEntradas,
-                suffixIcon: Icon(Icons.search, size: 16),
-                isDense: true,
-              ),
-            ),
-          ),
           const SizedBox(width: 10),
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, size: 18)),
-          IconButton(
-            onPressed: () => toggleTheme(!isDark),
-            icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 18),
-          ),
         ],
       ),
     );
@@ -499,7 +434,9 @@ class _PortalTopBar extends StatelessWidget {
 }
 
 class _TabletHeader extends StatelessWidget {
-  const _TabletHeader();
+  const _TabletHeader({required this.onOpenMenu});
+
+  final VoidCallback onOpenMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -511,6 +448,11 @@ class _TabletHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
+          IconButton(
+            onPressed: onOpenMenu,
+            icon: const Icon(Icons.menu_rounded, size: 20),
+            tooltip: 'Abrir menu',
+          ),
           Text(AppStrings.dashboard, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700, fontSize: 18)),
           const Spacer(),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search, size: 18)),
@@ -522,10 +464,11 @@ class _TabletHeader extends StatelessWidget {
 }
 
 class _PortalHero extends StatelessWidget {
-  const _PortalHero({required this.greeting, required this.dateLabel, this.compact = false});
+  const _PortalHero({required this.greeting, required this.dateLabel, required this.phrase, this.compact = false});
 
   final String greeting;
   final String dateLabel;
+  final String phrase;
   final bool compact;
 
   @override
@@ -544,12 +487,22 @@ class _PortalHero extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '$greeting Â· $dateLabel',
+          '$greeting · $dateLabel',
           style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context)),
         ),
         const SizedBox(height: 4),
         Text(
-          AppStrings.heroSubtitle,
+          'Frase del día',
+          style: TextStyle(
+            color: FocuslaneSemanticTokens.textSecondary(context),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          phrase,
           style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: compact ? 13 : 14),
         ),
       ],
@@ -567,15 +520,12 @@ class _KpiGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _KpiItem(AppStrings.kpiTareas, '${summary.pendingTasksToday}', AppStrings.kpiPendientesHoy, Icons.task_alt_outlined, AppRoutes.tasksDashboard),
-      _KpiItem(AppStrings.kpiHabitos, '${summary.completedHabitsToday}/${summary.habits.length}', AppStrings.kpiCompletados, Icons.repeat, '/habits'),
-      _KpiItem(AppStrings.kpiEventos, '${summary.upcomingEvents.length}', AppStrings.kpiProximos, Icons.calendar_today_outlined, AppRoutes.calendarDashboard),
       _KpiItem(
-        AppStrings.kpiGymStudy,
-        summary.defaultGymRoutineName ?? AppStrings.sinRutina,
-        summary.latestStudySession == null ? AppStrings.sinSesionEstudio : AppStrings.sesionEstudioMinutos(summary.latestStudySession!.minutes),
-        Icons.insights_outlined,
-        AppRoutes.studyDashboard,
+        AppStrings.kpiEnfoque,
+        '${summary.pendingTasksToday}',
+        summary.pendingTasksToday == 1 ? '1 tarea pendiente hoy' : '${summary.pendingTasksToday} tareas pendientes hoy',
+        Icons.task_alt_outlined,
+        AppRoutes.tasksDashboard,
       ),
     ];
 
@@ -587,7 +537,7 @@ class _KpiGrid extends StatelessWidget {
         crossAxisCount: columns,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        childAspectRatio: columns == 4 ? 2.05 : 1.8,
+        childAspectRatio: columns == 1 ? 3.2 : 1.9,
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -691,78 +641,70 @@ class _TodayTasksCard extends StatelessWidget {
   }
 }
 
-class _QuickActionsCard extends StatelessWidget {
-  const _QuickActionsCard({required this.onRoute});
-
-  final void Function(String route) onRoute;
-
-  @override
-  Widget build(BuildContext context) {
-    return _Panel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppStrings.accionesRapidas, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontSize: 23, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 10),
-          _action(context, AppStrings.accionNuevaTarea, Icons.task_alt_outlined, '/tasks/create'),
-          const SizedBox(height: 8),
-          _action(context, AppStrings.accionRegistrarHabito, Icons.repeat, '/habits'),
-          const SizedBox(height: 8),
-          _action(context, AppStrings.accionNotaRapida, Icons.note_add_outlined, '/notes/editor'),
-          const SizedBox(height: 8),
-          _action(context, AppStrings.accionAbrirCalendario, Icons.calendar_today_outlined, AppRoutes.calendarDashboard),
-          const SizedBox(height: 8),
-          _action(context, AppStrings.accionIniciarEstudio, Icons.timer_outlined, '/study/timer'),
-        ],
-      ),
-    );
-  }
-
-  Widget _action(BuildContext context, String label, IconData icon, String route) {
-    return InkWell(
-      onTap: () => onRoute(route),
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border.all(color: FocuslaneSemanticTokens.border(context)),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: FocuslaneSemanticTokens.primary(context)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(label, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HabitsCard extends StatelessWidget {
+class _HabitsCard extends StatefulWidget {
   const _HabitsCard({required this.summary});
 
   final DashboardSummaryModel summary;
 
   @override
+  State<_HabitsCard> createState() => _HabitsCardState();
+}
+
+class _HabitsCardState extends State<_HabitsCard> {
+  late final Random _reloadRandom;
+  final Map<String, double> _randomOrderByHabitId = <String, double>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _reloadRandom = Random(DateTime.now().microsecondsSinceEpoch);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final habits = summary.habits.take(4).toList(growable: false);
+    final habits = _selectHabits(widget.summary.habits);
+    final now = DateTime.now();
+    final weekStart = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+    final weekDays = List.generate(7, (i) => weekStart.add(Duration(days: i)));
     return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(AppStrings.matrizHabitos, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontSize: 22, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text(
+            'Filas: hábitos · Columnas: lunes a domingo · Estado: verde completado / gris pendiente',
+            style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11),
+          ),
           const SizedBox(height: 12),
+          Row(
+            children: [
+              const SizedBox(width: 120),
+              for (final day in weekDays)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      DateFormat('E', 'es_ES').format(day).substring(0, 1).toUpperCase(),
+                      style: TextStyle(
+                        color: FocuslaneSemanticTokens.textSecondary(context),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
           if (habits.isEmpty) Text(AppStrings.sinHabitosActivos, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context))),
           for (final habit in habits)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  SizedBox(
+                    width: 120,
                     child: Text(
                       habit.name,
                       maxLines: 1,
@@ -770,31 +712,88 @@ class _HabitsCard extends StatelessWidget {
                       style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w600),
                     ),
                   ),
-                  _habitDots(context, habit.currentStreak),
+                  ...weekDays.map((day) {
+                    final done = _isHabitDoneOnDay(habit, day);
+                    final isToday = day.year == now.year && day.month == now.month && day.day == now.day;
+                    return Expanded(
+                      child: Center(
+                        child: Container(
+                          width: 14,
+                          height: 14,
+                          decoration: BoxDecoration(
+                            color: done ? FocuslaneSemanticTokens.primary(context) : FocuslaneSemanticTokens.border(context),
+                            borderRadius: BorderRadius.circular(4),
+                            border: isToday
+                                ? Border.all(color: FocuslaneSemanticTokens.textPrimary(context), width: 1)
+                                : null,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: FocuslaneSemanticTokens.primary(context), borderRadius: BorderRadius.circular(2))),
+              const SizedBox(width: 6),
+              Text('Completado', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
+              const SizedBox(width: 14),
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: FocuslaneSemanticTokens.border(context), borderRadius: BorderRadius.circular(2))),
+              const SizedBox(width: 6),
+              Text('Pendiente', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _habitDots(BuildContext context, int streak) {
-    final score = streak >= 20 ? 5 : streak >= 12 ? 4 : streak >= 7 ? 3 : streak >= 3 ? 2 : streak > 0 ? 1 : 0;
-    return Row(
-      children: List.generate(5, (i) {
-        final active = i < score;
-        return Container(
-          width: 7,
-          height: 7,
-          margin: const EdgeInsets.only(left: 4),
-          decoration: BoxDecoration(
-            color: active ? FocuslaneSemanticTokens.primary(context) : FocuslaneSemanticTokens.border(context),
-            shape: BoxShape.circle,
-          ),
-        );
-      }),
-    );
+  List<dynamic> _selectHabits(List<dynamic> allHabits) {
+    if (allHabits.isEmpty) return const [];
+
+    final today = DateTime.now();
+    dynamic markedFirst;
+    final markedToday = allHabits
+        .where((h) => _isHabitDoneOnDay(h, today))
+        .toList(growable: false)
+      ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+    if (markedToday.isNotEmpty) {
+      markedFirst = markedToday.first;
+    }
+
+    final selected = <dynamic>[];
+
+    if (allHabits.length > 4) {
+      final latestRegistered = allHabits.toList(growable: false)
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      selected.addAll(latestRegistered.take(4));
+    } else {
+      final randomized = allHabits.toList(growable: false)
+        ..sort((a, b) {
+          final aw = _randomOrderByHabitId.putIfAbsent(a.id, () => _reloadRandom.nextDouble());
+          final bw = _randomOrderByHabitId.putIfAbsent(b.id, () => _reloadRandom.nextDouble());
+          return bw.compareTo(aw);
+        });
+      selected.addAll(randomized.take(4));
+    }
+
+    if (markedFirst != null) {
+      selected.removeWhere((h) => h.id == markedFirst.id);
+      selected.insert(0, markedFirst);
+      if (selected.length > 4) {
+        selected.removeRange(4, selected.length);
+      }
+    }
+
+    return selected;
+  }
+
+  bool _isHabitDoneOnDay(dynamic habit, DateTime day) {
+    final value = habitHistoryValueForDate(habit.history, day);
+    return isHabitCompletedValue(habit, value);
   }
 }
 
@@ -851,64 +850,6 @@ class _UpcomingCard extends StatelessWidget {
   }
 }
 
-class _HighlightsCard extends StatelessWidget {
-  const _HighlightsCard({required this.summary});
-
-  final DashboardSummaryModel summary;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _highlight(
-          context,
-          title: summary.defaultGymRoutineName ?? AppStrings.sinRutinaActiva,
-          subtitle: summary.latestGymSession == null ? AppStrings.sinSesionesGym : DateFormat('d MMM â€¢ HH:mm', 'es_ES').format(summary.latestGymSession!),
-          chip: AppStrings.ultimaSesionGym,
-          progress: summary.latestGymSession == null ? 0.2 : 0.72,
-        ),
-        const SizedBox(height: 10),
-        _highlight(
-          context,
-          title: summary.latestStudySession == null ? AppStrings.sinSesion : AppStrings.sesionMinutos(summary.latestStudySession!.minutes),
-          subtitle: AppStrings.tareasEstudioHoy(summary.studyTasks.length),
-          chip: AppStrings.enfoqueEstudio,
-          progress: summary.studyTasks.isEmpty ? 0.25 : 0.78,
-        ),
-      ],
-    );
-  }
-
-  Widget _highlight(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required String chip,
-    required double progress,
-  }) {
-    return _Panel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(chip, style: TextStyle(color: FocuslaneSemanticTokens.primary(context), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
-          const SizedBox(height: 4),
-          Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: progress.clamp(0, 1),
-            minHeight: 4,
-            borderRadius: BorderRadius.circular(5),
-            backgroundColor: FocuslaneSemanticTokens.border(context),
-            valueColor: AlwaysStoppedAnimation(FocuslaneSemanticTokens.primary(context)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _WeeklyProgressCard extends StatelessWidget {
   const _WeeklyProgressCard({required this.summary});
 
@@ -917,11 +858,14 @@ class _WeeklyProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = summary.weeklyConsistency.clamp(0.0, 1.0).toDouble();
+    final weeklyPercent = (progress * 100).round();
+    final habitsLine = 'Hábitos: ${summary.weeklyHabitChecksDone}/${summary.weeklyHabitChecksTotal} checks completados';
+    final tasksLine = 'Tareas: ${summary.weeklyTasksDone}/${summary.weeklyTasksTotal} completadas';
     return _Panel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.progresoSemanal, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700)),
+          Text('Progreso semanal (lunes a domingo)', style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: progress,
@@ -931,12 +875,11 @@ class _WeeklyProgressCard extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation(FocuslaneSemanticTokens.primary(context)),
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.consistenciaSemanal((progress * 100).round()), style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 12)),
+          Text('Consistencia semanal: $weeklyPercent%', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 12)),
           const SizedBox(height: 4),
-          Text(
-            AppStrings.resumenHabitosTareas(summary.completedHabitsToday, summary.habits.length, summary.pendingTasksToday),
-            style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11),
-          ),
+          Text(habitsLine, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
+          const SizedBox(height: 4),
+          Text(tasksLine, style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
         ],
       ),
     );
@@ -969,49 +912,6 @@ class _RecentActivityCard extends StatelessWidget {
               subtitle: Text(DateFormat('d MMM, HH:mm', 'es_ES').format(note.lastEditedAt), style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 11)),
               trailing: Icon(Icons.chevron_right, size: 16, color: FocuslaneSemanticTokens.textSecondary(context)),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ModuleLinksCard extends StatelessWidget {
-  const _ModuleLinksCard({required this.onRoute});
-
-  final void Function(String route) onRoute;
-
-  @override
-  Widget build(BuildContext context) {
-    final links = [
-      (AppStrings.moduloTareas, AppRoutes.tasksDashboard),
-      (AppStrings.moduloHabitos, '/habits'),
-      (AppStrings.moduloNotas, AppRoutes.notesDashboard),
-      (AppStrings.moduloCalendario, AppRoutes.calendarDashboard),
-      (AppStrings.moduloGym, AppRoutes.gymDashboard),
-      (AppStrings.moduloEstudio, AppRoutes.studyDashboard),
-      (AppStrings.moduloFinanzas, AppRoutes.financeDashboard),
-      (AppStrings.moduloNutricion, AppRoutes.foodDashboard),
-    ];
-
-    return _Panel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppStrings.accesosRapidos, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final link in links)
-                ActionChip(
-                  label: Text(link.$1),
-                  onPressed: () => onRoute(link.$2),
-                  backgroundColor: FocuslaneSemanticTokens.filledSurface(context),
-                  side: BorderSide(color: FocuslaneSemanticTokens.border(context)),
-                ),
-            ],
-          ),
         ],
       ),
     );

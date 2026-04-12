@@ -4,14 +4,7 @@ import 'package:focuslane/core/services/core_sync_service.dart';
 import 'package:focuslane/screens/home/home_dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    required this.toggleTheme,
-    required this.themeMode,
-  });
-
-  final void Function(bool isDark) toggleTheme;
-  final ThemeMode themeMode;
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,10 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return HomeDashboardScreen(
-      toggleTheme: widget.toggleTheme,
-      themeMode: widget.themeMode,
-    );
+    return const HomeDashboardScreen();
   }
 }
 

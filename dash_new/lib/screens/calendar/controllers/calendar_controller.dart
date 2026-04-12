@@ -131,14 +131,10 @@ class CalendarController extends ChangeNotifier {
         _selected = DateTime(_focused.year, _focused.month, 1);
         break;
       case 2:
-        _selected = _selected.add(Duration(days: 7 * delta));
-        _focused = _selected;
-        break;
-      case 3:
         _selected = _selected.add(Duration(days: delta));
         _focused = _selected;
         break;
-      case 4:
+      case 3:
         _selected = _selected.add(Duration(days: 7 * delta));
         _focused = _selected;
         break;
@@ -230,12 +226,8 @@ class CalendarController extends ChangeNotifier {
       case 1:
         return '${monthLabel(_focused.month)} ${_focused.year}';
       case 2:
-        final ws = weekStart(_selected);
-        final we = ws.add(const Duration(days: 6));
-        return 'Semana ${humanDate(ws)} - ${humanDate(we)}';
+        return humanDate(_selected);
       case 3:
-        return 'Dia ${humanDate(_selected)}';
-      case 4:
         return 'Agenda';
       default:
         return 'Calendario';
@@ -278,7 +270,7 @@ class CalendarController extends ChangeNotifier {
     if (allDay) return '${humanDate(d)} (todo el dia)';
     final hh = d.hour.toString().padLeft(2, '0');
     final mm = d.minute.toString().padLeft(2, '0');
-    return '${humanDate(d)} â€¢ $hh:$mm';
+    return '${humanDate(d)} · $hh:$mm';
   }
 
   List<CalendarYearMonthStat> yearStats(int year) {
@@ -381,24 +373,31 @@ class CalendarController extends ChangeNotifier {
     _rangeTo = to;
 
     _rangeSub?.cancel();
-    _rangeSub = _agg.combinedItems(from, to).listen((items) {
-      final byDay = <DateTime, List<CalendarItem>>{};
-      for (final item in items) {
-        final key = DateTime(
-          item.startAt.year,
-          item.startAt.month,
-          item.startAt.day,
-        );
-        (byDay[key] ??= <CalendarItem>[]).add(item);
-      }
-      for (final list in byDay.values) {
-        list.sort((a, b) => a.startAt.compareTo(b.startAt));
-      }
+    _rangeSub = _agg.combinedItems(from, to).listen(
+      (items) {
+        final byDay = <DateTime, List<CalendarItem>>{};
+        for (final item in items) {
+          final key = DateTime(
+            item.startAt.year,
+            item.startAt.month,
+            item.startAt.day,
+          );
+          (byDay[key] ??= <CalendarItem>[]).add(item);
+        }
+        for (final list in byDay.values) {
+          list.sort((a, b) => a.startAt.compareTo(b.startAt));
+        }
 
-      _rangeItems = items;
-      _itemsByDay = byDay;
-      notifyListeners();
-    });
+        _rangeItems = items;
+        _itemsByDay = byDay;
+        notifyListeners();
+      },
+      onError: (_, __) {
+        _rangeItems = const [];
+        _itemsByDay = const {};
+        notifyListeners();
+      },
+    );
   }
 }
 

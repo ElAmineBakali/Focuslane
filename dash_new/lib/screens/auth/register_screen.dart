@@ -58,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 980),
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 16, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: const Color(0xFF2B3548), width: 1.5),
@@ -69,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: const Color(0xFF0A0F18),
                   child: Center(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(isMobile ? 16 : 24),
+                      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 12 : 24, isMobile ? 16 : 24, isMobile ? 6 : 24),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 430),
                         child: Form(
@@ -78,7 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             children: [
                               const SizedBox(height: 6),
                               const Text(
-                                'EL AMINE',
+                                'FocusLane',
                                 style: TextStyle(
                                   color: Color(0xFF84C8C1),
                                   fontSize: 32,
@@ -140,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           _label(AppStrings.authContrasena),
                                           _field(
                                             controller: _pass,
-                                            hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                                            hint: '••••••••',
                                             obscureText: true,
                                             validator: (v) => (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
                                           ),
@@ -148,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           _label(AppStrings.authConfirmar),
                                           _field(
                                             controller: _confirm,
-                                            hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                                            hint: '••••••••',
                                             obscureText: true,
                                             validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
                                           ),
@@ -164,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 _label(AppStrings.authContrasena),
                                                 _field(
                                                   controller: _pass,
-                                                  hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                                                  hint: '••••••••',
                                                   obscureText: true,
                                                   validator: (v) =>
                                                       (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
@@ -180,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 _label(AppStrings.authConfirmar),
                                                 _field(
                                                   controller: _confirm,
-                                                  hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                                                  hint: '••••••••',
                                                   obscureText: true,
                                                   validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
                                                 ),
@@ -239,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 6),
                               const Text(
                                 'SECURE      ENCRYPTED',
                                 style: TextStyle(color: Color(0xFF6D778A), fontSize: 11, letterSpacing: 2),

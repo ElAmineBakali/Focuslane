@@ -290,7 +290,7 @@ class _NoteTile extends StatelessWidget {
                     Text(
                       preview,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: color.onSurfaceVariant,
+                        color: color.onSurface,
                         fontSize: isMobile ? 13 : 14,
                       ),
                       maxLines: 2,
@@ -307,9 +307,9 @@ class _NoteTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Edited: $lastUpdate',
+                        'Editado: $lastUpdate',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: color.onSurfaceVariant,
+                          color: color.onSurface,
                           fontSize: isMobile ? 12 : 13,
                         ),
                       ),

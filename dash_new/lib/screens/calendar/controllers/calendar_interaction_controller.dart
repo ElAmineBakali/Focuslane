@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
 import 'package:focuslane/core/notifications/models/notification_action.dart';
 import 'package:focuslane/core/notifications/models/notification_content.dart';
@@ -57,15 +58,21 @@ class CalendarInteractionController {
   }
 
   Future<void> syncPlannerNotification(CalendarEvent event) {
+    if (kIsWeb) {
+      return Future<void>.value();
+    }
     return _syncPlannerNotification(event);
   }
 
   Future<void> cancelPlannerNotification(String eventId) async {
+    if (kIsWeb) return;
+    final id = eventId.trim();
+    if (id.isEmpty) return;
     await NotificationsFacade.I.cancelByEntity(
       NotificationEntityRef(
         module: NotificationModule.calendar,
         kind: 'planner_event',
-        id: eventId,
+        id: id,
       ),
     );
   }

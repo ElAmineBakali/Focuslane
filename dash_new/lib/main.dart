@@ -3,13 +3,14 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/design/theme/theme.dart';
 import 'package:focuslane/design/theme/prefs.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'design/widgets/app_background.dart';
@@ -23,34 +24,34 @@ import 'app/app_bootstrap.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
-const double kFabAvoidHeight = 84.0;
 const String _coreSyncCustomToken = String.fromEnvironment(
   'CORE_SYNC_CUSTOM_TOKEN',
   defaultValue: '',
 );
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-  };
-
-  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-    FlutterError.reportError(
-      FlutterErrorDetails(
-        exception: error,
-        stack: stack,
-        library: 'root_zone',
-        context: ErrorDescription('uncaught platform dispatcher error'),
-      ),
-    );
-    return true;
-  };
-
   await runZonedGuarded(
     () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FlutterError.presentError(details);
+      };
+
+      PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stack,
+            library: 'root_zone',
+            context: ErrorDescription('uncaught platform dispatcher error'),
+          ),
+        );
+        return true;
+      };
+
       await bootstrapApp();
+      await initializeDateFormatting('es_ES');
       runApp(const MyApp());
     },
     (Object error, StackTrace stack) {
@@ -119,6 +120,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _askNotifPermission() async {
+    if (kIsWeb) return;
     final messaging = FirebaseMessaging.instance;
     try {
       await messaging.requestPermission();
@@ -187,36 +189,14 @@ class _MyAppState extends State<MyApp> {
         scrollbars: false,
       ),
       builder: (context, child) {
-        final mq = MediaQuery.of(context);
-        final padded = mq.copyWith(
-          padding: mq.padding + const EdgeInsets.only(bottom: kFabAvoidHeight),
-        );
-        return MediaQuery(
-          data: padded,
-          child: AppBackground(
-            style: _bgStyle,
-            child: child ?? const SizedBox.shrink(),
-          ),
+        return AppBackground(
+          style: _bgStyle,
+          child: child ?? const SizedBox.shrink(),
         );
       },
       initialRoute: AppRoutes.home,
       routes: buildAppRoutes(
         AppRouterDependencies(
-          preset: _preset,
-          themeMode: _themeMode,
-          backgroundStyle: _bgStyle,
-          onChangePreset: (p) {
-            setState(() => _preset = p);
-            ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
-          },
-          onChangeMode: (m) {
-            setState(() => _themeMode = m);
-            ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
-          },
-          onChangeBackground: (b) {
-            setState(() => _bgStyle = b);
-            ThemePrefs.save(preset: _preset, mode: _themeMode, bg: _bgStyle);
-          },
           foodService: () {
             final userId =
                 fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
@@ -230,6 +210,11 @@ class _MyAppState extends State<MyApp> {
           studyService: () {
             _studySvc ??= StudyFirestoreService();
             return _studySvc!;
+          },
+          themeMode: () => _themeMode,
+          onThemeModeChanged: (mode) {
+            setState(() => _themeMode = mode);
+            ThemePrefs.save(preset: _preset, mode: mode, bg: _bgStyle);
           },
         ),
       ),

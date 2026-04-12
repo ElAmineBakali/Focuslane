@@ -74,7 +74,7 @@ class CalendarItemVisuals {
       sourceLabel(item.sourceModule),
       if ((item.description ?? '').trim().isNotEmpty) item.description!.trim(),
     ];
-    return parts.join(' â€¢ ');
+    return parts.join(' · ');
   }
 }
 
@@ -293,7 +293,7 @@ class CalendarDayItemList extends StatelessWidget {
               timeLabel,
               CalendarItemVisuals.sourceLabel(item.sourceModule),
               if ((item.description ?? '').isNotEmpty) item.description!,
-            ].join(' â€¢ '),
+            ].join(' · '),
           ),
           trailing:
               item.isEditable

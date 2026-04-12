@@ -6,7 +6,6 @@ import 'package:focuslane/screens/habits/habit_firestore_service.dart';
 import 'package:focuslane/screens/habits/habit_constants.dart';
 import 'package:focuslane/screens/habits/widgets/emoji_icon_picker.dart';
 import 'package:focuslane/screens/habits/widgets/tag_selector.dart';
-import 'package:focuslane/screens/habits/widgets/reminder_manager.dart';
 import 'package:focuslane/screens/habits/habit_utils.dart';
 
 class HabitDetailScreen extends StatefulWidget {
@@ -33,7 +32,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   late String? _emoji;
   late String? _iconCode;
   late List<String> _tags;
-  late List<HabitReminder> _reminders;
 
   @override
   void initState() {
@@ -53,7 +51,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     _emoji = habit.emoji;
     _iconCode = habit.iconCode;
     _tags = List.from(habit.tags);
-    _reminders = List.from(habit.reminders);
     super.initState();
   }
 
@@ -121,19 +118,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     );
   }
 
-  void _manageReminders() async {
-    await showDialog(
-      context: context,
-      builder:
-          (context) => ReminderManager(
-            reminders: _reminders,
-            onRemindersChanged: (reminders) {
-              setState(() => _reminders = reminders);
-            },
-          ),
-    );
-  }
-
   String _asHex(Color c) =>
       '0x${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
@@ -171,7 +155,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
       'emoji': _emoji,
       'iconCode': _iconCode,
       'tags': _tags,
-      'reminders': _reminders.map((r) => r.toMap()).toList(),
+      'reminders': widget.habit.reminders.map((r) => r.toMap()).toList(),
       'lastUpdated': DateTime.now(),
     });
     if (mounted) Navigator.pop(context, true);
@@ -372,59 +356,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                   }).toList(),
                             ),
                           ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                  ),
-                  child: InkWell(
-                    onTap: _manageReminders,
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                    child: Padding(
-                      padding: EdgeInsets.all(isMobile ? 14 : 16),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.notifications_active_outlined,
-                            color: cs.primary,
-                            size: isMobile ? 20 : 22,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Recordatorios (${_reminders.length})',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _reminders.isEmpty
-                                      ? 'Sin recordatorios'
-                                      : '${_reminders.where((r) => r.enabled).length} activos',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.edit_outlined,
-                            color: cs.onSurfaceVariant,
-                            size: isMobile ? 20 : 22,
-                          ),
                         ],
                       ),
                     ),

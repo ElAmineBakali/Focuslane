@@ -66,7 +66,7 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
         index: _selectedIndex,
         children: _getScreens(),
       ),
-      moduleTitle: 'Módulo Food',
+      moduleTitle: 'Módulo de nutrición',
       moduleIcon: Icons.restaurant,
     );
   }

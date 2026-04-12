@@ -85,6 +85,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   bool _focusMode = false;
   bool _saving = false;
+  bool _loadingExisting = false;
 
   @override
   void initState() {
@@ -98,6 +99,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _applyNoteToEditor(widget.note);
 
     if (widget.note == null && (widget.noteId ?? '').isNotEmpty) {
+      _loadingExisting = true;
       _loadById(widget.noteId!);
     }
   }
@@ -109,7 +111,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     try {
       if (note?.delta != null) {
-        _editor.loadDocument(Document.fromJson(note!.delta!));
+        _editor.loadDocument(Document.fromJson(_normalizeDeltaForReadability(note!.delta!)));
       } else {
         _editor.loadDocument(Document()..insert(0, note?.content ?? ''));
       }
@@ -121,13 +123,37 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentState.hydrating = false;
   }
 
+  List<dynamic> _normalizeDeltaForReadability(List<dynamic> delta) {
+    return delta.map((op) {
+      if (op is! Map) return op;
+      final opMap = Map<String, dynamic>.from(op);
+      final attrs = opMap['attributes'];
+      if (attrs is! Map) return op;
+      final sanitized = Map<String, dynamic>.from(attrs);
+      sanitized.remove('color');
+      sanitized.remove('background');
+      if (sanitized.isEmpty) {
+        final next = Map<String, dynamic>.from(opMap);
+        next.remove('attributes');
+        return next;
+      }
+      final next = Map<String, dynamic>.from(opMap);
+      next['attributes'] = sanitized;
+      return next;
+    }).toList(growable: false);
+  }
+
   Future<void> _loadById(String id) async {
     final note = await NoteFirestoreService.getById(id);
-    if (note != null && mounted) {
+    if (!mounted) return;
+    if (note != null) {
       setState(() {
         _applyNoteToEditor(note);
+        _loadingExisting = false;
       });
+      return;
     }
+    setState(() => _loadingExisting = false);
   }
 
   void _onDraftChanged() {
@@ -152,7 +178,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Eliminar nota'),
-          content: const Text('Esta accion no se puede deshacer. Â¿Eliminar esta nota?'),
+          content: const Text('Esta acción no se puede deshacer. ¿Eliminar esta nota?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -193,7 +219,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   DateTime? get _editedAt => _contentState.editedAt;
 
   String _formatEditedAt(DateTime value) {
-    return DateFormat('dd MMM yyyy â€¢ HH:mm').format(value);
+    return DateFormat('dd MMM yyyy · HH:mm', 'es_ES').format(value);
   }
 
   Future<void> _persist({
@@ -288,7 +314,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           elevation: 0,
           scrolledUnderElevation: 0,
           backgroundColor: scheme.surfaceContainerLowest,
-          title: const Text('Editar nota'),
+          title: const Text('Nota'),
           actions: [
             IconButton(
               icon: Icon(
@@ -328,6 +354,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         ),
         body: SafeArea(
           top: false,
+          bottom: true,
           child: Column(
             children: [
               if (!_focusMode)
@@ -349,7 +376,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           fontSize: isMobile ? 20 : 24,
                         ),
                         decoration: const InputDecoration(
-                          hintText: 'Titulo',
+                          hintText: 'Título',
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -363,14 +390,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                                   ? 'Sin guardar'
                                   : 'Editado: ${_formatEditedAt(_editedAt!)}',
                               style: theme.textTheme.labelMedium?.copyWith(
-                                color: scheme.onSurfaceVariant,
+                                color: scheme.onSurface,
                               ),
                             ),
                           ),
                           Text(
-                            _saving ? 'Guardando...' : 'Autoguardado',
+                            _saving ? 'Guardando...' : 'Autoguardado activo',
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
+                              color: scheme.onSurface,
                             ),
                           ),
                         ],
@@ -379,42 +406,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   ),
                 ),
 
-              if (!_focusMode)
-                Container(
-                  margin: EdgeInsets.fromLTRB(isMobile ? 12 : 18, 0, isMobile ? 12 : 18, 10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: scheme.outlineVariant.withOpacity(0.5)),
-                  ),
-                  child: Column(
-                    children: [
-                      QuillSimpleToolbar(
-                        controller: _editor.quillController,
-                        config: QuillSimpleToolbarConfig(
-                          buttonOptions: QuillSimpleToolbarButtonOptions(
-                            base: QuillToolbarBaseButtonOptions(
-                              iconSize: isMobile ? 18 : 20,
-                            ),
-                          ),
-                          showSubscript: false,
-                          showSuperscript: false,
-                          showFontFamily: false,
-                          showCodeBlock: false,
-                          showInlineCode: false,
-                          showLink: false,
-                          showBackgroundColorButton: false,
-                          showColorButton: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(isMobile ? 12 : 18, 0, isMobile ? 12 : 18, isMobile ? 10 : 12),
+                  margin: EdgeInsets.fromLTRB(isMobile ? 12 : 18, 0, isMobile ? 12 : 18, 8),
                   padding: EdgeInsets.all(isMobile ? 10 : 12),
                   decoration: BoxDecoration(
                     color: scheme.surface,
@@ -428,22 +422,89 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                     ],
                   ),
-                  child: QuillEditor.basic(
-                    controller: _editor.quillController,
-                    focusNode: _editor.focusNode,
-                    config: QuillEditorConfig(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 6 : 8,
-                        vertical: isMobile ? 10 : 12,
-                      ),
-                    ),
-                  ),
+                  child: _loadingExisting
+                      ? const Center(child: CircularProgressIndicator())
+                      : DefaultTextStyle.merge(
+                          style: TextStyle(color: scheme.onSurface, fontSize: 16),
+                          child: QuillEditor.basic(
+                            controller: _editor.quillController,
+                            focusNode: _editor.focusNode,
+                            config: QuillEditorConfig(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 6 : 8,
+                                vertical: isMobile ? 10 : 12,
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
               ),
+
+              if (!_focusMode && !_loadingExisting)
+                Container(
+                  margin: EdgeInsets.fromLTRB(isMobile ? 12 : 18, 0, isMobile ? 12 : 18, 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: scheme.outlineVariant.withOpacity(0.5)),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: _MobileNoteToolbar(controller: _editor.quillController),
+                  ),
+                ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MobileNoteToolbar extends StatelessWidget {
+  const _MobileNoteToolbar({required this.controller});
+
+  final QuillController controller;
+
+  bool _hasAttr(String key) {
+    return controller.getSelectionStyle().attributes.containsKey(key);
+  }
+
+  void _toggle(Attribute attribute) {
+    final key = attribute.key;
+    if (_hasAttr(key)) {
+      controller.formatSelection(Attribute.clone(attribute, null));
+      return;
+    }
+    controller.formatSelection(attribute);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(onPressed: () => _toggle(Attribute.bold), icon: const Icon(Icons.format_bold)),
+        IconButton(onPressed: () => _toggle(Attribute.italic), icon: const Icon(Icons.format_italic)),
+        IconButton(onPressed: () => _toggle(Attribute.underline), icon: const Icon(Icons.format_underlined)),
+        IconButton(onPressed: () => _toggle(Attribute.strikeThrough), icon: const Icon(Icons.format_strikethrough)),
+        IconButton(onPressed: () => _toggle(Attribute.ul), icon: const Icon(Icons.format_list_bulleted)),
+        IconButton(onPressed: () => _toggle(Attribute.ol), icon: const Icon(Icons.format_list_numbered)),
+        IconButton(onPressed: () => _toggle(Attribute.blockQuote), icon: const Icon(Icons.format_quote)),
+        IconButton(
+          onPressed: () {
+            controller.formatSelection(Attribute.clone(Attribute.bold, null));
+            controller.formatSelection(Attribute.clone(Attribute.italic, null));
+            controller.formatSelection(Attribute.clone(Attribute.underline, null));
+            controller.formatSelection(Attribute.clone(Attribute.strikeThrough, null));
+            controller.formatSelection(Attribute.clone(Attribute.ul, null));
+            controller.formatSelection(Attribute.clone(Attribute.ol, null));
+            controller.formatSelection(Attribute.clone(Attribute.blockQuote, null));
+          },
+          icon: const Icon(Icons.format_clear),
+        ),
+      ],
     );
   }
 }

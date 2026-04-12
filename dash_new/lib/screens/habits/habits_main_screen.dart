@@ -22,7 +22,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis HÃ¡bitos'),
+        title: const Text('Mis Hábitos'),
         actions: [
           if (_selectedTagFilter != null)
             IconButton(
@@ -54,7 +54,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
           }
 
           if (_habits.isEmpty) {
-            return const Center(child: Text('No tienes hÃ¡bitos aÃºn.'));
+            return const Center(child: Text('No tienes hábitos aún.'));
           }
 
           return Column(
@@ -109,7 +109,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'No hay hÃ¡bitos con esta etiqueta',
+                                'No hay hábitos con esta etiqueta',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   color: cs.onSurfaceVariant,
                                 ),
@@ -308,7 +308,7 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                                     ),
                                                     const SizedBox(width: 4),
                                                     Text(
-                                                      '${habit.currentStreak} ${habit.currentStreak == 1 ? 'dÃ­a' : 'dÃ­as'}',
+                                                      '${habit.currentStreak} ${habit.currentStreak == 1 ? 'día' : 'días'}',
                                                       style: TextStyle(
                                                         fontSize:
                                                             isMobile ? 11 : 12,
@@ -323,39 +323,6 @@ class _HabitsMainScreenState extends State<HabitsMainScreen> {
                                             ],
                                           ),
                                         ),
-
-                                        if (habit.reminders.isNotEmpty)
-                                          Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: cs.primaryContainer
-                                                  .withOpacity(0.5),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons
-                                                      .notifications_active_rounded,
-                                                  size: isMobile ? 14 : 16,
-                                                  color: cs.onPrimaryContainer,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '${habit.reminders.where((r) => r.enabled).length}',
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        isMobile ? 11 : 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        cs.onPrimaryContainer,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                       ],
                                     ),
                                   ),

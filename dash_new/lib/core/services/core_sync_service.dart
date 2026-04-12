@@ -8,10 +8,10 @@ import '../../screens/food/services/food_firestore_service.dart';
 import '../utils/date_utils.dart';
 
 /// Sync-debug logging.
-/// Active by default in debug builds; pass `--dart-define=DEBUG_SYNC_LOGS=false`
-/// to mute, or `--dart-define=DEBUG_SYNC_LOGS=true` to enable in release/profile.
+/// Disabled by default; pass `--dart-define=DEBUG_SYNC_LOGS=true`
+/// only when troubleshooting sync behavior.
 const bool kCoreSyncDebug =
-    bool.fromEnvironment('DEBUG_SYNC_LOGS', defaultValue: kDebugMode);
+  bool.fromEnvironment('DEBUG_SYNC_LOGS', defaultValue: false);
 
 class CoreSyncService {
   CoreSyncService._();
@@ -36,7 +36,9 @@ class CoreSyncService {
   bool _recalcBudgetBusy = false;
 
   void debugPrint(String message) {
-    _log(message);
+    if (!kCoreSyncDebug) return;
+    // ignore: avoid_print
+    print(message);
   }
 
   void start(String uid) {
@@ -57,9 +59,11 @@ class CoreSyncService {
     _watchGymToday(trimmed);
     _watchStudyTasks(trimmed);
     _watchTasks(trimmed);
-    _watchFoodBudgetRealtime(trimmed);
-    _watchSubscriptions(trimmed);
-    _watchRecurringFinance(trimmed);
+    if (!kIsWeb) {
+      _watchFoodBudgetRealtime(trimmed);
+      _watchSubscriptions(trimmed);
+      _watchRecurringFinance(trimmed);
+    }
     debugPrint('[CoreSync] start() — all 6 listeners launched');
     debugPrint('[CoreSync] ══════════════════════════════════════');
   }
@@ -85,7 +89,6 @@ class CoreSyncService {
   }
 
   void _log(String message) {
-    if (!kCoreSyncDebug) return;
     debugPrint(message);
   }
 

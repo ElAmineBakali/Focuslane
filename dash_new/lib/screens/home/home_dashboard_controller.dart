@@ -7,6 +7,7 @@ import 'package:focuslane/screens/finance/services/transaction_service.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/habits/habit_firestore_service.dart';
 import 'package:focuslane/screens/habits/habit_model.dart';
+import 'package:focuslane/screens/habits/habit_utils.dart';
 import 'package:focuslane/screens/notes/note_firestore_service.dart';
 import 'package:focuslane/screens/notes/note_model.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
@@ -25,6 +26,21 @@ class HomeDashboardController {
 
   final StudyFirestoreService studyService;
   final GymFirestoreService gymService;
+
+  static const List<String> _dailyMotivation = [
+    'Hoy no se improvisa: hoy se avanza.',
+    'Una tarea terminada vale más que diez pendientes.',
+    'Menos ruido, más foco.',
+    'Constancia pequeña, resultados grandes.',
+    'Lo importante primero, lo urgente después.',
+    'Hazlo simple, hazlo bien, hazlo hoy.',
+    'Tu progreso de hoy es la calma de mañana.',
+    'Empieza por una cosa y termínala.',
+    'La disciplina de hoy evita el estrés de mañana.',
+    'Prioriza lo que te acerca a tu objetivo.',
+    'Siete días consistentes valen más que uno perfecto.',
+    'Si es importante, ponlo en calendario y hazlo.',
+  ];
 
   Stream<DashboardSummaryModel> streamSummary() {
     final now = DateTime.now();
@@ -72,6 +88,34 @@ class HomeDashboardController {
             .where((task) => _isSameDay(task.due, now))
             .toList();
 
+        final weekStart = start.subtract(Duration(days: start.weekday - 1));
+        final weekEnd = weekStart.add(const Duration(days: 7));
+        final weekTasks = tasks
+            .where((task) => task.dueDate != null)
+            .where((task) => !task.dueDate!.isBefore(weekStart) && task.dueDate!.isBefore(weekEnd))
+            .toList();
+        final weeklyTasksDone = weekTasks.where((task) => task.completed).length;
+        final weeklyTasksTotal = weekTasks.length;
+        final weeklyTaskCompletion = weeklyTasksTotal == 0
+          ? 0.0
+          : weeklyTasksDone / weeklyTasksTotal;
+
+        int habitsWithActivity = 0;
+        for (final habit in habits) {
+          var completedThisWeek = false;
+          for (var i = 0; i < 7; i++) {
+            final day = weekStart.add(Duration(days: i));
+            if (_isHabitCompletedOnDay(habit, day)) {
+              completedThisWeek = true;
+              break;
+            }
+          }
+          if (completedThisWeek) {
+            habitsWithActivity += 1;
+          }
+        }
+        final weeklyHabitCompletion = habits.isEmpty ? 0.0 : habitsWithActivity / habits.length;
+
         final recentNotes = notes.take(5).toList(growable: false);
 
         final latestStudy = studySessions.isEmpty ? null : studySessions.first;
@@ -95,9 +139,25 @@ class HomeDashboardController {
           monthExpense: monthlyStats['expense'] ?? 0,
           monthIncome: monthlyStats['income'] ?? 0,
           recentNotes: recentNotes,
+          weeklyHabitCompletion: weeklyHabitCompletion,
+          weeklyTaskCompletion: weeklyTaskCompletion,
+          weeklyHabitChecksDone: habitsWithActivity,
+          weeklyHabitChecksTotal: habits.length,
+          weeklyTasksDone: weeklyTasksDone,
+          weeklyTasksTotal: weeklyTasksTotal,
         );
       },
     );
+  }
+
+  String motivationalPhraseFor(DateTime now) {
+    final idx = phraseIndexForDate(now);
+    return _dailyMotivation[idx];
+  }
+
+  int phraseIndexForDate(DateTime now) {
+    final seed = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+    return seed % _dailyMotivation.length;
   }
 
   String greetingFor(DateTime now) {
@@ -116,7 +176,7 @@ class HomeDashboardController {
     pieces.add('${summary.pendingTasksToday} tareas pendientes');
     pieces.add('${summary.completedHabitsToday}/${summary.activeHabitsCount} habitos');
     pieces.add('${summary.upcomingEvents.length} eventos proximos');
-    return pieces.join(' Â· ');
+    return pieces.join(' · ');
   }
 
   static bool _isSameDay(DateTime? a, DateTime b) {
@@ -125,19 +185,12 @@ class HomeDashboardController {
   }
 
   static bool _isHabitCompletedToday(Habit habit, DateTime today) {
-    final key = DateFormat('yyyy-MM-dd').format(today);
-    if (habit.completedDates.contains(key)) {
-      return true;
-    }
+    return _isHabitCompletedOnDay(habit, today);
+  }
 
-    final dynamic value = habit.history[key];
-    if (value is bool) return value;
-    if (value is num) return value > 0;
-    if (value is String) {
-      final lower = value.toLowerCase();
-      return lower == 'true' || lower == 'done' || lower == '1';
-    }
-    return false;
+  static bool _isHabitCompletedOnDay(Habit habit, DateTime day) {
+    final value = habitHistoryValueForDate(habit.history, day);
+    return isHabitCompletedValue(habit, value);
   }
 }
 

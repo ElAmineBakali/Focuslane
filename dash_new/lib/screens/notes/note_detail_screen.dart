@@ -76,7 +76,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         children: [
           const SizedBox(height: 8),
           Text(
-            'Edited: ${DateFormat('dd MMM yyyy · HH:mm').format(_lastEditedAt)}',
+            'Editado: ${DateFormat('dd MMM yyyy · HH:mm', 'es_ES').format(_lastEditedAt)}',
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

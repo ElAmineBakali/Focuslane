@@ -11,7 +11,6 @@ import 'package:focuslane/screens/calendar/widgets/calendar_agenda_view.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_day_view.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_event_editor.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_month_view.dart';
-import 'package:focuslane/screens/calendar/widgets/calendar_week_view.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_year_view.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -35,7 +34,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     _calendarController = CalendarController(initialViewIndex: 1);
     _interactionController = CalendarInteractionController();
     _tabController = TabController(
-      length: 5,
+      length: 4,
       vsync: this,
       initialIndex: _calendarController.activeViewIndex,
     );
@@ -228,38 +227,6 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  Widget _buildWeekTab() {
-    final days = _calendarController.weekDays(_calendarController.selected);
-    return CalendarWeekView(
-      days: days,
-      selectedDay: _calendarController.selected,
-      itemsFor: _calendarController.itemsFor,
-      canMoveItem: _interactionController.canMoveItem,
-      canResizeItem: _interactionController.canResizeItem,
-      durationMinutes: _interactionController.durationMinutes,
-      topFor: _calendarController.topFor,
-      onSelectDay: _calendarController.selectDay,
-      onMoveItemToDay: _moveItemToDay,
-      onMoveItemToSlot: _moveItemToSlot,
-      onResizeItem: _resizeItem,
-      onTapItem: _handleItemTap,
-      onCreateEvent: (day) => _openEventEditor(defaultDay: day),
-      weekdayShort: _calendarController.weekdayShort,
-      humanDate: _calendarController.humanDate,
-      prefs: _calendarController.prefs,
-      onTypeToggle: _calendarController.setTypeEnabled,
-      onHighOnlyToggle: _calendarController.setHighOnly,
-      timeAxisWidth: CalendarController.timeAxisWidth,
-      dayWidth: CalendarController.weekDayColumnWidth,
-      slotHeight: _calendarController.slotHeight,
-      timelineHeight: _calendarController.timelineHeight,
-      timelineStartHour: CalendarController.timelineStartHour,
-      timelineEndHour: CalendarController.timelineEndHour,
-      onPointerSignal: _onTimelinePointerSignal,
-      onScaleUpdate: _onTimelineScaleUpdate,
-    );
-  }
-
   Widget _buildDayTab(BuildContext context) {
     final selected = _calendarController.selected;
     final day = DateTime(selected.year, selected.month, selected.day);
@@ -372,8 +339,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                     tabs: const [
                       Tab(text: 'Anual', icon: Icon(Icons.calendar_view_month)),
                       Tab(text: 'Mensual', icon: Icon(Icons.calendar_month)),
-                      Tab(text: 'Semanal', icon: Icon(Icons.view_week)),
-                      Tab(text: 'Dia', icon: Icon(Icons.today)),
+                      Tab(text: 'Día', icon: Icon(Icons.today)),
                       Tab(text: 'Agenda', icon: Icon(Icons.view_agenda)),
                     ],
                   ),
@@ -385,7 +351,6 @@ class _CalendarScreenState extends State<CalendarScreen>
                     children: [
                       _buildYearTab(),
                       _buildMonthTab(),
-                      _buildWeekTab(),
                       _buildDayTab(context),
                       _buildAgendaTab(),
                     ],

@@ -1,17 +1,19 @@
-﻿import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/navigation/app_routes.dart';
-import '../../../design/ui/components/focus_module_header.dart';
-import '../../../design/ui/components/focus_empty_state.dart';
+
 import '../../../design/ui/components/focus_badge.dart';
+import '../../../design/ui/components/focus_empty_state.dart';
+import '../../../design/ui/components/focus_module_header.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
-import '../services/food_firestore_service.dart';
 import '../models/food_models.dart';
+import '../services/food_firestore_service.dart';
 
 class FoodHistoryScreen extends StatefulWidget {
-  final FoodFirestoreService svc;
   const FoodHistoryScreen({super.key, required this.svc});
+
+  final FoodFirestoreService svc;
 
   @override
   State<FoodHistoryScreen> createState() => _FoodHistoryScreenState();
@@ -19,8 +21,9 @@ class FoodHistoryScreen extends StatefulWidget {
 
 class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  late final TabController _tabController;
   int _daysRange = 7;
+
   @override
   void initState() {
     super.initState();
@@ -53,27 +56,41 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildRangeChip(7, '7 días'),
-              _buildRangeChip(30, '30 días'),
-              _buildRangeChip(90, '90 días'),
+              _buildRangeChip(7, '7 dias'),
+              _buildRangeChip(30, '30 dias'),
+              _buildRangeChip(90, '90 dias'),
             ],
           ),
+          const SizedBox(height: FocusSpacing.md),
+          StreamBuilder<List<DailyIntakeDoc>>(
+            stream: widget.svc.streamLastNDays(_daysRange),
+            builder: (context, snap) {
+              if (snap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            const SizedBox(height: FocusSpacing.md),
+              final days = snap.data ?? const <DailyIntakeDoc>[];
+              if (days.isEmpty) {
+                return const FocusEmptyState(
+                  icon: Icons.show_chart,
+                  message: 'Sin datos en este rango',
+                );
+              }
 
-          _buildCaloriesChart(),
-
-            const SizedBox(height: FocusSpacing.md),
-
-          _buildProteinChart(),
-
-            const SizedBox(height: FocusSpacing.md),
-
-          _buildWaterChart(),
-
-            const SizedBox(height: FocusSpacing.md),
-
-          _buildSummaryStats(),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCaloriesChart(days),
+                  const SizedBox(height: FocusSpacing.md),
+                  _buildProteinChart(days),
+                  const SizedBox(height: FocusSpacing.md),
+                  _buildWaterChart(days),
+                  const SizedBox(height: FocusSpacing.md),
+                  _buildSummaryStats(days),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -85,247 +102,196 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
-      onSelected: (v) => setState(() => _daysRange = days),
+      onSelected: (_) => setState(() => _daysRange = days),
       selectedColor: colorScheme.primary,
       labelStyle: TextStyle(
-        color:
-            isSelected
-                ? Theme.of(context).colorScheme.onPrimary
-                : FocusColors.grey700,
+        color: isSelected ? colorScheme.onPrimary : FocusColors.grey700,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
   }
 
-  Widget _buildCaloriesChart() {
-    return FutureBuilder<List<DailyIntakeDoc>>(
-      future: _fetchDaysData(_daysRange),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final days = snap.data ?? [];
-        if (days.isEmpty) {
-          return const FocusEmptyState(
-            icon: Icons.show_chart,
-            message: 'Sin datos en este rango',
-          );
-        }
-
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
-            side: BorderSide(
-              color: FocuslaneTokens.borderColor(context),
-              width: FocuslaneTokens.borderW,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: FocusColors.food,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: FocusSpacing.md),
-                    Text('Calorías', style: FocusTypography.heading3(context)),
-                  ],
-                ),
-                  const SizedBox(height: FocusSpacing.md),
-                SizedBox(
-                  height: 140,
-                  child: LineChart(
-                    _buildLineChartData(
-                      days,
-                      (d) => d.totals['kcal'] ?? 0,
-                      FocusColors.food,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).animate().fadeIn().slideY(begin: 0.2, end: 0);
-      },
-    );
-  }
-
-  Widget _buildProteinChart() {
-    return FutureBuilder<List<DailyIntakeDoc>>(
-      future: _fetchDaysData(_daysRange),
-      builder: (context, snap) {
-        final days = snap.data ?? [];
-        if (days.isEmpty) return const SizedBox.shrink();
-
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
-            side: BorderSide(
-              color: FocuslaneTokens.borderColor(context),
-              width: FocuslaneTokens.borderW,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: FocusSpacing.md),
-                    Text('Proteínas', style: FocusTypography.heading3(context)),
-                  ],
-                ),
-                  const SizedBox(height: FocusSpacing.md),
-                SizedBox(
-                  height: 140,
-                  child: LineChart(
-                    _buildLineChartData(
-                      days,
-                      (d) => d.totals['protein'] ?? 0,
-                      Colors.red,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).animate().fadeIn().slideY(begin: 0.2, end: 0);
-      },
-    );
-  }
-
-  Widget _buildWaterChart() {
-    return FutureBuilder<List<DailyIntakeDoc>>(
-      future: _fetchDaysData(_daysRange),
-      builder: (context, snap) {
-        final days = snap.data ?? [];
-        if (days.isEmpty) return const SizedBox.shrink();
-
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
-            side: BorderSide(
-              color: FocuslaneTokens.borderColor(context),
-              width: FocuslaneTokens.borderW,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(FocusSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: FocusSpacing.md),
-                    Text(
-                      'Hidratación',
-                      style: FocusTypography.heading3(context),
-                    ),
-                  ],
-                ),
-                  const SizedBox(height: FocusSpacing.md),
-                SizedBox(
-                  height: 140,
-                  child: BarChart(
-                    _buildBarChartData(
-                      days,
-                      (d) => d.waterMl.toDouble(),
-                      Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).animate().fadeIn().slideY(begin: 0.2, end: 0);
-      },
-    );
-  }
-
-  Widget _buildSummaryStats() {
-    return FutureBuilder<List<DailyIntakeDoc>>(
-      future: _fetchDaysData(_daysRange),
-      builder: (context, snap) {
-        final days = snap.data ?? [];
-        if (days.isEmpty) return const SizedBox.shrink();
-
-        final avgKcal =
-            days.map((d) => d.totals['kcal'] ?? 0).reduce((a, b) => a + b) /
-            days.length;
-        final avgProtein =
-            days.map((d) => d.totals['protein'] ?? 0).reduce((a, b) => a + b) /
-            days.length;
-        final avgWater =
-            days.map((d) => d.waterMl).reduce((a, b) => a + b) / days.length;
-
-        return Column(
+  Widget _buildCaloriesChart(List<DailyIntakeDoc> days) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+        side: BorderSide(
+          color: FocuslaneTokens.borderColor(context),
+          width: FocuslaneTokens.borderW,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(FocusSpacing.md),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Promedios', style: FocusTypography.heading3(context)),
-            const SizedBox(height: FocusSpacing.md),
             Row(
               children: [
-                Expanded(
-                  child: _StatCard(
-                    label: 'Calorías',
-                    value: avgKcal.toStringAsFixed(0),
-                    subtitle: 'kcal promedio',
-                    icon: Icons.local_fire_department,
+                Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
                     color: FocusColors.food,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(width: FocusSpacing.md),
-                Expanded(
-                  child: _StatCard(
-                    label: 'Proteínas',
-                    value: avgProtein.toStringAsFixed(1),
-                    subtitle: 'g promedio',
-                    icon: Icons.fitness_center,
-                    color: Colors.red,
-                  ),
-                ),
+                Text('Calorias', style: FocusTypography.heading3(context)),
               ],
             ),
             const SizedBox(height: FocusSpacing.md),
-            _StatCard(
-              label: 'Agua',
-              value: avgWater.toStringAsFixed(0),
-              subtitle: 'ml promedio',
-              icon: Icons.water_drop,
-              color: Colors.blue,
+            SizedBox(
+              height: 140,
+              child: LineChart(
+                _buildLineChartData(
+                  days,
+                  (d) => d.totals['kcal'] ?? 0,
+                  FocusColors.food,
+                ),
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ),
+    ).animate().fadeIn().slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildProteinChart(List<DailyIntakeDoc> days) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+        side: BorderSide(
+          color: FocuslaneTokens.borderColor(context),
+          width: FocuslaneTokens.borderW,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(FocusSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: FocusSpacing.md),
+                Text('Proteinas', style: FocusTypography.heading3(context)),
+              ],
+            ),
+            const SizedBox(height: FocusSpacing.md),
+            SizedBox(
+              height: 140,
+              child: LineChart(
+                _buildLineChartData(
+                  days,
+                  (d) => d.totals['protein'] ?? 0,
+                  Colors.red,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn().slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildWaterChart(List<DailyIntakeDoc> days) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(FocusSpacing.radiusLg),
+        side: BorderSide(
+          color: FocuslaneTokens.borderColor(context),
+          width: FocuslaneTokens.borderW,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(FocusSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: FocusSpacing.md),
+                Text('Hidratacion', style: FocusTypography.heading3(context)),
+              ],
+            ),
+            const SizedBox(height: FocusSpacing.md),
+            SizedBox(
+              height: 140,
+              child: BarChart(
+                _buildBarChartData(days, (d) => d.waterMl.toDouble(), Colors.blue),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn().slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildSummaryStats(List<DailyIntakeDoc> days) {
+    final avgKcal =
+        days.map((d) => d.totals['kcal'] ?? 0).reduce((a, b) => a + b) /
+        days.length;
+    final avgProtein =
+        days.map((d) => d.totals['protein'] ?? 0).reduce((a, b) => a + b) /
+        days.length;
+    final avgWater =
+        days.map((d) => d.waterMl).reduce((a, b) => a + b) / days.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Promedios', style: FocusTypography.heading3(context)),
+        const SizedBox(height: FocusSpacing.md),
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                label: 'Calorias',
+                value: avgKcal.toStringAsFixed(0),
+                subtitle: 'kcal promedio',
+                icon: Icons.local_fire_department,
+                color: FocusColors.food,
+              ),
+            ),
+            const SizedBox(width: FocusSpacing.md),
+            Expanded(
+              child: _StatCard(
+                label: 'Proteinas',
+                value: avgProtein.toStringAsFixed(1),
+                subtitle: 'g promedio',
+                icon: Icons.fitness_center,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: FocusSpacing.md),
+        _StatCard(
+          label: 'Agua',
+          value: avgWater.toStringAsFixed(0),
+          subtitle: 'ml promedio',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+        ),
+      ],
     );
   }
 
@@ -334,17 +300,18 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     double Function(DailyIntakeDoc) valueGetter,
     Color color,
   ) {
-    final spots =
-        days.asMap().entries.map((e) {
-          return FlSpot(e.key.toDouble(), valueGetter(e.value));
-        }).toList();
+    final spots = days
+        .asMap()
+        .entries
+        .map((e) => FlSpot(e.key.toDouble(), valueGetter(e.value)))
+        .toList();
 
     return LineChartData(
       gridData: FlGridData(
         show: true,
         drawVerticalLine: false,
         horizontalInterval: 500,
-        getDrawingHorizontalLine: (value) {
+        getDrawingHorizontalLine: (_) {
           return FlLine(color: FocusColors.grey300, strokeWidth: 1);
         },
       ),
@@ -353,7 +320,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 40,
-            getTitlesWidget: (value, meta) {
+            getTitlesWidget: (value, _) {
               return Text(
                 value.toInt().toString(),
                 style: FocusTypography.caption(context),
@@ -365,7 +332,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            getTitlesWidget: (value, meta) {
+            getTitlesWidget: (value, _) {
               final index = value.toInt();
               if (index < 0 || index >= days.length) return const SizedBox();
 
@@ -398,13 +365,15 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
           tooltipBgColor: Colors.black87,
-          getTooltipItems: (spots) {
-            return spots.map((spot) {
-              return LineTooltipItem(
-                spot.y.toStringAsFixed(1),
-                TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-              );
-            }).toList();
+          getTooltipItems: (lineSpots) {
+            return lineSpots
+                .map(
+                  (spot) => LineTooltipItem(
+                    spot.y.toStringAsFixed(1),
+                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  ),
+                )
+                .toList();
           },
         ),
       ),
@@ -416,9 +385,11 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     double Function(DailyIntakeDoc) valueGetter,
     Color color,
   ) {
-    final barGroups =
-        days.asMap().entries.map((e) {
-          return BarChartGroupData(
+    final barGroups = days
+        .asMap()
+        .entries
+        .map(
+          (e) => BarChartGroupData(
             x: e.key,
             barRods: [
               BarChartRodData(
@@ -430,8 +401,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
                 ),
               ),
             ],
-          );
-        }).toList();
+          ),
+        )
+        .toList();
 
     return BarChartData(
       gridData: FlGridData(show: false),
@@ -440,7 +412,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 40,
-            getTitlesWidget: (value, meta) {
+            getTitlesWidget: (value, _) {
               return Text(
                 value.toInt().toString(),
                 style: FocusTypography.caption(context),
@@ -452,10 +424,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            getTitlesWidget: (value, meta) {
+            getTitlesWidget: (value, _) {
               final index = value.toInt();
               if (index < 0 || index >= days.length) return const SizedBox();
-
               if (_daysRange == 7 || index % 5 == 0) {
                 final day = DateTime.parse(days[index].id);
                 return Text(
@@ -475,7 +446,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
       barTouchData: BarTouchData(
         touchTooltipData: BarTouchTooltipData(
           tooltipBgColor: Colors.black87,
-          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+          getTooltipItem: (_, __, rod, ___) {
             return BarTooltipItem(
               '${rod.toY.toInt()} ml',
               TextStyle(color: Theme.of(context).colorScheme.onPrimary),
@@ -486,38 +457,15 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     );
   }
 
-  Future<List<DailyIntakeDoc>> _fetchDaysData(int days) async {
-    final now = DateTime.now();
-    final result = <DailyIntakeDoc>[];
-
-    for (int i = 0; i < days; i++) {
-      final date = now.subtract(Duration(days: i));
-      final dayId = date.toIso8601String().substring(0, 10);
-      await widget.svc.getDay(dayId);
-      result.add(
-        DailyIntakeDoc(
-          id: dayId,
-          entries: const [],
-          waterMl: 0,
-          totals: const {'kcal': 0.0, 'protein': 0.0, 'carbs': 0.0, 'fat': 0.0},
-          targets: const {},
-        ),
-      );
-    }
-
-    return result.reversed.toList();
-  }
-
   Widget _buildShoppingHistoryTab() {
     return StreamBuilder<List<CompletedShoppingList>>(
-      stream: Stream.value([]),
+      stream: Stream.value(const []),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final completed = snap.data ?? [];
-
+        final completed = snap.data ?? const <CompletedShoppingList>[];
         if (completed.isEmpty) {
           return const FocusEmptyState(
             icon: Icons.shopping_bag,
@@ -529,16 +477,16 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
         final grouped = <String, List<CompletedShoppingList>>{};
         for (final c in completed) {
           final month = c.completedAt.toIso8601String().substring(0, 7);
-          grouped.putIfAbsent(month, () => []).add(c);
+          grouped.putIfAbsent(month, () => <CompletedShoppingList>[]).add(c);
         }
 
+        final months = grouped.keys.toList();
         return ListView.builder(
           padding: const EdgeInsets.all(FocusSpacing.lg),
-          itemCount: grouped.keys.length,
+          itemCount: months.length,
           itemBuilder: (_, i) {
-            final month = grouped.keys.toList()[i];
-            final items = grouped[month]!;
-            return _buildMonthGroup(context, month, items);
+            final month = months[i];
+            return _buildMonthGroup(context, month, grouped[month]!);
           },
         );
       },
@@ -550,9 +498,8 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
     String month,
     List<CompletedShoppingList> items,
   ) {
-    final totalSpent = items
-        .map((c) => c.totalSpent ?? 0)
-        .reduce((a, b) => a + b);
+    final totalSpent =
+        items.map((c) => c.totalSpent ?? 0).reduce((a, b) => a + b);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -562,10 +509,7 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                _formatMonth(month),
-                style: FocusTypography.heading3(context),
-              ),
+              Text(_formatMonth(month), style: FocusTypography.heading3(context)),
               if (totalSpent > 0)
                 FocusBadge(
                   text: '\$${totalSpent.toStringAsFixed(2)}',
@@ -596,60 +540,51 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
       child: ExpansionTile(
         leading: CircleAvatar(
           backgroundColor: Colors.green,
-          child: Icon(
-            Icons.check,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
+          child: Icon(Icons.check, color: Theme.of(context).colorScheme.onPrimary),
         ),
         title: Text(
           completed.plannerId ?? 'Compra',
           style: FocusTypography.heading4(context),
         ),
-        subtitle: Text(
-          _formatDate(completed.completedAt),
-          style: FocusTypography.caption(context),
-        ),
-        trailing:
-            completed.totalSpent != null
-                ? Text(
-                  '\$${completed.totalSpent!.toStringAsFixed(2)}',
-                  style: FocusTypography.label(context).copyWith(
-                    color: FocusColors.success,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-                : null,
-        children:
-            completed.items.map((item) {
-              return ListTile(
+        subtitle: Text(_formatDate(completed.completedAt), style: FocusTypography.caption(context)),
+        trailing: completed.totalSpent != null
+            ? Text(
+                '\$${completed.totalSpent!.toStringAsFixed(2)}',
+                style: FocusTypography.label(context).copyWith(
+                  color: FocusColors.success,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : null,
+        children: completed.items
+            .map(
+              (item) => ListTile(
                 dense: true,
                 leading: Icon(
-                  item.checked
-                      ? Icons.check_box
-                      : Icons.check_box_outline_blank,
+                  item.checked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: item.checked ? Colors.green : FocusColors.grey600,
                   size: 20,
                 ),
                 title: Text(
                   item.name,
                   style: TextStyle(
-                    decoration:
-                        item.checked ? TextDecoration.lineThrough : null,
+                    decoration: item.checked ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 trailing: Text(
                   '${item.qty} ${item.unit.name}',
                   style: FocusTypography.caption(context),
                 ),
-              );
-            }).toList(),
+              ),
+            )
+            .toList(),
       ),
     );
   }
 
   String _formatMonth(String month) {
     final date = DateTime.parse('$month-01');
-    final months = [
+    const months = [
       'Enero',
       'Febrero',
       'Marzo',
@@ -672,9 +607,9 @@ class _FoodHistoryScreenState extends State<FoodHistoryScreen>
 }
 
 class _FoodHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final TabController controller;
-
   const _FoodHistoryAppBar({required this.controller});
+
+  final TabController controller;
 
   @override
   Size get preferredSize => const Size.fromHeight(48 + kTextTabBarHeight);
@@ -717,12 +652,6 @@ class _FoodHistoryAppBar extends StatelessWidget implements PreferredSizeWidget 
 }
 
 class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-
   const _StatCard({
     required this.label,
     required this.value,
@@ -730,6 +659,12 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.color,
   });
+
+  final String label;
+  final String value;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -769,5 +704,3 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
-
-

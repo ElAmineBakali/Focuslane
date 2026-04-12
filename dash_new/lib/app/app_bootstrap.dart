@@ -39,60 +39,74 @@ Future<void> bootstrapApp() async {
 
   await NotificationsBootstrap.instance.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseAppCheck.instance.activate(
-    androidProvider:
-        kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-    appleProvider: AppleProvider.deviceCheck,
-  );
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage msg) async {
-    await _handlePushTap(msg);
-  });
-
-  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  if (initialMessage != null) {
-    await _handlePushTap(initialMessage);
+  try {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider:
+          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.deviceCheck,
+    );
+  } catch (_) {
+    // App Check can fail in web/dev setups; the app should still boot.
   }
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
-    final notification = msg.notification;
-    if (notification == null) {
-      return;
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
+
+  if (!kIsWeb) {
+    try {
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage msg) async {
+        await _handlePushTap(msg);
+      });
+
+      final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+      if (initialMessage != null) {
+        await _handlePushTap(initialMessage);
+      }
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
+        final notification = msg.notification;
+        if (notification == null) {
+          return;
+        }
+        final now = DateTime.now();
+        final epoch = now.toUtc().millisecondsSinceEpoch;
+        await NotificationsFacade.I.scheduleIntent(
+          NotificationIntent(
+            module: NotificationModule.system,
+            type: 'FCM_FOREGROUND_MESSAGE',
+            entity: const NotificationEntityRef(
+              module: NotificationModule.system,
+              kind: 'fcm_message',
+              id: 'foreground',
+            ),
+            content: NotificationContent(
+              title: notification.title ?? 'Mensaje',
+              body: notification.body ?? '',
+            ),
+            action: const NotificationAction(kind: NotificationActionKind.none),
+            schedule: NotificationSchedule(
+              kind: NotificationScheduleKind.immediate,
+              scheduledAtUtc: now.toUtc(),
+              timezone: now.timeZoneName,
+            ),
+            delivery: const NotificationDelivery(
+              kind: NotificationDeliveryKind.localOnly,
+              channel: AndroidChannelCatalog.defaultChannel,
+              priority: NotificationPriority.normal,
+            ),
+            dedupeKey: 'system:fcm:foreground:$epoch',
+            userId: 'system',
+            source: 'app.bootstrap.onMessage',
+            notificationId: 'ntf_system_fcm_foreground_$epoch',
+          ),
+        );
+      });
+    } catch (_) {
+      // FCM may not be available in certain contexts.
     }
-    final now = DateTime.now();
-    final epoch = now.toUtc().millisecondsSinceEpoch;
-    await NotificationsFacade.I.scheduleIntent(
-      NotificationIntent(
-        module: NotificationModule.system,
-        type: 'FCM_FOREGROUND_MESSAGE',
-        entity: const NotificationEntityRef(
-          module: NotificationModule.system,
-          kind: 'fcm_message',
-          id: 'foreground',
-        ),
-        content: NotificationContent(
-          title: notification.title ?? 'Mensaje',
-          body: notification.body ?? '',
-        ),
-        action: const NotificationAction(kind: NotificationActionKind.none),
-        schedule: NotificationSchedule(
-          kind: NotificationScheduleKind.immediate,
-          scheduledAtUtc: now.toUtc(),
-          timezone: now.timeZoneName,
-        ),
-        delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
-          channel: AndroidChannelCatalog.defaultChannel,
-          priority: NotificationPriority.normal,
-        ),
-        dedupeKey: 'system:fcm:foreground:$epoch',
-        userId: 'system',
-        source: 'app.bootstrap.onMessage',
-        notificationId: 'ntf_system_fcm_foreground_$epoch',
-      ),
-    );
-  });
+  }
 
   try {
     if (kIsWeb) {

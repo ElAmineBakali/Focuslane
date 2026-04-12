@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
@@ -151,7 +152,14 @@ class FoodPhotoAiService {
       );
     }
 
-    final compressed = _compressForAi(originalBytes);
+    final compressed = await compute(
+      _compressForAiIsolate,
+      <String, dynamic>{
+        'bytes': originalBytes,
+        'targetBytes': _targetBytes,
+        'maxBytes': _maxBytes,
+      },
+    );
 
     if (kDebugMode) {
       debugPrint(
@@ -190,43 +198,6 @@ class FoodPhotoAiService {
     return result;
   }
 
-  Uint8List _compressForAi(Uint8List input) {
-    final decoded = img.decodeImage(input);
-    if (decoded == null) {
-      if (input.length <= _maxBytes) return input;
-      throw const FoodPhotoAiException(
-        'La imagen supera el máximo permitido de 2MB.',
-      );
-    }
-
-    img.Image working = img.bakeOrientation(decoded);
-    if (working.width > 1024) {
-      working = img.copyResize(working, width: 1024);
-    }
-
-    var quality = 80;
-    Uint8List encoded = Uint8List.fromList(
-      img.encodeJpg(working, quality: quality),
-    );
-
-    while (encoded.length > _targetBytes && quality > 45) {
-      quality -= 5;
-      encoded = Uint8List.fromList(img.encodeJpg(working, quality: quality));
-    }
-
-    while (encoded.length > _maxBytes && working.width > 420) {
-      final resizedWidth = (working.width * 0.85).round();
-      working = img.copyResize(working, width: resizedWidth);
-      encoded = Uint8List.fromList(img.encodeJpg(working, quality: 70));
-      while (encoded.length > _targetBytes && quality > 45) {
-        quality -= 5;
-        encoded = Uint8List.fromList(img.encodeJpg(working, quality: quality));
-      }
-    }
-
-    return encoded;
-  }
-
   String _mimeFromFile(String path, String? provided) {
     final mime = (provided ?? '').toLowerCase().trim();
     if (mime == 'image/jpeg' || mime == 'image/png' || mime == 'image/webp') {
@@ -237,4 +208,40 @@ class FoodPhotoAiService {
     if (lowerPath.endsWith('.webp')) return 'image/webp';
     return 'image/jpeg';
   }
+}
+
+Uint8List _compressForAiIsolate(Map<String, dynamic> payload) {
+  final bytes = payload['bytes'] as Uint8List;
+  final targetBytes = payload['targetBytes'] as int;
+  final maxBytes = payload['maxBytes'] as int;
+
+  final decoded = img.decodeImage(bytes);
+  if (decoded == null) {
+    if (bytes.length <= maxBytes) return bytes;
+    throw const FoodPhotoAiException(
+      'La imagen supera el máximo permitido de 2MB.',
+    );
+  }
+
+  img.Image working = img.bakeOrientation(decoded);
+  if (working.width > 896) {
+    working = img.copyResize(working, width: 896);
+  }
+
+  var quality = working.width >= 896 ? 74 : 78;
+  Uint8List encoded = Uint8List.fromList(img.encodeJpg(working, quality: quality));
+
+  while (encoded.length > targetBytes && quality > 58) {
+    quality -= 4;
+    encoded = Uint8List.fromList(img.encodeJpg(working, quality: quality));
+  }
+
+  while (encoded.length > maxBytes && working.width > 420) {
+    final resizedWidth = (working.width * 0.82).round();
+    working = img.copyResize(working, width: resizedWidth);
+    quality = 68;
+    encoded = Uint8List.fromList(img.encodeJpg(working, quality: quality));
+  }
+
+  return encoded;
 }

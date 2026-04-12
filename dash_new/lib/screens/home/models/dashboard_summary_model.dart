@@ -19,6 +19,12 @@ class DashboardSummaryModel {
     required this.monthExpense,
     required this.monthIncome,
     required this.recentNotes,
+    required this.weeklyHabitCompletion,
+    required this.weeklyTaskCompletion,
+    required this.weeklyHabitChecksDone,
+    required this.weeklyHabitChecksTotal,
+    required this.weeklyTasksDone,
+    required this.weeklyTasksTotal,
   });
 
   final DateTime today;
@@ -34,6 +40,12 @@ class DashboardSummaryModel {
   final double monthExpense;
   final double monthIncome;
   final List<Note> recentNotes;
+  final double weeklyHabitCompletion;
+  final double weeklyTaskCompletion;
+  final int weeklyHabitChecksDone;
+  final int weeklyHabitChecksTotal;
+  final int weeklyTasksDone;
+  final int weeklyTasksTotal;
 
   int get activeHabitsCount => habits.length;
 
@@ -49,8 +61,8 @@ class DashboardSummaryModel {
   }
 
   double get weeklyConsistency {
-    final a = habitCompletionRatio;
-    final b = taskCompletionRatio;
+    final a = weeklyHabitCompletion;
+    final b = weeklyTaskCompletion;
     return (a + b) / 2;
   }
 

@@ -48,7 +48,6 @@ class CalendarAgendaView extends StatelessWidget {
           child: ScrollConfiguration(
             behavior: const CalendarScrollBehavior(),
             child: Scrollbar(
-              thumbVisibility: true,
               child: CustomScrollView(
                 slivers: [
                   if (rows.isEmpty)

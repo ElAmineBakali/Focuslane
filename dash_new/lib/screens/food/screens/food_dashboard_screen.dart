@@ -1,17 +1,15 @@
 ﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:focuslane/navigation/app_route_observer.dart';
+import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import '../services/food_photo_ai_service.dart';
-import '../models/food_models.dart';
 import 'food_dashboard_widgets.dart';
 import '../../../design/ui/shared/app_card.dart';
 import 'food_diary_screen.dart';
 import 'recipes_list_screen.dart';
 import 'recipe_detail_screen.dart';
-import 'food_planner_screen.dart';
 import 'shopping_lists_screen.dart';
 import '../widgets/food_compact_widgets.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
@@ -64,7 +62,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: FoodCompactAppBar(
-        title: 'Food',
+        title: 'Nutrición',
         subtitle: 'Planificación, recetas y seguimiento',
         leadingMode: FocusModuleLeadingMode.exitModule,
         actions: [
@@ -72,11 +70,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
             icon: const Icon(Icons.add_a_photo_outlined, size: 18),
             tooltip: 'Añadir por foto',
             onPressed: _startPhotoAiFlow,
-          ),
-          IconButton(
-            icon: const Icon(Icons.calendar_today, size: 18),
-            tooltip: 'Plan semanal',
-            onPressed: () => _navigateToPlanner(context),
           ),
           IconButton(
             icon: const Icon(Icons.add, size: 18),
@@ -91,8 +84,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
             : FocuslaneUI.pagePaddingCompact,
         children: [
           _buildMetricsSection(context, todayId, isDesktop),
-          const SizedBox(height: 8.0),
-          _buildWeeklyPlanSection(context),
           const SizedBox(height: 10.0),
           isDesktop || isTablet
               ? _buildBottomSectionDesktop(context)
@@ -260,75 +251,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         );
       },
     );
-  }
-
-  Widget _buildWeeklyPlanSection(BuildContext context) {
-    return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: widget.svc.streamWeekPlannersRaw(),
-      builder: (context, snapshot) {
-        final plannersRaw = snapshot.data ?? [];
-        final selected = _pickActivePlanner(plannersRaw);
-        if (selected == null) {
-          return FoodWeeklyPlanCard(
-            weekPlan: const {},
-            onGeneratePlan: () => _navigateToPlanner(context),
-            onExportList: () => _navigateToShopping(context),
-            onViewCalendar: () => _navigateToPlanner(context),
-          );
-        }
-
-        final planner = WeekPlanner.fromMap(
-          selected['id'] as String,
-          Map<String, dynamic>.from(selected),
-        );
-
-        return StreamBuilder<List<Food>>(
-          stream: widget.svc.streamFoods(),
-          builder: (context, foodsSnap) {
-            final foods = foodsSnap.data ?? [];
-            final foodsMap = {for (final f in foods) f.id: f.name};
-
-            return StreamBuilder<List<Recipe>>(
-              stream: widget.svc.streamRecipes(),
-              builder: (context, recipesSnap) {
-                final recipes = recipesSnap.data ?? [];
-                final recipesMap = {
-                  for (final r in recipes) r.id: r.name,
-                };
-
-                final displayPlan = _buildDisplayPlan(
-                  planner,
-                  foodsMap: foodsMap,
-                  recipesMap: recipesMap,
-                );
-
-                return FoodWeeklyPlanCard(
-                  weekPlan: displayPlan,
-                  onGeneratePlan: () => _navigateToPlanner(context),
-                  onExportList: () => _navigateToShopping(context),
-                  onViewCalendar: () => _navigateToPlanner(context),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-  
-  String _getMealSlotName(MealSlot slot) {
-    switch (slot) {
-      case MealSlot.breakfast:
-        return 'Desayuno';
-      case MealSlot.snack:
-        return 'Aperitivo';
-      case MealSlot.lunch:
-        return 'Comida';
-      case MealSlot.merienda:
-        return 'Merienda';
-      case MealSlot.dinner:
-        return 'Cena';
-    }
   }
 
   Widget _buildBottomSectionDesktop(BuildContext context) {
@@ -503,63 +425,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
     return 32.0;
   }
 
-  Map<String, Map<String, String>> _buildDisplayPlan(
-    WeekPlanner planner, {
-    required Map<String, String> foodsMap,
-    required Map<String, String> recipesMap,
-  }) {
-    final displayPlan = <String, Map<String, String>>{};
-
-    for (final entry in planner.days.entries) {
-      final dayId = entry.key;
-      final dayEntries = entry.value;
-
-      final meals = <String, String>{};
-      for (final mealEntry in dayEntries) {
-        final slotName = _getMealSlotName(mealEntry.slot);
-        final name = mealEntry.type == FavoriteType.food
-            ? foodsMap[mealEntry.refId]
-            : recipesMap[mealEntry.refId];
-        meals[slotName] = name ?? mealEntry.refId;
-      }
-
-      if (meals.isNotEmpty) {
-        displayPlan[dayId] = meals;
-      }
-    }
-
-    return displayPlan;
-  }
-
-  Map<String, dynamic>? _pickActivePlanner(List<Map<String, dynamic>> raw) {
-    if (raw.isEmpty) return null;
-
-    final flagged = raw.where((p) {
-      return p['isActive'] == true || p['isDefault'] == true;
-    }).toList();
-
-    if (flagged.isNotEmpty) {
-      return flagged.first;
-    }
-
-    raw.sort((a, b) {
-      final ad = _toDate(a['updatedAt']) ?? _toDate(a['createdAt']);
-      final bd = _toDate(b['updatedAt']) ?? _toDate(b['createdAt']);
-      return (bd ?? DateTime.fromMillisecondsSinceEpoch(0))
-          .compareTo(ad ?? DateTime.fromMillisecondsSinceEpoch(0));
-    });
-
-    return raw.first;
-  }
-
-  DateTime? _toDate(dynamic v) {
-    if (v == null) return null;
-    if (v is DateTime) return v;
-    if (v is Timestamp) return v.toDate();
-    if (v is String) return DateTime.tryParse(v);
-    return null;
-  }
-
   void _navigateToDiary(BuildContext context) {
     Navigator.push(
       context,
@@ -576,15 +441,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
         builder: (_) => RecipesListScreen(svc: widget.svc),
       ),
     );
-  }
-
-  void _navigateToPlanner(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FoodPlannerScreen(svc: widget.svc),
-      ),
-    ).then((_) => setState(() {}));
   }
 
   void _navigateToShopping(BuildContext context) {
@@ -708,13 +564,11 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) {
-        var factor = 1.0;
         var saving = false;
         return StatefulBuilder(
           builder: (context, setStateSheet) {
-            final scaled = result.scaled(factor);
-            final kcal = scaled.calories;
-            final macros = scaled.macros;
+            final kcal = result.calories;
+            final macros = result.macros;
 
             Future<void> onConfirm() async {
               if (saving) return;
@@ -723,7 +577,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                 await _savePhotoAiEntry(
                   dayId: dayId,
                   result: result,
-                  factor: factor,
                 );
                 if (!sheetContext.mounted) return;
                 Navigator.of(sheetContext).pop();
@@ -787,14 +640,14 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                         'Macros · P ${macros.protein.toStringAsFixed(0)} g · C ${macros.carbs.toStringAsFixed(0)} g · G ${macros.fat.toStringAsFixed(0)} g',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      if (scaled.items.isNotEmpty) ...[
+                      if (result.items.isNotEmpty) ...[
                         const SizedBox(height: 14),
                         const Text(
                           'Items estimados',
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 8),
-                        ...scaled.items.map(
+                        ...result.items.map(
                           (item) => ListTile(
                             contentPadding: EdgeInsets.zero,
                             dense: true,
@@ -804,17 +657,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
                           ),
                         ),
                       ],
-                      const SizedBox(height: 8),
-                      Text('Ajuste por ración: ${factor.toStringAsFixed(2)}x'),
-                      Slider(
-                        value: factor,
-                        min: 0.5,
-                        max: 2.0,
-                        divisions: 15,
-                        onChanged: saving
-                            ? null
-                            : (value) => setStateSheet(() => factor = value),
-                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -849,24 +691,22 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
   Future<void> _savePhotoAiEntry({
     required String dayId,
     required CaloriesAiResult result,
-    required double factor,
   }) async {
-    final scaled = result.scaled(factor);
     final nowIso = DateTime.now().toIso8601String();
     final entry = IntakeEntry(
       id: '',
       type: FavoriteType.photoAi,
       refId: 'ai:${DateTime.now().millisecondsSinceEpoch}',
-      qty: factor,
+      qty: 1.0,
       unit: UnitKind.unit,
-      nameSnapshot: scaled.items.isNotEmpty
-          ? scaled.items.first.name
+      nameSnapshot: result.items.isNotEmpty
+          ? result.items.first.name
           : 'Comida estimada por foto',
       macrosSnapshot: {
-        'kcal': scaled.calories,
-        'protein': scaled.macros.protein,
-        'carbs': scaled.macros.carbs,
-        'fat': scaled.macros.fat,
+        'kcal': result.calories,
+        'protein': result.macros.protein,
+        'carbs': result.macros.carbs,
+        'fat': result.macros.fat,
         'fiber': 0.0,
         'sodium': 0.0,
       },

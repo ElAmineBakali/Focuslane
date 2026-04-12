@@ -41,7 +41,7 @@ class FinanceShell extends StatelessWidget {
     ModuleSidebarItem(icon: Icons.subscriptions_outlined, label: 'Suscripciones'),
     ModuleSidebarItem(icon: Icons.account_balance_wallet_outlined, label: 'Activos'),
     ModuleSidebarItem(icon: Icons.account_balance_outlined, label: 'Deudas'),
-    ModuleSidebarItem(icon: Icons.analytics_outlined, label: 'Analytics'),
+    ModuleSidebarItem(icon: Icons.analytics_outlined, label: 'Analítica'),
     ModuleSidebarItem(icon: Icons.settings_outlined, label: 'Ajustes'),
   ];
 

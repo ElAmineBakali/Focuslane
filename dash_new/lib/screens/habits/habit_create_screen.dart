@@ -6,7 +6,6 @@ import 'package:focuslane/screens/habits/habit_constants.dart';
 import 'package:focuslane/screens/habits/widgets/emoji_icon_picker.dart';
 import 'package:focuslane/screens/habits/widgets/tag_selector.dart';
 import 'package:focuslane/screens/habits/widgets/template_selector.dart';
-import 'package:focuslane/screens/habits/widgets/reminder_manager.dart';
 import 'package:focuslane/design/widgets/ui_scaffold.dart';
 import 'package:focuslane/screens/habits/habit_utils.dart';
 
@@ -34,8 +33,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   String? _emoji;
   String? _iconCode;
   List<String> _tags = [];
-  List<HabitReminder> _reminders = [];
-
   bool get _isEditing => widget.habit != null;
 
   @override
@@ -53,7 +50,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
       _emoji = h.emoji;
       _iconCode = h.iconCode;
       _tags = List.from(h.tags);
-      _reminders = List.from(h.reminders);
       _goalValueController.text =
           h.goalValue == null ? '' : formatHabitStatNumber(h.goalValue);
       _goalUnitController.text = h.goalUnit ?? '';
@@ -107,7 +103,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         'emoji': _emoji,
         'iconCode': _iconCode,
         'tags': _tags,
-        'reminders': _reminders.map((r) => r.toMap()).toList(),
+        'reminders': widget.habit?.reminders.map((r) => r.toMap()).toList() ?? const <Map<String, dynamic>>[],
         'lastUpdated': DateTime.now(),
       });
     } else {
@@ -131,7 +127,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         emoji: _emoji,
         iconCode: _iconCode,
         tags: _tags,
-        reminders: _reminders,
+        reminders: const [],
         goalValue: goalValue,
         goalUnit: goalUnit,
       );
@@ -185,19 +181,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
             selectedTags: _tags,
             onTagsChanged: (tags) {
               setState(() => _tags = tags);
-            },
-          ),
-    );
-  }
-
-  void _manageReminders() async {
-    await showDialog(
-      context: context,
-      builder:
-          (context) => ReminderManager(
-            reminders: _reminders,
-            onRemindersChanged: (reminders) {
-              setState(() => _reminders = reminders);
             },
           ),
     );
@@ -432,60 +415,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                               ),
                             ),
                           ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                  ),
-                  child: InkWell(
-                    onTap: _manageReminders,
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                    child: Padding(
-                      padding: EdgeInsets.all(isMobile ? 14 : 16),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.notifications_active_outlined,
-                            color: cs.primary,
-                            size: isMobile ? 20 : 22,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Recordatorios (${_reminders.length})',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _reminders.isEmpty
-                                      ? 'Sin recordatorios configurados'
-                                      : '${_reminders.where((r) => r.enabled).length} activos',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.edit_outlined,
-                            color: cs.onSurfaceVariant,
-                            size: isMobile ? 20 : 22,
-                          ),
                         ],
                       ),
                     ),

@@ -15,6 +15,7 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
   late AnimationController _controller;
   final List<_Particle> _particles = [];
   final Random _random = Random();
+  bool _particlesReady = false;
 
   @override
   void initState() {
@@ -23,12 +24,6 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
-
-    for (int i = 0; i < 50; i++) {
-      _particles.add(
-        _Particle(random: _random, colorScheme: Theme.of(context).colorScheme),
-      );
-    }
 
     _controller.forward().then((_) {
       if (widget.onComplete != null) {
@@ -39,6 +34,17 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
     _controller.addListener(() {
       setState(() {});
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_particlesReady) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    for (int i = 0; i < 50; i++) {
+      _particles.add(_Particle(random: _random, colorScheme: colorScheme));
+    }
+    _particlesReady = true;
   }
 
   @override
@@ -319,7 +325,7 @@ class _HabitCompletedDialogState extends State<HabitCompletedDialog>
                   Text(
                     widget.isPerfectDay
                         ? 'Has completado todos tus hábitos 💯'
-                        : 'Hábito "${widget.habitName}" completado ✨',
+                        : 'Hábito "${widget.habitName}" completado',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: cs.onPrimaryContainer,
                       fontSize: isMobile ? 14 : 15,

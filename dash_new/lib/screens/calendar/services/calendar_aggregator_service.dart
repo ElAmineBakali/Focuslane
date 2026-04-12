@@ -508,7 +508,7 @@ class CalendarAggregatorService {
             })
             .whereType<CalendarItem>()
             .toList(growable: false);
-      });
+          }).handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }
@@ -578,7 +578,7 @@ class CalendarAggregatorService {
             })
             .whereType<CalendarItem>()
             .toList(growable: false);
-      });
+          }).handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }
@@ -639,7 +639,7 @@ class CalendarAggregatorService {
             })
             .whereType<CalendarItem>()
             .toList(growable: false);
-      });
+      }).handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }

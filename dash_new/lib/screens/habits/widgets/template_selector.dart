@@ -32,14 +32,14 @@ class TemplateSelector extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Plantillas de hÃ¡bitos',
+                          'Plantillas de hábitos',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Elige una plantilla para empezar rÃ¡pido',
+                          'Elige una plantilla para empezar rápido',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: cs.onSurfaceVariant,
                           ),

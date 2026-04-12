@@ -74,7 +74,7 @@ class CalendarDayView extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Dia ${humanDateLong(day)}',
+                  humanDateLong(day),
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),

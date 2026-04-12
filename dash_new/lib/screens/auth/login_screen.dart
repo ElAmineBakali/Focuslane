@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 980),
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 16, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: const Color(0xFF2B3548), width: 1.5),
@@ -89,9 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       colors: [Color(0xFF0A0F18), Color(0xFF0B1220)],
                     ),
                   ),
-                  child: Center(
+                    child: Center(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(isMobile ? 16 : 24),
+                      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 12 : 24, isMobile ? 16 : 24, isMobile ? 6 : 24),
                       child: Form(
                         key: _formKey,
                         child: ConstrainedBox(
@@ -109,11 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 14),
                               const Text(
-                                'EL AMINE',
+                                'Bienvenido a FocusLane',
                                 style: TextStyle(
                                   color: Color(0xFF84C8C1),
                                   fontWeight: FontWeight.w800,
-                                  fontSize: 32,
+                                  fontSize: 30,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     _field(
                                       controller: _pass,
-                                      hint: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
+                                      hint: '••••••••',
                                       obscureText: true,
                                       validator: (value) {
                                         final v = value ?? '';
@@ -256,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 2),
                             ],
                           ),
                         ),

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,6 +23,11 @@ class FcmTokenSyncService {
     if (_started) return;
     _started = true;
 
+    if (kIsWeb) {
+      // Web FCM setup can be optional during development.
+      return;
+    }
+
     _authSub = fb_auth.FirebaseAuth.instance.authStateChanges().listen((user) async {
       await _onAuthChanged(user);
     });
@@ -30,7 +35,15 @@ class FcmTokenSyncService {
     _tokenRefreshSub = FirebaseMessaging.instance.onTokenRefresh.listen((token) async {
       final user = fb_auth.FirebaseAuth.instance.currentUser;
       if (user == null || token.trim().isEmpty) return;
-      await _upsertToken(user: user, token: token);
+      try {
+        await _upsertToken(user: user, token: token);
+      } catch (e) {
+        if (kDebugMode) {
+          // Ignore push sync errors outside supported FCM environments.
+          // ignore: avoid_print
+          print('[FCM] token refresh sync skipped: $e');
+        }
+      }
     });
 
     final currentUser = fb_auth.FirebaseAuth.instance.currentUser;
@@ -58,7 +71,16 @@ class FcmTokenSyncService {
   }
 
   Future<void> _syncCurrentToken(fb_auth.User user) async {
-    final token = await FirebaseMessaging.instance.getToken();
+    String? token;
+    try {
+      token = await FirebaseMessaging.instance.getToken();
+    } catch (e) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('[FCM] getToken skipped: $e');
+      }
+      return;
+    }
     if (token == null || token.trim().isEmpty) return;
     await _upsertToken(user: user, token: token);
   }

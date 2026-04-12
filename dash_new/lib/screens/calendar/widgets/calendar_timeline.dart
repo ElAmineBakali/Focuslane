@@ -252,7 +252,6 @@ class CalendarTimelineSurface extends StatelessWidget {
             child: SizedBox(
               width: totalWidth,
               child: Scrollbar(
-                thumbVisibility: true,
                 child: SingleChildScrollView(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

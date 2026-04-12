@@ -3,24 +3,14 @@ import 'task_model.dart';
 import 'task_firestore_service.dart';
 import 'task_helpers.dart';
 import 'package:focuslane/screens/tasks/services/reminder_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class TasksMainScreen extends StatefulWidget {
-  const TasksMainScreen({super.key, this.startWithChecklist = true});
-  final bool startWithChecklist;
+  const TasksMainScreen({super.key});
   @override
   State<TasksMainScreen> createState() => _TasksMainScreenState();
 }
 
 class _TasksMainScreenState extends State<TasksMainScreen> {
-  int _tab = 1;
-  @override
-  void initState() {
-    super.initState();
-    _tab = widget.startWithChecklist ? 1 : 0;
-  }
-
   bool showCompleted = false;
   String sortBy = 'manual';
 
@@ -39,58 +29,26 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _TabTextButton(
-              label: 'Checklist',
-              selected: _tab == 1,
-              onTap: () => setState(() => _tab = 1),
-            ),
-            const SizedBox(width: 18),
-            _TabTextButton(
-              label: 'Tareas',
-              selected: _tab == 0,
-              onTap: () => setState(() => _tab = 0),
-            ),
-          ],
-        ),
+        title: const Text('Tareas'),
         centerTitle: true,
-        actions:
-            _tab == 0
-                ? [
-                  IconButton(
-                    icon: Icon(Icons.filter_alt, color: theme.iconTheme.color),
-                    onPressed: () => _showFilterDialog(context),
-                  ),
-                ]
-                : [
-                  IconButton(
-                    tooltip: 'Marcar todo',
-                    icon: const Icon(Icons.done_all),
-                    onPressed: () => _Checklist.checkAll(context),
-                  ),
-                  IconButton(
-                    tooltip: 'Desmarcar todo',
-                    icon: const Icon(Icons.close_fullscreen),
-                    onPressed: () => _Checklist.uncheckAll(context),
-                  ),
-                ],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_alt, color: theme.iconTheme.color),
+            onPressed: () => _showFilterDialog(context),
+          ),
+        ],
       ),
 
-      body: _tab == 0 ? _buildTasksBody(theme) : const _ChecklistToday(),
+      body: _buildTasksBody(theme),
 
-      floatingActionButton:
-          _tab == 0
-              ? FloatingActionButton(
-                backgroundColor: theme.colorScheme.secondary,
-                foregroundColor: theme.colorScheme.onSecondary,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/tasks/create');
-                },
-                child: const Icon(Icons.add),
-              )
-              : null,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: theme.colorScheme.secondary,
+        foregroundColor: theme.colorScheme.onSecondary,
+        onPressed: () {
+          Navigator.pushNamed(context, '/tasks/create');
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -635,35 +593,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   }
 }
 
-class _TabTextButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const _TabTextButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-      color: selected ? cs.primary : cs.onSurface,
-      decoration: selected ? TextDecoration.underline : TextDecoration.none,
-    );
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-        child: Text(label, style: style),
-      ),
-    );
-  }
-}
-
 class _SubtaskRow extends StatelessWidget {
   final Subtask subtask;
   final bool canMoveUp;
@@ -716,375 +645,6 @@ class _SubtaskRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Checklist {
-  static CollectionReference<Map<String, dynamic>> _col() {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('checklist')
-        .doc('data')
-        .collection('items');
-  }
-
-  static Stream<List<_ChecklistItem>> watchToday() {
-    return _col()
-        .orderBy('order')
-        .snapshots()
-        .map(
-          (s) =>
-              s.docs
-                  .map((d) => _ChecklistItem.fromDoc(d.id, d.data()))
-                  .toList(),
-        );
-  }
-
-  static Future<void> add(String text) async {
-    final col = _col();
-    final snap = await col.get();
-    final next = snap.size;
-    await col.add({'text': text, 'done': false, 'order': next});
-  }
-
-  static Future<void> toggle(_ChecklistItem it) async {
-    await _col().doc(it.id).update({'done': !it.done});
-  }
-
-  static Future<void> remove(_ChecklistItem it) async {
-    await _col().doc(it.id).delete();
-    final items = await _col().orderBy('order').get();
-    int i = 0;
-    for (final d in items.docs) {
-      await d.reference.update({'order': i++});
-    }
-  }
-
-  static Future<void> reorder(
-    int oldIndex,
-    int newIndex,
-    List<_ChecklistItem> list,
-  ) async {
-    if (newIndex > oldIndex) newIndex--;
-    final moved = list.removeAt(oldIndex);
-    list.insert(newIndex, moved);
-    for (int i = 0; i < list.length; i++) {
-      await _col().doc(list[i].id).update({'order': i});
-    }
-  }
-
-  static Future<void> setColor(_ChecklistItem it, String? hex) async {
-    await _col().doc(it.id).update({'color': hex});
-  }
-
-  static const int _kBatchLimit = 450;
-
-  static Future<void> checkAll(BuildContext context) async {
-    await _setAll(done: true);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text('Todo marcado âœ…'),
-        ),
-      );
-    }
-  }
-
-  static Future<void> uncheckAll(BuildContext context) async {
-    await _setAll(done: false);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text('Todo desmarcado âœ¨'),
-        ),
-      );
-    }
-  }
-
-  static Future<void> _setAll({required bool done}) async {
-    final qs = await _col().get();
-    for (var i = 0; i < qs.docs.length; i += _kBatchLimit) {
-      final slice = qs.docs.skip(i).take(_kBatchLimit);
-      final batch = FirebaseFirestore.instance.batch();
-      for (final d in slice) {
-        batch.update(d.reference, {'done': done});
-      }
-      await batch.commit();
-    }
-  }
-}
-
-class _ChecklistItem {
-  final String id;
-  final String text;
-  final bool done;
-  final int order;
-  final String? colorHex;
-
-  _ChecklistItem({
-    required this.id,
-    required this.text,
-    required this.done,
-    required this.order,
-    required this.colorHex,
-  });
-
-  static _ChecklistItem fromDoc(String id, Map<String, dynamic> m) {
-    return _ChecklistItem(
-      id: id,
-      text: (m['text'] ?? '').toString(),
-      done: (m['done'] ?? false) as bool,
-      order: (m['order'] ?? 0) as int,
-      colorHex: m['color'] as String?,
-    );
-  }
-}
-
-class _ChecklistToday extends StatefulWidget {
-  const _ChecklistToday();
-  @override
-  State<_ChecklistToday> createState() => _ChecklistTodayState();
-}
-
-class _ChecklistTodayState extends State<_ChecklistToday> {
-  final _ctrl = TextEditingController();
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<_ChecklistItem>>(
-      stream: _Checklist.watchToday(),
-      builder: (context, snap) {
-        final items = snap.data ?? const <_ChecklistItem>[];
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _ctrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Nuevo ítem rápido',
-                        prefixIcon: Icon(Icons.add_task),
-                      ),
-                      onSubmitted: (s) async {
-                        final t = s.trim();
-                        if (t.isEmpty) return;
-                        await _Checklist.add(t);
-                        _ctrl.clear();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: () async {
-                      final t = _ctrl.text.trim();
-                      if (t.isEmpty) return;
-                      await _Checklist.add(t);
-                      _ctrl.clear();
-                    },
-                    child: const Text('Añadir'),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ReorderableListView.builder(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
-                itemCount: items.length,
-                onReorder: (o, n) async => _Checklist.reorder(o, n, items),
-                buildDefaultDragHandles: false,
-                itemBuilder: (c, i) {
-                  final it = items[i];
-                  final color = _colorFromHex(it.colorHex);
-                  final tileBg = color?.withOpacity(0.12);
-                  return Card(
-                    key: ValueKey(it.id),
-                    color: tileBg ?? Theme.of(context).cardColor,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 4,
-                    ),
-                    child: ListTile(
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      leading: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ReorderableDragStartListener(
-                            index: i,
-                            child: const Icon(Icons.drag_handle_rounded),
-                          ),
-                          const SizedBox(width: 6),
-                          _ColorPill(color: color),
-                        ],
-                      ),
-                      title: Text(
-                        it.text,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          decoration:
-                              it.done ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _ColorMenuButton(
-                            current: color,
-                            onPick:
-                                (c) =>
-                                    _Checklist.setColor(it, _hexFromColor(c)),
-                            onClear: () => _Checklist.setColor(it, null),
-                          ),
-                          Checkbox(
-                            visualDensity: VisualDensity.compact,
-                            value: it.done,
-                            onChanged: (_) => _Checklist.toggle(it),
-                          ),
-                          IconButton(
-                            visualDensity: VisualDensity.compact,
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () => _Checklist.remove(it),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-const List<Color> _kPalette = [
-  Color(0xFFFF8A80),
-  Color(0xFFFFC400),
-  Color(0xFFFFF176),
-  Color(0xFFA5D6A7),
-  Color(0xFF66BB6A),
-  Color(0xFF80DEEA),
-  Color(0xFF81D4FA),
-  Color(0xFF64B5F6),
-  Color(0xFFCE93D8),
-  Color(0xFFF48FB1),
-  Color(0xFFBCAAA4),
-  Color(0xFFCFD8DC),
-];
-
-String? _hexFromColor(Color? c) =>
-    c == null
-        ? null
-        : '#${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
-
-Color? _colorFromHex(String? hex) {
-  if (hex == null || hex.isEmpty) return null;
-  final v = int.tryParse(hex.replaceFirst('#', ''), radix: 16);
-  if (v == null) return null;
-  return Color(v);
-}
-
-class _ColorPill extends StatelessWidget {
-  final Color? color;
-  const _ColorPill({this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      width: 18,
-      height: 18,
-      decoration: BoxDecoration(
-        color: color ?? Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: color == null ? cs.outlineVariant : color!.withOpacity(.9),
-          width: 1,
-        ),
-      ),
-    );
-  }
-}
-
-class _ColorMenuButton extends StatelessWidget {
-  final Color? current;
-  final ValueChanged<Color?> onPick;
-  final VoidCallback onClear;
-
-  const _ColorMenuButton({
-    required this.current,
-    required this.onPick,
-    required this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<Color?>(
-      tooltip: 'Color',
-      icon: const Icon(Icons.palette_outlined),
-      itemBuilder: (context) {
-        return <PopupMenuEntry<Color?>>[
-          PopupMenuItem<Color?>(
-            enabled: false,
-            child: SizedBox(
-              width: 220,
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final c in _kPalette)
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                        onPick(c);
-                      },
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: c,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:
-                                (current == c)
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Colors.black26,
-                            width: current == c ? 2 : 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          const PopupMenuDivider(),
-          PopupMenuItem<Color?>(
-            value: null,
-            onTap: onClear,
-            child: const Text('Sin color'),
-          ),
-        ];
-      },
     );
   }
 }

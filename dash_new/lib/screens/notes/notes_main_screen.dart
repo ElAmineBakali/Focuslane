@@ -27,7 +27,7 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
           final notes = snapshot.data ?? [];
 
           if (notes.isEmpty) {
-            return const Center(child: Text('No tienes notas aÃºn.'));
+            return const Center(child: Text('No tienes notas aún.'));
           }
 
           return ListView.builder(
@@ -51,7 +51,7 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
                         arguments: note,
                       ),
                   title: Text(
-                    note.title.isEmpty ? 'Sin tÃ­tulo' : note.title,
+                    note.title.isEmpty ? 'Sin título' : note.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -72,7 +72,7 @@ class _NotesMainScreenState extends State<NotesMainScreen> {
                       Align(
                         alignment: Alignment.bottomRight,
                         child: Text(
-                          'Edited: ${DateFormat('dd MMM yyyy Â· HH:mm').format(note.lastEditedAt)}',
+                          'Editado: ${DateFormat('dd MMM yyyy · HH:mm', 'es_ES').format(note.lastEditedAt)}',
                           style: theme.textTheme.labelSmall,
                         ),
                       ),
