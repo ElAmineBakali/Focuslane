@@ -262,6 +262,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'foodPlannerFab',
         onPressed: _createNewPlanner,
         icon: const Icon(Icons.add),
         label: const Text('Nuevo'),
@@ -279,10 +280,9 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
           stream: widget.svc.streamAlerts(),
           builder: (context, alertsSnap) {
             final alerts = alertsSnap.data ?? const {};
-            final overBudget = alerts['overBudget'] == true || alerts['foodOverBudget'] == true;
             final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
             final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
-            debugPrint('[FoodPlanner][statusBar] targets=kcal:$targetKcal protein:$targetProtein overBudget=$overBudget proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
+            debugPrint('[FoodPlanner][statusBar] targets=kcal:$targetKcal protein:$targetProtein proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
 
             return Container(
               width: double.infinity,
@@ -313,11 +313,6 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                   if (extremeDeficit)
                     Chip(
                       label: const Text('Déficit extremo con entreno fuerte'),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  if (overBudget)
-                    Chip(
-                      label: const Text('Presupuesto food superado'),
                       visualDensity: VisualDensity.compact,
                     ),
                 ],

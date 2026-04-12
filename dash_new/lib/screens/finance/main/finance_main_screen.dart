@@ -3,7 +3,6 @@ import '../../../design/ui/layouts/module_shell.dart';
 import '../../../design/ui/layouts/module_sidebar.dart';
 import '../screens/dashboard/finance_dashboard_screen.dart';
 import '../screens/transactions/transactions_screen.dart';
-import '../screens/budgets/budgets_screen.dart';
 import '../screens/subscriptions/subscriptions_screen.dart';
 import '../screens/assets/assets_screen.dart';
 import '../screens/debts/debts_screen.dart';
@@ -23,7 +22,6 @@ class _FinanceMainScreenState extends State<FinanceMainScreen> {
   static const _items = <ModuleSidebarItem>[
     ModuleSidebarItem(icon: Icons.dashboard_outlined, label: 'Panel'),
     ModuleSidebarItem(icon: Icons.receipt_long, label: 'Transacciones'),
-    ModuleSidebarItem(icon: Icons.savings_outlined, label: 'Presupuestos'),
     ModuleSidebarItem(icon: Icons.subscriptions_outlined, label: 'Suscripciones'),
     ModuleSidebarItem(icon: Icons.account_balance_wallet_outlined, label: 'Activos'),
     ModuleSidebarItem(icon: Icons.account_balance_outlined, label: 'Deudas'),
@@ -55,7 +53,6 @@ class _FinanceMainScreenState extends State<FinanceMainScreen> {
         children: [
           FinanceDashboardScreen(onSelectSection: _selectIndex),
           TransactionsScreen(onBackToDashboard: () => _selectIndex(0)),
-          BudgetsScreen(onBackToDashboard: () => _selectIndex(0)),
           SubscriptionsScreen(onBackToDashboard: () => _selectIndex(0)),
           AssetsScreen(onBackToDashboard: () => _selectIndex(0)),
           DebtsScreen(onBackToDashboard: () => _selectIndex(0)),

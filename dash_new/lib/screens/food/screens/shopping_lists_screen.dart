@@ -1,9 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:intl/intl.dart';
 import '../../../design/ui/components/focus_empty_state.dart';
-import '../../../design/ui/shared/app_section_tabs.dart';
 import '../models/food_models.dart';
 import '../services/food_firestore_service.dart';
 import 'shopping_list_detail_screen.dart';
@@ -17,28 +15,13 @@ class ShoppingListsScreen extends StatefulWidget {
   State<ShoppingListsScreen> createState() => _ShoppingListsScreenState();
 }
 
-class _ShoppingListsScreenState extends State<ShoppingListsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: FoodCompactAppBar(
         title: 'Listas de compra',
-        subtitle: 'Activas e historial',
+        subtitle: 'Listas activas',
         actions: [
           IconButton(
             icon: const Icon(Icons.add, size: 18),
@@ -47,26 +30,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: AppSectionTabs(
-              controller: _tabController,
-              tabs: const [
-                Tab(icon: Icon(Icons.shopping_cart), text: 'Activas'),
-                Tab(icon: Icon(Icons.history), text: 'Historial'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [_buildActiveListsTab(), _buildHistoryTab()],
-            ),
-          ),
-        ],
-      ),
+      body: _buildActiveListsTab(),
       floatingActionButton: Theme(
         data: Theme.of(context).copyWith(
           floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -74,6 +38,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
           ),
         ),
         child: FloatingActionButton.extended(
+          heroTag: 'shoppingListsFab',
           onPressed: _createNewList,
           icon: const Icon(Icons.add),
           label: const Text('Nueva lista'),
@@ -92,7 +57,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
         }
 
         final lists = snapshot.data!;
-        final activeLists = lists;
+        final activeLists = lists.where((list) => !list.isCompleted).toList();
 
         if (activeLists.isEmpty) {
           return FocusEmptyState(
@@ -124,47 +89,6 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
             .animate()
             .fadeIn(delay: Duration(milliseconds: index * 30))
             .slideX(begin: -0.2);
-      },
-    );
-  }
-
-  Widget _buildHistoryTab() {
-    return StreamBuilder<List<ShoppingList>>(
-      stream: widget.svc.streamShoppingLists(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final lists = snapshot.data!;
-        final completedLists =
-            lists.where((list) => list.completedAt != null).toList()
-              ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
-
-        if (completedLists.isEmpty) {
-          return const FocusEmptyState(
-            icon: Icons.history,
-            message: 'Sin historial',
-            subtitle: 'Las listas completadas aparecerán aquí',
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          itemCount: completedLists.length,
-          itemBuilder: (context, index) {
-            final list = completedLists[index];
-            return _HistoryListCard(
-                  list: list,
-                  onTap: () => _openListDetail(list),
-                  onRestore: () => _restoreList(list),
-                  onDelete: () => _deleteList(list),
-                )
-                .animate()
-                .fadeIn(delay: Duration(milliseconds: index * 30))
-                .slideX(begin: -0.2);
-          },
-        );
       },
     );
   }
@@ -377,23 +301,6 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen>
     );
   }
 
-  Future<void> _restoreList(ShoppingList list) async {
-    try {
-      await widget.svc.updateShoppingList(list.id, {'completedAt': null});
-
-      if (mounted) {
-        FoodFeedback.showSuccess(
-          context,
-          'Lista "${list.name}" restaurada',
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        FoodFeedback.showError(context, 'Error al restaurar: $e');
-      }
-    }
-  }
-
   Future<void> _deleteList(ShoppingList list) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -542,100 +449,3 @@ class _ShoppingListTile extends StatelessWidget {
     }
   }
 }
-
-class _HistoryListCard extends StatelessWidget {
-  final ShoppingList list;
-  final VoidCallback onTap;
-  final VoidCallback onRestore;
-  final VoidCallback onDelete;
-
-  const _HistoryListCard({
-    required this.list,
-    required this.onTap,
-    required this.onRestore,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final total = list.items.fold<double>(
-      0,
-      (sum, item) => sum + (item.total ?? 0),
-    );
-    final completedDate =
-        list.completedAt != null
-            ? DateFormat('dd/MM/yyyy').format(list.completedAt!)
-            : 'Fecha desconocida';
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: FoodCompactTile(
-        height: 50,
-        onTap: onTap,
-        leading: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.check_circle,
-            color: colorScheme.onSecondaryContainer,
-            size: 18,
-          ),
-        ),
-        title: list.name,
-        subtitle:
-            'Completada el $completedDate • ${list.items.length} productos${total > 0 ? ' • €${total.toStringAsFixed(2)}' : ''}',
-        trailing: PopupMenuButton<String>(
-          padding: EdgeInsets.zero,
-          onSelected: (value) {
-            if (value == 'restore') onRestore();
-            if (value == 'delete') onDelete();
-          },
-          itemBuilder:
-              (context) => [
-                PopupMenuItem(
-                  value: 'restore',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.restore,
-                        size: 20,
-                        color: colorScheme.primary,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Restaurar',
-                        style: TextStyle(color: colorScheme.primary),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: colorScheme.error,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Eliminar',
-                        style: TextStyle(color: colorScheme.error),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-        ),
-      ),
-    );
-  }
-}
-
-

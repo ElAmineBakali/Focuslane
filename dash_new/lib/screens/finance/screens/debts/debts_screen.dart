@@ -44,7 +44,7 @@ class DebtsScreen extends StatelessWidget {
                   stream: DebtService.I.watchAll(),
                   builder: (context, snap) {
                     if (snap.hasError) {
-                      return Center(child: Text('Error: ${snap.error}'));
+                      return const Center(child: Text('Error al cargar deudas'));
                     }
                     if (snap.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

@@ -40,6 +40,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'foodDiaryFab',
         onPressed: () => _showAddEntrySheet(context, dayId),
         icon: const Icon(Icons.add),
         label: const Text('Añadir'),

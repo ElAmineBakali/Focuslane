@@ -1,8 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:focuslane/screens/finance/models/budget_model.dart';
 import 'package:focuslane/screens/finance/models/subscription_model.dart';
 import 'package:focuslane/screens/finance/models/transaction_model.dart';
-import 'package:focuslane/screens/finance/services/budget_service.dart';
 import 'package:focuslane/screens/finance/services/finance_category_labels.dart';
 import 'package:focuslane/screens/finance/services/subscription_service.dart';
 import 'package:focuslane/screens/finance/services/transaction_service.dart';
@@ -44,7 +42,7 @@ class FinanceDashboardScreen extends StatelessWidget {
         stream: TransactionService.I.watch(from: monthStart),
         builder: (context, snap) {
           if (snap.hasError) {
-            return Center(child: Text('Error: ${snap.error}'));
+            return const Center(child: Text('Error al cargar el panel de finanzas'));
           }
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -93,7 +91,7 @@ class FinanceDashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: FocuslaneTokens.spacing12),
                           Expanded(
-                            child: _BudgetAndSubs(
+                            child: _FinanceSummaryCards(
                               onSelectSection: onSelectSection,
                             ),
                           ),
@@ -107,7 +105,7 @@ class FinanceDashboardScreen extends StatelessWidget {
                           onSelectSection: onSelectSection,
                         ),
                         const SizedBox(height: FocuslaneTokens.spacing12),
-                        _BudgetAndSubs(onSelectSection: onSelectSection),
+                        _FinanceSummaryCards(onSelectSection: onSelectSection),
                       ],
                     );
                   },
@@ -167,7 +165,7 @@ class _MetricsRow extends StatelessWidget {
             ? '–'
             : '${(income - expense).toStringAsFixed(2)} € • ${(savings * 100).toStringAsFixed(1)}%',
         subtitle: 'Ingreso - gasto',
-        onTap: () => onSelectSection(2),
+        onTap: () => onSelectSection(5),
       ),
     ];
 
@@ -284,81 +282,14 @@ class _RecentTransactions extends StatelessWidget {
   }
 }
 
-class _BudgetAndSubs extends StatelessWidget {
-  const _BudgetAndSubs({required this.onSelectSection});
+class _FinanceSummaryCards extends StatelessWidget {
+  const _FinanceSummaryCards({required this.onSelectSection});
 
   final ValueChanged<int> onSelectSection;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _BudgetsCard(onSelectSection: onSelectSection),
-        const SizedBox(height: FocuslaneTokens.spacing12),
-        _SubsCard(onSelectSection: onSelectSection),
-      ],
-    );
-  }
-}
-
-class _BudgetsCard extends StatelessWidget {
-  const _BudgetsCard({required this.onSelectSection});
-
-  final ValueChanged<int> onSelectSection;
-
-  @override
-  Widget build(BuildContext context) {
-    return FocusCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Presupuestos', style: TextStyle(fontWeight: FontWeight.w700)),
-              TextButton(
-                onPressed: () => onSelectSection(2),
-                child: const Text('Abrir'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          StreamBuilder<List<Budget>>(
-            stream: BudgetService.I.watchAll(),
-            builder: (context, snap) {
-              if (snap.hasError) {
-                return Text('Error: ${snap.error}');
-              }
-              if (snap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final budgets = snap.data ?? const [];
-              if (budgets.isEmpty) return const Text('Sin presupuestos');
-              return Column(
-                children: budgets.take(3).map((b) {
-                  return ListTile(
-                    dense: true,
-                    title: Text(b.name),
-                    subtitle: Text(labelForCategory(b.category)),
-                    trailing: Text(
-                      '${b.limit.toStringAsFixed(2)} EUR',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      '/finance/budgets/form',
-                      arguments: b,
-                    ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+    return _SubsCard(onSelectSection: onSelectSection);
   }
 }
 
@@ -379,7 +310,7 @@ class _SubsCard extends StatelessWidget {
             children: [
               const Text('Suscripciones', style: TextStyle(fontWeight: FontWeight.w700)),
               TextButton(
-                onPressed: () => onSelectSection(3),
+                onPressed: () => onSelectSection(2),
                 child: const Text('Abrir'),
               ),
             ],
@@ -389,7 +320,7 @@ class _SubsCard extends StatelessWidget {
             stream: SubscriptionService.I.watchAll(),
             builder: (context, snap) {
               if (snap.hasError) {
-                return Text('Error: ${snap.error}');
+                return const Text('Error al cargar suscripciones');
               }
               if (snap.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

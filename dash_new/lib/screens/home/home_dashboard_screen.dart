@@ -53,6 +53,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     title: const Text(AppStrings.dashboard),
                     centerTitle: false,
                     scrolledUnderElevation: 0,
+                    actions: [
+                      IconButton(
+                        onPressed: () => _openRoute(AppRoutes.notifications),
+                        icon: const Icon(Icons.notifications_none, size: 18),
+                        tooltip: 'Notificaciones',
+                      ),
+                    ],
                   )
                 : null,
             drawer: (isMobile || isTablet)
@@ -151,6 +158,7 @@ class _DesktopDashboard extends StatelessWidget {
             children: [
               _PortalTopBar(
                 title: AppStrings.dashboard,
+                onOpenNotifications: () => onRoute(AppRoutes.notifications),
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -224,7 +232,10 @@ class _TabletDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _TabletHeader(onOpenMenu: onOpenMenu),
+        _TabletHeader(
+          onOpenMenu: onOpenMenu,
+          onOpenNotifications: () => onRoute(AppRoutes.notifications),
+        ),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -394,6 +405,16 @@ class _PortalSidebar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: ListTile(
               dense: true,
+              onTap: () => onRoute(AppRoutes.notifications),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              leading: Icon(Icons.notifications_outlined, size: 18, color: FocuslaneSemanticTokens.textSecondary(context)),
+              title: Text('Notificaciones', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context), fontSize: 14)),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: ListTile(
+              dense: true,
               onTap: () => onRoute('/settings'),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               leading: Icon(Icons.settings_outlined, size: 18, color: FocuslaneSemanticTokens.textSecondary(context)),
@@ -407,9 +428,10 @@ class _PortalSidebar extends StatelessWidget {
 }
 
 class _PortalTopBar extends StatelessWidget {
-  const _PortalTopBar({required this.title});
+  const _PortalTopBar({required this.title, required this.onOpenNotifications});
 
   final String title;
+  final VoidCallback onOpenNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +448,11 @@ class _PortalTopBar extends StatelessWidget {
           Text('/ $title', style: TextStyle(color: FocuslaneSemanticTokens.textSecondary(context))),
           const Spacer(),
           const SizedBox(width: 10),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, size: 18)),
+          IconButton(
+            onPressed: onOpenNotifications,
+            icon: const Icon(Icons.notifications_none, size: 18),
+            tooltip: 'Notificaciones',
+          ),
         ],
       ),
     );
@@ -434,9 +460,10 @@ class _PortalTopBar extends StatelessWidget {
 }
 
 class _TabletHeader extends StatelessWidget {
-  const _TabletHeader({required this.onOpenMenu});
+  const _TabletHeader({required this.onOpenMenu, required this.onOpenNotifications});
 
   final VoidCallback onOpenMenu;
+  final VoidCallback onOpenNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -456,7 +483,11 @@ class _TabletHeader extends StatelessWidget {
           Text(AppStrings.dashboard, style: TextStyle(color: FocuslaneSemanticTokens.textPrimary(context), fontWeight: FontWeight.w700, fontSize: 18)),
           const Spacer(),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search, size: 18)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, size: 18)),
+          IconButton(
+            onPressed: onOpenNotifications,
+            icon: const Icon(Icons.notifications_none, size: 18),
+            tooltip: 'Notificaciones',
+          ),
         ],
       ),
     );

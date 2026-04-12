@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FinanceSecurityService {
   FinanceSecurityService._();
@@ -49,7 +50,7 @@ class FinanceSecurityService {
       'createdAt': DateTime.now().toUtc().toIso8601String(),
     });
 
-    await _storage.write(key: _storageKey, value: record);
+    await _writeRecord(record);
     _markSessionUnlocked();
   }
 
@@ -133,7 +134,7 @@ class FinanceSecurityService {
   }
 
   Future<_FinancePasswordRecord?> _readRecord() async {
-    final raw = await _storage.read(key: _storageKey);
+    final raw = await _readRawRecord();
     if (raw == null || raw.trim().isEmpty) return null;
 
     final map = jsonDecode(raw) as Map<String, dynamic>;
@@ -148,6 +149,23 @@ class FinanceSecurityService {
       hashB64: hashB64,
       iterations: iterations,
     );
+  }
+
+  Future<String?> _readRawRecord() async {
+    final fromSecure = await _storage.read(key: _storageKey);
+    if (fromSecure != null && fromSecure.trim().isNotEmpty) {
+      return fromSecure;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final fromPrefs = prefs.getString(_storageKey);
+    return (fromPrefs == null || fromPrefs.trim().isEmpty) ? null : fromPrefs;
+  }
+
+  Future<void> _writeRecord(String record) async {
+    await _storage.write(key: _storageKey, value: record);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_storageKey, record);
   }
 }
 

@@ -431,7 +431,7 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Edited: $lastUpdate',
+                    'Editado: $lastUpdate',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: color.onSurfaceVariant,
                       fontSize: isMobile ? 11 : 12,

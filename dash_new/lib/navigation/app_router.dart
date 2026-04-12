@@ -25,6 +25,7 @@ import 'package:focuslane/screens/modules_screen.dart';
 import 'package:focuslane/screens/notes/note_editor_screen.dart';
 import 'package:focuslane/screens/notes/note_model.dart';
 import 'package:focuslane/screens/notes/notes_list_screen.dart';
+import 'package:focuslane/screens/notifications/global_notifications_screen.dart';
 import 'package:focuslane/screens/settings/settings_screen.dart';
 import 'package:focuslane/screens/study/analytics/study_analytics_screen.dart';
 import 'package:focuslane/screens/study/main/study_main_screen.dart';
@@ -61,6 +62,10 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
     '/settings': (_) => SettingsScreen(
       currentThemeMode: deps.themeMode(),
       onThemeModeChanged: deps.onThemeModeChanged,
+    ),
+    AppRoutes.notifications: (_) => GlobalNotificationsScreen(
+      foodService: deps.foodService(),
+      studyService: deps.studyService(),
     ),
     '/modules': (_) => const ModulesScreen(),
     AppRoutes.tasksDashboard: (_) => const TasksMainScreen(),

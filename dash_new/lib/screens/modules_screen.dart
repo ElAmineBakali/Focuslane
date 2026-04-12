@@ -47,7 +47,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
       ('/habits', 'Hábitos', Icons.checklist_outlined),
       (AppRoutes.studyDashboard, 'Estudio', Icons.school_outlined),
       (AppRoutes.gymDashboard, 'Gimnasio', Icons.fitness_center_outlined),
-      (AppRoutes.foodDashboard, 'Food', Icons.restaurant_outlined),
+      (AppRoutes.foodDashboard, 'Nutrición', Icons.restaurant_outlined),
       (AppRoutes.financeDashboard, 'Finanzas', Icons.account_balance_wallet_outlined),
     ];
 

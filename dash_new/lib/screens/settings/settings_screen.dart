@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -267,6 +268,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.notifications_active_outlined),
+                      title: const Text('Notificaciones globales'),
+                      subtitle: const Text('Gestiona recordatorios de todos los módulos'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
                     ),
                   ),
                   const SizedBox(height: 12),

@@ -88,7 +88,7 @@ class FinanceTransaction {
   final String? originalCurrency; // e.g., 'USD', 'EUR'
   final double? fxRate; // rate to convert to base
   final String? recurrence; // e.g., 'none','weekly','monthly','custom'
-  final String? envelopeId; // budgeting envelope linkage
+  final String? envelopeId; // optional envelope linkage
   final String? relatedTxId; // link to other tx (e.g., debt payment)
   final FinanceAiMeta? aiMeta;
 

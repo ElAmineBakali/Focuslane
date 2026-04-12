@@ -23,17 +23,11 @@ class CoreSyncService {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _gymTodaySub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _studyTasksSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _tasksSub;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeBudgetsSub;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeTxSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeSubsSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _financeRecurringSub;
 
   static const _actorStudy = 'core-sync:study';
   static const _actorTasks = 'core-sync:tasks';
-
-  List<QueryDocumentSnapshot<Map<String, dynamic>>> _cachedBudgetDocs = const [];
-  List<QueryDocumentSnapshot<Map<String, dynamic>>> _cachedFinanceDocs = const [];
-  bool _recalcBudgetBusy = false;
 
   void debugPrint(String message) {
     if (!kCoreSyncDebug) return;
@@ -60,20 +54,16 @@ class CoreSyncService {
     _watchStudyTasks(trimmed);
     _watchTasks(trimmed);
     if (!kIsWeb) {
-      _watchFoodBudgetRealtime(trimmed);
       _watchSubscriptions(trimmed);
       _watchRecurringFinance(trimmed);
     }
-    debugPrint('[CoreSync] start() — all 6 listeners launched');
+    debugPrint('[CoreSync] start() — listeners launched');
     debugPrint('[CoreSync] ══════════════════════════════════════');
   }
 
   void stop() {
     _disposeUserSubs();
     _activeUid = null;
-    _cachedBudgetDocs = const [];
-    _cachedFinanceDocs = const [];
-    _recalcBudgetBusy = false;
   }
 
   void dispose() => stop();
@@ -82,8 +72,6 @@ class CoreSyncService {
     _gymTodaySub?.cancel();
     _studyTasksSub?.cancel();
     _tasksSub?.cancel();
-    _financeBudgetsSub?.cancel();
-    _financeTxSub?.cancel();
     _financeSubsSub?.cancel();
     _financeRecurringSub?.cancel();
   }
@@ -181,153 +169,6 @@ class CoreSyncService {
         }, onError: (Object e, StackTrace st) {
           _logError('tasks', e, st);
         });
-  }
-
-  void _watchFoodBudgetRealtime(String uid) {
-    debugPrint('[CoreSync][financeBudgets] LISTENER STARTED uid=$uid');
-    _financeBudgetsSub = _db
-        .collection('finance_budgets')
-        .where('userId', isEqualTo: uid)
-        .snapshots()
-        .listen((snap) {
-          _cachedBudgetDocs = snap.docs;
-          debugPrint('[CoreSync][financeBudgets] ▶ EVENT received uid=$uid docs=${snap.docs.length} changes=${snap.docChanges.length}');
-          for (final ch in snap.docChanges) {
-            final d = ch.doc.data() ?? {};
-            debugPrint('[CoreSync][financeBudgets]   change type=${ch.type.name} docId=${ch.doc.id} category=${d['category']} amount=${d['amount']} period=${d['period']}');
-          }
-          debugPrint('[CoreSync][financeBudgets] → side-effect: _recalcFoodOverBudget');
-          unawaited(
-            _recalcFoodOverBudget(uid).catchError((Object e, StackTrace st) {
-              _logError('financeBudgets→recalcFoodOverBudget', e, st);
-            }),
-          );
-        }, onError: (Object e, StackTrace st) {
-          _logError('financeBudgets', e, st);
-        });
-
-    debugPrint('[CoreSync][financeTransactions] LISTENER STARTED uid=$uid');
-    _financeTxSub = _db
-        .collection('finance_transactions')
-        .where('userId', isEqualTo: uid)
-        .where('type', isEqualTo: 'expense')
-        .snapshots()
-        .listen((snap) {
-          _cachedFinanceDocs = snap.docs;
-          debugPrint('[CoreSync][financeTransactions] ▶ EVENT received uid=$uid docs=${snap.docs.length} changes=${snap.docChanges.length}');
-          for (final ch in snap.docChanges) {
-            final d = ch.doc.data() ?? {};
-            debugPrint('[CoreSync][financeTransactions]   change type=${ch.type.name} docId=${ch.doc.id} category=${d['category']} amount=${d['amount']} date=${d['date']}');
-          }
-          debugPrint('[CoreSync][financeTransactions] → side-effect: _recalcFoodOverBudget');
-          unawaited(
-            _recalcFoodOverBudget(uid).catchError((Object e, StackTrace st) {
-              _logError('financeTransactions→recalcFoodOverBudget', e, st);
-            }),
-          );
-        }, onError: (Object e, StackTrace st) {
-          _logError('financeTransactions', e, st);
-        });
-  }
-
-  Future<void> _recalcFoodOverBudget(String uid) async {
-    if (_recalcBudgetBusy) {
-      _log('[CoreSync][_recalcFoodOverBudget] SKIP already busy uid=$uid');
-      return;
-    }
-    _recalcBudgetBusy = true;
-    _log('[CoreSync][_recalcFoodOverBudget] ENTER uid=$uid budgetDocs=${_cachedBudgetDocs.length} txDocs=${_cachedFinanceDocs.length}');
-    try {
-      final now = DateTime.now();
-      var overBudget = false;
-      String? overBudgetId;
-      var selectedSpent = 0.0;
-      var selectedLimit = 0.0;
-
-      for (final d in _cachedBudgetDocs) {
-        final m = d.data();
-        final cat = _normalizeCategoryKey((m['category'] ?? '').toString());
-        if (!_isFoodCategory(cat)) continue;
-        final amount = _n(m['limit']) ?? _n(m['amount']) ?? 0;
-        if (amount <= 0) {
-          _log('[CoreSync][_recalcFoodOverBudget] SKIP budget=${d.id} invalid limit=$amount');
-          continue;
-        }
-
-        final period = (m['period'] ?? 'monthly').toString();
-        final startDate = _toDate(m['startDate']) ?? now;
-        final endDate = _toDate(m['endDate']);
-        final (rangeStart, rangeEnd) = _budgetRange(period, startDate, endDate, now);
-
-        double spent = 0;
-        for (final tx in _cachedFinanceDocs) {
-          final t = tx.data();
-          final txCat = _normalizeCategoryKey((t['category'] ?? '').toString());
-          if (!_isFoodCategory(txCat)) continue;
-          final txDate = _toDate(t['date']);
-          if (txDate == null) continue;
-          if (txDate.isBefore(rangeStart) || txDate.isAfter(rangeEnd)) continue;
-          spent += _n(t['amount']) ?? 0;
-        }
-
-        selectedSpent = spent;
-        selectedLimit = amount;
-        _log('[CoreSync][_recalcFoodOverBudget] budget=${d.id} cat=$cat spent=$spent limit=$amount over=${spent > amount}');
-        if (spent > amount) {
-          overBudget = true;
-          overBudgetId = d.id;
-          _log('[CoreSync][_recalcFoodOverBudget] OVER-BUDGET budgetId=$overBudgetId spent=$spent limit=$amount');
-          break;
-        }
-      }
-
-      final alertsRef = _db
-          .collection('users')
-          .doc(uid)
-          .collection('food')
-          .doc('root')
-          .collection('config')
-          .doc('alerts');
-
-      final alertsPatch = {
-        'overBudget': overBudget,
-        'categoryKey': 'alimentacion',
-        'spent': selectedSpent,
-        'limit': selectedLimit,
-        'foodOverBudget': overBudget,
-        'foodOverBudgetBudgetId': overBudgetId,
-        'foodOverBudgetSpent': selectedSpent,
-        'foodOverBudgetLimit': selectedLimit,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
-      _logWrite('users/$uid/food/root/config/alerts', alertsPatch);
-      await alertsRef.set(alertsPatch, SetOptions(merge: true));
-      _log('[CoreSync][_recalcFoodOverBudget] RESULT overBudget=$overBudget spent=$selectedSpent limit=$selectedLimit budgetId=$overBudgetId');
-    } finally {
-      _recalcBudgetBusy = false;
-    }
-  }
-
-  (DateTime, DateTime) _budgetRange(
-    String period,
-    DateTime startDate,
-    DateTime? endDate,
-    DateTime now,
-  ) {
-    if (period == 'weekly') {
-      final from = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 7));
-      final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
-      return (from, to);
-    }
-    if (period == 'custom') {
-      final from = DateTime(startDate.year, startDate.month, startDate.day);
-      final toBase = endDate ?? now;
-      final to = DateTime(toBase.year, toBase.month, toBase.day, 23, 59, 59);
-      return (from, to);
-    }
-    final from = DateTime(now.year, now.month, 1);
-    final to = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
-    return (from, to);
   }
 
   void _watchSubscriptions(String uid) {
@@ -733,55 +574,23 @@ class CoreSyncService {
     final nextDay = DateTime(next.year, next.month, next.day);
 
     final dayId = dayIdFromDateTime(nextDay);
-    final plannedDoc = _db
-        .collection('users')
-        .doc(uid)
-        .collection('finance')
-        .doc('data')
-        .collection('transactions')
-        .doc('$txId-$dayId');
+    final dedupeKey = 'finance:recurring:$txId:$dayId';
+    final calendarDocId = 'finrec_$txId\_$dayId';
+    final calRef = _db
+      .collection('users')
+      .doc(uid)
+      .collection('planner')
+      .doc('data')
+      .collection('calendar')
+      .doc(calendarDocId);
 
-    _log('[CoreSync][_materializeRecurring] nextDate=$nextDay dayId=$dayId');
-    final already = await plannedDoc.get();
-    if (!already.exists) {
-      _log('[CoreSync][_materializeRecurring] → side-effect create planned tx $txId-$dayId');
-      final plannedPatch = {
-        'title': data['title'] ?? 'Recurrente',
-        'amount': data['amount'] ?? 0,
-        'category': data['category'],
-        'type': data['type'] ?? 'expense',
-        'planned': true,
-        'isBill': false,
-        'date': Timestamp.fromDate(nextDay),
-        'dueDate': Timestamp.fromDate(nextDay),
-        'recurrence': recurrence,
-        'sourceRecurringId': txId,
-      };
-      _logWrite('users/$uid/finance/data/transactions/$txId-$dayId', plannedPatch);
-      await plannedDoc.set(plannedPatch);
-    } else {
-      _log('[CoreSync][_materializeRecurring] SKIP planned tx already exists doc=$txId-$dayId');
-    }
-
-    final calendarCol = _db
-        .collection('users')
-        .doc(uid)
-        .collection('planner')
-        .doc('data')
-        .collection('calendar');
-    final dedupeKey = '$txId|$dayId';
-    final calendarDocId = 'fin-rec-$txId-$dayId';
-    final calRef = calendarCol.doc(calendarDocId);
-
-    final calSnap = await calRef.get();
-    if (calSnap.exists) {
-      _log('[CoreSync][_materializeRecurring] SKIP calendar idempotent doc=$calendarDocId');
-      return;
-    }
-
-    final dup = await calendarCol
-        .where('relatedTxId', isEqualTo: txId)
-        .where('dedupeKey', isEqualTo: dedupeKey)
+    final dup = await _db
+      .collection('users')
+      .doc(uid)
+      .collection('planner')
+      .doc('data')
+      .collection('calendar')
+      .where('dedupeKey', isEqualTo: dedupeKey)
         .limit(1)
         .get();
     if (dup.docs.isNotEmpty) {
@@ -847,55 +656,6 @@ class CoreSyncService {
     if (v is DateTime) return v;
     if (v is String && v.isNotEmpty) return DateTime.tryParse(v);
     return null;
-  }
-
-  bool _isFoodCategory(String normalizedCategoryKey) {
-    return normalizedCategoryKey == 'alimentacion' ||
-        normalizedCategoryKey == 'food' ||
-        normalizedCategoryKey == 'comida' ||
-        normalizedCategoryKey == 'supermercado';
-  }
-
-  String _normalizeCategoryKey(String raw) {
-    var value = raw.trim().toLowerCase();
-    if (value.isEmpty) return '';
-
-    const replacements = {
-      'á': 'a',
-      'à': 'a',
-      'ä': 'a',
-      'â': 'a',
-      'ã': 'a',
-      'é': 'e',
-      'è': 'e',
-      'ë': 'e',
-      'ê': 'e',
-      'í': 'i',
-      'ì': 'i',
-      'ï': 'i',
-      'î': 'i',
-      'ó': 'o',
-      'ò': 'o',
-      'ö': 'o',
-      'ô': 'o',
-      'õ': 'o',
-      'ú': 'u',
-      'ù': 'u',
-      'ü': 'u',
-      'û': 'u',
-      'ñ': 'n',
-      'ç': 'c',
-    };
-
-    replacements.forEach((from, to) {
-      value = value.replaceAll(from, to);
-    });
-
-    value = value
-        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
-        .replaceAll(RegExp(r'_+'), '_')
-        .replaceAll(RegExp(r'^_|_$'), '');
-    return value;
   }
 
   String _studyHash(Map<String, dynamic> m) {

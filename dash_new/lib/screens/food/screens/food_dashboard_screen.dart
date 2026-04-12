@@ -194,11 +194,10 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       builder: (context, alertSnap) {
         debugPrint('[FoodDashboard][alerts] snapshot state=${alertSnap.connectionState} data=${alertSnap.data}');
         final alerts = alertSnap.data ?? const {};
-        final overBudget = alerts['overBudget'] == true || alerts['foodOverBudget'] == true;
         final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
         final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
-        debugPrint('[FoodDashboard][alerts] overBudget=$overBudget proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
-        if (!overBudget && !proteinLow && !extremeDeficit) {
+        debugPrint('[FoodDashboard][alerts] proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
+        if (!proteinLow && !extremeDeficit) {
           return const SizedBox.shrink();
         }
 
@@ -225,22 +224,6 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
             ),
           );
         }
-        if (overBudget) {
-          final spent = (alerts['spent'] as num?)?.toDouble() ??
-              (alerts['foodOverBudgetSpent'] as num?)?.toDouble() ??
-              0;
-          final limit = (alerts['limit'] as num?)?.toDouble() ??
-              (alerts['foodOverBudgetLimit'] as num?)?.toDouble() ??
-              0;
-          cards.add(
-            _AlertCard(
-              icon: Icons.payments,
-              title: 'Presupuesto de comida superado',
-              message: 'Gastado ${spent.toStringAsFixed(0)} / límite ${limit.toStringAsFixed(0)}.',
-            ),
-          );
-        }
-
         return Column(
           children: cards
               .map((c) => Padding(
@@ -362,7 +345,7 @@ class _FoodDashboardScreenState extends State<FoodDashboardScreen>
       stream: widget.svc.streamShoppingLists(),
       builder: (context, snapshot) {
         final lists = snapshot.data ?? [];
-        final activeLists = lists.where((l) => l.completedAt == null).toList();
+        final activeLists = lists;
         ShoppingList? activeList;
 
         if (activeLists.isNotEmpty) {

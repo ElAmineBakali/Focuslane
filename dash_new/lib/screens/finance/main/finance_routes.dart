@@ -3,7 +3,6 @@
 // V2 Redesigned screens
 import '../main/finance_main_screen.dart';
 import '../screens/forms/transaction_form_screen.dart';
-import '../screens/forms/budget_form_screen.dart';
 import '../screens/forms/subscription_form_screen.dart';
 import '../screens/forms/debt_form_screen.dart';
 import '../screens/forms/asset_form_screen.dart';
@@ -11,7 +10,6 @@ import '../widgets/finance_access_gate.dart';
 
 // Models for argument passing
 import 'package:focuslane/screens/finance/models/transaction_model.dart';
-import 'package:focuslane/screens/finance/models/budget_model.dart';
 import 'package:focuslane/screens/finance/models/subscription_model.dart';
 import 'package:focuslane/screens/finance/models/loan_model.dart';
 import 'package:focuslane/screens/finance/models/asset_model.dart';
@@ -24,27 +22,20 @@ Map<String, WidgetBuilder> financeRoutes = {
   '/finance': (_) => _financeProtected(const FinanceMainScreen(initialIndex: 0)),
   '/finance/transactions':
     (_) => _financeProtected(const FinanceMainScreen(initialIndex: 1)),
-  '/finance/budgets':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 2)),
   '/finance/subscriptions':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 3)),
+    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 2)),
   '/finance/assets':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 4)),
+    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 3)),
   '/finance/debts':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 5)),
+    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 4)),
   '/finance/analytics':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 6)),
+    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 5)),
   '/finance/settings':
-    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 7)),
+    (_) => _financeProtected(const FinanceMainScreen(initialIndex: 6)),
 
   TransactionFormScreen.route: (context) {
     final tx = ModalRoute.of(context)?.settings.arguments as FinanceTransaction?;
     return _financeProtected(TransactionFormScreen(transaction: tx));
-  },
-
-  BudgetFormScreen.route: (context) {
-    final budget = ModalRoute.of(context)?.settings.arguments as Budget?;
-    return _financeProtected(BudgetFormScreen(budget: budget));
   },
 
   SubscriptionFormScreen.route: (context) {

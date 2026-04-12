@@ -7,8 +7,6 @@ import '../screens/recipes_list_screen.dart';
 import '../screens/food_planner_screen.dart';
 import '../screens/shopping_lists_screen.dart';
 import '../screens/pantry_screen.dart';
-import '../screens/food_history_screen.dart';
-import '../screens/food_settings_notifications_screen.dart';
 import '../../../design/ui/layouts/module_shell.dart';
 import '../../../design/ui/layouts/module_sidebar.dart';
 
@@ -33,11 +31,6 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       FoodPlannerScreen(svc: widget.svc),
       ShoppingListsScreen(svc: widget.svc),
       PantryScreen(svc: widget.svc),
-      FoodHistoryScreen(svc: widget.svc),
-      FoodSettingsNotificationsScreen(
-        svc: widget.svc,
-        initialSection: FoodSettingsSection.notificaciones,
-      ),
     ];
   }
 
@@ -51,11 +44,6 @@ class _FoodMainScreenState extends State<FoodMainScreen> {
       const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
       const ModuleSidebarItem(icon: Icons.list_alt, label: 'Listas de Compra'),
       const ModuleSidebarItem(icon: Icons.kitchen, label: 'Despensa'),
-      const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
-      const ModuleSidebarItem(
-        icon: Icons.notifications,
-        label: 'Notificaciones y recordatorios',
-      ),
     ];
 
     return ModuleShell(

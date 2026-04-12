@@ -46,7 +46,7 @@ class SubscriptionsScreen extends StatelessWidget {
                   stream: SubscriptionService.I.watchAll(),
                   builder: (context, snap) {
                     if (snap.hasError) {
-                      return Center(child: Text('Error: ${snap.error}'));
+                      return const Center(child: Text('Error al cargar suscripciones'));
                     }
                     if (snap.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -65,7 +65,7 @@ class SubscriptionsScreen extends StatelessWidget {
                         return ListTile(
                           title: Text(s.title),
                           subtitle: Text(
-                            '${labelForCategory(s.category)} Â· ${s.frequency}',
+                            '${labelForCategory(s.category)} · ${s.frequency}',
                           ),
                           trailing: Text('En $daysLeft d'),
                           onTap: () => Navigator.pushNamed(

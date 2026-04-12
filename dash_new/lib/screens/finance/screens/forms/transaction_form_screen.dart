@@ -528,7 +528,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     return TextFormField(
       initialValue: _envelopeId,
       decoration: InputDecoration(
-        labelText: 'Sobre (Envelope Budgeting)',
+        labelText: 'Sobre',
         hintText: 'Ej: Vacaciones, Emergencias',
         prefixIcon: const Icon(Icons.folder_special),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

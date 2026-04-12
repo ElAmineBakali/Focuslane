@@ -22,6 +22,8 @@ class GymNotificationService {
       'gym_measurements_reminder_enabled';
   static const String _keyMeasurementsReminderTime =
       'gym_measurements_reminder_time';
+  static const String _keyInactivityReminderEnabled =
+      'gym_inactivity_reminder_enabled';
 
   static const int _defaultInactivityDays = 3;
   static const int _defaultWeightDay = DateTime.monday;
@@ -109,6 +111,7 @@ class GymNotificationService {
     int days = _defaultInactivityDays,
   }) async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyInactivityReminderEnabled, true);
     await prefs.setInt(_keyInactivityDays, days);
 
     final entity = const NotificationEntityRef(
@@ -153,6 +156,8 @@ class GymNotificationService {
   }
 
   Future<void> cancelInactivityReminder() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyInactivityReminderEnabled, false);
     await NotificationsFacade.I.cancelByEntity(
       const NotificationEntityRef(
         module: NotificationModule.gym,
@@ -165,6 +170,32 @@ class GymNotificationService {
   Future<int> getInactivityDays() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyInactivityDays) ?? _defaultInactivityDays;
+  }
+
+  Future<bool> isInactivityReminderEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyInactivityReminderEnabled) ?? false;
+  }
+
+  Future<int> getWeightReminderWeekday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyWeightReminderDay) ?? _defaultWeightDay;
+  }
+
+  Future<TimeOfDay> getWeightReminderTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final total =
+        prefs.getInt(_keyWeightReminderTime) ??
+        (_defaultWeightHour * 60 + _defaultWeightMinute);
+    return TimeOfDay(hour: total ~/ 60, minute: total % 60);
+  }
+
+  Future<TimeOfDay> getMeasurementsReminderTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final total =
+        prefs.getInt(_keyMeasurementsReminderTime) ??
+        (_defaultMeasurementsHour * 60 + _defaultMeasurementsMinute);
+    return TimeOfDay(hour: total ~/ 60, minute: total % 60);
   }
 
   Future<void> scheduleWeeklyWeightReminder({

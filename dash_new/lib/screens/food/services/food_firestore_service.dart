@@ -549,6 +549,7 @@ class FoodFirestoreService {
       'name': name,
       'scope': scope.name,
       'isDefault': isDefault,
+      'isCompleted': false,
       'items': [],
       'createdAt': FieldValue.serverTimestamp(),
     });

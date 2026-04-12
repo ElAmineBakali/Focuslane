@@ -615,20 +615,20 @@ class ShoppingList {
   final String name;
   final ShoppingScope scope;
   final bool isDefault;
+  final bool isCompleted;
   final List<ShoppingListItem> items;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final DateTime? completedAt;
 
   const ShoppingList({
     required this.id,
     required this.name,
     required this.scope,
     required this.isDefault,
+    required this.isCompleted,
     required this.items,
     required this.createdAt,
     this.updatedAt,
-    this.completedAt,
   });
 
   factory ShoppingList.fromMap(String id, Map<String, dynamic> m) {
@@ -660,6 +660,7 @@ class ShoppingList {
       name: m['name'] ?? '',
       scope: scope(m['scope']),
       isDefault: m['isDefault'] == true,
+        isCompleted: m['isCompleted'] == true,
       items:
           ((m['items'] as List?) ?? const [])
               .asMap()
@@ -673,7 +674,6 @@ class ShoppingList {
               .toList(),
       createdAt: parse(m['createdAt']),
       updatedAt: m['updatedAt'] != null ? parse(m['updatedAt']) : null,
-      completedAt: m['completedAt'] != null ? parse(m['completedAt']) : null,
     );
   }
 
@@ -681,26 +681,26 @@ class ShoppingList {
     'name': name,
     'scope': scope.name,
     'isDefault': isDefault,
+    'isCompleted': isCompleted,
     'items': items.map((e) => e.toMap()).toList(),
     'createdAt': createdAt.toIso8601String(),
     if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
-    if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
   };
 
   ShoppingList copyWith({
     String? name,
+    bool? isCompleted,
     List<ShoppingListItem>? items,
-    DateTime? completedAt,
   }) {
     return ShoppingList(
       id: id,
       name: name ?? this.name,
       scope: scope,
       isDefault: isDefault,
+      isCompleted: isCompleted ?? this.isCompleted,
       items: items ?? this.items,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
-      completedAt: completedAt ?? this.completedAt,
     );
   }
 }
@@ -817,59 +817,6 @@ class DayMenu {
       snack: snack ?? this.snack,
     );
   }
-}
-
-class CompletedShoppingList {
-  final String id;
-  final String? plannerId;
-  final List<ShoppingListItem> items;
-  final DateTime completedAt;
-  final double? totalSpent;
-
-  const CompletedShoppingList({
-    required this.id,
-    this.plannerId,
-    required this.items,
-    required this.completedAt,
-    this.totalSpent,
-  });
-
-  factory CompletedShoppingList.fromMap(String id, Map<String, dynamic> m) {
-    DateTime parse(dynamic v) {
-      try {
-        if (v == null) return DateTime.now();
-        if (v is DateTime) return v;
-        return DateTime.parse(v.toString());
-      } catch (_) {
-        return DateTime.now();
-      }
-    }
-
-    return CompletedShoppingList(
-      id: id,
-      plannerId: m['plannerId'],
-      items:
-          ((m['items'] as List?) ?? const [])
-              .asMap()
-              .entries
-              .map(
-                (e) => ShoppingListItem.fromMap(
-                  e.key.toString(),
-                  Map<String, dynamic>.from(e.value as Map),
-                ),
-              )
-              .toList(),
-      completedAt: parse(m['completedAt']),
-      totalSpent: (m['totalSpent'] as num?)?.toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toMap() => {
-    if (plannerId != null) 'plannerId': plannerId,
-    'items': items.map((e) => e.toMap()).toList(),
-    'completedAt': completedAt.toIso8601String(),
-    if (totalSpent != null) 'totalSpent': totalSpent,
-  };
 }
 
 extension FavoriteX on Favorite {

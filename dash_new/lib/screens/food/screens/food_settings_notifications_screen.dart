@@ -53,6 +53,7 @@ class _FoodSettingsNotificationsScreenState
   Future<void> _loadConfig() async {
     try {
       final data = await widget.svc.getRemindersConfig();
+      if (!mounted) return;
       final master = data['enabled'] as bool? ?? true;
       final rawReminders = (data['reminders'] as List?) ?? const [];
       final parsed = rawReminders
@@ -74,9 +75,11 @@ class _FoodSettingsNotificationsScreenState
         masterEnabled: _masterEnabled,
         reminders: _reminders,
       );
+      if (!mounted) return;
 
       _scrollToInitialSection();
     } catch (_) {
+      if (!mounted) return;
       setState(() => _loading = false);
     }
   }
@@ -165,6 +168,7 @@ class _FoodSettingsNotificationsScreenState
   Future<void> _toggleMaster(bool value) async {
     setState(() => _masterEnabled = value);
     await _persistAndSchedule();
+    if (!mounted) return;
     if (mounted) {
       FocusFeedback.showSuccess(
         context,
@@ -174,14 +178,17 @@ class _FoodSettingsNotificationsScreenState
   }
 
   Future<void> _toggleReminder(int index, bool value) async {
+    if (index < 0 || index >= _reminders.length) return;
     final reminder = _reminders[index];
     setState(() {
       _reminders[index] = reminder.copyWith(enabled: value);
     });
     await _persistAndSchedule();
+    if (!mounted) return;
   }
 
   Future<void> _changeReminderTime(int index) async {
+    if (index < 0 || index >= _reminders.length) return;
     final reminder = _reminders[index];
     final current = reminder.trigger.timeOfDay ??
         const TimeOfDay(hour: 9, minute: 0);
@@ -189,6 +196,7 @@ class _FoodSettingsNotificationsScreenState
       context: context,
       initialTime: current,
     );
+    if (!mounted) return;
     if (picked == null) return;
 
     final updatedTrigger = FoodReminderTrigger(
@@ -204,6 +212,7 @@ class _FoodSettingsNotificationsScreenState
     });
 
     await _persistAndSchedule();
+    if (!mounted) return;
   }
 
   Future<void> _resetDefaults() async {
@@ -212,18 +221,17 @@ class _FoodSettingsNotificationsScreenState
       _reminders = _defaultReminders();
     });
     await _persistAndSchedule();
-    if (mounted) {
-      FocusFeedback.showSuccess(context, 'Recordatorios restablecidos');
-    }
+    if (!mounted) return;
+    FocusFeedback.showSuccess(context, 'Recordatorios restablecidos');
   }
 
   Future<void> _cancelAll() async {
     await NotificationsFacade.I.cancelByModule(NotificationModule.food);
+    if (!mounted) return;
     setState(() => _masterEnabled = false);
     await _persistAndSchedule();
-    if (mounted) {
-      FocusFeedback.showInfo(context, 'Notificaciones del módulo canceladas');
-    }
+    if (!mounted) return;
+    FocusFeedback.showInfo(context, 'Notificaciones del módulo canceladas');
   }
 
   @override
@@ -232,7 +240,7 @@ class _FoodSettingsNotificationsScreenState
       return const Scaffold(
         appBar: FoodCompactAppBar(
           title: 'Notificaciones y recordatorios',
-          subtitle: 'Módulo Food',
+          subtitle: 'Módulo de nutrición',
         ),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -241,7 +249,7 @@ class _FoodSettingsNotificationsScreenState
     return Scaffold(
       appBar: const FoodCompactAppBar(
         title: 'Notificaciones y recordatorios',
-        subtitle: 'Módulo Food',
+        subtitle: 'Módulo de nutrición',
       ),
       body: ListView(
         controller: _scrollController,
@@ -269,7 +277,7 @@ class _FoodSettingsNotificationsScreenState
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Activar notificaciones'),
-                  subtitle: const Text('Recordatorios diarios del módulo Food'),
+                  subtitle: const Text('Recordatorios diarios del módulo de nutrición'),
                   value: _masterEnabled,
                   onChanged: _toggleMaster,
                 ),

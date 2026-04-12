@@ -46,6 +46,7 @@ class _ShoppingListDetailScreenState
                 name: 'Lista',
                 scope: ShoppingScope.custom,
                 isDefault: false,
+                isCompleted: false,
                 items: const [],
                 createdAt: DateTime.now(),
               ),
@@ -90,7 +91,6 @@ class _ShoppingListDetailScreenState
                   if (value == 'markAll') _markAll(list);
                   if (value == 'clear') _clearPurchased(list);
                   if (value == 'pantry') _sendToPantry(list);
-                  if (value == 'complete') _completeList(list);
                 },
                 itemBuilder:
                     (context) => [
@@ -124,26 +124,6 @@ class _ShoppingListDetailScreenState
                           ],
                         ),
                       ),
-                      if (progress >= 1.0 && list.completedAt == null)
-                        PopupMenuItem(
-                          value: 'complete',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.archive,
-                                size: 18,
-                                color: FocuslaneUI.accent(context),
-                              ),
-                              SizedBox(width: AppSpacing.sm),
-                              Text(
-                                'Archivar al historial',
-                                style: TextStyle(
-                                  color: FocuslaneUI.accent(context),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                     ],
               ),
             ],
@@ -272,6 +252,7 @@ class _ShoppingListDetailScreenState
             ],
           ),
           floatingActionButton: FloatingActionButton(
+            heroTag: 'shoppingListDetailFab_${widget.listId}',
             onPressed: () => _addItemDialog(list),
             child: const Icon(Icons.add),
           ),
@@ -743,51 +724,6 @@ class _ShoppingListDetailScreenState
         context,
         '${purchased.length} enviados a la despensa',
       );
-    }
-  }
-
-  Future<void> _completeList(ShoppingList list) async {
-    final colorScheme = Theme.of(context).colorScheme;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: colorScheme.surface,
-            title: const Text('Archivar lista'),
-            content: const Text(
-              '¿Marcar esta lista como completada y enviarla al historial?\n\nPodrás restaurarla más tarde si lo necesitas.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: FocuslaneUI.accent(context),
-                ),
-                child: const Text('Archivar'),
-              ),
-            ],
-          ),
-    );
-
-    if (confirmed == true && mounted) {
-      try {
-        await widget.svc.updateShoppingList(list.id, {
-          'completedAt': DateTime.now().toIso8601String(),
-        });
-
-        if (mounted) {
-          Navigator.pop(context);
-          FoodFeedback.showSuccess(context, 'Lista archivada');
-        }
-      } catch (e) {
-        if (mounted) {
-          FoodFeedback.showError(context, 'Error al archivar: $e');
-        }
-      }
     }
   }
 

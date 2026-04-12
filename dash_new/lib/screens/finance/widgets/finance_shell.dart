@@ -26,7 +26,6 @@ class FinanceShell extends StatelessWidget {
   static const _routes = <String>[
     '/finance',
     '/finance/transactions',
-    '/finance/budgets',
     '/finance/subscriptions',
     '/finance/assets',
     '/finance/debts',
@@ -37,7 +36,6 @@ class FinanceShell extends StatelessWidget {
   static const _items = <ModuleSidebarItem>[
     ModuleSidebarItem(icon: Icons.dashboard_outlined, label: 'Panel'),
     ModuleSidebarItem(icon: Icons.receipt_long, label: 'Transacciones'),
-    ModuleSidebarItem(icon: Icons.savings_outlined, label: 'Presupuestos'),
     ModuleSidebarItem(icon: Icons.subscriptions_outlined, label: 'Suscripciones'),
     ModuleSidebarItem(icon: Icons.account_balance_wallet_outlined, label: 'Activos'),
     ModuleSidebarItem(icon: Icons.account_balance_outlined, label: 'Deudas'),

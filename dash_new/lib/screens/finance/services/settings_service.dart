@@ -66,7 +66,7 @@ class FinanceSettingsService {
     // WARNING: This deletes ALL finance data
     final batch = _db.batch();
     
-    final collections = ['transactions', 'budgets', 'subscriptions', 'debts', 'assets', 'deposits', 'variable_expenses'];
+    final collections = ['transactions', 'subscriptions', 'debts', 'assets', 'deposits', 'variable_expenses'];
     for (final col in collections) {
       final snapshot = await _db.collection('users').doc(_uid).collection(col).get();
       for (final doc in snapshot.docs) {
