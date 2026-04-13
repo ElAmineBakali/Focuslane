@@ -476,7 +476,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen>
                         ),
                       ),
                       Text(
-                        ' Ã— ${pr.reps}',
+                        ' x ${pr.reps}',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.grey[600],

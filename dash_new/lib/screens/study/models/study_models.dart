@@ -6,7 +6,7 @@ enum Priority { low, normal, high }
 
 enum TaskStatus { todo, doing, done }
 
-enum StudyMethod { pomodoro, flowtime, timeboxing, custom, simple }
+enum StudyMethod { pomodoro, flowtime, timeboxing, simple }
 
 Color? _hex(String? hex) {
   if (hex == null || hex.isEmpty) return null;
@@ -311,7 +311,9 @@ class GradeEntry {
   final String id;
   final String taskId;
   final String courseId;
+  final String? assessmentType;
   final double grade;
+  final double? weight;
   final DateTime date;
   final String? notes;
 
@@ -319,7 +321,9 @@ class GradeEntry {
     required this.id,
     required this.taskId,
     required this.courseId,
+    this.assessmentType,
     required this.grade,
+    this.weight,
     required this.date,
     this.notes,
   });
@@ -340,7 +344,9 @@ class GradeEntry {
       id: id,
       taskId: m['taskId'] ?? '',
       courseId: m['courseId'] ?? '',
+      assessmentType: m['assessmentType'] as String?,
       grade: (m['grade'] as num?)?.toDouble() ?? 0.0,
+      weight: (m['weight'] as num?)?.toDouble(),
       date: parseDate(m['date']),
       notes: m['notes'],
     );
@@ -349,7 +355,9 @@ class GradeEntry {
   Map<String, dynamic> toMap() => {
     'taskId': taskId,
     'courseId': courseId,
+    if (assessmentType != null) 'assessmentType': assessmentType,
     'grade': grade,
+    if (weight != null) 'weight': weight,
     'date': date.toIso8601String(),
     if (notes != null) 'notes': notes,
   };

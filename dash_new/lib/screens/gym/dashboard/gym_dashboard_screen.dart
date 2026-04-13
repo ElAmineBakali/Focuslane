@@ -7,7 +7,6 @@ import '../../gym/services/gym_firestore_service.dart';
 import '../../gym/routines/routines_list_screen.dart';
 import '../../gym/routines/routine_detail_screen.dart';
 import '../../gym/session/session_history_screen.dart';
-import '../../gym/goals/gym_goals_screen.dart';
 import '../../../design/ui/components/focus_card.dart';
 import '../../../design/ui/components/focus_metric_card.dart';
 import '../../../design/ui/components/focus_section_title.dart';
@@ -233,14 +232,6 @@ class GymDashboardScreen extends StatelessWidget {
                               label: 'Peso actual / objetivo',
                               value: weightText,
                               subtitle: targetText,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => GymGoalsScreen(svc: svc),
-                                  ),
-                                );
-                              },
                             ),
                           ];
 
@@ -428,7 +419,7 @@ class GymDashboardScreen extends StatelessWidget {
                                   final date = DateFormat('d MMM', 'es')
                                       .format(s.date);
                                   final subtitle =
-                                      '${s.routineName} Â· $date';
+                                      '${s.routineName} · $date';
                                   final volume = s.volumeKg > 0
                                       ? '${(s.volumeKg / 1000).toStringAsFixed(1)} ton'
                                       : '–';
@@ -463,15 +454,15 @@ class GymDashboardScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const FocusSectionTitle(
-                          title: 'Objetivos',
-                          subtitle: 'Metas y seguimiento',
+                          title: 'Progreso',
+                          subtitle: 'Seguimiento de entrenamientos',
                         ),
                         FocusCard(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Define tus objetivos de fuerza y peso.',
+                                'Revisa tu historial para seguir volumen y constancia.',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: FocuslaneTokens.spacing12),
@@ -480,11 +471,11 @@ class GymDashboardScreen extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => GymGoalsScreen(svc: svc),
+                                      builder: (_) => SessionHistoryScreen(svc: svc),
                                     ),
                                   );
                                 },
-                                child: const Text('Abrir objetivos'),
+                                child: const Text('Abrir historial'),
                               ),
                             ],
                           ),

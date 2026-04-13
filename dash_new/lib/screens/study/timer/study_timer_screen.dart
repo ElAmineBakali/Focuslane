@@ -288,17 +288,6 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       case StudyMethod.timeboxing:
         _startBox('work', (_cfg['block'] ?? 50).toInt());
         break;
-      case StudyMethod.custom:
-        final seq =
-            (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
-            const [];
-        if (seq.isEmpty) {
-          AppToast.error(context, 'Secuencia vacía');
-          return;
-        }
-        final first = seq.first;
-        _startBox('work', (first['work'] ?? 40).toInt());
-        break;
       case StudyMethod.simple:
         _phase = 'counting';
         _totalTime = 0;
@@ -443,14 +432,6 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         }
         if (_method == StudyMethod.timeboxing && _phase == 'work') {
           _changePhase('rest', (_cfg['rest'] ?? 10).toInt() * 60, after: () {});
-          return;
-        }
-        if (_method == StudyMethod.custom && _phase == 'work') {
-          final seq =
-              (_cfg['sequence'] as List?)?.cast<Map<String, dynamic>>() ??
-              const [];
-          final currentRest = (seq.first['rest'] ?? 10).toInt();
-          _changePhase('rest', currentRest * 60, after: () {});
           return;
         }
         if (_method == StudyMethod.pomodoro) {
@@ -881,8 +862,6 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         final block = (_cfg['block'] ?? 50).toString();
         final rest = (_cfg['rest'] ?? 10).toString();
         return 'Timeboxing • $block min bloque / $rest min pausa';
-      case StudyMethod.custom:
-        return 'Secuencia personalizada • ${(_cfg['sequence'] as List? ?? []).length} bloques';
       case StudyMethod.simple:
         return 'Cronómetro simple • cuenta ascendente';
     }

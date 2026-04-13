@@ -28,6 +28,8 @@ class CoreSyncService {
 
   static const _actorStudy = 'core-sync:study';
   static const _actorTasks = 'core-sync:tasks';
+  final Set<String> _processingStudyTaskIds = <String>{};
+  final Set<String> _processingTaskIds = <String>{};
 
   void debugPrint(String message) {
     if (!kCoreSyncDebug) return;
@@ -396,8 +398,30 @@ class CoreSyncService {
   ) async {
     debugPrint('[CoreSync][_mirrorStudyIntoTasks] ENTER uid=$uid changes=${snap.docChanges.length}');
     for (final change in snap.docChanges) {
+      final processingKey = '$uid:${change.doc.id}';
+      if (!_processingStudyTaskIds.add(processingKey)) {
+        continue;
+      }
+      try {
       if (change.type == DocumentChangeType.removed) {
-        debugPrint('[CoreSync][_mirrorStudyIntoTasks]   SKIP removed doc=${change.doc.id}');
+        final linkedTaskId =
+            (change.doc.data()?['syncedTaskId'] ?? '').toString();
+        if (linkedTaskId.isNotEmpty) {
+          final linkedRef = _db
+              .collection('users')
+              .doc(uid)
+              .collection('tasks')
+              .doc(linkedTaskId);
+          final linkedSnap = await linkedRef.get();
+          if (linkedSnap.exists) {
+            final linkedData = linkedSnap.data() ?? const <String, dynamic>{};
+            final fromStudyId =
+                (linkedData['syncedStudyTaskId'] ?? '').toString();
+            if (fromStudyId == change.doc.id) {
+              await linkedRef.delete();
+            }
+          }
+        }
         continue;
       }
       final raw = change.doc.data();
@@ -414,6 +438,24 @@ class CoreSyncService {
       var linkedTaskId = (data['syncedTaskId'] ?? '').toString();
 
       if (linkedTaskId.isEmpty) {
+        final existing = await _db
+            .collection('users')
+            .doc(uid)
+            .collection('tasks')
+            .where('syncedStudyTaskId', isEqualTo: change.doc.id)
+            .limit(1)
+            .get();
+        if (existing.docs.isNotEmpty) {
+          linkedTaskId = existing.docs.first.id;
+          final backPatch = {
+            'syncedTaskId': linkedTaskId,
+            ..._metaPatch(_actorStudy, hash),
+          };
+          _logWrite('users/$uid/study/root/tasks/${change.doc.id}', backPatch);
+          await change.doc.reference.set(backPatch, SetOptions(merge: true));
+          continue;
+        }
+
         final due = _parseDueDate(data['due']);
         final priority = _mapStudyPriority(data['priority']);
         final newTaskRef = _db.collection('users').doc(uid).collection('tasks').doc();
@@ -458,9 +500,15 @@ class CoreSyncService {
 
       _logWrite('users/$uid/tasks/$linkedTaskId', patch);
       await ref.set(patch, SetOptions(merge: true));
-      // NOTE: No backpatch to study doc for existing links —
-      // the link (syncedTaskId) is already set and updating
-      // syncMeta here would trigger the study listener again.
+      final backPatch = {
+        'syncedTaskId': linkedTaskId,
+        ..._metaPatch(_actorStudy, hash),
+      };
+      _logWrite('users/$uid/study/root/tasks/${change.doc.id}', backPatch);
+      await change.doc.reference.set(backPatch, SetOptions(merge: true));
+      } finally {
+        _processingStudyTaskIds.remove(processingKey);
+      }
     }
   }
 
@@ -470,8 +518,31 @@ class CoreSyncService {
   ) async {
     debugPrint('[CoreSync][_mirrorTasksIntoStudy] ENTER uid=$uid changes=${snap.docChanges.length}');
     for (final change in snap.docChanges) {
+      final processingKey = '$uid:${change.doc.id}';
+      if (!_processingTaskIds.add(processingKey)) {
+        continue;
+      }
+      try {
       if (change.type == DocumentChangeType.removed) {
-        debugPrint('[CoreSync][_mirrorTasksIntoStudy]   SKIP removed doc=${change.doc.id}');
+        final linkedStudyId =
+            (change.doc.data()?['syncedStudyTaskId'] ?? '').toString();
+        if (linkedStudyId.isNotEmpty) {
+          final linkedRef = _db
+              .collection('users')
+              .doc(uid)
+              .collection('study')
+              .doc('root')
+              .collection('tasks')
+              .doc(linkedStudyId);
+          final linkedSnap = await linkedRef.get();
+          if (linkedSnap.exists) {
+            final linkedData = linkedSnap.data() ?? const <String, dynamic>{};
+            final fromTaskId = (linkedData['syncedTaskId'] ?? '').toString();
+            if (fromTaskId == change.doc.id) {
+              await linkedRef.delete();
+            }
+          }
+        }
         continue;
       }
       final raw = change.doc.data();
@@ -489,6 +560,26 @@ class CoreSyncService {
       if (linkedStudyId.isEmpty) {
         final linkedCourseId = (data['linkedStudyCourseId'] ?? '').toString();
         if (linkedCourseId.isNotEmpty) {
+          final existing = await _db
+              .collection('users')
+              .doc(uid)
+              .collection('study')
+              .doc('root')
+              .collection('tasks')
+              .where('syncedTaskId', isEqualTo: change.doc.id)
+              .limit(1)
+              .get();
+          if (existing.docs.isNotEmpty) {
+            linkedStudyId = existing.docs.first.id;
+            final taskBackPatch = {
+              'syncedStudyTaskId': linkedStudyId,
+              ..._metaPatch(_actorTasks, hash),
+            };
+            _logWrite('users/$uid/tasks/${change.doc.id}', taskBackPatch);
+            await change.doc.reference.set(taskBackPatch, SetOptions(merge: true));
+            continue;
+          }
+
           final due = _parseDueDate(data['dueDate']);
           final status = (data['completed'] == true) ? 'done' : 'todo';
           final priority = _mapTaskPriority(data['priority']);
@@ -550,9 +641,15 @@ class CoreSyncService {
 
       _logWrite('users/$uid/study/root/tasks/$linkedStudyId', patch);
       await ref.set(patch, SetOptions(merge: true));
-      // NOTE: No backpatch to task doc for existing links —
-      // the link (syncedStudyTaskId) is already set and updating
-      // syncMeta here would trigger the tasks listener again.
+      final taskBackPatch = {
+        'syncedStudyTaskId': linkedStudyId,
+        ..._metaPatch(_actorTasks, hash),
+      };
+      _logWrite('users/$uid/tasks/${change.doc.id}', taskBackPatch);
+      await change.doc.reference.set(taskBackPatch, SetOptions(merge: true));
+      } finally {
+        _processingTaskIds.remove(processingKey);
+      }
     }
   }
 

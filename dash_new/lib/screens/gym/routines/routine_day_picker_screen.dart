@@ -223,7 +223,7 @@ class _LastDoneMini extends StatelessWidget {
             lastLocal.month == now.month &&
             lastLocal.day == now.day;
 
-        return Text(sameDay ? 'Hecho hoy âœ“' : 'Última vez: $lastLocal');
+        return Text(sameDay ? 'Hecho hoy' : 'Ultima vez: $lastLocal');
       },
     );
   }

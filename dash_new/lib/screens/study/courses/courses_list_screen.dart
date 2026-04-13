@@ -7,7 +7,6 @@ import '../models/study_models.dart';
 import 'course_edit_sheet.dart';
 import 'course_detail_editable_screen.dart';
 import 'external_links_sheet.dart';
-import '../settings/study_settings_sheet.dart';
 import '../../../design/ui/components/focus_module_header.dart';
 
 class CoursesListScreen extends StatelessWidget {
@@ -33,18 +32,6 @@ class CoursesListScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: colorScheme.surface,
         actions: [
-          IconButton(
-            tooltip: 'Ajustes de Study',
-            icon: const Icon(Icons.settings_rounded),
-            onPressed: () async {
-              await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => StudySettingsSheet(svc: svc),
-              );
-            },
-          ),
           IconButton(
             tooltip: 'Enlaces externos',
             icon: const Icon(Icons.link_rounded),

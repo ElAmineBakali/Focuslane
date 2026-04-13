@@ -480,7 +480,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 leading: const Icon(Icons.fitness_center, size: 20),
                 title: Text(ex.name, style: GoogleFonts.poppins(fontSize: 13)),
                 subtitle: Text(
-                  '${ex.targetSets} Ã— ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
+                  '${ex.targetSets} x ${ex.targetReps}${ex.targetRPE != null ? ' @RPE ${ex.targetRPE}' : ''}',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     color: Colors.grey[600],
@@ -547,7 +547,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
                 const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
                 Text(
-                  'âœ… Rutina "${routine.name}" creada',
+                  'Rutina "${routine.name}" creada correctamente',
                   style: GoogleFonts.poppins(color: Colors.white),
                 ),
               ],

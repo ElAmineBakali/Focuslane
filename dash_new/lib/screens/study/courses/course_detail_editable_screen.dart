@@ -403,6 +403,91 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                       const SizedBox(height: 12),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.grading),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Calificaciones',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await _showAddGradeDialog(context);
+                                    },
+                                    icon: const Icon(Icons.add_circle_outline),
+                                    tooltip: 'Agregar calificacion',
+                                  ),
+                                ],
+                              ),
+                              StreamBuilder<List<GradeEntry>>(
+                                stream: widget.svc.streamGrades(
+                                  courseId: widget.course.id,
+                                ),
+                                builder: (context, snapshot) {
+                                  final grades = snapshot.data ?? const <GradeEntry>[];
+                                  if (grades.isEmpty) {
+                                    return const Padding(
+                                      padding: EdgeInsets.only(top: 8),
+                                      child: Text('Aun no hay calificaciones registradas'),
+                                    );
+                                  }
+
+                                  final average =
+                                      grades.map((grade) => grade.grade).reduce((a, b) => a + b) /
+                                      grades.length;
+
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          'Promedio: ${average.toStringAsFixed(2)}',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      ...grades.take(6).map(
+                                        (grade) => ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                          leading: const Icon(Icons.assignment_outlined),
+                                          title: Text(
+                                            grade.taskId,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            '${grade.assessmentType ?? 'Evaluacion'} • Nota ${grade.grade.toStringAsFixed(2)} • ${_formatGradeDate(grade.date)}',
+                                          ),
+                                          trailing: IconButton(
+                                            icon: const Icon(Icons.delete_outline),
+                                            onPressed: () => widget.svc.deleteGrade(grade.id),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       _StatCard(
                         icon: Icons.school_rounded,
                         label: 'Profesor',
@@ -450,6 +535,125 @@ class _CourseDetailEditableScreenState
         ],
       ),
     );
+  }
+
+  Future<void> _showAddGradeDialog(BuildContext context) async {
+    final nameCtrl = TextEditingController();
+    final typeCtrl = TextEditingController(text: 'Examen');
+    final gradeCtrl = TextEditingController();
+    final weightCtrl = TextEditingController();
+    final commentCtrl = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setLocalState) {
+            return AlertDialog(
+              title: const Text('Registrar calificacion'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre de la prueba',
+                      ),
+                    ),
+                    TextField(
+                      controller: typeCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo (examen, practica, parcial)',
+                      ),
+                    ),
+                    TextField(
+                      controller: gradeCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Nota'),
+                    ),
+                    TextField(
+                      controller: weightCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Peso (%) opcional',
+                      ),
+                    ),
+                    TextField(
+                      controller: commentCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Comentario opcional',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(Icons.event_outlined),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text('Fecha: ${_formatGradeDate(selectedDate)}'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            final picked = await showDatePicker(
+                              context: ctx,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                              initialDate: selectedDate,
+                            );
+                            if (picked != null) {
+                              setLocalState(() => selectedDate = picked);
+                            }
+                          },
+                          child: const Text('Cambiar'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancelar'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Guardar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (saved != true) return;
+    final grade = double.tryParse(gradeCtrl.text.trim().replaceAll(',', '.'));
+    final assessmentName = nameCtrl.text.trim();
+    if (grade == null || assessmentName.isEmpty) return;
+
+    await widget.svc.addGrade(
+      GradeEntry(
+        id: '',
+        taskId: assessmentName,
+        courseId: widget.course.id,
+        assessmentType:
+            typeCtrl.text.trim().isEmpty ? null : typeCtrl.text.trim(),
+        grade: grade,
+        weight: double.tryParse(weightCtrl.text.trim().replaceAll(',', '.')),
+        date: selectedDate,
+        notes: commentCtrl.text.trim().isEmpty ? null : commentCtrl.text.trim(),
+      ),
+    );
+  }
+
+  static String _formatGradeDate(DateTime date) {
+    final d = date.day.toString().padLeft(2, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final y = date.year.toString();
+    return '$d/$m/$y';
   }
 }
 

@@ -17,8 +17,6 @@ class SessionSummaryScreen extends StatelessWidget {
         return 'Flowtime';
       case StudyMethod.timeboxing:
         return 'Timeboxing';
-      case StudyMethod.custom:
-        return 'Personalizado';
       case StudyMethod.simple:
         return 'Simple';
     }

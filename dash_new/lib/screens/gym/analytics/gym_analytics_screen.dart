@@ -1486,7 +1486,10 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
               children: [
                 const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
-                Text('Peso guardado âœ…', style: GoogleFonts.poppins()),
+                Text(
+                  'Peso guardado correctamente',
+                  style: GoogleFonts.poppins(),
+                ),
               ],
             ),
           ),
@@ -1763,7 +1766,10 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
               children: [
                 const Icon(Icons.check_circle),
                 const SizedBox(width: 8),
-                Text('Medida guardada ðŸ“', style: GoogleFonts.poppins()),
+                Text(
+                  'Medida guardada correctamente',
+                  style: GoogleFonts.poppins(),
+                ),
               ],
             ),
           ),

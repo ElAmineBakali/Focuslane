@@ -43,7 +43,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('âœ… Sensaciones guardadas'),
+            content: Text('Sensaciones guardadas correctamente'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -93,7 +93,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('âœ… Sesión eliminada'),
+            content: Text('Sesion eliminada correctamente'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -190,7 +190,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
                     const SizedBox(height: 4),
                     for (int i = 0; i < e.sets.length; i++)
                       Text(
-                        'Set ${i + 1}: ${e.sets[i].weight.toStringAsFixed(1)} kg Ã— ${e.sets[i].reps} reps'
+                        'Set ${i + 1}: ${e.sets[i].weight.toStringAsFixed(1)} kg x ${e.sets[i].reps} reps'
                         '${e.sets[i].rpe != null ? ' • RPE ${e.sets[i].rpe}' : ''}',
                       ),
                     const SizedBox(height: 4),

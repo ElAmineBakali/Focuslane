@@ -40,16 +40,6 @@ class _PresetsSheetState extends State<PresetsSheet> {
           ..clear()
           ..addAll({'block': 50, 'rest': 10});
         break;
-      case StudyMethod.custom:
-        _params
-          ..clear()
-          ..addAll({
-            'sequence': [
-              {'label': 'W1', 'work': 40, 'rest': 10},
-              {'label': 'W2', 'work': 40, 'rest': 10},
-            ],
-          });
-        break;
       case StudyMethod.simple:
         _params
           ..clear()
@@ -581,8 +571,6 @@ class _PresetsSheetState extends State<PresetsSheet> {
         return Icons.waves_rounded;
       case StudyMethod.timeboxing:
         return Icons.grid_view_rounded;
-      case StudyMethod.custom:
-        return Icons.tune_rounded;
       case StudyMethod.simple:
         return Icons.play_circle_rounded;
     }
@@ -596,8 +584,6 @@ class _PresetsSheetState extends State<PresetsSheet> {
         return Colors.blue;
       case StudyMethod.timeboxing:
         return Colors.purple;
-      case StudyMethod.custom:
-        return Colors.orange;
       case StudyMethod.simple:
         return Colors.green;
     }
@@ -611,8 +597,6 @@ class _PresetsSheetState extends State<PresetsSheet> {
         return 'Flowtime';
       case StudyMethod.timeboxing:
         return 'Timeboxing';
-      case StudyMethod.custom:
-        return 'Personalizado';
       case StudyMethod.simple:
         return 'Simple';
     }
@@ -685,33 +669,6 @@ class _ParamsEditorState extends State<_ParamsEditor> {
             const SizedBox(height: 12),
             _num('Descanso (min)', 'rest', Icons.free_breakfast_rounded),
           ],
-        );
-      case StudyMethod.custom:
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                color: Colors.orange.shade700,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Secuencia personalizada: edita los detalles en Firestore',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    color: Colors.orange.shade900,
-                  ),
-                ),
-              ),
-            ],
-          ),
         );
       case StudyMethod.simple:
         return _num('Objetivo (minutos)', 'target', Icons.flag_rounded);

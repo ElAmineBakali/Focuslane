@@ -277,7 +277,7 @@ class RoutineDetailScreen extends StatelessWidget {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               _buildSnackBar(
-                                'Día duplicado âœ¨',
+                                  'Dia duplicado correctamente',
                                 Icons.copy_all_rounded,
                                 s,
                               ),
@@ -323,7 +323,7 @@ class RoutineDetailScreen extends StatelessWidget {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 _buildSnackBar(
-                                  'Día eliminado ðŸ—‘ï¸',
+                                  'Dia eliminado correctamente',
                                   Icons.delete_outline,
                                   s,
                                 ),
@@ -527,7 +527,7 @@ class RoutineDetailScreen extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         _buildSnackBar(
-          'Día "$name" creado correctamente ðŸŽ‰',
+          'Dia "$name" creado correctamente',
           Icons.check_circle_rounded,
           Theme.of(context).colorScheme,
         ),

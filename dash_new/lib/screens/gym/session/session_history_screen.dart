@@ -321,20 +321,20 @@ class _SessionHistoryScreenState extends State<SessionHistoryScreen> {
                       const SizedBox(width: 6),
                       if (session.feelingEnergy != null)
                         Text(
-                          'âš¡ ${session.feelingEnergy}',
+                          'Energia ${session.feelingEnergy}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       if (session.feelingFatigue != null) ...[
                         const SizedBox(width: 8),
                         Text(
-                          'ðŸ’ª ${session.feelingFatigue}',
+                          'Fatiga ${session.feelingFatigue}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       ],
                       if (session.feelingMotivation != null) ...[
                         const SizedBox(width: 8),
                         Text(
-                          'â¤ï¸ ${session.feelingMotivation}',
+                          'Motivacion ${session.feelingMotivation}',
                           style: GoogleFonts.poppins(fontSize: 11),
                         ),
                       ],

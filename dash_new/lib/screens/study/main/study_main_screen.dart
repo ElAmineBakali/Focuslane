@@ -5,9 +5,7 @@ import '../../study/diary/study_diary_screen.dart';
 import '../../study/catalog/study_catalog_screen.dart';
 import '../../study/planner/study_planner_screen.dart';
 import '../../study/lists/study_lists_screen.dart';
-import '../../study/pantry/study_pantry_screen.dart';
 import '../../study/history/study_history_screen.dart';
-import '../../study/settings/study_settings_screen.dart';
 import '../../../design/ui/layouts/module_shell.dart';
 import '../../../design/ui/layouts/module_sidebar.dart';
 
@@ -30,9 +28,7 @@ class _StudyMainScreenState extends State<StudyMainScreen> {
       StudyCatalogScreen(svc: widget.svc),
       StudyPlannerScreen(svc: widget.svc),
       StudyListsScreen(svc: widget.svc),
-      StudyPantryScreen(svc: widget.svc),
       StudyHistoryScreen(svc: widget.svc),
-      StudySettingsScreen(svc: widget.svc),
     ];
   }
 
@@ -44,9 +40,7 @@ class _StudyMainScreenState extends State<StudyMainScreen> {
       const ModuleSidebarItem(icon: Icons.school, label: 'Cursos'),
       const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
       const ModuleSidebarItem(icon: Icons.checklist, label: 'Tareas'),
-      const ModuleSidebarItem(icon: Icons.insights, label: 'Notas'),
       const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
-      const ModuleSidebarItem(icon: Icons.tune, label: 'Ajustes'),
     ];
 
     return ModuleShell(

@@ -9,9 +9,6 @@ import 'package:focuslane/screens/finance/main/finance_routes.dart';
 import 'package:focuslane/screens/food/main/food_main_screen.dart';
 import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'package:focuslane/screens/gym/analytics/gym_analytics_screen.dart';
-import 'package:focuslane/screens/gym/body/bodyweight_screen.dart';
-import 'package:focuslane/screens/gym/body/measurements_screen.dart';
-import 'package:focuslane/screens/gym/goals/gym_goals_screen.dart';
 import 'package:focuslane/screens/gym/main/gym_main_screen.dart';
 import 'package:focuslane/screens/gym/routines/routines_list_screen.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
@@ -111,18 +108,6 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
     '/gym/analytics': (_) {
       final service = deps.gymService();
       return GymAnalyticsScreen(svc: service);
-    },
-    '/gym/goals': (_) {
-      final service = deps.gymService();
-      return GymGoalsScreen(svc: service);
-    },
-    '/gym/body/weight': (_) {
-      final service = deps.gymService();
-      return BodyweightScreen(svc: service);
-    },
-    '/gym/body/measurements': (_) {
-      final service = deps.gymService();
-      return MeasurementsScreen(svc: service);
     },
     AppRoutes.studyDashboard: (_) {
       final service = deps.studyService();

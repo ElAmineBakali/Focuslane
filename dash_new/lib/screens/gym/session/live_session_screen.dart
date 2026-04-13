@@ -669,7 +669,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                         runSpacing: 4,
                         children: [
                           _buildMetaChip(
-                            '${e.targetSets} Ã— ${e.targetReps}',
+                            '${e.targetSets} x ${e.targetReps}',
                             Icons.repeat_rounded,
                             s,
                           ),
@@ -918,7 +918,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${sets[i].weight.toStringAsFixed(1)} kg Ã— ${sets[i].reps} reps',
+                                    '${sets[i].weight.toStringAsFixed(1)} kg x ${sets[i].reps} reps',
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
