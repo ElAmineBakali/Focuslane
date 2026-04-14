@@ -1,11 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:flutter/services.dart';
-import '../../../design/ui/components/focus_card.dart';
-import '../../../design/ui/components/focus_module_header.dart';
-import '../../../design/ui/components/focus_text_field.dart';
-import '../../../design/ui/feedback/focus_feedback.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/components/focus_text_field.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class FoodCompactCard extends StatelessWidget {
   final Widget child;
@@ -309,5 +309,6 @@ class FoodFeedback {
     FocusFeedback.showInfo(context, message);
   }
 }
+
 
 

@@ -3,9 +3,9 @@ import 'package:focuslane/screens/finance/models/subscription_model.dart';
 import 'package:focuslane/screens/finance/services/finance_category_labels.dart';
 import 'package:focuslane/screens/finance/services/subscription_service.dart';
 
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/components/focus_module_header.dart';
-import '../../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class SubscriptionsScreen extends StatelessWidget {
   const SubscriptionsScreen({
@@ -86,6 +86,7 @@ class SubscriptionsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

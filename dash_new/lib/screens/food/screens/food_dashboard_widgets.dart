@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/ui/components/focus_metric_card.dart';
-import '../widgets/food_compact_widgets.dart';
-import '../models/food_models.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_metric_card.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class FoodMetricCard extends StatelessWidget {
   final IconData icon;
@@ -616,4 +616,5 @@ class _FoodShoppingListCardState extends State<FoodShoppingListCard> {
     );
   }
 }
+
 

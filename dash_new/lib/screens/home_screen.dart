@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:focuslane/core/services/core_sync_service.dart';
-import 'package:focuslane/screens/home/home_dashboard_screen.dart';
+import 'package:focuslane/screens/home/screens/home_dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,4 +25,5 @@ class _HomeScreenState extends State<HomeScreen> {
     return const HomeDashboardScreen();
   }
 }
+
 

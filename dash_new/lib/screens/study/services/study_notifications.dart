@@ -8,7 +8,6 @@ import 'package:focuslane/core/notifications/models/notification_intent.dart';
 import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'study_firestore_service.dart';
-import '../models/study_models.dart';
 
 class StudyNotifications {
   final StudyFirestoreService svc;
@@ -162,5 +161,6 @@ class StudyNotifications {
     }
   }
 }
+
 
 

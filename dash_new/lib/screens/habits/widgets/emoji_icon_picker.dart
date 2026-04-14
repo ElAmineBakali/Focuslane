@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:focuslane/screens/habits/habit_constants.dart';
+import 'package:focuslane/screens/habits/utils/habit_constants.dart';
 
 class EmojiIconPicker extends StatefulWidget {
   final String? selectedEmoji;
@@ -264,4 +264,5 @@ class _EmojiIconPickerState extends State<EmojiIconPicker>
     );
   }
 }
+
 

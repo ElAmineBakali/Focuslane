@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:focuslane/screens/finance/models/subscription_model.dart';
 import 'package:focuslane/screens/finance/services/subscription_service.dart';
 
-import '../../widgets/finance_shell.dart';
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/screens/finance/widgets/finance_shell.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
 
 class SubscriptionFormScreen extends StatefulWidget {
   const SubscriptionFormScreen({super.key, this.subscription});
@@ -330,5 +330,6 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
     super.dispose();
   }
 }
+
 
 

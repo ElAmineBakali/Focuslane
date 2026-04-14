@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:focuslane/screens/habits/habit_constants.dart';
+import 'package:focuslane/screens/habits/utils/habit_constants.dart';
 
 class TemplateSelector extends StatelessWidget {
   final Function(HabitTemplate) onSelect;
@@ -190,4 +190,5 @@ class TemplateSelector extends StatelessWidget {
     );
   }
 }
+
 

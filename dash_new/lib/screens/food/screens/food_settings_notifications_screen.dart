@@ -1,20 +1,20 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
-import '../../../core/notifications/local/android_channel_catalog.dart';
-import '../../../core/notifications/models/notification_action.dart';
-import '../../../core/notifications/models/notification_content.dart';
-import '../../../core/notifications/models/notification_delivery.dart';
-import '../../../core/notifications/models/notification_entity_ref.dart';
-import '../../../core/notifications/models/notification_intent.dart';
-import '../../../core/notifications/models/notification_schedule.dart';
-import '../../../core/notifications/notifications_facade.dart';
-import '../../../design/ui/shared/app_card.dart';
-import '../../../design/ui/feedback/focus_feedback.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
-import '../models/food_notification_models.dart';
-import '../services/food_firestore_service.dart';
-import '../widgets/food_compact_widgets.dart';
+import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
+import 'package:focuslane/core/notifications/models/notification_action.dart';
+import 'package:focuslane/core/notifications/models/notification_content.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
+import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
+import 'package:focuslane/core/notifications/models/notification_intent.dart';
+import 'package:focuslane/core/notifications/models/notification_schedule.dart';
+import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/design/ui/shared/app_card.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/screens/food/models/food_notification_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 
 enum FoodSettingsSection { notificaciones, configuracion }
 
@@ -512,5 +512,6 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+
 
 

@@ -7,9 +7,9 @@ import 'dart:io';
 import 'package:focuslane/screens/finance/models/asset_model.dart';
 import 'package:focuslane/screens/finance/services/asset_service.dart';
 
-import '../../widgets/finance_shell.dart';
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/screens/finance/widgets/finance_shell.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
 
 class AssetFormScreen extends StatefulWidget {
   const AssetFormScreen({super.key, this.asset});
@@ -391,5 +391,6 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
     super.dispose();
   }
 }
+
 
 

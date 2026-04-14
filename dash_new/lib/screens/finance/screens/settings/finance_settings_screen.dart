@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/components/focus_module_header.dart';
-import '../../../../design/ui/tokens/focuslane_tokens.dart';
-import '../../services/finance_security_service.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/screens/finance/services/finance_security_service.dart';
 
 class FinanceSettingsScreen extends StatefulWidget {
   const FinanceSettingsScreen({
@@ -222,6 +222,7 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
     );
   }
 }
+
 
 
 

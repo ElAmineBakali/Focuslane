@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/study_models.dart';
+import 'package:focuslane/screens/study/models/study_models.dart';
 
 class StudyTasksSyncService {
   final String _fallbackUserId;
@@ -118,3 +118,4 @@ class StudyTasksSyncService {
     }
   }
 }
+

@@ -16,9 +16,9 @@ import 'package:focuslane/screens/finance/services/finance_ai_preferences.dart';
 import 'package:focuslane/screens/finance/services/finance_receipt_ai_service.dart';
 import 'package:focuslane/screens/finance/services/transaction_service.dart';
 
-import '../../widgets/finance_shell.dart';
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/screens/finance/widgets/finance_shell.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
 
 class TransactionFormScreen extends StatefulWidget {
   const TransactionFormScreen({super.key, this.transaction});
@@ -1398,5 +1398,6 @@ class _AiSuggestion {
     );
   }
 }
+
 
 

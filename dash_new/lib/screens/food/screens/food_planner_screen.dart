@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../../../design/ui/components/focus_badge.dart';
-import '../../../design/ui/components/focus_primary_button.dart';
-import '../models/food_models.dart';
-import '../services/food_firestore_service.dart';
-import '../widgets/food_compact_widgets.dart';
+import 'package:focuslane/design/ui/components/focus_badge.dart';
+import 'package:focuslane/design/ui/components/focus_primary_button.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 
 IconData _iconFromCodePoint(int codePoint) {
   switch (codePoint) {
@@ -1645,4 +1645,5 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
     );
   }
 }
+
 

@@ -1,11 +1,11 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
-import '../../../core/services/ai_backend_client.dart';
+import 'package:focuslane/core/services/ai_backend_client.dart';
 
 class CaloriesAiMacros {
   final double protein;
@@ -148,7 +148,7 @@ class FoodPhotoAiService {
         );
       }
       throw const FoodPhotoAiException(
-        'La imagen supera el máximo permitido de 2MB.',
+        'La imagen supera el mÃ¡ximo permitido de 2MB.',
       );
     }
 
@@ -174,7 +174,7 @@ class FoodPhotoAiService {
         );
       }
       throw const FoodPhotoAiException(
-        'La imagen supera el máximo permitido de 2MB.',
+        'La imagen supera el mÃ¡ximo permitido de 2MB.',
       );
     }
 
@@ -219,7 +219,7 @@ Uint8List _compressForAiIsolate(Map<String, dynamic> payload) {
   if (decoded == null) {
     if (bytes.length <= maxBytes) return bytes;
     throw const FoodPhotoAiException(
-      'La imagen supera el máximo permitido de 2MB.',
+      'La imagen supera el mÃ¡ximo permitido de 2MB.',
     );
   }
 
@@ -245,3 +245,4 @@ Uint8List _compressForAiIsolate(Map<String, dynamic> payload) {
 
   return encoded;
 }
+

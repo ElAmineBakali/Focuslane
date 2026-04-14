@@ -7,7 +7,7 @@ import 'package:focuslane/core/notifications/models/notification_entity_ref.dart
 import 'package:focuslane/core/notifications/models/notification_intent.dart';
 import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
-import 'package:focuslane/screens/tasks/task_model.dart';
+import 'package:focuslane/screens/tasks/models/task_model.dart';
 
 class ReminderService {
   ReminderService._();
@@ -92,5 +92,6 @@ class ReminderService {
   Future<void> cancelAllTasks() =>
       NotificationsFacade.I.cancelByModule(NotificationModule.tasks);
 }
+
 
 

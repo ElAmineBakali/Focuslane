@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:focuslane/screens/finance/models/loan_model.dart';
 import 'package:focuslane/screens/finance/services/debt_service_loans.dart';
 
-import '../../widgets/finance_shell.dart';
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/screens/finance/widgets/finance_shell.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
 
 class DebtFormScreen extends StatefulWidget {
   const DebtFormScreen({super.key, this.debt});
@@ -455,5 +455,6 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     super.dispose();
   }
 }
+
 
 

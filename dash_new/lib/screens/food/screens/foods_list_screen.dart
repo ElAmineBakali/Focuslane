@@ -1,11 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../design/ui/components/focus_empty_state.dart';
-import '../../../design/ui/components/focus_chip.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
-import '../widgets/food_compact_widgets.dart';
-import '../models/food_models.dart';
-import '../services/food_firestore_service.dart';
+import 'package:focuslane/design/ui/components/focus_empty_state.dart';
+import 'package:focuslane/design/ui/components/focus_chip.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'food_edit_sheet.dart';
 
 class FoodsListScreen extends StatefulWidget {
@@ -397,4 +397,5 @@ class _FoodListCardState extends State<_FoodListCard> {
     );
   }
 }
+
 

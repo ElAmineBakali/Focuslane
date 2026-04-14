@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter/services.dart';
-import '../models/food_models.dart';
-import '../services/food_firestore_service.dart';
-import '../widgets/food_compact_widgets.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 
 class FoodEditSheet extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -364,4 +364,5 @@ class _FoodEditSheetState extends State<FoodEditSheet> {
     }
   }
 }
+
 

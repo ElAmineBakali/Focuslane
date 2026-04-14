@@ -2,19 +2,19 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:focuslane/navigation/app_route_observer.dart';
-import '../models/food_models.dart';
-import '../services/food_firestore_service.dart';
-import '../services/food_photo_ai_service.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
+import 'package:focuslane/screens/food/services/food_photo_ai_service.dart';
 import 'food_dashboard_widgets.dart';
-import '../../../design/ui/shared/app_card.dart';
+import 'package:focuslane/design/ui/shared/app_card.dart';
 import 'food_diary_screen.dart';
 import 'recipes_list_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'shopping_lists_screen.dart';
-import '../widgets/food_compact_widgets.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
-import '../../../design/ui/components/focus_module_header.dart';
-import '../../../design/ui/components/responsive_kpi_grid.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/components/responsive_kpi_grid.dart';
 
 class FoodDashboardScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -782,6 +782,7 @@ class _AlertCard extends StatelessWidget {
     );
   }
 }
+
 
 
 

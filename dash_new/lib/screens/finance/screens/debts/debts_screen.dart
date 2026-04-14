@@ -2,9 +2,9 @@
 import 'package:focuslane/screens/finance/models/loan_model.dart';
 import 'package:focuslane/screens/finance/services/debt_service_loans.dart';
 
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/components/focus_module_header.dart';
-import '../../../../design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class DebtsScreen extends StatelessWidget {
   const DebtsScreen({
@@ -96,6 +96,7 @@ class DebtsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

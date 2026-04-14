@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../models/study_models.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/study/models/study_models.dart';
 
 class InteractiveScheduleGrid extends StatefulWidget {
   final List<StudyClassBlock> blocks;
@@ -38,7 +38,7 @@ class _InteractiveScheduleGridState extends State<InteractiveScheduleGrid> {
 
   @override
   Widget build(BuildContext context) {
-    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const days = ['Lun', 'Mar', 'MiÃ©', 'Jue', 'Vie', 'SÃ¡b', 'Dom'];
     const hours = [
       '8:00',
       '9:00',
@@ -258,3 +258,4 @@ class _ScheduleTable extends StatelessWidget {
     );
   }
 }
+

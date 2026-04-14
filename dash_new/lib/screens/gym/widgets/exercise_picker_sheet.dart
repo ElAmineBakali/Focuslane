@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/gym_models.dart';
-import '../models/exercise_library_data.dart';
+import 'package:focuslane/screens/gym/models/gym_models.dart';
+import 'package:focuslane/screens/gym/models/exercise_library_data.dart';
 
 class ExercisePickerSheet extends StatefulWidget {
   final int order;
@@ -81,7 +81,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                   ),
                 ),
                 Text(
-                  'Añadir ejercicio',
+                  'AÃ±adir ejercicio',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -408,7 +408,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               FilledButton.icon(
                 onPressed: () => Navigator.pop(context, true),
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('Añadir'),
+                label: const Text('AÃ±adir'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -449,3 +449,4 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     }
   }
 }
+

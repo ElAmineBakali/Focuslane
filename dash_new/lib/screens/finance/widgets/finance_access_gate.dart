@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../services/finance_security_service.dart';
+import 'package:focuslane/screens/finance/services/finance_security_service.dart';
 
 class FinanceAccessGate extends StatefulWidget {
   const FinanceAccessGate({super.key, required this.child});
@@ -61,11 +61,11 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
     final confirm = _confirmCtrl.text.trim();
 
     if (password.length < 6) {
-      setState(() => _error = 'La contraseña debe tener al menos 6 caracteres.');
+      setState(() => _error = 'La contraseÃ±a debe tener al menos 6 caracteres.');
       return;
     }
     if (password != confirm) {
-      setState(() => _error = 'Las contraseñas no coinciden.');
+      setState(() => _error = 'Las contraseÃ±as no coinciden.');
       return;
     }
 
@@ -89,7 +89,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
     if (_busy) return;
     final password = _unlockCtrl.text.trim();
     if (password.isEmpty) {
-      setState(() => _error = 'Introduce la contraseña.');
+      setState(() => _error = 'Introduce la contraseÃ±a.');
       return;
     }
 
@@ -104,7 +104,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
     if (!ok) {
       setState(() {
         _busy = false;
-        _error = 'Contraseña incorrecta.';
+        _error = 'ContraseÃ±a incorrecta.';
       });
       return;
     }
@@ -148,7 +148,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Crea una contraseña para proteger el módulo de finanzas.',
+          'Crea una contraseÃ±a para proteger el mÃ³dulo de finanzas.',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
@@ -156,7 +156,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
           controller: _passwordCtrl,
           obscureText: true,
           decoration: const InputDecoration(
-            labelText: 'Nueva contraseña',
+            labelText: 'Nueva contraseÃ±a',
             border: OutlineInputBorder(),
           ),
         ),
@@ -165,7 +165,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
           controller: _confirmCtrl,
           obscureText: true,
           decoration: const InputDecoration(
-            labelText: 'Confirmar contraseña',
+            labelText: 'Confirmar contraseÃ±a',
             border: OutlineInputBorder(),
           ),
         ),
@@ -178,7 +178,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
           width: double.infinity,
           child: FilledButton(
             onPressed: _busy ? null : _createPassword,
-            child: Text(_busy ? 'Guardando...' : 'Crear contraseña'),
+            child: Text(_busy ? 'Guardando...' : 'Crear contraseÃ±a'),
           ),
         ),
       ],
@@ -191,7 +191,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Introduce la contraseña de finanzas para continuar.',
+          'Introduce la contraseÃ±a de finanzas para continuar.',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
@@ -199,7 +199,7 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
           controller: _unlockCtrl,
           obscureText: true,
           decoration: const InputDecoration(
-            labelText: 'Contraseña de finanzas',
+            labelText: 'ContraseÃ±a de finanzas',
             border: OutlineInputBorder(),
           ),
           onSubmitted: (_) => _unlock(),
@@ -220,3 +220,4 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
     );
   }
 }
+

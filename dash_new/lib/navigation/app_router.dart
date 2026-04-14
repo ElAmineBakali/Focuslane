@@ -2,36 +2,36 @@
 
 import 'package:focuslane/core/auth/auth_gate.dart';
 import 'package:focuslane/navigation/app_routes.dart';
-import 'package:focuslane/screens/auth/login_screen.dart';
-import 'package:focuslane/screens/auth/register_screen.dart';
-import 'package:focuslane/screens/calendar/calendar_screen.dart';
-import 'package:focuslane/screens/finance/main/finance_routes.dart';
-import 'package:focuslane/screens/food/main/food_main_screen.dart';
+import 'package:focuslane/screens/auth/screens/login_screen.dart';
+import 'package:focuslane/screens/auth/screens/register_screen.dart';
+import 'package:focuslane/screens/calendar/screens/calendar_screen.dart';
+import 'package:focuslane/screens/finance/routes/finance_routes.dart';
+import 'package:focuslane/screens/food/screens/main/food_main_screen.dart';
 import 'package:focuslane/screens/food/services/food_firestore_service.dart';
-import 'package:focuslane/screens/gym/analytics/gym_analytics_screen.dart';
-import 'package:focuslane/screens/gym/main/gym_main_screen.dart';
-import 'package:focuslane/screens/gym/routines/routines_list_screen.dart';
+import 'package:focuslane/screens/gym/screens/analytics/gym_analytics_screen.dart';
+import 'package:focuslane/screens/gym/screens/main/gym_main_screen.dart';
+import 'package:focuslane/screens/gym/screens/routines/routines_list_screen.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
-import 'package:focuslane/screens/habits/habit_create_screen.dart';
-import 'package:focuslane/screens/habits/habit_detail_screen.dart';
-import 'package:focuslane/screens/habits/habit_model.dart';
-import 'package:focuslane/screens/habits/habit_stats_screen.dart';
-import 'package:focuslane/screens/habits/habits_table_screen.dart';
+import 'package:focuslane/screens/habits/screens/habit_create_screen.dart';
+import 'package:focuslane/screens/habits/screens/habit_detail_screen.dart';
+import 'package:focuslane/screens/habits/models/habit_model.dart';
+import 'package:focuslane/screens/habits/screens/habit_stats_screen.dart';
+import 'package:focuslane/screens/habits/screens/habits_table_screen.dart';
 import 'package:focuslane/screens/home_screen.dart';
 import 'package:focuslane/screens/modules_screen.dart';
-import 'package:focuslane/screens/notes/note_editor_screen.dart';
-import 'package:focuslane/screens/notes/note_model.dart';
-import 'package:focuslane/screens/notes/notes_list_screen.dart';
-import 'package:focuslane/screens/notifications/global_notifications_screen.dart';
-import 'package:focuslane/screens/settings/settings_screen.dart';
-import 'package:focuslane/screens/study/analytics/study_analytics_screen.dart';
-import 'package:focuslane/screens/study/main/study_main_screen.dart';
+import 'package:focuslane/screens/notes/screens/note_editor_screen.dart';
+import 'package:focuslane/screens/notes/models/note_model.dart';
+import 'package:focuslane/screens/notes/screens/notes_list_screen.dart';
+import 'package:focuslane/screens/notifications/screens/global_notifications_screen.dart';
+import 'package:focuslane/screens/settings/screens/settings_screen.dart';
+import 'package:focuslane/screens/study/screens/analytics/study_analytics_screen.dart';
+import 'package:focuslane/screens/study/screens/main/study_main_screen.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
-import 'package:focuslane/screens/study/timer/study_timer_screen.dart';
-import 'package:focuslane/screens/tasks/task_create_screen.dart';
-import 'package:focuslane/screens/tasks/task_edit_screen.dart';
-import 'package:focuslane/screens/tasks/task_model.dart';
-import 'package:focuslane/screens/tasks/tasks_main_screen.dart';
+import 'package:focuslane/screens/study/screens/timer/study_timer_screen.dart';
+import 'package:focuslane/screens/tasks/screens/task_create_screen.dart';
+import 'package:focuslane/screens/tasks/screens/task_edit_screen.dart';
+import 'package:focuslane/screens/tasks/models/task_model.dart';
+import 'package:focuslane/screens/tasks/screens/tasks_main_screen.dart';
 
 class AppRouterDependencies {
   const AppRouterDependencies({
@@ -128,3 +128,5 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
     ...financeRoutes,
   };
 }
+
+

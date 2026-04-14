@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/gym_models.dart';
+import 'package:focuslane/screens/gym/models/gym_models.dart';
 
 export '../models/gym_models.dart';
 
@@ -849,3 +849,4 @@ class GymFirestoreService {
     return routineId;
   }
 }
+

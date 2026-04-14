@@ -1,6 +1,6 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 
 class CalendarService {
   CalendarService._();
@@ -216,5 +216,6 @@ class CalendarService {
     ).doc(timetableId).collection('slots').doc(slotId).delete();
   }
 }
+
 
 

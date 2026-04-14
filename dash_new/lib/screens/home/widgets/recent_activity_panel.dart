@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
-import 'package:focuslane/screens/notes/note_model.dart';
+import 'package:focuslane/screens/notes/models/note_model.dart';
 
 class RecentActivityPanel extends StatelessWidget {
   const RecentActivityPanel({
@@ -52,4 +52,5 @@ class RecentActivityPanel extends StatelessWidget {
     );
   }
 }
+
 

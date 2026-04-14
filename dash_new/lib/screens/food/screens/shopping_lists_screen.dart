@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import '../../../design/ui/tokens/focuslane_tokens.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../design/ui/components/focus_empty_state.dart';
-import '../models/food_models.dart';
-import '../services/food_firestore_service.dart';
+import 'package:focuslane/design/ui/components/focus_empty_state.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'shopping_list_detail_screen.dart';
-import '../widgets/food_compact_widgets.dart';
+import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 
 class ShoppingListsScreen extends StatefulWidget {
   final FoodFirestoreService svc;
@@ -307,7 +307,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
       builder:
           (context) => AlertDialog(
             title: const Text('Eliminar lista'),
-            content: Text('¿Seguro que quieres eliminar "${list.name}"?'),
+            content: Text('Â¿Seguro que quieres eliminar "${list.name}"?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -366,7 +366,7 @@ class _ShoppingListTile extends StatelessWidget {
     );
     final purchased = list.items.where((i) => i.checked).length;
     final subtitle =
-        '${list.items.length} productos • ${_getScopeLabel(list.scope)} • $purchased/${list.items.length} comprados${total > 0 ? ' • €${total.toStringAsFixed(2)}' : ''}';
+        '${list.items.length} productos â€¢ ${_getScopeLabel(list.scope)} â€¢ $purchased/${list.items.length} comprados${total > 0 ? ' â€¢ â‚¬${total.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -449,3 +449,4 @@ class _ShoppingListTile extends StatelessWidget {
     }
   }
 }
+

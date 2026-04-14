@@ -5,11 +5,11 @@ import 'package:focuslane/screens/finance/services/finance_category_labels.dart'
 import 'package:focuslane/screens/finance/services/subscription_service.dart';
 import 'package:focuslane/screens/finance/services/transaction_service.dart';
 
-import '../../../../design/ui/components/focus_card.dart';
-import '../../../../design/ui/components/focus_metric_card.dart';
-import '../../../../design/ui/components/focus_module_header.dart';
-import '../../../../design/ui/tokens/focuslane_tokens.dart';
-import '../../../../design/ui/components/responsive_kpi_grid.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_metric_card.dart';
+import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/components/responsive_kpi_grid.dart';
 
 class FinanceDashboardScreen extends StatelessWidget {
   const FinanceDashboardScreen({super.key, required this.onSelectSection});
@@ -348,6 +348,7 @@ class _SubsCard extends StatelessWidget {
 }
 
 String _currency(double v) => '${v.toStringAsFixed(2)} €';
+
 
 
 

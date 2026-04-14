@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/food_models.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:focuslane/screens/food/models/food_models.dart';
 
 class FoodFirestoreService {
   final String userId;
@@ -845,3 +845,4 @@ class FoodFirestoreService {
     }, SetOptions(merge: true));
   }
 }
+

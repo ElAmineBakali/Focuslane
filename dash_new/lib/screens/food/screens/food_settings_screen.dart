@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../services/food_firestore_service.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'food_settings_notifications_screen.dart';
 
 class FoodSettingsScreen extends StatefulWidget {
@@ -20,3 +20,4 @@ class _FoodSettingsScreenState extends State<FoodSettingsScreen> {
     );
   }
 }
+
