@@ -282,6 +282,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 12),
                   Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.dashboard_customize_outlined),
+                      title: const Text('Módulos de la app'),
+                      subtitle: const Text('Activa o desactiva módulos visibles en la navegación'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).pushNamed('/modules'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Card(
                     child: Padding(
                       padding: const EdgeInsets.all(14),
                       child: Column(

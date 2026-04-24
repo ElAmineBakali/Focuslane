@@ -21,11 +21,13 @@ enum FoodSettingsSection { notificaciones, configuracion }
 class FoodSettingsNotificationsScreen extends StatefulWidget {
   final FoodFirestoreService svc;
   final FoodSettingsSection initialSection;
+  final VoidCallback? onBack;
 
   const FoodSettingsNotificationsScreen({
     super.key,
     required this.svc,
     this.initialSection = FoodSettingsSection.notificaciones,
+    this.onBack,
   });
 
   @override
@@ -237,19 +239,21 @@ class _FoodSettingsNotificationsScreenState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
+      return Scaffold(
         appBar: FoodCompactAppBar(
           title: 'Notificaciones y recordatorios',
           subtitle: 'Módulo de nutrición',
+          onBack: widget.onBack,
         ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: const FoodCompactAppBar(
+      appBar: FoodCompactAppBar(
         title: 'Notificaciones y recordatorios',
         subtitle: 'Módulo de nutrición',
+        onBack: widget.onBack,
       ),
       body: ListView(
         controller: _scrollController,

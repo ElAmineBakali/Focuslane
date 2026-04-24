@@ -41,7 +41,7 @@ class StudyHistoryScreen extends StatelessWidget {
                       (session) => _HistoryEvent(
                         date: session.date,
                         title:
-                            'Sesion ${_methodLabel(session.method)} â€¢ ${session.minutes} min',
+                            'Sesión ${_methodLabel(session.method)} · ${session.minutes} min',
                         subtitle:
                             'Curso: ${courseNames[session.courseId] ?? 'Curso eliminado'}',
                         icon: Icons.timer_outlined,
@@ -64,7 +64,7 @@ class StudyHistoryScreen extends StatelessWidget {
 
                   if (events.isEmpty) {
                     return const Center(
-                      child: Text('Aun no hay actividad de estudio registrada'),
+                      child: Text('Aún no hay actividad de estudio registrada'),
                     );
                   }
 

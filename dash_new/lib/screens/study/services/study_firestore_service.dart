@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
 
@@ -201,25 +201,36 @@ class StudyFirestoreService {
   Stream<List<GradeEntry>> streamGrades({String? courseId}) {
     Query q = _root.collection('grades');
     if (courseId != null) q = q.where('courseId', isEqualTo: courseId);
-    return q
-        .orderBy('date', descending: true)
-        .snapshots()
-        .map(
-          (s) =>
-              s.docs
-                  .map(
-                    (d) => GradeEntry.fromMap(
-                      d.id,
-                      d.data() as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList(),
-        );
+    return q.snapshots(includeMetadataChanges: true).map((s) {
+      final list =
+          s.docs
+              .map(
+                (d) =>
+                    GradeEntry.fromMap(d.id, d.data() as Map<String, dynamic>),
+              )
+              .toList();
+
+      list.sort((a, b) {
+        final byDate = b.date.compareTo(a.date);
+        if (byDate != 0) return byDate;
+        return b.id.compareTo(a.id);
+      });
+
+      return list;
+    });
   }
 
+  String nextGradeId() => _root.collection('grades').doc().id;
+
   Future<String> addGrade(GradeEntry g) async {
-    final doc = _root.collection('grades').doc();
-    await doc.set(g.toMap());
+    final doc =
+        g.id.trim().isEmpty
+            ? _root.collection('grades').doc()
+            : _root.collection('grades').doc(g.id);
+    await doc.set({
+      ...g.copyWith(id: doc.id).toMap(),
+      'createdAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
     return doc.id;
   }
 
@@ -232,27 +243,24 @@ class StudyFirestoreService {
   }
 
   Stream<Map<String, String>> streamAttendanceMap(String courseId) {
-    return _root
-        .collection('attendance')
-        .doc(courseId)
-        .snapshots()
-        .map((d) {
-          final raw = d.data() ?? const <String, dynamic>{};
-          final parsed = <String, String>{};
-          for (final entry in raw.entries) {
-            final key = entry.key;
-            if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(key)) {
-              continue;
-            }
-            final status = entry.value is String
+    return _root.collection('attendance').doc(courseId).snapshots().map((d) {
+      final raw = d.data() ?? const <String, dynamic>{};
+      final parsed = <String, String>{};
+      for (final entry in raw.entries) {
+        final key = entry.key;
+        if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(key)) {
+          continue;
+        }
+        final status =
+            entry.value is String
                 ? (entry.value as String).trim().toUpperCase()
                 : '';
-            if (status == 'A' || status == 'X' || status == '-') {
-              parsed[key] = status;
-            }
-          }
-          return parsed;
-        });
+        if (status == 'A' || status == 'X' || status == '-') {
+          parsed[key] = status;
+        }
+      }
+      return parsed;
+    });
   }
 
   Future<void> setAttendance({
@@ -276,4 +284,3 @@ class StudyFirestoreService {
     });
   }
 }
-

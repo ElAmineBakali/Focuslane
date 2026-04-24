@@ -328,6 +328,28 @@ class GradeEntry {
     this.notes,
   });
 
+  GradeEntry copyWith({
+    String? id,
+    String? taskId,
+    String? courseId,
+    String? assessmentType,
+    double? grade,
+    double? weight,
+    DateTime? date,
+    String? notes,
+  }) {
+    return GradeEntry(
+      id: id ?? this.id,
+      taskId: taskId ?? this.taskId,
+      courseId: courseId ?? this.courseId,
+      assessmentType: assessmentType ?? this.assessmentType,
+      grade: grade ?? this.grade,
+      weight: weight ?? this.weight,
+      date: date ?? this.date,
+      notes: notes ?? this.notes,
+    );
+  }
+
   factory GradeEntry.fromMap(String id, Map<String, dynamic> m) {
     DateTime parseDate(dynamic v) {
       try {

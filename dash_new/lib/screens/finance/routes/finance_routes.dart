@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 // V2 Redesigned screens
-import '../main/finance_main_screen.dart';
+import '../screens/main/finance_main_screen.dart';
 import 'package:focuslane/screens/finance/screens/forms/transaction_form_screen.dart';
 import 'package:focuslane/screens/finance/screens/forms/subscription_form_screen.dart';
 import 'package:focuslane/screens/finance/screens/forms/debt_form_screen.dart';

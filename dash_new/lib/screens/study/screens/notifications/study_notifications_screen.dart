@@ -10,8 +10,9 @@ import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class StudyNotificationsScreen extends StatefulWidget {
   final StudyFirestoreService svc;
+  final VoidCallback? onBack;
 
-  const StudyNotificationsScreen({super.key, required this.svc});
+  const StudyNotificationsScreen({super.key, required this.svc, this.onBack});
 
   @override
   State<StudyNotificationsScreen> createState() =>
@@ -51,17 +52,18 @@ class _StudyNotificationsScreenState extends State<StudyNotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const header = FocusModuleHeader(
+    final header = FocusModuleHeader(
       title: 'Notificaciones',
       subtitle: 'Controla tus recordatorios de estudio',
       leadingMode: FocusModuleLeadingMode.backToModuleDashboard,
+      onBack: widget.onBack,
       backRouteName: AppRoutes.studyDashboard,
     );
 
     if (_loading) {
-      return const Scaffold(
+      return Scaffold(
         appBar: header,
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 

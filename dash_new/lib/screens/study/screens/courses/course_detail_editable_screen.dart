@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
@@ -33,6 +33,7 @@ class _CourseDetailEditableScreenState
   Color _selectedColor = Colors.blue;
   bool _isEditing = false;
   bool _isSaving = false;
+  final Map<String, GradeEntry> _pendingGrades = <String, GradeEntry>{};
 
   @override
   void initState() {
@@ -204,12 +205,12 @@ class _CourseDetailEditableScreenState
           SliverAppBar.large(
             expandedHeight: 200,
             pinned: true,
-                leading: FocusModuleHeader.buildLeading(
-                  context,
-                  mode: FocusModuleLeadingMode.backToModuleDashboard,
-                  backRouteName: AppRoutes.studyDashboard,
-                ),
-                leadingWidth: 96,
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.studyDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 widget.course.name,
@@ -393,10 +394,11 @@ class _CourseDetailEditableScreenState
                           onTap: () {
                             Navigator.of(context, rootNavigator: true).push(
                               MaterialPageRoute(
-                                builder: (_) => AttendanceScreen(
-                                  svc: widget.svc,
-                                  course: widget.course,
-                                ),
+                                builder:
+                                    (_) => AttendanceScreen(
+                                      svc: widget.svc,
+                                      course: widget.course,
+                                    ),
                               ),
                             );
                           },
@@ -411,71 +413,168 @@ class _CourseDetailEditableScreenState
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.grading),
+                                  Icon(
+                                    Icons.grading_rounded,
+                                    color: colorScheme.primary,
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    'Calificaciones',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
+                                  Expanded(
+                                    child: Text(
+                                      'Calificaciones',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
-                                  const Spacer(),
-                                  IconButton(
+                                  FilledButton.tonalIcon(
                                     onPressed: () async {
                                       await _showAddGradeDialog(context);
                                     },
-                                    icon: const Icon(Icons.add_circle_outline),
-                                    tooltip: 'Agregar calificacion',
+                                    icon: const Icon(
+                                      Icons.add_rounded,
+                                      size: 18,
+                                    ),
+                                    label: const Text('Añadir'),
                                   ),
                                 ],
                               ),
+                              const SizedBox(height: 12),
                               StreamBuilder<List<GradeEntry>>(
                                 stream: widget.svc.streamGrades(
                                   courseId: widget.course.id,
                                 ),
                                 builder: (context, snapshot) {
-                                  final grades = snapshot.data ?? const <GradeEntry>[];
+                                  if (snapshot.hasError) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        'No se pudieron cargar las calificaciones.',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: colorScheme.error,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final grades = _mergeGrades(
+                                    snapshot.data ?? const <GradeEntry>[],
+                                  );
                                   if (grades.isEmpty) {
-                                    return const Padding(
-                                      padding: EdgeInsets.only(top: 8),
-                                      child: Text('Aun no hay calificaciones registradas'),
+                                    return Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: colorScheme
+                                            .surfaceContainerHighest
+                                            .withOpacity(0.45),
+                                      ),
+                                      child: const Text(
+                                        'Aún no hay calificaciones registradas',
+                                      ),
                                     );
                                   }
 
                                   final average =
-                                      grades.map((grade) => grade.grade).reduce((a, b) => a + b) /
+                                      grades
+                                          .map((grade) => grade.grade)
+                                          .reduce((a, b) => a + b) /
                                       grades.length;
 
                                   return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 10,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          color: colorScheme.primaryContainer
+                                              .withOpacity(0.55),
+                                        ),
                                         child: Text(
-                                          'Promedio: ${average.toStringAsFixed(2)}',
+                                          'Promedio actual: ${average.toStringAsFixed(2)}',
                                           style: GoogleFonts.plusJakartaSans(
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.w700,
+                                            color:
+                                                colorScheme.onPrimaryContainer,
                                           ),
                                         ),
                                       ),
-                                      ...grades.take(6).map(
-                                        (grade) => ListTile(
-                                          dense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                          leading: const Icon(Icons.assignment_outlined),
-                                          title: Text(
-                                            grade.taskId,
-                                            style: GoogleFonts.plusJakartaSans(
-                                              fontWeight: FontWeight.w600,
+                                      ...grades.map(
+                                        (grade) => Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            color:
+                                                colorScheme
+                                                    .surfaceContainerHigh,
+                                            border: Border.all(
+                                              color: colorScheme.outlineVariant,
                                             ),
                                           ),
-                                          subtitle: Text(
-                                            '${grade.assessmentType ?? 'Evaluacion'} • Nota ${grade.grade.toStringAsFixed(2)} • ${_formatGradeDate(grade.date)}',
-                                          ),
-                                          trailing: IconButton(
-                                            icon: const Icon(Icons.delete_outline),
-                                            onPressed: () => widget.svc.deleteGrade(grade.id),
+                                          child: ListTile(
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 6,
+                                                ),
+                                            leading: const Icon(
+                                              Icons.assignment_outlined,
+                                            ),
+                                            title: Text(
+                                              grade.taskId,
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                            ),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  '${grade.assessmentType ?? 'Evaluación'} · Nota ${grade.grade.toStringAsFixed(2)} · ${_formatGradeDate(grade.date)}${grade.weight == null ? '' : ' · Peso ${grade.weight!.toStringAsFixed(0)}%'}',
+                                                ),
+                                                if ((grade.notes ?? '')
+                                                    .trim()
+                                                    .isNotEmpty) ...[
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    grade.notes!.trim(),
+                                                    style: GoogleFonts.plusJakartaSans(
+                                                      color:
+                                                          colorScheme
+                                                              .onSurfaceVariant,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                            trailing: IconButton(
+                                              icon: const Icon(
+                                                Icons.delete_outline,
+                                              ),
+                                              onPressed:
+                                                  () => widget.svc.deleteGrade(
+                                                    grade.id,
+                                                  ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -538,118 +637,422 @@ class _CourseDetailEditableScreenState
   }
 
   Future<void> _showAddGradeDialog(BuildContext context) async {
-    final nameCtrl = TextEditingController();
-    final typeCtrl = TextEditingController(text: 'Examen');
-    final gradeCtrl = TextEditingController();
-    final weightCtrl = TextEditingController();
-    final commentCtrl = TextEditingController();
-    DateTime selectedDate = DateTime.now();
-
-    final saved = await showDialog<bool>(
+    final draft = await showModalBottomSheet<_GradeDraft>(
       context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setLocalState) {
-            return AlertDialog(
-              title: const Text('Registrar calificacion'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre de la prueba',
-                      ),
-                    ),
-                    TextField(
-                      controller: typeCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Tipo (examen, practica, parcial)',
-                      ),
-                    ),
-                    TextField(
-                      controller: gradeCtrl,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Nota'),
-                    ),
-                    TextField(
-                      controller: weightCtrl,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Peso (%) opcional',
-                      ),
-                    ),
-                    TextField(
-                      controller: commentCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Comentario opcional',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.event_outlined),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text('Fecha: ${_formatGradeDate(selectedDate)}'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: ctx,
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                              initialDate: selectedDate,
-                            );
-                            if (picked != null) {
-                              setLocalState(() => selectedDate = picked);
-                            }
-                          },
-                          child: const Text('Cambiar'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancelar'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Guardar'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      isScrollControlled: true,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (_) => const _AddGradeSheet(),
     );
 
-    if (saved != true) return;
-    final grade = double.tryParse(gradeCtrl.text.trim().replaceAll(',', '.'));
-    final assessmentName = nameCtrl.text.trim();
+    if (draft == null) return;
+
+    final optimisticId = widget.svc.nextGradeId();
+    final pendingGrade = GradeEntry(
+      id: optimisticId,
+      taskId: draft.assessmentName,
+      courseId: widget.course.id,
+      assessmentType: draft.assessmentType,
+      grade: draft.grade,
+      weight: draft.weight,
+      date: draft.date,
+      notes: draft.notes,
+    );
+    setState(() {
+      _pendingGrades[optimisticId] = pendingGrade;
+    });
+
+    try {
+      await widget.svc.addGrade(pendingGrade);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _pendingGrades.remove(optimisticId);
+      });
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(content: Text('No se pudo guardar la calificación: $e')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      this.context,
+    ).showSnackBar(const SnackBar(content: Text('Calificación añadida')));
+  }
+
+  static String _formatGradeDate(DateTime date) {
+    final d = date.day.toString().padLeft(2, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final y = date.year.toString();
+    return '$d/$m/$y';
+  }
+
+  List<GradeEntry> _mergeGrades(List<GradeEntry> remoteGrades) {
+    final merged = <String, GradeEntry>{};
+
+    for (final grade in remoteGrades) {
+      merged[grade.id] = grade;
+    }
+
+    _pendingGrades.removeWhere((id, _) => merged.containsKey(id));
+
+    for (final entry in _pendingGrades.entries) {
+      merged.putIfAbsent(entry.key, () => entry.value);
+    }
+
+    final result =
+        merged.values.toList()..sort((a, b) {
+          final byDate = b.date.compareTo(a.date);
+          if (byDate != 0) return byDate;
+          return b.id.compareTo(a.id);
+        });
+    return result;
+  }
+}
+
+class _GradeDraft {
+  const _GradeDraft({
+    required this.assessmentName,
+    required this.assessmentType,
+    required this.grade,
+    required this.weight,
+    required this.date,
+    required this.notes,
+  });
+
+  final String assessmentName;
+  final String assessmentType;
+  final double grade;
+  final double? weight;
+  final DateTime date;
+  final String? notes;
+}
+
+class _AddGradeSheet extends StatefulWidget {
+  const _AddGradeSheet();
+
+  @override
+  State<_AddGradeSheet> createState() => _AddGradeSheetState();
+}
+
+class _AddGradeSheetState extends State<_AddGradeSheet> {
+  static const List<String> _typeOptions = <String>[
+    'Examen',
+    'Parcial',
+    'Práctica',
+    'Trabajo',
+    'Proyecto',
+    'Otro',
+  ];
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _gradeCtrl;
+  late final TextEditingController _weightCtrl;
+  late final TextEditingController _commentCtrl;
+
+  String _selectedType = _typeOptions.first;
+  DateTime _selectedDate = DateTime.now();
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController();
+    _gradeCtrl = TextEditingController();
+    _weightCtrl = TextEditingController();
+    _commentCtrl = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _gradeCtrl.dispose();
+    _weightCtrl.dispose();
+    _commentCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      initialDate: _selectedDate,
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _selectedDate = picked);
+  }
+
+  void _submit() {
+    if (_formKey.currentState?.validate() != true) return;
+
+    final grade = double.tryParse(_gradeCtrl.text.trim().replaceAll(',', '.'));
+    final weight = double.tryParse(
+      _weightCtrl.text.trim().replaceAll(',', '.'),
+    );
+    final assessmentName = _nameCtrl.text.trim();
+
     if (grade == null || assessmentName.isEmpty) return;
 
-    await widget.svc.addGrade(
-      GradeEntry(
-        id: '',
-        taskId: assessmentName,
-        courseId: widget.course.id,
-        assessmentType:
-            typeCtrl.text.trim().isEmpty ? null : typeCtrl.text.trim(),
+    setState(() => _isSubmitting = true);
+    Navigator.of(context).pop(
+      _GradeDraft(
+        assessmentName: assessmentName,
+        assessmentType: _selectedType,
         grade: grade,
-        weight: double.tryParse(weightCtrl.text.trim().replaceAll(',', '.')),
-        date: selectedDate,
-        notes: commentCtrl.text.trim().isEmpty ? null : commentCtrl.text.trim(),
+        weight: weight,
+        date: _selectedDate,
+        notes:
+            _commentCtrl.text.trim().isEmpty ? null : _commentCtrl.text.trim(),
       ),
     );
   }
 
-  static String _formatGradeDate(DateTime date) {
+  InputDecoration _fieldDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.5,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        8,
+        20,
+        24 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 18),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  color: colorScheme.outlineVariant.withOpacity(0.9),
+                ),
+              ),
+              Text(
+                'Registrar calificación',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Completa los datos para añadir una nota al curso',
+                style: GoogleFonts.plusJakartaSans(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: colorScheme.surfaceContainerLow,
+                  border: Border.all(color: colorScheme.outlineVariant),
+                ),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _nameCtrl,
+                      decoration: _fieldDecoration(
+                        label: 'Nombre de la evaluación',
+                        icon: Icons.assignment_turned_in_outlined,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'El nombre es obligatorio';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedType,
+                      decoration: _fieldDecoration(
+                        label: 'Tipo de evaluación',
+                        icon: Icons.category_outlined,
+                      ),
+                      items: _typeOptions
+                          .map(
+                            (type) => DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            ),
+                          )
+                          .toList(growable: false),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() => _selectedType = value);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _gradeCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: _fieldDecoration(
+                              label: 'Nota',
+                              icon: Icons.grade_outlined,
+                            ),
+                            validator: (value) {
+                              final grade = double.tryParse(
+                                (value ?? '').trim().replaceAll(',', '.'),
+                              );
+                              if (grade == null) {
+                                return 'Nota inválida';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _weightCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: _fieldDecoration(
+                              label: 'Peso (%)',
+                              icon: Icons.percent_outlined,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: _pickDate,
+                      child: InputDecorator(
+                        decoration: _fieldDecoration(
+                          label: 'Fecha',
+                          icon: Icons.event_outlined,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                CourseDetailEditableScreenStateHelper.formatGradeDate(
+                                  _selectedDate,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'Cambiar',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _commentCtrl,
+                      maxLines: 2,
+                      decoration: _fieldDecoration(
+                        label: 'Comentario (opcional)',
+                        icon: Icons.notes_outlined,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed:
+                          _isSubmitting
+                              ? null
+                              : () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text('Cancelar'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child:
+                          _isSubmitting
+                              ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Text('Guardar'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+abstract final class CourseDetailEditableScreenStateHelper {
+  static String formatGradeDate(DateTime date) {
     final d = date.day.toString().padLeft(2, '0');
     final m = date.month.toString().padLeft(2, '0');
     final y = date.year.toString();
@@ -759,7 +1162,3 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
