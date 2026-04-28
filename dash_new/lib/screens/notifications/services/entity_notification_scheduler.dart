@@ -74,7 +74,7 @@ class EntityNotificationScheduler {
           timezone: whenLocal.timeZoneName,
         ),
         delivery: NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
+          kind: NotificationDeliveryKind.pushOnly,
           channel: _channelFor(config.module),
           priority: NotificationPriority.high,
         ),

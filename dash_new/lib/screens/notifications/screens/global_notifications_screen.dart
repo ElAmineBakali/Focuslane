@@ -16,6 +16,7 @@ import 'package:focuslane/screens/habits/services/habit_firestore_service.dart';
 import 'package:focuslane/screens/notifications/models/entity_notification_config.dart';
 import 'package:focuslane/screens/notifications/services/entity_notification_config_store.dart';
 import 'package:focuslane/screens/notifications/services/entity_notification_scheduler.dart';
+import 'package:focuslane/screens/notifications/widgets/notification_diagnostics_panel.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
 import 'package:focuslane/screens/study/screens/notifications/study_notifications_screen.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
@@ -652,6 +653,8 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 18),
+          const NotificationDiagnosticsPanel(),
           const SizedBox(height: 18),
           _ScreenGroupHeader(
             title: 'Recordatorios por módulo',

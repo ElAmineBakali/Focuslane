@@ -8,6 +8,7 @@ import 'package:focuslane/core/notifications/mapping/intent_to_envelope_mapper.d
 import 'package:focuslane/core/notifications/notification_manager.dart';
 import 'package:focuslane/core/notifications/policies/dedupe_policy.dart';
 import 'package:focuslane/core/notifications/policies/notification_policy_engine.dart';
+import 'package:focuslane/core/notifications/push/push_notification_gateway.dart';
 import 'package:focuslane/core/notifications/registry/hive_notification_registry_repository.dart';
 import 'package:focuslane/core/notifications/router/notification_router.dart';
 import 'package:focuslane/core/notifications/router/route_resolver.dart';
@@ -35,6 +36,7 @@ class NotificationsBootstrap {
         gateway: gateway,
         idGenerator: FnvLocalIdGenerator(),
       ),
+      pushGateway: FirestorePushNotificationGateway(),
       registry: registry,
       policyEngine: AllowAllNotificationPolicyEngine(),
       dedupePolicy: DedupePolicy(registry),

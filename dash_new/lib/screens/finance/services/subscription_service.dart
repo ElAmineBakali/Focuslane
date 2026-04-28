@@ -106,7 +106,7 @@ class SubscriptionService {
           timezone: notifDate.timeZoneName,
         ),
         delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
+          kind: NotificationDeliveryKind.pushOnly,
           channel: AndroidChannelCatalog.financeReminders,
           priority: NotificationPriority.normal,
         ),

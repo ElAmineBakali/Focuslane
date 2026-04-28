@@ -62,7 +62,7 @@ class ReminderService {
           timezone: target.timeZoneName,
         ),
         delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
+          kind: NotificationDeliveryKind.pushOnly,
           channel: AndroidChannelCatalog.tasksReminders,
           priority: NotificationPriority.high,
         ),

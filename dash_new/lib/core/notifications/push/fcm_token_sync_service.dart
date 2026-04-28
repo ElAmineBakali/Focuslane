@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kDebugMode, kIsWeb;
+import 'package:focuslane/core/notifications/push/notification_diagnostics_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -37,8 +38,9 @@ class FcmTokenSyncService {
       if (user == null || token.trim().isEmpty) return;
       try {
         await _upsertToken(user: user, token: token);
-      } catch (e) {
-        if (kDebugMode) {
+        } catch (e) {
+          await NotificationDiagnosticsService.I.recordError(e);
+          if (kDebugMode) {
           // Ignore push sync errors outside supported FCM environments.
           // ignore: avoid_print
           print('[FCM] token refresh sync skipped: $e');
@@ -75,6 +77,7 @@ class FcmTokenSyncService {
     try {
       token = await FirebaseMessaging.instance.getToken();
     } catch (e) {
+      await NotificationDiagnosticsService.I.recordError(e);
       if (kDebugMode) {
         // ignore: avoid_print
         print('[FCM] getToken skipped: $e');

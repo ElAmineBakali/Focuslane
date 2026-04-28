@@ -19,6 +19,8 @@ import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 import 'package:focuslane/core/config/supabase_config.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/core/notifications/notifications_bootstrap.dart';
+import 'package:focuslane/core/notifications/push/notification_diagnostics_service.dart';
+import 'package:focuslane/core/notifications/router/notification_router.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -26,9 +28,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> _handlePushTap(RemoteMessage msg) async {
+  await NotificationDiagnosticsService.I.recordPushReceived(msg, source: 'tap');
   if (msg.data.isEmpty) return;
   final payload = jsonEncode(msg.data);
-  await NotificationsBootstrap.instance.manager.handleTapPayload(payload);
+  await NotificationsBootstrap.instance.manager.handleTapPayload(
+    payload,
+    source: NotificationTapSource.push,
+  );
 }
 
 Future<void> bootstrapApp() async {
@@ -37,8 +43,8 @@ Future<void> bootstrapApp() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
-  await NotificationsBootstrap.instance.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationsBootstrap.instance.init();
 
   try {
     await FirebaseAppCheck.instance.activate(
@@ -66,6 +72,10 @@ Future<void> bootstrapApp() async {
       }
 
       FirebaseMessaging.onMessage.listen((RemoteMessage msg) async {
+        await NotificationDiagnosticsService.I.recordPushReceived(
+          msg,
+          source: 'foreground',
+        );
         final notification = msg.notification;
         if (notification == null) {
           return;

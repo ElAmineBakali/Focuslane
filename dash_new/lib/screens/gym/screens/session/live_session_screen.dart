@@ -370,7 +370,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           timezone: at.timeZoneName,
         ),
         delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
+          kind: NotificationDeliveryKind.pushOnly,
           channel: AndroidChannelCatalog.gymReminders,
           priority: NotificationPriority.normal,
         ),

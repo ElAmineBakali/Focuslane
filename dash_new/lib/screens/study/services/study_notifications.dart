@@ -58,7 +58,7 @@ class StudyNotifications {
               timezone: when.timeZoneName,
             ),
             delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.localOnly,
+              kind: NotificationDeliveryKind.pushOnly,
               channel: AndroidChannelCatalog.studyReminders,
               priority: NotificationPriority.normal,
             ),
@@ -84,6 +84,7 @@ class StudyNotifications {
         kind: 'study_task',
         id: t.id,
       );
+      await NotificationsFacade.I.cancelByEntity(entity);
 
       if (oneDayBefore.isAfter(DateTime.now())) {
         final epoch = oneDayBefore.toUtc().millisecondsSinceEpoch;
@@ -106,7 +107,7 @@ class StudyNotifications {
               timezone: oneDayBefore.timeZoneName,
             ),
             delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.localOnly,
+              kind: NotificationDeliveryKind.pushOnly,
               channel: AndroidChannelCatalog.studyReminders,
               priority: NotificationPriority.normal,
             ),
@@ -138,7 +139,7 @@ class StudyNotifications {
               timezone: sameDay.timeZoneName,
             ),
             delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.localOnly,
+              kind: NotificationDeliveryKind.pushOnly,
               channel: AndroidChannelCatalog.studyReminders,
               priority: NotificationPriority.normal,
             ),

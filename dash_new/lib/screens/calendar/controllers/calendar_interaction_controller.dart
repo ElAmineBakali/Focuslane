@@ -642,7 +642,7 @@ class CalendarInteractionController {
               timezone: when.timeZoneName,
             ),
             delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.localOnly,
+              kind: NotificationDeliveryKind.pushOnly,
               channel: AndroidChannelCatalog.financeReminders,
               priority: NotificationPriority.normal,
             ),
@@ -689,7 +689,7 @@ class CalendarInteractionController {
           timezone: event.start.timeZoneName,
         ),
         delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.localOnly,
+          kind: NotificationDeliveryKind.pushOnly,
           channel: AndroidChannelCatalog.calendarReminders,
           priority: NotificationPriority.normal,
         ),

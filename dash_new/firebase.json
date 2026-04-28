@@ -8,6 +8,9 @@
     "storage": {
         "rules": "storage.rules"
     },
+    "firestore": {
+        "indexes": "firestore.indexes.json"
+    },
     "flutter": {
         "platforms": {
             "android": {

@@ -405,7 +405,7 @@ class FoodReminderScheduler {
               minute: time.minute,
             ),
             delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.localOnly,
+              kind: NotificationDeliveryKind.pushOnly,
               channel: AndroidChannelCatalog.foodReminders,
               priority: NotificationPriority.normal,
             ),

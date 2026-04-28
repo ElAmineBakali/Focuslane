@@ -6,6 +6,7 @@ import 'package:focuslane/core/notifications/contracts/notification_logger.dart'
 import 'package:focuslane/core/notifications/contracts/notification_repository.dart';
 import 'package:focuslane/core/notifications/local/local_scheduler.dart';
 import 'package:focuslane/core/notifications/mapping/intent_to_envelope_mapper.dart';
+import 'package:focuslane/core/notifications/models/notification_delivery.dart';
 import 'package:focuslane/core/notifications/models/notification_envelope.dart';
 import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
 import 'package:focuslane/core/notifications/models/notification_intent.dart';
@@ -13,11 +14,13 @@ import 'package:focuslane/core/notifications/models/notification_registry_entry.
 import 'package:focuslane/core/notifications/models/notification_result.dart';
 import 'package:focuslane/core/notifications/policies/dedupe_policy.dart';
 import 'package:focuslane/core/notifications/policies/notification_policy_engine.dart';
+import 'package:focuslane/core/notifications/push/push_notification_gateway.dart';
 import 'package:focuslane/core/notifications/router/notification_router.dart';
 
 class NotificationManager {
   NotificationManager({
     required LocalScheduler localScheduler,
+    required PushNotificationGateway pushGateway,
     required NotificationRegistryRepository registry,
     required NotificationPolicyEngine policyEngine,
     required DedupePolicy dedupePolicy,
@@ -26,6 +29,7 @@ class NotificationManager {
     required NotificationClock clock,
     required NotificationLogger logger,
   })  : _localScheduler = localScheduler,
+        _pushGateway = pushGateway,
         _registry = registry,
         _policyEngine = policyEngine,
         _dedupePolicy = dedupePolicy,
@@ -35,6 +39,7 @@ class NotificationManager {
         _logger = logger;
 
   final LocalScheduler _localScheduler;
+  final PushNotificationGateway _pushGateway;
   final NotificationRegistryRepository _registry;
   final NotificationPolicyEngine _policyEngine;
   final DedupePolicy _dedupePolicy;
@@ -97,7 +102,25 @@ class NotificationManager {
       ),
     );
 
-    await _localScheduler.schedule(policy.transformedEnvelope);
+    try {
+      await _scheduleByDelivery(policy.transformedEnvelope);
+    } catch (e) {
+      await _registry.upsert(
+        NotificationRegistryEntry(
+          notificationId: envelope.notificationId,
+          dedupeKey: envelope.dedupeKey,
+          status: NotificationLifecycleStatus.failed,
+          updatedAtUtc: _clock.nowUtc(),
+          envelope: policy.transformedEnvelope,
+          reason: e.toString(),
+        ),
+      );
+      return NotificationResult.failure(
+        envelope.notificationId,
+        code: 'delivery_failed',
+        message: e.toString(),
+      );
+    }
 
     await _registry.upsert(
       NotificationRegistryEntry(
@@ -117,6 +140,21 @@ class NotificationManager {
     return NotificationResult.success(envelope.notificationId);
   }
 
+  Future<void> _scheduleByDelivery(NotificationEnvelope envelope) async {
+    switch (envelope.delivery.kind) {
+      case NotificationDeliveryKind.localOnly:
+        await _localScheduler.schedule(envelope);
+        return;
+      case NotificationDeliveryKind.pushOnly:
+        await _pushGateway.schedule(envelope);
+        return;
+      case NotificationDeliveryKind.hybrid:
+        await _pushGateway.schedule(envelope);
+        await _localScheduler.schedule(envelope);
+        return;
+    }
+  }
+
   Future<List<NotificationResult>> scheduleIntents(List<NotificationIntent> intents) async {
     final results = <NotificationResult>[];
     for (final intent in intents) {
@@ -127,6 +165,7 @@ class NotificationManager {
 
   Future<NotificationResult> cancelByNotificationId(String notificationId) async {
     await _localScheduler.cancelByNotificationId(notificationId);
+    await _pushGateway.cancelByNotificationId(notificationId);
     final entry = await _registry.findByNotificationId(notificationId);
     if (entry != null) {
       await _registry.upsert(
@@ -144,6 +183,7 @@ class NotificationManager {
 
   Future<int> cancelByEntity(NotificationEntityRef entity) async {
     final removed = await _localScheduler.cancelByEntity(entity);
+    final removedPush = await _pushGateway.cancelByEntity(entity);
     final entries = await _registry.findByEntity(entity);
     for (final entry in entries) {
       await _registry.upsert(
@@ -156,15 +196,16 @@ class NotificationManager {
         ),
       );
     }
-    return removed;
+    return removed + removedPush;
   }
 
   Future<int> cancelByDedupeKey(String dedupeKey) async {
+    final removedPush = await _pushGateway.cancelByDedupeKey(dedupeKey);
     final entries = await _registry.findByDedupeKey(dedupeKey);
     for (final entry in entries) {
       await cancelByNotificationId(entry.notificationId);
     }
-    return entries.length;
+    return entries.length + removedPush;
   }
 
   Future<int> cancelByDedupePrefix(String dedupePrefix) async {
@@ -175,8 +216,10 @@ class NotificationManager {
     return entries.length;
   }
 
-  Future<int> cancelByModule(NotificationModule module) {
-    return _localScheduler.cancelByModule(module);
+  Future<int> cancelByModule(NotificationModule module) async {
+    final removedLocal = await _localScheduler.cancelByModule(module);
+    final removedPush = await _pushGateway.cancelByModule(module);
+    return removedLocal + removedPush;
   }
 
   Future<NotificationResult> rescheduleIntent(NotificationIntent intent) async {
@@ -185,8 +228,11 @@ class NotificationManager {
     return scheduleIntent(intent);
   }
 
-  Future<void> handleTapPayload(String rawPayload) async {
-    await _router.handleTap(rawPayload: rawPayload, source: NotificationTapSource.local);
+  Future<void> handleTapPayload(
+    String rawPayload, {
+    NotificationTapSource source = NotificationTapSource.local,
+  }) async {
+    await _router.handleTap(rawPayload: rawPayload, source: source);
     try {
       final map = Map<String, dynamic>.from(jsonDecode(rawPayload) as Map);
       NotificationEnvelope? envelope;
