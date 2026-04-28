@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/widgets/ui_scaffold.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:focuslane/screens/habits/models/habit_model.dart';
@@ -21,7 +21,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
-  late TextEditingController _reminderController;
   late TextEditingController _goalValueController;
   late TextEditingController _goalUnitController;
   late String _frequency;
@@ -38,9 +37,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     final habit = widget.habit;
     _nameController = TextEditingController(text: habit.name);
     _descriptionController = TextEditingController(text: habit.description);
-    _reminderController = TextEditingController(text: habit.reminderTime);
     _goalValueController = TextEditingController(
-      text: habit.goalValue == null ? '' : formatHabitStatNumber(habit.goalValue),
+      text:
+          habit.goalValue == null ? '' : formatHabitStatNumber(habit.goalValue),
     );
     _goalUnitController = TextEditingController(text: habit.goalUnit ?? '');
     _frequency = habit.frequency;
@@ -58,7 +57,6 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _reminderController.dispose();
     _goalValueController.dispose();
     _goalUnitController.dispose();
     super.dispose();
@@ -135,17 +133,18 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final goalValue = _isQuantitative ? _parseGoalValue() : null;
-    final goalUnit = _isQuantitative
-        ? _goalUnitController.text.trim().isEmpty
-            ? null
-            : _goalUnitController.text.trim()
-        : null;
+    final goalUnit =
+        _isQuantitative
+            ? _goalUnitController.text.trim().isEmpty
+                ? null
+                : _goalUnitController.text.trim()
+            : null;
 
     await HabitFirestoreService.updateHabitFields(widget.habit.id, {
       'name': _nameController.text.trim(),
       'description': _descriptionController.text.trim(),
       'frequency': _frequency,
-      'reminderTime': _reminderController.text.trim(),
+      'reminderTime': '',
       'isQuantitative': _isQuantitative,
       'unit': _isQuantitative ? _unit.trim() : '',
       'goalValue': goalValue,
@@ -155,7 +154,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
       'emoji': _emoji,
       'iconCode': _iconCode,
       'tags': _tags,
-      'reminders': widget.habit.reminders.map((r) => r.toMap()).toList(),
+      'reminders': const <Map<String, dynamic>>[],
       'lastUpdated': DateTime.now(),
     });
     if (mounted) Navigator.pop(context, true);
@@ -167,18 +166,21 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     final cs = theme.colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
     final currentGoalValue = _isQuantitative ? _parseGoalValue() : null;
-    final currentGoalUnit = _goalUnitController.text.trim().isEmpty
-      ? (_unit.trim().isEmpty ? '' : _unit.trim())
-      : _goalUnitController.text.trim();
+    final currentGoalUnit =
+        _goalUnitController.text.trim().isEmpty
+            ? (_unit.trim().isEmpty ? '' : _unit.trim())
+            : _goalUnitController.text.trim();
     final currentValue = parseHabitNumericValue(
       habitHistoryValueForDate(widget.habit.history, DateTime.now()),
     );
-    final remainingValue = currentGoalValue == null
-      ? 0.0
-      : (currentGoalValue - currentValue).clamp(0.0, double.infinity);
-    final currentPercent = currentGoalValue == null || currentGoalValue <= 0
-      ? 0.0
-      : ((currentValue / currentGoalValue) * 100).clamp(0.0, 999999.0);
+    final remainingValue =
+        currentGoalValue == null
+            ? 0.0
+            : (currentGoalValue - currentValue).clamp(0.0, double.infinity);
+    final currentPercent =
+        currentGoalValue == null || currentGoalValue <= 0
+            ? 0.0
+            : ((currentValue / currentGoalValue) * 100).clamp(0.0, 999999.0);
 
     return Scaffold(
       appBar: AppBar(
@@ -381,9 +383,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                     elevation: 0,
                     color: cs.surfaceContainerHigh,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        isMobile ? 14 : 16,
-                      ),
+                      borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
@@ -432,9 +432,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             controller: _goalUnitController,
                             decoration: InputDecoration(
                               labelText: 'Unidad de meta',
-                              hintText: _unit.trim().isEmpty
-                                  ? 'Ej: ml, páginas, pasos'
-                                  : 'Ej: ${_unit.trim()}',
+                              hintText:
+                                  _unit.trim().isEmpty
+                                      ? 'Ej: ml, páginas, pasos'
+                                      : 'Ej: ${_unit.trim()}',
                             ),
                             onChanged: (_) => setState(() {}),
                           ),
@@ -459,15 +460,18 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    '${formatHabitStatNumber(currentValue)} / ${formatHabitStatNumber(currentGoalValue)} ${currentGoalUnit.trim()}'.trim(),
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      color: cs.onPrimaryContainer,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    '${formatHabitStatNumber(currentValue)} / ${formatHabitStatNumber(currentGoalValue)} ${currentGoalUnit.trim()}'
+                                        .trim(),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          color: cs.onPrimaryContainer,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${formatHabitStatNumber(currentPercent)}% completado · faltan ${formatHabitStatNumber(remainingValue)} ${currentGoalUnit.trim()}'.trim(),
+                                    '${formatHabitStatNumber(currentPercent)}% completado · faltan ${formatHabitStatNumber(remainingValue)} ${currentGoalUnit.trim()}'
+                                        .trim(),
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: cs.onPrimaryContainer,
                                     ),
@@ -503,6 +507,3 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     );
   }
 }
-
-
-

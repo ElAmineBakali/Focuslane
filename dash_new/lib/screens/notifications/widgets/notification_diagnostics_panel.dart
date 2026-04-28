@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/blocks/toast/app_toast.dart';
 import 'package:focuslane/core/notifications/push/notification_diagnostics_service.dart';
 
 class NotificationDiagnosticsPanel extends StatefulWidget {
@@ -32,14 +33,10 @@ class _NotificationDiagnosticsPanelState
     try {
       await NotificationDiagnosticsService.I.sendTestPush();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Push de prueba encolado en Firebase')),
-      );
+      AppToast.success(context, 'Push de prueba encolado en Firebase');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo enviar el push: $e')),
-      );
+      AppToast.error(context, 'No se pudo enviar el push: $e');
     } finally {
       if (mounted) {
         setState(() => _sendingPush = false);
@@ -53,14 +50,10 @@ class _NotificationDiagnosticsPanelState
     try {
       await NotificationDiagnosticsService.I.sendLocalTest();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Notificación local enviada')),
-      );
+      AppToast.success(context, 'Notificación local enviada');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo probar local: $e')),
-      );
+      AppToast.error(context, 'No se pudo probar la notificación local: $e');
     } finally {
       if (mounted) {
         setState(() => _testingLocal = false);
@@ -149,14 +142,16 @@ class _NotificationDiagnosticsPanelState
                     ),
                     _StatusChip(
                       label: 'Tokens activos',
-                      value: data.activeTokenCount?.toString() ?? 'no disponible',
+                      value:
+                          data.activeTokenCount?.toString() ?? 'no disponible',
                       ok: (data.activeTokenCount ?? 0) > 0,
                     ),
                     _StatusChip(
                       label: 'Exact alarms',
-                      value: data.exactAlarmsAvailable == null
-                          ? 'no aplica'
-                          : data.exactAlarmsAvailable!
+                      value:
+                          data.exactAlarmsAvailable == null
+                              ? 'no aplica'
+                              : data.exactAlarmsAvailable!
                               ? 'disponible'
                               : 'bloqueado',
                       ok: data.exactAlarmsAvailable != false,
@@ -178,8 +173,9 @@ class _NotificationDiagnosticsPanelState
                 const SizedBox(height: 10),
                 Text(
                   data.explanation,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: cs.onSurfaceVariant),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
                 const SizedBox(height: 14),
                 Wrap(
@@ -188,24 +184,30 @@ class _NotificationDiagnosticsPanelState
                   children: [
                     FilledButton.icon(
                       onPressed: _sendingPush ? null : _sendPushTest,
-                      icon: _sendingPush
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.cloud_upload_outlined),
+                      icon:
+                          _sendingPush
+                              ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Icon(Icons.cloud_upload_outlined),
                       label: const Text('Enviar push de prueba'),
                     ),
                     OutlinedButton.icon(
                       onPressed: _testingLocal ? null : _sendLocalTest,
-                      icon: _testingLocal
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.notifications_active_outlined),
+                      icon:
+                          _testingLocal
+                              ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Icon(Icons.notifications_active_outlined),
                       label: const Text('Probar notificación local'),
                     ),
                   ],
@@ -280,4 +282,3 @@ class _InfoLine extends StatelessWidget {
     );
   }
 }
-

@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:focuslane/design/blocks/toast/app_toast.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 import 'package:focuslane/screens/study/services/study_notifications.dart';
@@ -104,9 +105,7 @@ class _StudyNotificationsScreenState extends State<StudyNotificationsScreen> {
                 onPressed: () async {
                   await _save();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Recordatorios actualizados')),
-                    );
+                    AppToast.success(context, 'Recordatorios actualizados');
                   }
                 },
                 child: const Text('Guardar'),
@@ -118,7 +117,3 @@ class _StudyNotificationsScreenState extends State<StudyNotificationsScreen> {
     );
   }
 }
-
-
-
-

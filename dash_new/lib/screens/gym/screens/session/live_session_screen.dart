@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
@@ -39,7 +39,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   final _notesCtrl = TextEditingController();
   late final DateTime _startAt;
 
-    String _restNotificationId(String exName) =>
+  String _restNotificationId(String exName) =>
       'ntf_gym_rest_${widget.routine.id}_${widget.day.id}_$exName';
 
   @override
@@ -58,7 +58,9 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   }
 
   void _startRest(String exName, int seconds) async {
-    await NotificationsFacade.I.cancelByNotificationId(_restNotificationId(exName));
+    await NotificationsFacade.I.cancelByNotificationId(
+      _restNotificationId(exName),
+    );
 
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = seconds);
@@ -76,7 +78,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
         ),
         content: NotificationContent(
           title: 'Descanso terminado',
-          body: 'Siguiente serie: $exName',
+          body: 'Vuelve al ejercicio',
         ),
         action: const NotificationAction(
           kind: NotificationActionKind.openRoute,
@@ -113,7 +115,9 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   void _stopRest(String exName) async {
     _timers[exName]?.cancel();
     setState(() => _restLeft[exName] = 0);
-    await NotificationsFacade.I.cancelByNotificationId(_restNotificationId(exName));
+    await NotificationsFacade.I.cancelByNotificationId(
+      _restNotificationId(exName),
+    );
   }
 
   Future<void> _addSetDialog(String exName) async {
@@ -336,51 +340,6 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     await widget.svc.saveSession(doc);
     await widget.svc.markDayCompleted(widget.routine.id, widget.day.id);
 
-    const xDays = 3;
-    final base = DateTime.now().add(const Duration(days: xDays));
-    final at = DateTime(base.year, base.month, base.day, 10, 0);
-    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
-    await NotificationsFacade.I.cancelByEntity(
-      const NotificationEntityRef(
-        module: NotificationModule.gym,
-        kind: 'inactivity_home',
-        id: 'home',
-      ),
-    );
-    await NotificationsFacade.I.scheduleIntent(
-      NotificationIntent(
-        module: NotificationModule.gym,
-        type: 'INACTIVITY_REMINDER',
-        entity: const NotificationEntityRef(
-          module: NotificationModule.gym,
-          kind: 'inactivity_home',
-          id: 'home',
-        ),
-        content: const NotificationContent(
-          title: 'Vuelve al gym',
-          body: 'Llevas 3 dias sin entrenar. Toca sesion.',
-        ),
-        action: const NotificationAction(
-          kind: NotificationActionKind.openRoute,
-          route: '/gym',
-        ),
-        schedule: NotificationSchedule(
-          kind: NotificationScheduleKind.oneShot,
-          scheduledAtUtc: at.toUtc(),
-          timezone: at.timeZoneName,
-        ),
-        delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.pushOnly,
-          channel: AndroidChannelCatalog.gymReminders,
-          priority: NotificationPriority.normal,
-        ),
-        dedupeKey: 'gym:home:inactivity:$xDays',
-        userId: uid,
-        source: 'gym.live_session',
-        notificationId: 'ntf_gym_home_inactivity',
-      ),
-    );
-
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
@@ -402,12 +361,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
             floating: false,
             pinned: true,
             expandedHeight: 160,
-                leading: FocusModuleHeader.buildLeading(
-                  context,
-                  mode: FocusModuleLeadingMode.backToModuleDashboard,
-                  backRouteName: AppRoutes.gymDashboard,
-                ),
-                leadingWidth: 96,
+            leading: FocusModuleHeader.buildLeading(
+              context,
+              mode: FocusModuleLeadingMode.backToModuleDashboard,
+              backRouteName: AppRoutes.gymDashboard,
+            ),
+            leadingWidth: 96,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(
                 left: 16,
@@ -1038,7 +997,3 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     );
   }
 }
-
-
-
-

@@ -1,15 +1,8 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
-import 'package:focuslane/core/notifications/models/notification_action.dart';
-import 'package:focuslane/core/notifications/models/notification_content.dart';
-import 'package:focuslane/core/notifications/models/notification_delivery.dart';
 import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
-import 'package:focuslane/core/notifications/models/notification_intent.dart';
-import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 import 'package:focuslane/screens/calendar/services/calendar_service.dart';
@@ -57,15 +50,7 @@ class CalendarInteractionController {
     return duration <= 0 ? 30 : duration;
   }
 
-  Future<void> syncPlannerNotification(CalendarEvent event) {
-    if (kIsWeb) {
-      return Future<void>.value();
-    }
-    return _syncPlannerNotification(event);
-  }
-
   Future<void> cancelPlannerNotification(String eventId) async {
-    if (kIsWeb) return;
     final id = eventId.trim();
     if (id.isEmpty) return;
     await NotificationsFacade.I.cancelByEntity(
@@ -110,7 +95,6 @@ class CalendarInteractionController {
           );
 
           await _svc.updateEvent(updated);
-          await _syncPlannerNotification(updated);
           onSuccess('Evento reprogramado.');
           return true;
         case CalendarSourceModule.task:
@@ -233,7 +217,6 @@ class CalendarInteractionController {
           );
 
           await _svc.updateEvent(updated);
-          await _syncPlannerNotification(updated);
           onSuccess('Evento movido al dia.');
           return true;
         case CalendarSourceModule.task:
@@ -358,7 +341,6 @@ class CalendarInteractionController {
         );
 
         await _svc.updateEvent(updated);
-        await _syncPlannerNotification(updated);
         onSuccess('Duracion del evento actualizada.');
         return true;
       }
@@ -599,106 +581,10 @@ class CalendarInteractionController {
     if ((data['userId'] ?? '').toString() != uid) return false;
 
     final nextDue = DateTime(due.year, due.month, due.day);
-    final title = (data['title'] ?? data['name'] ?? 'Suscripcion').toString();
-    final amount = (data['amount'] as num?)?.toDouble() ?? 0;
-    final remindDaysBefore =
-        (data['remindDaysBefore'] as num?)?.toInt() ??
-        (data['reminderDays'] as num?)?.toInt() ??
-        3;
-    final reminderEnabled = data['reminderEnabled'] != false;
-
     await ref.update({
       'nextDue': Timestamp.fromDate(nextDue),
       'nextPaymentDate': Timestamp.fromDate(nextDue),
     });
-
-    final entity = NotificationEntityRef(
-      module: NotificationModule.finance,
-      kind: 'subscription',
-      id: subId,
-    );
-    await NotificationsFacade.I.cancelByEntity(entity);
-    if (reminderEnabled && remindDaysBefore > 0) {
-      final when = nextDue.subtract(Duration(days: remindDaysBefore));
-      if (when.isAfter(DateTime.now())) {
-        final epoch = when.toUtc().millisecondsSinceEpoch;
-        await NotificationsFacade.I.scheduleIntent(
-          NotificationIntent(
-            module: NotificationModule.finance,
-            type: 'SUBSCRIPTION_DUE_SOON',
-            entity: entity,
-            content: NotificationContent(
-              title: 'Proximo pago: $title',
-              body:
-                  'Vence en $remindDaysBefore dias. Monto: ${amount.toStringAsFixed(2)}',
-            ),
-            action: const NotificationAction(
-              kind: NotificationActionKind.openRoute,
-              route: '/finance',
-            ),
-            schedule: NotificationSchedule(
-              kind: NotificationScheduleKind.oneShot,
-              scheduledAtUtc: when.toUtc(),
-              timezone: when.timeZoneName,
-            ),
-            delivery: const NotificationDelivery(
-              kind: NotificationDeliveryKind.pushOnly,
-              channel: AndroidChannelCatalog.financeReminders,
-              priority: NotificationPriority.normal,
-            ),
-            dedupeKey: 'finance:subscription:$subId:$epoch',
-            userId: uid,
-            source: 'calendar.subscription_sync',
-            notificationId: 'ntf_finance_subscription_${subId}_$epoch',
-          ),
-        );
-      }
-    }
     return true;
   }
-
-  Future<void> _syncPlannerNotification(CalendarEvent event) async {
-    final entity = NotificationEntityRef(
-      module: NotificationModule.calendar,
-      kind: 'planner_event',
-      id: event.id,
-    );
-    await NotificationsFacade.I.cancelByEntity(entity);
-    if (event.allDay) return;
-    if (!event.start.isAfter(DateTime.now().add(const Duration(seconds: 1)))) {
-      return;
-    }
-    final uid = _currentUid() ?? 'local';
-    final epoch = event.start.toUtc().millisecondsSinceEpoch;
-    await NotificationsFacade.I.scheduleIntent(
-      NotificationIntent(
-        module: NotificationModule.calendar,
-        type: 'PLANNER_EVENT_REMINDER',
-        entity: entity,
-        content: NotificationContent(
-          title: event.title,
-          body: event.notes ?? 'Recordatorio',
-        ),
-        action: const NotificationAction(
-          kind: NotificationActionKind.openRoute,
-          route: '/calendar',
-        ),
-        schedule: NotificationSchedule(
-          kind: NotificationScheduleKind.oneShot,
-          scheduledAtUtc: event.start.toUtc(),
-          timezone: event.start.timeZoneName,
-        ),
-        delivery: const NotificationDelivery(
-          kind: NotificationDeliveryKind.pushOnly,
-          channel: AndroidChannelCatalog.calendarReminders,
-          priority: NotificationPriority.normal,
-        ),
-        dedupeKey: 'calendar:event:${event.id}:$epoch',
-        userId: uid,
-        source: 'calendar.planner_sync',
-        notificationId: 'ntf_calendar_event_${event.id}_$epoch',
-      ),
-    );
-  }
 }
-

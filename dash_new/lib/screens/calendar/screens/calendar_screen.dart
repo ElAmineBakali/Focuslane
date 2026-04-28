@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -83,25 +83,9 @@ class _CalendarScreenState extends State<CalendarScreen>
       humanDateTime: _calendarController.humanDateTime,
       onSave: (draft, isNew, when) async {
         if (isNew) {
-          final newId = await CalendarService.I.addEvent(draft);
-          final fixed = CalendarEvent(
-            id: newId ?? draft.id,
-            title: draft.title,
-            type: draft.type,
-            priority: draft.priority,
-            start: draft.start,
-            end: draft.end,
-            allDay: draft.allDay,
-            notes: draft.notes,
-            relatedActionId: draft.relatedActionId,
-            relatedTxId: draft.relatedTxId,
-            dedupeKey: draft.dedupeKey,
-            completed: draft.completed,
-          );
-          await _interactionController.syncPlannerNotification(fixed);
+          await CalendarService.I.addEvent(draft);
         } else {
           await CalendarService.I.updateEvent(draft);
-          await _interactionController.syncPlannerNotification(draft);
         }
 
         _calendarController.focusEditedDay(when);
@@ -386,4 +370,3 @@ class _CalendarShiftVisibleIntent extends Intent {
 
   final int delta;
 }
-

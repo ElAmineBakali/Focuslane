@@ -1,8 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/task_model.dart';
 import '../services/task_firestore_service.dart';
-import 'package:focuslane/screens/tasks/services/reminder_service.dart';
 import 'package:focuslane/design/widgets/ui_scaffold.dart';
 
 class TaskEditScreen extends StatefulWidget {
@@ -30,10 +29,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
   late bool _isCalendarVisible;
   late List<Subtask> _subtasks;
 
-  bool _enableReminder = false;
-  DateTime? _remindDate;
-  TimeOfDay? _remindTime;
-
   DateTime _combine(DateTime d, TimeOfDay? t) =>
       DateTime(d.year, d.month, d.day, t?.hour ?? 9, t?.minute ?? 0);
 
@@ -59,13 +54,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
     _repeatRule = widget.task.repeatRule;
     _isCalendarVisible = widget.task.isCalendarVisible;
     _subtasks = List<Subtask>.from(widget.task.subtasks);
-
-    _enableReminder = widget.task.remindAt != null;
-    if (widget.task.remindAt != null) {
-      final r = widget.task.remindAt!;
-      _remindDate = DateTime(r.year, r.month, r.day);
-      _remindTime = TimeOfDay(hour: r.hour, minute: r.minute);
-    }
   }
 
   @override
@@ -368,84 +356,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  value: _enableReminder,
-                  onChanged: (v) {
-                    setState(() {
-                      _enableReminder = v;
-                      if (v) {
-                        final now = DateTime.now().add(
-                          const Duration(hours: 1),
-                        );
-                        _remindDate ??=
-                            _selectedDate ??
-                            DateTime(now.year, now.month, now.day);
-                        _remindTime ??=
-                            _selectedTime ??
-                            TimeOfDay(hour: now.hour, minute: now.minute);
-                      }
-                    });
-                  },
-                  title: const Text('Añadir recordatorio'),
-                ),
-                if (_enableReminder) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _remindDate == null
-                              ? 'Elegir fecha'
-                              : DateFormat('dd/MM/yyyy').format(_remindDate!),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate:
-                                _remindDate ??
-                                (_selectedDate ?? DateTime.now()),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
-                            setState(() => _remindDate = picked);
-                          }
-                        },
-                        icon: const Icon(Icons.event),
-                        label: const Text('Fecha recordatorio'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _remindTime == null
-                              ? 'Elegir hora'
-                              : _remindTime!.format(context),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: _remindTime ?? TimeOfDay.now(),
-                          );
-                          if (picked != null) {
-                            setState(() => _remindTime = picked);
-                          }
-                        },
-                        icon: const Icon(Icons.alarm),
-                        label: const Text('Hora recordatorio'),
-                      ),
-                    ],
-                  ),
-                ],
-
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -459,11 +369,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                       if (_selectedDate != null) {
                         finalDue = _combine(_selectedDate!, _selectedTime);
                       }
-
-                      final remindAt =
-                          (_enableReminder && _remindDate != null)
-                              ? _combine(_remindDate!, _remindTime)
-                              : null;
 
                       final tags =
                           _tagsController.text
@@ -484,7 +389,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                                 : null,
                         completed: widget.task.completed,
                         tags: tags,
-                        remindAt: remindAt,
+                        remindAt: null,
                         order: widget.task.order,
                         isPinned: _isPinned,
                         repeatRule: _repeatRule,
@@ -493,17 +398,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                       );
 
                       await TaskFirestoreService.updateTask(updatedTask);
-
-                      try {
-                        await ReminderService.I.scheduleTaskReminder(
-                          updatedTask,
-                          previous: widget.task,
-                          globalEnabled: true,
-                          tasksEnabled: true,
-                        );
-                      } catch (e) {
-                        debugPrint('Error scheduling task reminder: $e');
-                      }
 
                       if (mounted) {
                         Navigator.popUntil(
@@ -530,5 +424,3 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
     );
   }
 }
-
-

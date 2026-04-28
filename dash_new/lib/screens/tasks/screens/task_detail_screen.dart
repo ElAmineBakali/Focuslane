@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../models/task_model.dart';
 import '../utils/task_helpers.dart';
 
@@ -148,11 +147,6 @@ class TaskDetailScreen extends StatelessWidget {
                         ? 'Vence: ${TaskFormatter.formatDueDate(task.dueDate)}'
                         : 'Sin fecha límite',
                   ),
-                  if (task.remindAt != null)
-                    infoRow(
-                      Icons.notifications_active,
-                      'Recordatorio: ${DateFormat('dd/MM/yy HH:mm').format(task.remindAt!)}',
-                    ),
                 ]),
                 section('Estado', [
                   Row(

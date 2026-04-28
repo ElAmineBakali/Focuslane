@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:focuslane/design/blocks/toast/app_toast.dart';
 import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
@@ -136,17 +137,7 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
   Future<void> _cancelByModule(NotificationModule module, String label) async {
     await NotificationsFacade.I.cancelByModule(module);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Notificaciones de $label canceladas')),
-    );
-  }
-
-  Future<void> _rescheduleFinance() async {
-    await SubscriptionService.I.scheduleAllReminders();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Recordatorios de finanzas reprogramados')),
-    );
+    AppToast.success(context, 'Notificaciones de $label canceladas');
   }
 
   Future<void> _openStudyDetails() async {
@@ -224,6 +215,7 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     int minutesBefore = existing?.minutesBefore ?? 30;
     bool enabled = existing?.enabled ?? true;
     String selectedType = existing?.notificationType ?? target.defaultType;
+    bool deleted = false;
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
@@ -331,12 +323,9 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
                         final next = value.first;
                         if (next == EntityNotificationScheduleMode.relative &&
                             !canUseRelative) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Esta entidad no tiene fecha base para recordatorio relativo.',
-                              ),
-                            ),
+                          AppToast.warning(
+                            context,
+                            'Esta entidad no tiene fecha base para un aviso relativo.',
                           );
                           return;
                         }
@@ -394,44 +383,71 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        if (existing != null)
-                          TextButton.icon(
-                            onPressed: () async {
-                              await EntityNotificationConfigStore.I.remove(
-                                target.configKey,
-                              );
-                              await EntityNotificationScheduler.I.cancel(
-                                existing,
-                              );
-                              if (!mounted) return;
-                              setState(() {
-                                final copy =
-                                    Map<String, EntityNotificationConfig>.from(
-                                      _configs,
+                    const SizedBox(height: 18),
+                    LayoutBuilder(
+                      builder: (ctx, constraints) {
+                        final compact = constraints.maxWidth < 420;
+                        final deleteButton =
+                            existing == null
+                                ? null
+                                : TextButton.icon(
+                                  onPressed: () async {
+                                    await EntityNotificationConfigStore.I
+                                        .remove(target.configKey);
+                                    await EntityNotificationScheduler.I.cancel(
+                                      existing,
                                     );
-                                copy.remove(target.configKey);
-                                _configs = copy;
-                              });
-                              if (!ctx.mounted) return;
-                              Navigator.of(ctx).pop(true);
-                            },
-                            icon: const Icon(Icons.delete_outline),
-                            label: const Text('Eliminar configuración'),
-                          ),
-                        const Spacer(),
-                        TextButton(
+                                    if (!mounted) return;
+                                    setState(() {
+                                      final copy = Map<
+                                        String,
+                                        EntityNotificationConfig
+                                      >.from(_configs);
+                                      copy.remove(target.configKey);
+                                      _configs = copy;
+                                    });
+                                    deleted = true;
+                                    if (!ctx.mounted) return;
+                                    Navigator.of(ctx).pop(true);
+                                  },
+                                  icon: const Icon(Icons.delete_outline),
+                                  label: const Text('Eliminar'),
+                                );
+                        final cancelButton = TextButton(
                           onPressed: () => Navigator.of(ctx).pop(false),
                           child: const Text('Cancelar'),
-                        ),
-                        const SizedBox(width: 8),
-                        FilledButton(
+                        );
+                        final saveButton = FilledButton.icon(
                           onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text('Guardar'),
-                        ),
-                      ],
+                          icon: const Icon(Icons.save_outlined),
+                          label: const Text('Guardar'),
+                        );
+
+                        if (compact) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              saveButton,
+                              const SizedBox(height: 8),
+                              cancelButton,
+                              if (deleteButton != null) ...[
+                                const SizedBox(height: 4),
+                                deleteButton,
+                              ],
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          children: [
+                            if (deleteButton != null) deleteButton,
+                            const Spacer(),
+                            cancelButton,
+                            const SizedBox(width: 8),
+                            saveButton,
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -443,6 +459,12 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     );
 
     if (saved != true) {
+      return;
+    }
+
+    if (deleted) {
+      if (!mounted) return;
+      AppToast.success(context, 'Configuración eliminada para ${target.label}');
       return;
     }
 
@@ -483,9 +505,7 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
       _configs = next;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Configuración guardada para ${target.label}')),
-    );
+    AppToast.success(context, 'Configuración guardada para ${target.label}');
   }
 
   Widget _buildEntityList({
@@ -989,15 +1009,6 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
             subtitle: 'Avisos de suscripciones y pagos próximos',
             icon: Icons.account_balance_wallet_outlined,
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton.icon(
-                  onPressed: _rescheduleFinance,
-                  icon: const Icon(Icons.schedule),
-                  label: const Text('Reprogramar suscripciones base'),
-                ),
-              ),
-              const SizedBox(height: 10),
               StreamBuilder<List<Subscription>>(
                 stream: SubscriptionService.I.watchAll(activeOnly: true),
                 builder: (context, snapshot) {

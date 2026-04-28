@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:focuslane/screens/habits/models/habit_model.dart';
 import 'package:focuslane/screens/habits/services/habit_firestore_service.dart';
@@ -21,7 +21,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _reminderController = TextEditingController();
   final _goalValueController = TextEditingController();
   final _goalUnitController = TextEditingController();
 
@@ -42,7 +41,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     if (h != null) {
       _nameController.text = h.name;
       _descriptionController.text = h.description;
-      _reminderController.text = h.reminderTime;
       _frequency = h.frequency;
       _isQuantitative = h.isQuantitative;
       _unit = h.unit;
@@ -60,7 +58,6 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _reminderController.dispose();
     _goalValueController.dispose();
     _goalUnitController.dispose();
     super.dispose();
@@ -83,18 +80,19 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final goalValue = _isQuantitative ? _parseGoalValue() : null;
-    final goalUnit = _isQuantitative
-        ? _goalUnitController.text.trim().isEmpty
-            ? null
-            : _goalUnitController.text.trim()
-        : null;
+    final goalUnit =
+        _isQuantitative
+            ? _goalUnitController.text.trim().isEmpty
+                ? null
+                : _goalUnitController.text.trim()
+            : null;
 
     if (_isEditing) {
       await HabitFirestoreService.updateHabitFields(widget.habit!.id, {
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'frequency': _frequency,
-        'reminderTime': _reminderController.text.trim(),
+        'reminderTime': '',
         'isQuantitative': _isQuantitative,
         'unit': _isQuantitative ? _unit : '',
         'goalValue': goalValue,
@@ -103,7 +101,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         'emoji': _emoji,
         'iconCode': _iconCode,
         'tags': _tags,
-        'reminders': widget.habit?.reminders.map((r) => r.toMap()).toList() ?? const <Map<String, dynamic>>[],
+        'reminders': const <Map<String, dynamic>>[],
         'lastUpdated': DateTime.now(),
       });
     } else {
@@ -113,7 +111,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         frequency: _frequency,
-        reminderTime: _reminderController.text.trim(),
+        reminderTime: '',
         unit: _isQuantitative ? _unit : '',
         isQuantitative: _isQuantitative,
         history: const {},
@@ -454,9 +452,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                     elevation: 0,
                     color: cs.surfaceContainerHigh,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        isMobile ? 14 : 16,
-                      ),
+                      borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
@@ -504,9 +500,10 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                             controller: _goalUnitController,
                             decoration: InputDecoration(
                               labelText: 'Unidad de meta',
-                              hintText: _unit.isEmpty
-                                  ? 'Ej: ml, páginas, pasos'
-                                  : 'Ej: $_unit',
+                              hintText:
+                                  _unit.isEmpty
+                                      ? 'Ej: ml, páginas, pasos'
+                                      : 'Ej: $_unit',
                             ),
                           ),
                         ],
@@ -566,6 +563,3 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
     );
   }
 }
-
-
-

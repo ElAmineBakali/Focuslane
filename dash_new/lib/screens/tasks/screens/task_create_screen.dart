@@ -1,8 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/task_model.dart';
 import '../services/task_firestore_service.dart';
-import 'package:focuslane/screens/tasks/services/reminder_service.dart';
 import 'package:focuslane/design/widgets/ui_scaffold.dart';
 
 class TaskCreateScreen extends StatefulWidget {
@@ -27,10 +26,6 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
   RepeatRule _repeatRule = RepeatRule.none;
   final bool _isCalendarVisible = true;
   final List<Subtask> _subtasks = [];
-
-  bool _enableReminder = false;
-  DateTime? _remindDate;
-  TimeOfDay? _remindTime;
 
   DateTime _combine(DateTime d, TimeOfDay? t) =>
       DateTime(d.year, d.month, d.day, t?.hour ?? 9, t?.minute ?? 0);
@@ -65,22 +60,10 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
   void _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_enableReminder && _titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El recordatorio requiere un título')),
-      );
-      return;
-    }
-
     DateTime? finalDue;
     if (_dueDate != null) {
       finalDue = _combine(_dueDate!, _dueTime);
     }
-
-    final remindAt =
-        (_enableReminder && _remindDate != null)
-            ? _combine(_remindDate!, _remindTime)
-            : null;
 
     final tags =
         _tagsController.text
@@ -101,27 +84,14 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
               : null,
       completed: false,
       tags: tags,
-      remindAt: remindAt,
+      remindAt: null,
       isPinned: _isPinned,
       repeatRule: _repeatRule,
       subtasks: _subtasks,
       isCalendarVisible: _isCalendarVisible,
     );
 
-    final newId = await TaskFirestoreService.addTask(task);
-
-    if (newId != null) {
-      final taskWithId = task.copyWith(id: newId);
-      try {
-        await ReminderService.I.scheduleTaskReminder(
-          taskWithId,
-          globalEnabled: true,
-          tasksEnabled: true,
-        );
-      } catch (e) {
-        debugPrint('Error scheduling task reminder: $e');
-      }
-    }
+    await TaskFirestoreService.addTask(task);
 
     if (mounted) Navigator.pop(context);
   }
@@ -372,82 +342,6 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  value: _enableReminder,
-                  onChanged: (v) {
-                    setState(() {
-                      _enableReminder = v;
-                      if (v) {
-                        final now = DateTime.now().add(
-                          const Duration(hours: 1),
-                        );
-                        _remindDate ??=
-                            _dueDate ?? DateTime(now.year, now.month, now.day);
-                        _remindTime ??=
-                            _dueTime ??
-                            TimeOfDay(hour: now.hour, minute: now.minute);
-                      }
-                    });
-                  },
-                  title: const Text('Añadir recordatorio'),
-                ),
-                if (_enableReminder) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _remindDate == null
-                              ? 'Elegir fecha'
-                              : DateFormat('dd/MM/yyyy').format(_remindDate!),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate:
-                                _remindDate ?? (_dueDate ?? DateTime.now()),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
-                            setState(() => _remindDate = picked);
-                          }
-                        },
-                        icon: const Icon(Icons.event),
-                        label: const Text('Fecha recordatorio'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _remindTime == null
-                              ? 'Elegir hora'
-                              : _remindTime!.format(context),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: _remindTime ?? TimeOfDay.now(),
-                          );
-                          if (picked != null) {
-                            setState(() => _remindTime = picked);
-                          }
-                        },
-                        icon: const Icon(Icons.alarm),
-                        label: const Text('Hora recordatorio'),
-                      ),
-                    ],
-                  ),
-                ],
-
                 const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
@@ -473,5 +367,3 @@ class _TaskCreateScreenState extends State<TaskCreateScreen> {
     );
   }
 }
-
-

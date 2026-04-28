@@ -1,10 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
-import 'package:focuslane/screens/study/services/study_notifications.dart';
 import 'schedule_widgets.dart';
 import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
@@ -202,9 +201,6 @@ class _WeeklyScheduleView extends StatelessWidget {
                                       );
                                       if (ok == true) {
                                         await svc.deleteScheduleBlock(b.id);
-                                        await StudyNotifications(
-                                          svc,
-                                        ).scheduleTodayClasses();
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(
                                             context,
@@ -505,9 +501,6 @@ class _MobileDayByDayScheduleState extends State<_MobileDayByDaySchedule> {
                       );
                       if (ok == true && context.mounted) {
                         await widget.svc.deleteScheduleBlock(block.id);
-                        await StudyNotifications(
-                          widget.svc,
-                        ).scheduleTodayClasses();
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -803,9 +796,10 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                                 : null,
                         color:
                             !sel
-                                ? Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest.withOpacity(0.5)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withOpacity(0.5)
                                 : null,
                         borderRadius: BorderRadius.circular(12),
                         border:
@@ -1084,9 +1078,6 @@ class _EditBlockSheetState extends State<_EditBlockSheet> {
                               newMap,
                             );
                           }
-                          await StudyNotifications(
-                            widget.svc,
-                          ).scheduleTodayClasses();
                           if (mounted) Navigator.pop(context);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1159,7 +1150,9 @@ class _TimePickerButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          color: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
@@ -1201,7 +1194,3 @@ class _TimePickerButton extends StatelessWidget {
     );
   }
 }
-
-
-
-

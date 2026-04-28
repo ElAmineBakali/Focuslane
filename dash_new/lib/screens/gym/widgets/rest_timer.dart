@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
@@ -43,7 +43,8 @@ class _RestTimerState extends State<RestTimer> {
       kind: 'rest_timer',
       id: 'widget',
     );
-    final notificationId = 'ntf_gym_rest_timer_${when.toUtc().millisecondsSinceEpoch}_$hashCode';
+    final notificationId =
+        'ntf_gym_rest_timer_${when.toUtc().millisecondsSinceEpoch}_$hashCode';
 
     await NotificationsFacade.I.cancelByEntity(entity);
     await NotificationsFacade.I.scheduleIntent(
@@ -53,7 +54,7 @@ class _RestTimerState extends State<RestTimer> {
         entity: entity,
         content: const NotificationContent(
           title: 'Descanso terminado',
-          body: 'Vuelve a la serie',
+          body: 'Vuelve al ejercicio',
         ),
         action: const NotificationAction(
           kind: NotificationActionKind.openRoute,
@@ -174,5 +175,3 @@ class _RestTimerState extends State<RestTimer> {
     );
   }
 }
-
-

@@ -1,8 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/task_model.dart';
 import '../services/task_firestore_service.dart';
 import '../utils/task_helpers.dart';
-import 'package:focuslane/screens/tasks/services/reminder_service.dart';
 
 class TasksMainScreen extends StatefulWidget {
   const TasksMainScreen({super.key});
@@ -238,7 +237,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   Widget _buildTaskCard(BuildContext context, ThemeData theme, Task task) {
     final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    final hasReminder = task.remindAt != null;
     final hasRepeat = task.repeatRule != RepeatRule.none;
     final isOverdue =
         task.dueDate != null &&
@@ -280,53 +278,36 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
               visualDensity: VisualDensity.compact,
               value: task.completed,
               onChanged: (val) async {
-                final previous = task;
                 final updated = task.copyWith(completed: val ?? false);
                 await TaskFirestoreService.updateTask(updated);
 
                 if (updated.completed) {
-                  try {
-                    await ReminderService.I.cancelTaskReminder(task.id);
-                  } catch (e) {
-                    debugPrint('Error canceling task reminder: $e');
-                  }
                   if (task.repeatRule != RepeatRule.none) {
                     final nextDue = _nextDueDate(task.dueDate, task.repeatRule);
-                    final nextRemind = _nextDateFrom(
-                      task.remindAt,
-                      task.repeatRule,
-                    );
                     final nextSubtasks =
                         task.subtasks
                             .map((s) => s.copyWith(isDone: false))
                             .toList();
-                    final nextTask = task.copyWith(
+                    final nextTask = Task(
                       id: '',
+                      title: task.title,
+                      description: task.description,
+                      priority: task.priority,
+                      category: task.category,
                       completed: false,
+                      order: task.order,
+                      tags: task.tags,
                       dueDate: nextDue,
-                      remindAt: nextRemind,
+                      remindAt: null,
+                      isPinned: task.isPinned,
+                      repeatRule: task.repeatRule,
                       subtasks: nextSubtasks,
+                      isCalendarVisible: task.isCalendarVisible,
+                      linkedNoteId: task.linkedNoteId,
+                      linkedStudyCourseId: task.linkedStudyCourseId,
+                      syncedStudyTaskId: task.syncedStudyTaskId,
                     );
-                    final newId = await TaskFirestoreService.addTask(nextTask);
-                    if (newId != null) {
-                      final withId = nextTask.copyWith(id: newId);
-                      try {
-                        await ReminderService.I.scheduleTaskReminder(withId);
-                      } catch (e) {
-                        debugPrint('Error scheduling next repeated task: $e');
-                      }
-                    }
-                  }
-                } else {
-                  try {
-                    await ReminderService.I.scheduleTaskReminder(
-                      updated,
-                      previous: previous,
-                      globalEnabled: true,
-                      tasksEnabled: true,
-                    );
-                  } catch (e) {
-                    debugPrint('Error scheduling task reminder: $e');
+                    await TaskFirestoreService.addTask(nextTask);
                   }
                 }
               },
@@ -356,15 +337,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: Icon(Icons.autorenew, size: 16, color: cs.secondary),
-              ),
-            if (hasReminder)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Icon(
-                  Icons.notifications_active,
-                  size: 16,
-                  color: cs.secondary,
-                ),
               ),
             if (task.tags.isNotEmpty)
               Padding(
@@ -456,11 +428,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
           visualDensity: VisualDensity.compact,
           icon: Icon(Icons.delete_outline, color: cs.onSurfaceVariant),
           onPressed: () async {
-            try {
-              await ReminderService.I.cancelTaskReminder(task.id);
-            } catch (e) {
-              debugPrint('Error canceling task reminder on delete: $e');
-            }
             await TaskFirestoreService.deleteTask(task.id);
           },
           tooltip: 'Eliminar',
@@ -473,26 +440,6 @@ class _TasksMainScreenState extends State<TasksMainScreen> {
   }
 
   DateTime? _nextDueDate(DateTime? current, RepeatRule rule) {
-    if (current == null) return null;
-    switch (rule) {
-      case RepeatRule.daily:
-        return current.add(const Duration(days: 1));
-      case RepeatRule.weekly:
-        return current.add(const Duration(days: 7));
-      case RepeatRule.monthly:
-        return DateTime(
-          current.year,
-          current.month + 1,
-          current.day,
-          current.hour,
-          current.minute,
-        );
-      case RepeatRule.none:
-        return null;
-    }
-  }
-
-  DateTime? _nextDateFrom(DateTime? current, RepeatRule rule) {
     if (current == null) return null;
     switch (rule) {
       case RepeatRule.daily:
@@ -648,5 +595,3 @@ class _SubtaskRow extends StatelessWidget {
     );
   }
 }
-
-

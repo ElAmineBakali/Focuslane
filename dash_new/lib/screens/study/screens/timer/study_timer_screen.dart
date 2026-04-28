@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
@@ -108,7 +108,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           ),
           content: NotificationContent(
             title: 'Estudio',
-            body: 'Trabajo iniciado (${(seconds / 60).round()} min)',
+            body:
+                'Bloque de concentración iniciado (${(seconds / 60).round()} min)',
           ),
           action: const NotificationAction(
             kind: NotificationActionKind.openRoute,
@@ -127,7 +128,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           dedupeKey: 'study:timer:work_start:${now.millisecondsSinceEpoch}',
           userId: _uid,
           source: 'study.timer',
-          notificationId: 'ntf_study_timer_work_start_${now.millisecondsSinceEpoch}',
+          notificationId:
+              'ntf_study_timer_work_start_${now.millisecondsSinceEpoch}',
         ),
       );
       final end = now.add(Duration(seconds: seconds));
@@ -148,8 +150,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             id: 'work',
           ),
           content: const NotificationContent(
-            title: 'Fin del trabajo',
-            body: 'Toca descanso',
+            title: 'Bloque de concentración terminado',
+            body: 'Toca descansar',
           ),
           action: const NotificationAction(
             kind: NotificationActionKind.openRoute,
@@ -203,7 +205,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
           dedupeKey: 'study:timer:rest_start:${now.millisecondsSinceEpoch}',
           userId: _uid,
           source: 'study.timer',
-          notificationId: 'ntf_study_timer_rest_start_${now.millisecondsSinceEpoch}',
+          notificationId:
+              'ntf_study_timer_rest_start_${now.millisecondsSinceEpoch}',
         ),
       );
       final end = now.add(Duration(seconds: seconds));
@@ -248,6 +251,54 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _notifyPhaseFinished(String phase) async {
+    if (phase != 'work' && phase != 'rest') return;
+
+    final entity = NotificationEntityRef(
+      module: NotificationModule.study,
+      kind: 'timer_phase_end',
+      id: phase,
+    );
+    await NotificationsFacade.I.cancelByEntity(entity);
+
+    final now = DateTime.now();
+    final isRest = phase == 'rest';
+    await NotificationsFacade.I.scheduleIntent(
+      NotificationIntent(
+        module: NotificationModule.study,
+        type: isRest ? 'TIMER_REST_ENDED' : 'TIMER_WORK_ENDED',
+        entity: entity,
+        content: NotificationContent(
+          title:
+              isRest
+                  ? 'Descanso terminado'
+                  : 'Bloque de concentración terminado',
+          body: isRest ? 'Vuelve al bloque de concentración' : 'Toca descansar',
+        ),
+        action: const NotificationAction(
+          kind: NotificationActionKind.openRoute,
+          route: '/study',
+        ),
+        schedule: NotificationSchedule(
+          kind: NotificationScheduleKind.immediate,
+          scheduledAtUtc: now.toUtc(),
+          timezone: now.timeZoneName,
+        ),
+        delivery: const NotificationDelivery(
+          kind: NotificationDeliveryKind.localOnly,
+          channel: AndroidChannelCatalog.studyReminders,
+          priority: NotificationPriority.high,
+        ),
+        dedupeKey:
+            'study:timer:${phase}_finished:${now.millisecondsSinceEpoch}',
+        userId: _uid,
+        source: 'study.timer',
+        notificationId:
+            'ntf_study_timer_${phase}_finished_${now.millisecondsSinceEpoch}',
+      ),
+    );
   }
 
   void _loadPreset(TimerPreset p) {
@@ -306,7 +357,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             ),
             content: const NotificationContent(
               title: 'Estudio',
-              body: 'Sesion iniciada',
+              body: 'Sesión iniciada',
             ),
             action: const NotificationAction(
               kind: NotificationActionKind.openRoute,
@@ -325,7 +376,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
             dedupeKey: 'study:timer:simple_start:${now.millisecondsSinceEpoch}',
             userId: _uid,
             source: 'study.timer',
-            notificationId: 'ntf_study_timer_simple_start_${now.millisecondsSinceEpoch}',
+            notificationId:
+                'ntf_study_timer_simple_start_${now.millisecondsSinceEpoch}',
           ),
         );
         break;
@@ -387,7 +439,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         dedupeKey: 'study:timer:flowtime_start:${now.millisecondsSinceEpoch}',
         userId: _uid,
         source: 'study.timer',
-        notificationId: 'ntf_study_timer_flowtime_start_${now.millisecondsSinceEpoch}',
+        notificationId:
+            'ntf_study_timer_flowtime_start_${now.millisecondsSinceEpoch}',
       ),
     );
     _cancelStudyPhaseNotifs();
@@ -416,6 +469,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
     _ticker = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_timeLeft <= 1) {
         t.cancel();
+        unawaited(_notifyPhaseFinished(_phase));
         if (_phase == 'work') {
           _accumulatedMinutes += (seconds / 60).round();
           _confettiController.play();
@@ -501,7 +555,7 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         ),
         content: NotificationContent(
           title: 'Estudio',
-          body: 'Sesion guardada ($minutes min)',
+          body: 'Sesión guardada ($minutes min)',
         ),
         action: const NotificationAction(
           kind: NotificationActionKind.openRoute,
@@ -520,7 +574,8 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
         dedupeKey: 'study:timer:session_saved:${now.millisecondsSinceEpoch}',
         userId: _uid,
         source: 'study.timer',
-        notificationId: 'ntf_study_timer_session_saved_${now.millisecondsSinceEpoch}',
+        notificationId:
+            'ntf_study_timer_session_saved_${now.millisecondsSinceEpoch}',
       ),
     );
 
@@ -1328,7 +1383,3 @@ class _HeaderSelectors extends StatelessWidget {
     );
   }
 }
-
-
-
-

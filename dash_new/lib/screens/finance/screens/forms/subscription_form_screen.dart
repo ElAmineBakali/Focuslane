@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -26,8 +26,6 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
   late String _frequency;
   late DateTime _nextPaymentDate;
   bool _isActive = true;
-  bool _reminderEnabled = true;
-  int _reminderDays = 3;
   bool _autoMarkAsPaid = true;
 
   final _frequencies = {
@@ -47,8 +45,6 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
       _frequency = s.frequency;
       _nextPaymentDate = s.nextPaymentDate;
       _isActive = s.isActive;
-      _reminderEnabled = s.reminderEnabled;
-      _reminderDays = s.reminderDays;
       _autoMarkAsPaid = s.autoMarkAsPaid;
       _notesCtrl.text = s.notes ?? '';
     } else {
@@ -59,9 +55,10 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle = widget.subscription == null
-      ? 'Nueva suscripción'
-      : 'Editar suscripción';
+    final subtitle =
+        widget.subscription == null
+            ? 'Nueva suscripción'
+            : 'Editar suscripción';
 
     return FinanceShell(
       selectedIndex: 3,
@@ -103,8 +100,6 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
                         _buildNextPaymentField(),
                         const SizedBox(height: 16),
                         _buildActiveSwitch(),
-                        const SizedBox(height: 16),
-                        _buildReminderSection(),
                         const SizedBox(height: 16),
                         _buildAutoMarkSwitch(),
                         const SizedBox(height: 16),
@@ -165,9 +160,10 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         prefixIcon: const Icon(Icons.repeat),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      items: _frequencies.entries
-          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-          .toList(),
+      items:
+          _frequencies.entries
+              .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+              .toList(),
       onChanged: (v) => setState(() => _frequency = v ?? 'monthly'),
     );
   }
@@ -189,7 +185,9 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
           prefixIcon: const Icon(Icons.calendar_today),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: Text(DateFormat('EEEE, d MMM yyyy', 'es').format(_nextPaymentDate)),
+        child: Text(
+          DateFormat('EEEE, d MMM yyyy', 'es').format(_nextPaymentDate),
+        ),
       ),
     );
   }
@@ -204,40 +202,6 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         ),
         value: _isActive,
         onChanged: (v) => setState(() => _isActive = v),
-      ),
-    );
-  }
-
-  Widget _buildReminderSection() {
-    return FocusCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SwitchListTile(
-            title: const Text('Recordatorio'),
-            subtitle: Text(
-              _reminderEnabled ? 'Recibiras notificaciones' : 'Sin recordatorios',
-            ),
-            value: _reminderEnabled,
-            onChanged: (v) => setState(() => _reminderEnabled = v),
-            contentPadding: EdgeInsets.zero,
-          ),
-          if (_reminderEnabled) ...[
-            const SizedBox(height: 12),
-            const Text('Dias de anticipacion'),
-            const SizedBox(height: 8),
-            Slider(
-              value: _reminderDays.toDouble(),
-              min: 1,
-              max: 7,
-              divisions: 6,
-              label: '$_reminderDays dias',
-              onChanged: (v) => setState(() => _reminderDays = v.toInt()),
-            ),
-            Center(child: Text('$_reminderDays dias antes')),
-          ],
-        ],
       ),
     );
   }
@@ -284,9 +248,9 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
       frequency: _frequency,
       nextPaymentDate: _nextPaymentDate,
       nextDue: _nextPaymentDate,
-      reminderDays: _reminderDays,
-      remindDaysBefore: _reminderDays,
-      reminderEnabled: _reminderEnabled,
+      reminderDays: 0,
+      remindDaysBefore: 0,
+      reminderEnabled: false,
       autoMarkAsPaid: _autoMarkAsPaid,
       autoMark: _autoMarkAsPaid,
       isActive: _isActive,
@@ -297,14 +261,8 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
     try {
       if (widget.subscription == null) {
         await SubscriptionService.I.create(sub);
-        if (_reminderEnabled) {
-          await SubscriptionService.I.scheduleAllReminders();
-        }
       } else {
         await SubscriptionService.I.update(sub);
-        if (_reminderEnabled) {
-          await SubscriptionService.I.scheduleAllReminders();
-        }
       }
       if (mounted) {
         Navigator.pop(context, true);
@@ -330,6 +288,3 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
     super.dispose();
   }
 }
-
-
-
