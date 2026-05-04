@@ -59,7 +59,6 @@ dependencies:
   async: any
   collection: ^1.18.0
   image_picker: ^1.2.0
-  supabase_flutter: ^2.8.1
   url_launcher: ^6.3.2
   file_picker: ^8.0.0
   firebase_messaging: ^15.0.0

@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:focuslane/core/config/firebase_options.dart';
 import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
@@ -16,7 +15,6 @@ import 'package:focuslane/core/notifications/models/notification_delivery.dart';
 import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
 import 'package:focuslane/core/notifications/models/notification_intent.dart';
 import 'package:focuslane/core/notifications/models/notification_schedule.dart';
-import 'package:focuslane/core/config/supabase_config.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/core/notifications/notifications_bootstrap.dart';
 import 'package:focuslane/core/notifications/push/notification_diagnostics_service.dart';
@@ -38,11 +36,6 @@ Future<void> _handlePushTap(RemoteMessage msg) async {
 }
 
 Future<void> bootstrapApp() async {
-  await Supabase.initialize(
-    url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.anonKey,
-  );
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationsBootstrap.instance.init();
 
@@ -66,7 +59,8 @@ Future<void> bootstrapApp() async {
         await _handlePushTap(msg);
       });
 
-      final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+      final initialMessage =
+          await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null) {
         await _handlePushTap(initialMessage);
       }

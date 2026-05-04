@@ -355,7 +355,7 @@ router.post('/v1/ai/sync/explain_or_debug', async (req: AuthenticatedRequest, re
   const start = process.hrtime.bigint();
   const responsePayload = {
     explanation: 'Stub response: explicación de sincronización disponible en implementación 1.',
-    nextStep: 'Integrar motor IA en Cloud Run y enrutar desde API Gateway.',
+    nextStep: 'Ampliar este endpoint auxiliar con logica IA real y evaluar API Gateway/IAM si pasa a produccion estricta.',
   };
 
   await safePersistAiLog({

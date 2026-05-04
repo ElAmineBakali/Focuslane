@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import 'models/calendar_models.dart';
-import 'package:focuslane/screens/calendar/screens/calendar/services/calendar_service.dart';
+import 'package:flutter/material.dart';
+import 'package:focuslane/screens/calendar/models/calendar_models.dart';
+import 'package:focuslane/screens/calendar/services/calendar_service.dart';
 import 'timetable_editor_screen.dart';
 
 class TimetablesListScreen extends StatelessWidget {
@@ -74,7 +74,3 @@ class TimetablesListScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
