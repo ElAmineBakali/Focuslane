@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { aiRouter } from './routes.js';
-import { config, isProd } from './config.js';
+import { config, isCorsOriginAllowed, isProd } from './config.js';
 import { log } from './logger.js';
 
 if (!config.openAiApiKey) {
@@ -46,8 +46,7 @@ app.use((req, res, next) => {
     return;
   }
 
-  const allowed = config.corsAllowlist.includes(origin)
-    || (!isProd && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
+  const allowed = isCorsOriginAllowed(origin);
   if (!allowed) {
     if (isProd) {
       res.status(403).json({ error: 'cors_origin_not_allowed' });

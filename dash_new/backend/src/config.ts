@@ -31,3 +31,27 @@ export const config = {
 } as const;
 
 export const isProd = config.env === 'prod' || config.env === 'production';
+
+function matchesLocalhostWildcard(origin: string, allowedOrigin: string): boolean {
+  if (allowedOrigin !== 'http://localhost:*' && allowedOrigin !== 'http://127.0.0.1:*') {
+    return false;
+  }
+
+  try {
+    const parsedOrigin = new URL(origin);
+    const [allowedProtocol, allowedHostWithWildcard] = allowedOrigin.split('://');
+    const allowedHost = allowedHostWithWildcard.replace(':*', '');
+
+    return parsedOrigin.protocol === `${allowedProtocol}:`
+      && parsedOrigin.hostname === allowedHost
+      && parsedOrigin.port.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+export function isCorsOriginAllowed(origin: string): boolean {
+  return config.corsAllowlist.some((allowedOrigin) => (
+    allowedOrigin === origin || matchesLocalhostWildcard(origin, allowedOrigin)
+  )) || (!isProd && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
+}
