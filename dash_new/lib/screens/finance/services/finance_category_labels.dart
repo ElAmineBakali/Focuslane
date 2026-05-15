@@ -54,6 +54,7 @@ String labelForSubCategory(String? key, {String locale = 'es'}) {
     'viajes': 'Viajes',
     'hobbies': 'Hobbies',
     'streaming': 'Streaming',
+    'membresia': 'Membresía',
     'medico': 'Médico',
     'farmacia': 'Farmacia',
     'gimnasio': 'Gimnasio',
@@ -104,7 +105,8 @@ IconData? iconForCategory(String? key) {
   }
 }
 
-String _defaultCategoryLabel(String locale) => locale == 'es' ? 'Otros' : 'Other';
+String _defaultCategoryLabel(String locale) =>
+    locale == 'es' ? 'Otros' : 'Other';
 
 String _normalizeKey(String? raw) {
   if (raw == null) return '';
@@ -115,7 +117,7 @@ String _normalizeKey(String? raw) {
     'á': 'a',
     'à': 'a',
     'ä': 'a',
-    'â': 'a',
+    '\u00e2': 'a',
     'ã': 'a',
     'é': 'e',
     'è': 'e',

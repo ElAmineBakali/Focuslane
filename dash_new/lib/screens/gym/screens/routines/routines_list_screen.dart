@@ -2,6 +2,7 @@
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/gym/models/gym_models.dart';
 import 'routine_detail_screen.dart';
@@ -9,7 +10,13 @@ import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class RoutinesListScreen extends StatelessWidget {
   final GymFirestoreService svc;
-  const RoutinesListScreen({super.key, required this.svc});
+  final bool embedded;
+
+  const RoutinesListScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,33 +25,50 @@ class RoutinesListScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            floating: true,
-            leading: FocusModuleHeader.buildLeading(
-              context,
-              mode: FocusModuleLeadingMode.backToModuleDashboard,
-              backRouteName: AppRoutes.gymDashboard,
-            ),
-            leadingWidth: 96,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Mis Rutinas',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+          if (!embedded)
+            SliverAppBar.large(
+              floating: true,
+              leading: FocusModuleHeader.buildLeading(
+                context,
+                mode: FocusModuleLeadingMode.backToModuleDashboard,
+                backRouteName: AppRoutes.gymDashboard,
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      s.primaryContainer,
-                      s.secondaryContainer.withOpacity(0.8),
-                    ],
+              leadingWidth: 96,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  'Mis rutinas',
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                ),
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        s.primaryContainer,
+                        s.secondaryContainer.withValues(alpha: 0.8),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          if (embedded)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                child: FocusSectionHeader(
+                  icon: Icons.list_alt_rounded,
+                  title: 'Rutinas',
+                  subtitle: 'Gestiona divisiones, días y descansos.',
+                  trailing: FilledButton.icon(
+                    onPressed: () => _newRoutineSheet(context),
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('Nueva rutina'),
+                  ),
+                ),
+              ),
+            ),
           SliverToBoxAdapter(
             child: StreamBuilder<List<Routine>>(
               stream: svc.streamRoutines(),
@@ -108,7 +132,7 @@ class RoutinesListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _newRoutineSheet(context),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Nueva Rutina'),
+        label: const Text('Nueva rutina'),
       ),
     );
   }
@@ -581,10 +605,10 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 items: const [
                   DropdownMenuItem(
                     value: 'PPL',
-                    child: Text('PPL (Push/Pull/Legs)'),
+                    child: Text('PPL (empuje/tirón/pierna)'),
                   ),
-                  DropdownMenuItem(value: 'UL', child: Text('Upper/Lower')),
-                  DropdownMenuItem(value: 'FB', child: Text('Full Body')),
+                  DropdownMenuItem(value: 'UL', child: Text('Torso/pierna')),
+                  DropdownMenuItem(value: 'FB', child: Text('Cuerpo completo')),
                   DropdownMenuItem(
                     value: 'Custom',
                     child: Text('Personalizada'),
@@ -592,7 +616,7 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
                 ],
                 onChanged: (v) => setState(() => _split = v ?? 'Custom'),
                 decoration: InputDecoration(
-                  labelText: 'Tipo de split',
+                  labelText: 'Tipo de división',
                   prefixIcon: const Icon(Icons.splitscreen_rounded),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),

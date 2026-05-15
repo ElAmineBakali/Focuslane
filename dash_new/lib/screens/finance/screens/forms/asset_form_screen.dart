@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -34,8 +34,8 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
 
   final _types = {
     'property': 'Propiedad',
-    'vehicle': 'Vehiculo',
-    'investment': 'Inversion',
+    'vehicle': 'Vehículo',
+    'investment': 'Inversión',
     'savings': 'Ahorros',
     'crypto': 'Criptomoneda',
     'other': 'Otro',
@@ -65,7 +65,7 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
     final subtitle = widget.asset == null ? 'Nuevo activo' : 'Editar activo';
 
     return FinanceShell(
-      selectedIndex: 4,
+      selectedIndex: 3,
       title: 'Finanzas',
       subtitle: subtitle,
       floatingActionButton: FloatingActionButton.extended(
@@ -170,14 +170,17 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(child: Icon(Icons.broken_image, size: 50)),
-                    ),
+                    errorBuilder:
+                        (_, __, ___) => Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.broken_image, size: 50),
+                          ),
+                        ),
                   ),
                 ),
                 Positioned(
@@ -197,7 +200,10 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
               child: Container(
                 height: 150,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.withOpacity(0.3), width: 2),
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.3),
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
@@ -212,7 +218,10 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery, maxWidth: 1920);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1920,
+    );
     if (image != null) {
       setState(() => _photoFile = File(image.path));
     }
@@ -239,9 +248,10 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
         prefixIcon: const Icon(Icons.category),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      items: _types.entries
-          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-          .toList(),
+      items:
+          _types.entries
+              .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+              .toList(),
       onChanged: (v) => setState(() => _type = v ?? 'other'),
     );
   }
@@ -263,7 +273,7 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
       validator: (v) {
         if (v == null || v.isEmpty) return 'Requerido';
         final amount = double.tryParse(v);
-        if (amount == null || amount < 0) return 'Valor invalido';
+        if (amount == null || amount < 0) return 'Valor inválido';
         return null;
       },
     );
@@ -286,7 +296,7 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
       validator: (v) {
         if (v == null || v.isEmpty) return 'Requerido';
         final amount = double.tryParse(v);
-        if (amount == null || amount < 0) return 'Valor invalido';
+        if (amount == null || amount < 0) return 'Valor inválido';
         return null;
       },
     );
@@ -391,6 +401,3 @@ class _AssetFormScreenState extends State<AssetFormScreen> {
     super.dispose();
   }
 }
-
-
-

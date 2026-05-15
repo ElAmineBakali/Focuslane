@@ -1,18 +1,19 @@
-﻿import 'package:flutter/material.dart';
-import 'package:focuslane/screens/study/services/study_firestore_service.dart';
+import 'package:flutter/material.dart';
+
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
+import 'package:focuslane/screens/study/screens/courses/courses_list_screen.dart';
 import 'package:focuslane/screens/study/screens/dashboard/study_dashboard_screen.dart';
 import 'package:focuslane/screens/study/screens/diary/study_diary_screen.dart';
-import 'package:focuslane/screens/study/screens/courses/courses_list_screen.dart';
+import 'package:focuslane/screens/study/screens/history/study_history_screen.dart';
 import 'package:focuslane/screens/study/screens/schedule/schedule_screen.dart';
 import 'package:focuslane/screens/study/screens/tasks/study_tasks_screen.dart';
-import 'package:focuslane/screens/study/screens/history/study_history_screen.dart';
-import 'package:focuslane/design/ui/layouts/module_shell.dart';
-import 'package:focuslane/design/ui/layouts/module_sidebar.dart';
+import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 
 class StudyMainScreen extends StatefulWidget {
-  final StudyFirestoreService svc;
-
   const StudyMainScreen({super.key, required this.svc});
+
+  final StudyFirestoreService svc;
 
   @override
   State<StudyMainScreen> createState() => _StudyMainScreenState();
@@ -21,42 +22,64 @@ class StudyMainScreen extends StatefulWidget {
 class _StudyMainScreenState extends State<StudyMainScreen> {
   int _selectedIndex = 0;
 
+  static const _items = <FocusSectionNavItem>[
+    FocusSectionNavItem(icon: Icons.dashboard_rounded, label: 'Panel'),
+    FocusSectionNavItem(icon: Icons.menu_book_rounded, label: 'Diario'),
+    FocusSectionNavItem(icon: Icons.school_rounded, label: 'Cursos'),
+    FocusSectionNavItem(
+      icon: Icons.calendar_today_rounded,
+      label: 'Planificador',
+    ),
+    FocusSectionNavItem(icon: Icons.checklist_rounded, label: 'Tareas'),
+    FocusSectionNavItem(icon: Icons.history_rounded, label: 'Historial'),
+  ];
+
   List<Widget> _screens() {
     return [
-      StudyDashboardScreen(svc: widget.svc),
-      StudyDiaryScreen(svc: widget.svc),
-      CoursesListScreen(svc: widget.svc),
-      ScheduleScreen(svc: widget.svc),
-      StudyTasksScreen(svc: widget.svc),
-      StudyHistoryScreen(svc: widget.svc),
+      StudyDashboardScreen(
+        svc: widget.svc,
+        embedded: true,
+        onOpenSection: _selectIndex,
+      ),
+      StudyDiaryScreen(svc: widget.svc, embedded: true),
+      CoursesListScreen(svc: widget.svc, embedded: true),
+      ScheduleScreen(svc: widget.svc, embedded: true),
+      StudyTasksScreen(svc: widget.svc, embedded: true),
+      StudyHistoryScreen(svc: widget.svc, embedded: true),
     ];
+  }
+
+  void _selectIndex(int index) {
+    if (index == _selectedIndex) return;
+    setState(() => _selectedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      const ModuleSidebarItem(icon: Icons.dashboard, label: 'Panel'),
-      const ModuleSidebarItem(icon: Icons.menu_book, label: 'Diario'),
-      const ModuleSidebarItem(icon: Icons.school, label: 'Cursos'),
-      const ModuleSidebarItem(icon: Icons.calendar_today, label: 'Planificador'),
-      const ModuleSidebarItem(icon: Icons.checklist, label: 'Tareas'),
-      const ModuleSidebarItem(icon: Icons.history, label: 'Historial'),
-    ];
-
-    return ModuleShell(
-      items: items,
-      selectedIndex: _selectedIndex,
-      onItemSelected: (index) => setState(() => _selectedIndex = index),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens(),
+    return AppShell(
+      title: 'Estudio',
+      subtitle: 'Cursos, sesiones, calificaciones e historial.',
+      activeRoute: AppRoutes.studyDashboard,
+      actions: [
+        FocusIconButton(
+          icon: Icons.timer_outlined,
+          tooltip: 'Abrir temporizador',
+          onPressed: () => Navigator.of(context).pushNamed('/study/timer'),
+        ),
+        const SizedBox(width: 10),
+      ],
+      child: Column(
+        children: [
+          FocusSectionNav(
+            items: _items,
+            selectedIndex: _selectedIndex,
+            onSelected: _selectIndex,
+          ),
+          Expanded(
+            child: IndexedStack(index: _selectedIndex, children: _screens()),
+          ),
+        ],
       ),
-      moduleTitle: 'Módulo Study',
-      moduleIcon: Icons.school,
     );
   }
 }
-
-
-
-

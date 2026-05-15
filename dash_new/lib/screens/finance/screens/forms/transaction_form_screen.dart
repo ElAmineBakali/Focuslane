@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
@@ -161,9 +161,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subtitle = widget.transaction == null
-      ? 'Nueva transacción'
-      : 'Editar transacción';
+    final subtitle =
+        widget.transaction == null ? 'Nueva transacción' : 'Editar transacción';
 
     return FinanceShell(
       selectedIndex: 1,
@@ -172,13 +171,14 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         heroTag: null,
-        icon: _isSaving
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.check),
+        icon:
+            _isSaving
+                ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : const Icon(Icons.check),
         label: Text(_isSaving ? 'Guardando...' : 'Guardar'),
       ),
       child: LayoutBuilder(
@@ -257,7 +257,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Tipo de transaccion',
+            'Tipo de transacción',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
@@ -271,20 +271,20 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                       Icon(
                         Icons.trending_up,
                         size: 18,
-                        color: _type == TxType.income
-                            ? cs.onPrimary
-                            : cs.primary,
+                        color:
+                            _type == TxType.income ? cs.onPrimary : cs.primary,
                       ),
                       const SizedBox(width: 8),
                       const Text('Ingreso'),
                     ],
                   ),
                   selected: _type == TxType.income,
-                  onSelected: (_) => setState(() {
-                    _type = TxType.income;
-                    _category = null;
-                    _subCategory = null;
-                  }),
+                  onSelected:
+                      (_) => setState(() {
+                        _type = TxType.income;
+                        _category = null;
+                        _subCategory = null;
+                      }),
                   selectedColor: cs.primary,
                 ),
               ),
@@ -297,20 +297,19 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                       Icon(
                         Icons.trending_down,
                         size: 18,
-                        color: _type == TxType.expense
-                            ? cs.onError
-                            : cs.error,
+                        color: _type == TxType.expense ? cs.onError : cs.error,
                       ),
                       const SizedBox(width: 8),
                       const Text('Gasto'),
                     ],
                   ),
                   selected: _type == TxType.expense,
-                  onSelected: (_) => setState(() {
-                    _type = TxType.expense;
-                    _category = null;
-                    _subCategory = null;
-                  }),
+                  onSelected:
+                      (_) => setState(() {
+                        _type = TxType.expense;
+                        _category = null;
+                        _subCategory = null;
+                      }),
                   selectedColor: cs.error,
                 ),
               ),
@@ -346,7 +345,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               labelText: 'Importe *',
               hintText: '0.00',
               prefixIcon: const Icon(Icons.euro),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
@@ -355,7 +356,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
             validator: (v) {
               if (v == null || v.isEmpty) return 'Requerido';
               final amount = double.tryParse(v);
-              if (amount == null || amount <= 0) return 'Importe invalido';
+              if (amount == null || amount <= 0) return 'Importe inválido';
               return null;
             },
           ),
@@ -366,11 +367,14 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
             initialValue: _divisa,
             decoration: InputDecoration(
               labelText: 'Divisa',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            items: _divisas
-                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                .toList(),
+            items:
+                _divisas
+                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                    .toList(),
             onChanged: (v) => setState(() => _divisa = v ?? 'EUR'),
           ),
         ),
@@ -438,30 +442,34 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   Widget _buildCategoryField() {
     final options = [..._categories[_type]!];
-    if (_category != null && _category!.isNotEmpty && !options.contains(_category)) {
+    if (_category != null &&
+        _category!.isNotEmpty &&
+        !options.contains(_category)) {
       options.insert(0, _category!);
     }
     return DropdownButtonFormField<String>(
       initialValue: _category,
       decoration: InputDecoration(
-        labelText: 'Categoria',
+        labelText: 'Categoría',
         prefixIcon: const Icon(Icons.category),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       hint: const Text('Selecciona una categoria'),
-      items: options
-          .map(
-            (cat) => DropdownMenuItem(
-              value: cat,
-              child: Text(labelForCategory(cat)),
-            ),
-          )
-          .toList(),
-      onChanged: (v) => setState(() {
-        _category = v;
-        _subCategory = null;
-        _setManualOverrideIfNeeded();
-      }),
+      items:
+          options
+              .map(
+                (cat) => DropdownMenuItem(
+                  value: cat,
+                  child: Text(labelForCategory(cat)),
+                ),
+              )
+              .toList(),
+      onChanged:
+          (v) => setState(() {
+            _category = v;
+            _subCategory = null;
+            _setManualOverrideIfNeeded();
+          }),
     );
   }
 
@@ -476,23 +484,25 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     return DropdownButtonFormField<String>(
       initialValue: _subCategory,
       decoration: InputDecoration(
-        labelText: 'Subcategoria',
+        labelText: 'Subcategoría',
         prefixIcon: const Icon(Icons.subdirectory_arrow_right),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       hint: const Text('Opcional'),
-      items: subs
-          .map(
-            (sub) => DropdownMenuItem(
-              value: sub,
-              child: Text(labelForSubCategory(sub)),
-            ),
-          )
-          .toList(),
-      onChanged: (v) => setState(() {
-        _subCategory = v;
-        _setManualOverrideIfNeeded();
-      }),
+      items:
+          subs
+              .map(
+                (sub) => DropdownMenuItem(
+                  value: sub,
+                  child: Text(labelForSubCategory(sub)),
+                ),
+              )
+              .toList(),
+      onChanged:
+          (v) => setState(() {
+            _subCategory = v;
+            _setManualOverrideIfNeeded();
+          }),
     );
   }
 
@@ -517,9 +527,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         prefixIcon: const Icon(Icons.repeat),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      items: _recurrenceOptions.entries
-          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-          .toList(),
+      items:
+          _recurrenceOptions.entries
+              .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+              .toList(),
       onChanged: (v) => setState(() => _recurrence = v ?? 'once'),
     );
   }
@@ -532,7 +543,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         hintText: 'Ej: Vacaciones, Emergencias',
         prefixIcon: const Icon(Icons.folder_special),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        helperText: 'Asigna esta transaccion a un sobre especifico',
+        helperText: 'Asigna esta transacción a un sobre específico',
       ),
       onChanged: (v) => _envelopeId = v.isEmpty ? null : v,
     );
@@ -563,16 +574,20 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _tags
-                .map((tag) => Chip(
-                      label: Text(tag),
-                      deleteIcon: const Icon(Icons.close, size: 18),
-                      onDeleted: () => setState(() {
-                        _tags.remove(tag);
-                        _setManualOverrideIfNeeded();
-                      }),
-                    ))
-                .toList(),
+            children:
+                _tags
+                    .map(
+                      (tag) => Chip(
+                        label: Text(tag),
+                        deleteIcon: const Icon(Icons.close, size: 18),
+                        onDeleted:
+                            () => setState(() {
+                              _tags.remove(tag);
+                              _setManualOverrideIfNeeded();
+                            }),
+                      ),
+                    )
+                    .toList(),
           ),
         ],
       ],
@@ -590,9 +605,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         Row(
           children: [
             OutlinedButton.icon(
-              onPressed: (_isScanningReceipt || _isSaving)
-                  ? null
-                  : _startReceiptScanFlow,
+              onPressed:
+                  (_isScanningReceipt || _isSaving)
+                      ? null
+                      : _startReceiptScanFlow,
               icon: const Icon(Icons.receipt_long_outlined, size: 18),
               label: const Text('Escanear ticket (IA)'),
             ),
@@ -624,10 +640,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                 'Ticket IA listo${confidence != null ? ' (${(confidence * 100).toStringAsFixed(0)}%)' : ''}',
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              Text(
-                draft.summary,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(draft.summary, style: Theme.of(context).textTheme.bodySmall),
               Text(
                 _receiptDraftAppliedToForm
                     ? 'Aplicado al formulario'
@@ -660,14 +673,17 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
             children: [
               OutlinedButton.icon(
                 onPressed: _isClassifying ? null : _onAutoClassifyPressed,
-                icon: _isClassifying
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.auto_awesome, size: 18),
-                label: Text(_isClassifying ? 'Clasificando…' : 'Auto-clasificar'),
+                icon:
+                    _isClassifying
+                        ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.auto_awesome, size: 18),
+                label: Text(
+                  _isClassifying ? 'Clasificando…' : 'Auto-clasificar',
+                ),
               ),
               FilterChip(
                 label: const Text('Auto'),
@@ -755,9 +771,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         _isScanningReceipt = false;
         _activeReceiptScanSeq = null;
       });
-      final message = error is FinanceReceiptAiException
-          ? error.message
-          : 'No se pudo analizar el ticket. Puedes continuar en modo manual.';
+      final message =
+          error is FinanceReceiptAiException
+              ? error.message
+              : 'No se pudo analizar el ticket. Puedes continuar en modo manual.';
       if (kDebugMode) {
         debugPrint('[FinanceReceiptAI] scan error message=$message');
       }
@@ -788,9 +805,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         return XFile.fromData(
           bytes,
           name: file.name,
-          mimeType: file.extension != null
-              ? 'image/${file.extension!.toLowerCase()}'
-              : null,
+          mimeType:
+              file.extension != null
+                  ? 'image/${file.extension!.toLowerCase()}'
+                  : null,
         );
       }
 
@@ -867,7 +885,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                 );
               }
 
-              if (dialogContext.mounted && Navigator.of(dialogContext).canPop()) {
+              if (dialogContext.mounted &&
+                  Navigator.of(dialogContext).canPop()) {
                 Navigator.of(dialogContext).pop();
               }
 
@@ -880,9 +899,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               );
             }
 
-            final totalText = result.total == null
-                ? 'Sin total'
-                : '${result.total!.toStringAsFixed(2)} ${result.currency ?? _divisa}';
+            final totalText =
+                result.total == null
+                    ? 'Sin total'
+                    : '${result.total!.toStringAsFixed(2)} ${result.currency ?? _divisa}';
             final dateText = result.dateISO ?? 'No detectada';
 
             return AlertDialog(
@@ -933,30 +953,33 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           onExpansionChanged: (v) {
                             setStateSheet(() => showItems = v);
                           },
-                          children: result.items
-                              .map(
-                                (item) => ListTile(
-                                  dense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(item.name),
-                                  subtitle: Text(
-                                    'Cantidad ${item.qty.toStringAsFixed(2)}',
-                                  ),
-                                  trailing: Text(
-                                    '${item.price.toStringAsFixed(2)} ${result.currency ?? _divisa}',
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                          children:
+                              result.items
+                                  .map(
+                                    (item) => ListTile(
+                                      dense: true,
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(item.name),
+                                      subtitle: Text(
+                                        'Cantidad ${item.qty.toStringAsFixed(2)}',
+                                      ),
+                                      trailing: Text(
+                                        '${item.price.toStringAsFixed(2)} ${result.currency ?? _divisa}',
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                         ),
                       ],
                       const SizedBox(height: 8),
                       SwitchListTile.adaptive(
                         contentPadding: EdgeInsets.zero,
                         value: applyToForm,
-                        onChanged: confirming
-                            ? null
-                            : (value) => setStateSheet(() => applyToForm = value),
+                        onChanged:
+                            confirming
+                                ? null
+                                : (value) =>
+                                    setStateSheet(() => applyToForm = value),
                         title: const Text('Aplicar a formulario'),
                         subtitle: const Text(
                           'Rellena importe/fecha/comercio y categoría sugerida, sin guardar automáticamente.',
@@ -968,9 +991,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               ),
               actions: [
                 OutlinedButton(
-                  onPressed: confirming
-                      ? null
-                      : () => Navigator.of(dialogContext).pop(),
+                  onPressed:
+                      confirming
+                          ? null
+                          : () => Navigator.of(dialogContext).pop(),
                   child: const Text('Cancelar'),
                 ),
                 FilledButton(
@@ -1011,12 +1035,19 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
     final parsedDate = result.parsedDate;
     if (parsedDate != null) {
-      _date = DateTime(parsedDate.year, parsedDate.month, parsedDate.day, 12, 0);
+      _date = DateTime(
+        parsedDate.year,
+        parsedDate.month,
+        parsedDate.day,
+        12,
+        0,
+      );
       _dateTouchedManually = false;
     }
 
     _category = suggestedCategory;
-    _subCategory = suggestedCategory == 'alimentacion' ? 'supermercado' : 'otros';
+    _subCategory =
+        suggestedCategory == 'alimentacion' ? 'supermercado' : 'otros';
 
     if (result.currency != null && result.currency!.isNotEmpty) {
       _divisa = result.currency!;
@@ -1079,7 +1110,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   String _buildClassificationText() {
     final parts = <String>[
       _titleCtrl.text.trim(),
-      if (_accountId != null && _accountId!.trim().isNotEmpty) _accountId!.trim(),
+      if (_accountId != null && _accountId!.trim().isNotEmpty)
+        _accountId!.trim(),
       if (_amountCtrl.text.trim().isNotEmpty) _amountCtrl.text.trim(),
       _divisa,
       if (_notesCtrl.text.trim().isNotEmpty) _notesCtrl.text.trim(),
@@ -1100,10 +1132,13 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
   bool _hasRecentSameHash(String inputHash) {
     final meta = _aiMeta;
-    if (meta == null || meta.inputHash != inputHash || meta.classifiedAt == null) {
+    if (meta == null ||
+        meta.inputHash != inputHash ||
+        meta.classifiedAt == null) {
       return false;
     }
-    return DateTime.now().difference(meta.classifiedAt!).abs() <= _aiRecentWindow;
+    return DateTime.now().difference(meta.classifiedAt!).abs() <=
+        _aiRecentWindow;
   }
 
   bool _missingClassificationFields() {
@@ -1119,7 +1154,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     final text = _buildClassificationText();
     if (text.isEmpty) {
       if (manualRequest && mounted) {
-        FocusFeedback.showError(context, 'Completa titulo/importe para clasificar');
+        FocusFeedback.showError(
+          context,
+          'Completa título/importe para clasificar',
+        );
       }
       return;
     }
@@ -1146,8 +1184,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         _isClassifying = false;
       });
 
-      final shouldApplyNow = forSave &&
-          (!_manualOverride && (_missingClassificationFields() || manualRequest));
+      final shouldApplyNow =
+          forSave &&
+          (!_manualOverride &&
+              (_missingClassificationFields() || manualRequest));
       if (shouldApplyNow) {
         _applyPendingSuggestion();
       }
@@ -1194,8 +1234,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final hasReceiptDraft = _receiptDraft != null || _aiMeta?.source == 'receipt_scan';
-      final shouldRunAi = _autoClassifyEnabled &&
+      final hasReceiptDraft =
+          _receiptDraft != null || _aiMeta?.source == 'receipt_scan';
+      final shouldRunAi =
+          _autoClassifyEnabled &&
           (_forceReclassifyOnSave || _missingClassificationFields()) &&
           _aiClassifyOnSave &&
           !hasReceiptDraft;
@@ -1207,22 +1249,26 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       }
 
       final receiptResult = _receiptDraft?.result;
-      final inferredCategory = (_type == TxType.expense)
-          ? _suggestExpenseCategoryFromMerchant(receiptResult?.merchant)
-          : null;
-      final effectiveCategory = (_category == null || _category!.trim().isEmpty)
-          ? inferredCategory
-          : _category;
-      final effectiveSubCategory = (_subCategory == null || _subCategory!.trim().isEmpty)
-          ? (effectiveCategory == 'alimentacion' ? 'supermercado' : 'otros')
-          : _subCategory;
+      final inferredCategory =
+          (_type == TxType.expense)
+              ? _suggestExpenseCategoryFromMerchant(receiptResult?.merchant)
+              : null;
+      final effectiveCategory =
+          (_category == null || _category!.trim().isEmpty)
+              ? inferredCategory
+              : _category;
+      final effectiveSubCategory =
+          (_subCategory == null || _subCategory!.trim().isEmpty)
+              ? (effectiveCategory == 'alimentacion' ? 'supermercado' : 'otros')
+              : _subCategory;
 
       DateTime effectiveDate = _date;
       if (!_dateTouchedManually && receiptResult != null) {
         final parsed = receiptResult.parsedDate;
-        effectiveDate = parsed == null
-            ? DateTime.now()
-            : DateTime(parsed.year, parsed.month, parsed.day, 12, 0);
+        effectiveDate =
+            parsed == null
+                ? DateTime.now()
+                : DateTime(parsed.year, parsed.month, parsed.day, 12, 0);
       }
 
       String? effectiveNotes =
@@ -1232,14 +1278,17 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         final merchantTag = 'Comercio: $merchant';
         if (effectiveNotes == null || effectiveNotes.isEmpty) {
           effectiveNotes = merchantTag;
-        } else if (!effectiveNotes.toLowerCase().contains(merchant.toLowerCase())) {
+        } else if (!effectiveNotes.toLowerCase().contains(
+          merchant.toLowerCase(),
+        )) {
           effectiveNotes = '$effectiveNotes · $merchantTag';
         }
       }
 
-      final effectiveAiMeta = _manualOverride && _aiMeta != null
-          ? _aiMeta!.copyWith(manualOverride: true)
-          : _aiMeta;
+      final effectiveAiMeta =
+          _manualOverride && _aiMeta != null
+              ? _aiMeta!.copyWith(manualOverride: true)
+              : _aiMeta;
 
       final tx = FinanceTransaction(
         id: widget.transaction?.id ?? '',
@@ -1270,7 +1319,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       }
 
       if (kDebugMode) {
-        debugPrint('[FinanceReceiptAI] saved tx docId=${createdDocId ?? 'null'}');
+        debugPrint(
+          '[FinanceReceiptAI] saved tx docId=${createdDocId ?? 'null'}',
+        );
       }
 
       _forceReclassifyOnSave = false;
@@ -1279,8 +1330,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         FocusFeedback.showSuccess(
           context,
           widget.transaction == null
-              ? 'Transaccion creada'
-              : 'Transaccion actualizada',
+              ? 'Transacción creada'
+              : 'Transacción actualizada',
         );
       }
     } catch (e) {
@@ -1305,10 +1356,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 }
 
 class _ReceiptScanDraft {
-  const _ReceiptScanDraft({
-    required this.result,
-    required this.classifiedAt,
-  });
+  const _ReceiptScanDraft({required this.result, required this.classifiedAt});
 
   final FinanceReceiptAiResult result;
   final DateTime classifiedAt;
@@ -1324,10 +1372,7 @@ class _ReceiptScanDraft {
   }
 
   static _ReceiptScanDraft fromResult(FinanceReceiptAiResult result) {
-    return _ReceiptScanDraft(
-      result: result,
-      classifiedAt: DateTime.now(),
-    );
+    return _ReceiptScanDraft(result: result, classifiedAt: DateTime.now());
   }
 
   FinanceAiMeta toMeta({required bool manualOverride}) {
@@ -1335,9 +1380,8 @@ class _ReceiptScanDraft {
     final amount = result.total?.toStringAsFixed(2) ?? 'total_no_detectado';
     final currency = result.currency ?? 'EUR';
     final baseShort = 'Ticket $merchant · $amount $currency'.trim();
-    final short = baseShort.length <= 120
-      ? baseShort
-      : baseShort.substring(0, 120);
+    final short =
+        baseShort.length <= 120 ? baseShort : baseShort.substring(0, 120);
 
     return FinanceAiMeta(
       source: 'receipt_scan',
@@ -1372,7 +1416,10 @@ class _AiSuggestion {
   final String inputHash;
   final DateTime classifiedAt;
 
-  static _AiSuggestion fromResponse(Map<String, dynamic> raw, String inputHash) {
+  static _AiSuggestion fromResponse(
+    Map<String, dynamic> raw,
+    String inputHash,
+  ) {
     final normalized = FinanceAiNormalizer.normalize(raw);
     return _AiSuggestion(
       category: normalized.category,
@@ -1380,7 +1427,9 @@ class _AiSuggestion {
       tags: normalized.tags,
       model: raw['model']?.toString(),
       confidence: (raw['confidence'] as num?)?.toDouble(),
-      reasoningShort: raw['reasoning_short']?.toString() ?? raw['reasoningShort']?.toString(),
+      reasoningShort:
+          raw['reasoning_short']?.toString() ??
+          raw['reasoningShort']?.toString(),
       inputHash: inputHash,
       classifiedAt: DateTime.now(),
     );
@@ -1398,6 +1447,3 @@ class _AiSuggestion {
     );
   }
 }
-
-
-

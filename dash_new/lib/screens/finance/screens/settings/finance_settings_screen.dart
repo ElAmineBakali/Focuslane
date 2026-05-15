@@ -1,15 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import 'package:focuslane/design/ui/components/focus_card.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
-import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/finance/services/finance_security_service.dart';
 
 class FinanceSettingsScreen extends StatefulWidget {
-  const FinanceSettingsScreen({
-    super.key,
-    required this.onBackToDashboard,
-  });
+  const FinanceSettingsScreen({super.key, required this.onBackToDashboard});
 
   final VoidCallback onBackToDashboard;
 
@@ -56,11 +51,15 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
     final confirmPassword = _confirmPasswordCtrl.text.trim();
 
     if (newPassword.length < 6) {
-      setState(() => _error = 'La contraseña debe tener al menos 6 caracteres.');
+      setState(
+        () => _error = 'La contraseña debe tener al menos 6 caracteres.',
+      );
       return;
     }
     if (newPassword != confirmPassword) {
-      setState(() => _error = 'La nueva contraseña y la confirmación no coinciden.');
+      setState(
+        () => _error = 'La nueva contraseña y la confirmación no coinciden.',
+      );
       return;
     }
     if (_hasPassword && currentPassword.isEmpty) {
@@ -117,20 +116,26 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: FocusModuleHeader(
-        title: 'Finanzas',
-        subtitle: 'Ajustes',
-        leadingMode: FocusModuleLeadingMode.backToModuleDashboard,
-        onBack: widget.onBackToDashboard,
-      ),
-      body: SingleChildScrollView(
-        padding: FocuslaneTokens.pagePaddingCompact,
+    final scheme = Theme.of(context).colorScheme;
+
+    return SingleChildScrollView(
+      child: PageContainer(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             FocusCard(
-              padding: const EdgeInsets.all(16),
+              child: FocusSectionHeader(
+                title: 'Ajustes de Finanzas',
+                subtitle: 'Seguridad y bloqueo del módulo protegido',
+                icon: Icons.lock_outline_rounded,
+                trailing: FocusBadge(
+                  label: _hasPassword ? 'Protegido' : 'Pendiente',
+                  color: _hasPassword ? scheme.primary : scheme.error,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            FocusCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -138,80 +143,74 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
                     _hasPassword
                         ? 'Cambiar contraseña de finanzas'
                         : 'Crear contraseña de finanzas',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  const SizedBox(height: 6),
+                  Text(
                     'Esta contraseña protege el acceso al módulo completo de finanzas.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   if (_hasPassword) ...[
-                    TextField(
+                    FocusTextField(
                       controller: _currentPasswordCtrl,
+                      label: 'Contraseña actual',
+                      prefixIcon: Icons.lock_outline_rounded,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña actual',
-                        border: OutlineInputBorder(),
-                      ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                   ],
-                  TextField(
+                  FocusTextField(
                     controller: _newPasswordCtrl,
+                    label: 'Nueva contraseña',
+                    prefixIcon: Icons.lock_reset_rounded,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Nueva contraseña',
-                      border: OutlineInputBorder(),
-                    ),
                   ),
-                  const SizedBox(height: 10),
-                  TextField(
+                  const SizedBox(height: 12),
+                  FocusTextField(
                     controller: _confirmPasswordCtrl,
+                    label: 'Confirmar nueva contraseña',
+                    prefixIcon: Icons.verified_user_outlined,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirmar nueva contraseña',
-                      border: OutlineInputBorder(),
-                    ),
                   ),
                   if (_error != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
-                    ),
+                    const SizedBox(height: 12),
+                    _ErrorMessage(message: _error!),
                   ],
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _busy ? null : _savePassword,
-                      child: Text(_busy ? 'Guardando...' : 'Guardar contraseña'),
-                    ),
+                  const SizedBox(height: 16),
+                  FocusPrimaryButton(
+                    label: _busy ? 'Guardando...' : 'Guardar contraseña',
+                    icon: Icons.save_outlined,
+                    fullWidth: true,
+                    isLoading: _busy,
+                    onPressed: _busy ? null : _savePassword,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             FocusCard(
-              padding: const EdgeInsets.all(16),
+              elevated: false,
+              backgroundColor: scheme.surfaceContainerLow,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Bloqueo',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                  const FocusSectionHeader(
+                    title: 'Bloqueo',
+                    subtitle: 'Cierra la sesión actual del módulo protegido',
+                    icon: Icons.logout_rounded,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Cierra la sesión actual del módulo para volver a pedir contraseña.',
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: _lockNow,
-                      child: const Text('Bloquear finanzas ahora'),
-                    ),
+                  const SizedBox(height: 16),
+                  FocusSecondaryButton(
+                    label: 'Bloquear finanzas ahora',
+                    icon: Icons.lock_rounded,
+                    fullWidth: true,
+                    onPressed: _lockNow,
                   ),
                 ],
               ),
@@ -223,6 +222,30 @@ class _FinanceSettingsScreenState extends State<FinanceSettingsScreen> {
   }
 }
 
+class _ErrorMessage extends StatelessWidget {
+  const _ErrorMessage({required this.message});
 
+  final String message;
 
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
 
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: scheme.error.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        message,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: scheme.error,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}

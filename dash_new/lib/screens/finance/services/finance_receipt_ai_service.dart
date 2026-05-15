@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
@@ -61,26 +61,29 @@ class FinanceReceiptAiResult {
     final dateISO = _normalizeDateISO(json['dateISO']);
 
     final itemsRaw = (json['items'] as List?) ?? const [];
-    final items = itemsRaw
-        .whereType<Map>()
-        .map((raw) {
-          final map = raw.cast<String, dynamic>();
-          final name = _normalizeText(map['name']) ?? '';
-          final qty = _asNullableDouble(map['qty']) ?? 1;
-          final price = _asNullableDouble(map['price']) ?? 0;
-          if (name.isEmpty) return null;
-          return FinanceReceiptAiItem(
-            name: name,
-            qty: qty > 0 ? qty : 1,
-            price: price >= 0 ? price : 0,
-          );
-        })
-        .whereType<FinanceReceiptAiItem>()
-        .toList();
+    final items =
+        itemsRaw
+            .whereType<Map>()
+            .map((raw) {
+              final map = raw.cast<String, dynamic>();
+              final name = _normalizeText(map['name']) ?? '';
+              final qty = _asNullableDouble(map['qty']) ?? 1;
+              final price = _asNullableDouble(map['price']) ?? 0;
+              if (name.isEmpty) return null;
+              return FinanceReceiptAiItem(
+                name: name,
+                qty: qty > 0 ? qty : 1,
+                price: price >= 0 ? price : 0,
+              );
+            })
+            .whereType<FinanceReceiptAiItem>()
+            .toList();
 
-    final confidence = ((_asNullableDouble(json['confidence']) ?? 0)
-            .clamp(0.0, 1.0))
-        .toDouble();
+    final confidence =
+        ((_asNullableDouble(json['confidence']) ?? 0).clamp(
+          0.0,
+          1.0,
+        )).toDouble();
     final model = _normalizeText(json['model']) ?? 'unknown';
 
     final stablePayload = {
@@ -156,7 +159,7 @@ class FinanceReceiptAiException implements Exception {
 
 class FinanceReceiptAiService {
   FinanceReceiptAiService({AiBackendClient? client})
-      : _client = client ?? AiBackendClient();
+    : _client = client ?? AiBackendClient();
 
   final AiBackendClient _client;
 
@@ -174,7 +177,7 @@ class FinanceReceiptAiService {
         );
       }
       throw const FinanceReceiptAiException(
-        'La imagen supera el mÃ¡ximo permitido de 2MB.',
+        'La imagen supera el máximo permitido de 2MB.',
       );
     }
 
@@ -188,7 +191,7 @@ class FinanceReceiptAiService {
 
     if (compressed.length > _maxBytes) {
       throw const FinanceReceiptAiException(
-        'La imagen supera el mÃ¡ximo permitido de 2MB.',
+        'La imagen supera el máximo permitido de 2MB.',
       );
     }
 
@@ -209,11 +212,11 @@ class FinanceReceiptAiService {
 
     final hasRequiredData =
         (result.total != null && result.total! >= 0) ||
-            (result.merchant != null && result.merchant!.isNotEmpty);
+        (result.merchant != null && result.merchant!.isNotEmpty);
 
     if (!hasRequiredData) {
       throw const FinanceReceiptAiException(
-        'La respuesta de IA no contiene datos vÃ¡lidos del ticket.',
+        'La respuesta de IA no contiene datos válidos del ticket.',
       );
     }
 
@@ -231,7 +234,7 @@ class FinanceReceiptAiService {
     if (decoded == null) {
       if (input.length <= _maxBytes) return input;
       throw const FinanceReceiptAiException(
-        'La imagen supera el mÃ¡ximo permitido de 2MB.',
+        'La imagen supera el máximo permitido de 2MB.',
       );
     }
 
@@ -284,4 +287,3 @@ String _fnv1aHashHex(String input) {
   }
   return hash.toRadixString(16).padLeft(8, '0');
 }
-

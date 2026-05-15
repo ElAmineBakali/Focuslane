@@ -3,6 +3,7 @@ import 'package:focuslane/navigation/app_routes.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/gym/models/gym_models.dart';
 import '../session/session_history_screen.dart';
@@ -12,8 +13,13 @@ import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class GymAnalyticsScreen extends StatefulWidget {
   final GymFirestoreService svc;
+  final bool embedded;
 
-  const GymAnalyticsScreen({super.key, required this.svc});
+  const GymAnalyticsScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   State<GymAnalyticsScreen> createState() => _GymAnalyticsScreenState();
@@ -48,7 +54,8 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
+          if (!widget.embedded)
+            SliverAppBar(
             expandedHeight: 160,
             pinned: true,
             backgroundColor: colorScheme.primaryContainer,
@@ -61,7 +68,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 16, bottom: 60),
               title: Text(
-                'Analíticas',
+                'Progreso',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w700,
                   fontSize: 26,
@@ -74,7 +81,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                     end: Alignment.bottomRight,
                     colors: [
                       colorScheme.primaryContainer,
-                      colorScheme.secondaryContainer.withOpacity(0.8),
+                      colorScheme.secondaryContainer.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -83,7 +90,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                     child: Icon(
                       Icons.analytics,
                       size: 80,
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
                   ),
                 ),
@@ -143,6 +150,102 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
               ],
             ),
           ),
+          if (widget.embedded)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                child: Column(
+                  children: [
+                    FocusSectionHeader(
+                      icon: Icons.analytics_rounded,
+                      title: 'Progreso',
+                      subtitle: 'Volumen, peso corporal y sensaciones.',
+                      trailing: Wrap(
+                        spacing: 8,
+                        children: [
+                          FocusIconButton(
+                            icon: Icons.history_rounded,
+                            tooltip: 'Ver historial completo',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          SessionHistoryScreen(svc: widget.svc),
+                                ),
+                              );
+                            },
+                          ),
+                          PopupMenuButton<String>(
+                            initialValue: _selectedPeriod,
+                            tooltip: 'Cambiar periodo',
+                            onSelected:
+                                (value) =>
+                                    setState(() => _selectedPeriod = value),
+                            itemBuilder:
+                                (context) => const [
+                                  PopupMenuItem(
+                                    value: '7',
+                                    child: Text('Últimos 7 días'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: '30',
+                                    child: Text('Último mes'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: '90',
+                                    child: Text('Últimos 90 días'),
+                                  ),
+                                ],
+                            child: Container(
+                              height: 40,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainerLow,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(_getPeriodLabel()),
+                                  const Icon(Icons.arrow_drop_down_rounded),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    FocusCard(
+                      padding: EdgeInsets.zero,
+                      child: TabBar(
+                        controller: _tabController,
+                        isScrollable: true,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.show_chart), text: 'Resumen'),
+                          Tab(
+                            icon: Icon(Icons.fitness_center),
+                            text: 'Entrenamiento',
+                          ),
+                          Tab(icon: Icon(Icons.monitor_weight), text: 'Físico'),
+                          Tab(
+                            icon: Icon(Icons.psychology),
+                            text: 'Sensaciones',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           SliverFillRemaining(
             child: TabBarView(
@@ -191,7 +294,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Métricas Principales'),
+              _buildSectionTitle('Métricas principales'),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -206,7 +309,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildKpiCard(
-                      'Volumen Total',
+                      'Volumen total',
                       '${(totalVolume / 1000).toStringAsFixed(1)} ton',
                       Icons.fitness_center,
                       Colors.orange,
@@ -219,7 +322,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                 children: [
                   Expanded(
                     child: _buildKpiCard(
-                      'Duración Prom.',
+                      'Duración media',
                       '${avgDuration.toStringAsFixed(0)} min',
                       Icons.timer,
                       Colors.green,
@@ -308,7 +411,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
 
               const SizedBox(height: 24),
 
-              _buildSectionTitle('Top Ejercicios (Volumen)'),
+              _buildSectionTitle('Ejercicios principales por volumen'),
               const SizedBox(height: 12),
               ...topExercises.take(10).map((e) {
                 return _buildExerciseVolumeCard(e.key, e.value);
@@ -337,7 +440,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                   children: [
                     Expanded(
                       child: _buildKpiCard(
-                        'Peso Actual',
+                        'Peso actual',
                         '${weights.last.weight.toStringAsFixed(1)} kg',
                         Icons.monitor_weight,
                         Colors.blue,
@@ -464,7 +567,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Promedios del Periodo'),
+              _buildSectionTitle('Promedios del periodo'),
               const SizedBox(height: 16),
 
               _buildFeelingMeter('Energía', avgEnergy, Colors.green),
@@ -1309,7 +1412,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Registrar Peso',
+                                'Registrar peso',
                                 style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
@@ -1542,7 +1645,7 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Registrar Medida',
+                                'Registrar medida',
                                 style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
@@ -1679,8 +1782,8 @@ class _GymAnalyticsScreenState extends State<GymAnalyticsScreen>
                       spacing: 8,
                       children:
                           [
-                            'Biceps',
-                            'Triceps',
+                            'Bíceps',
+                            'Tríceps',
                             'Pecho',
                             'Espalda',
                             'Pierna',

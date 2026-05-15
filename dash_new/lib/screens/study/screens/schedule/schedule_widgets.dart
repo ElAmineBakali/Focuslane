@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
@@ -235,7 +235,7 @@ class EmptyScheduleState extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Â¡Horario vacÃ­o!',
+                  '¡Horario vacío!',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
@@ -244,7 +244,7 @@ class EmptyScheduleState extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'AÃ±ade tus clases para visualizar tu horario semanal',
+                  'Añade tus clases para visualizar tu horario semanal',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 16,
                     color: colorScheme.onSurfaceVariant,
@@ -255,7 +255,7 @@ class EmptyScheduleState extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: onAddClass,
                   icon: const Icon(Icons.add_rounded),
-                  label: const Text('AÃ±adir clase'),
+                  label: const Text('Añadir clase'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
@@ -275,5 +275,3 @@ class EmptyScheduleState extends StatelessWidget {
     );
   }
 }
-
-

@@ -2,14 +2,20 @@
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/gym/models/preset_routines_data.dart';
 import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class PresetRoutinesScreen extends StatefulWidget {
   final GymFirestoreService svc;
+  final bool embedded;
 
-  const PresetRoutinesScreen({super.key, required this.svc});
+  const PresetRoutinesScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   State<PresetRoutinesScreen> createState() => _PresetRoutinesScreenState();
@@ -35,43 +41,55 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            expandedHeight: 200,
-            pinned: true,
-            stretch: true,
-            backgroundColor: colorScheme.primaryContainer,
-            leading: FocusModuleHeader.buildLeading(
-              context,
-              mode: FocusModuleLeadingMode.backToModuleDashboard,
-              backRouteName: AppRoutes.gymDashboard,
-            ),
-            leadingWidth: 96,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Rutinas Destacadas',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+          if (!widget.embedded)
+            SliverAppBar.large(
+              expandedHeight: 200,
+              pinned: true,
+              stretch: true,
+              backgroundColor: colorScheme.primaryContainer,
+              leading: FocusModuleHeader.buildLeading(
+                context,
+                mode: FocusModuleLeadingMode.backToModuleDashboard,
+                backRouteName: AppRoutes.gymDashboard,
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primaryContainer,
-                      colorScheme.secondaryContainer.withOpacity(0.8),
-                    ],
+              leadingWidth: 96,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  'Plantillas de rutina',
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                ),
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colorScheme.primaryContainer,
+                        colorScheme.secondaryContainer.withValues(alpha: 0.8),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.auto_awesome,
+                      size: 80,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.auto_awesome,
-                    size: 80,
-                    color: Colors.white.withOpacity(0.2),
-                  ),
+              ),
+            ),
+          if (widget.embedded)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 18, 16, 0),
+                child: FocusSectionHeader(
+                  icon: Icons.auto_awesome_rounded,
+                  title: 'Plantillas',
+                  subtitle: 'Rutinas guiadas para crear una base editable.',
                 ),
               ),
             ),
-          ),
 
           SliverToBoxAdapter(
             child: Padding(
@@ -333,7 +351,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.8,
@@ -461,7 +479,7 @@ class _PresetRoutinesScreenState extends State<PresetRoutinesScreen> {
         leading: CircleAvatar(
           backgroundColor: Colors.blue.withOpacity(0.2),
           child: Text(
-            day.icon ?? '$dayNumber',
+            '$dayNumber',
             style: const TextStyle(fontSize: 16),
           ),
         ),

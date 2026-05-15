@@ -2,68 +2,120 @@ import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
 import 'schedule_widgets.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class ScheduleScreen extends StatelessWidget {
   final StudyFirestoreService svc;
-  const ScheduleScreen({super.key, required this.svc});
+  final bool embedded;
+  const ScheduleScreen({super.key, required this.svc, this.embedded = false});
 
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Horario académico'),
-        leading: FocusModuleHeader.buildLeading(
-          context,
-          mode: FocusModuleLeadingMode.backToModuleDashboard,
-          backRouteName: AppRoutes.studyDashboard,
+    final content = Column(
+      children: [
+        _ScheduleToolbar(
+          onAddBlock: () async {
+            await showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => _EditBlockSheet(svc: svc),
+            );
+          },
         ),
-        leadingWidth: 96,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => _EditBlockSheet(svc: svc),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: StreamBuilder<List<Course>>(
-        stream: svc.streamCourses(includeArchived: false),
-        builder: (context, courseSnap) {
-          final courses = courseSnap.data ?? const <Course>[];
-          final byId = {for (final c in courses) c.id: c};
-          return StreamBuilder<List<StudyClassBlock>>(
-            stream: svc.streamSchedule(),
-            builder: (context, snap) {
-              if (!snap.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final blocks = snap.data!;
+        Expanded(
+          child: StreamBuilder<List<Course>>(
+            stream: svc.streamCourses(includeArchived: false),
+            builder: (context, courseSnap) {
+              final courses = courseSnap.data ?? const <Course>[];
+              final byId = {for (final c in courses) c.id: c};
+              return StreamBuilder<List<StudyClassBlock>>(
+                stream: svc.streamSchedule(),
+                builder: (context, snap) {
+                  if (!snap.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final blocks = snap.data!;
 
-              if (isMobile) {
-                return _MobileDayByDaySchedule(
-                  blocks: blocks,
-                  courseById: byId,
-                  svc: svc,
+                  if (isMobile) {
+                    return _MobileDayByDaySchedule(
+                      blocks: blocks,
+                      courseById: byId,
+                      svc: svc,
+                    );
+                  }
+
+                  return _WeeklyScheduleView(
+                    blocks: blocks,
+                    courseById: byId,
+                    svc: svc,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+
+    if (embedded) return content;
+
+    return AppShell(
+      title: 'Estudio',
+      subtitle: 'Horario académico',
+      activeRoute: AppRoutes.studyDashboard,
+      child: content,
+    );
+  }
+}
+
+class _ScheduleToolbar extends StatelessWidget {
+  const _ScheduleToolbar({required this.onAddBlock});
+
+  final VoidCallback onAddBlock;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: PageContainer(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: FocusCard(
+          padding: const EdgeInsets.all(16),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 640;
+              final header = FocusSectionHeader(
+                title: 'Planificador',
+                subtitle: 'Horario académico por curso, día y aula.',
+                icon: Icons.calendar_month_rounded,
+              );
+              final action = FilledButton.icon(
+                onPressed: onAddBlock,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Añadir bloque'),
+              );
+
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [header, const SizedBox(height: 12), action],
                 );
               }
 
-              return _WeeklyScheduleView(
-                blocks: blocks,
-                courseById: byId,
-                svc: svc,
+              return Row(
+                children: [
+                  Expanded(child: header),
+                  const SizedBox(width: 12),
+                  action,
+                ],
               );
             },
-          );
-        },
+          ),
+        ),
       ),
     );
   }

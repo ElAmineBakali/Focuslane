@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/study/models/study_models.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
 import '../attendance/attendance_screen.dart';
 import 'package:focuslane/design/widgets/global_color_picker_widget.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class CourseDetailEditableScreen extends StatefulWidget {
   final StudyFirestoreService svc;
@@ -199,94 +199,76 @@ class _CourseDetailEditableScreenState
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(
-            expandedHeight: 200,
-            pinned: true,
-            leading: FocusModuleHeader.buildLeading(
-              context,
-              mode: FocusModuleLeadingMode.backToModuleDashboard,
-              backRouteName: AppRoutes.studyDashboard,
-            ),
-            leadingWidth: 96,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                widget.course.name,
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w700,
-                  shadows: [
-                    Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 8),
-                  ],
-                ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [_selectedColor, _selectedColor.withOpacity(0.7)],
+    return AppShell(
+      title: 'Estudio',
+      subtitle: widget.course.name,
+      activeRoute: AppRoutes.studyDashboard,
+      actions: [
+        FocusIconButton(
+          icon: Icons.arrow_back_rounded,
+          tooltip: 'Volver',
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        const SizedBox(width: 8),
+        FocusIconButton(
+          icon: _isEditing ? Icons.close_rounded : Icons.edit_rounded,
+          tooltip: _isEditing ? 'Cancelar' : 'Editar',
+          onPressed: () => setState(() => _isEditing = !_isEditing),
+        ),
+        const SizedBox(width: 8),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert_rounded),
+          tooltip: 'Más acciones',
+          itemBuilder:
+              (context) => [
+                PopupMenuItem(
+                  value: 'archive',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.archive_rounded,
+                        color: Colors.orange.shade600,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('Archivar'),
+                    ],
                   ),
                 ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_rounded, color: Colors.red.shade600),
+                      const SizedBox(width: 12),
+                      const Text('Eliminar'),
+                    ],
+                  ),
+                ),
+              ],
+          onSelected: (value) {
+            if (value == 'archive') _archiveCourse();
+            if (value == 'delete') _deleteCourse();
+          },
+        ),
+        const SizedBox(width: 10),
+      ],
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: PageContainer(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: _CourseDetailHero(
+                course: widget.course,
+                color: _selectedColor,
+                isEditing: _isEditing,
               ),
             ),
-            actions: [
-              if (!_isEditing)
-                IconButton(
-                  icon: const Icon(Icons.edit_rounded),
-                  onPressed: () => setState(() => _isEditing = true),
-                  tooltip: 'Editar',
-                )
-              else
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () => setState(() => _isEditing = false),
-                  tooltip: 'Cancelar',
-                ),
-              PopupMenuButton(
-                icon: const Icon(Icons.more_vert_rounded),
-                itemBuilder:
-                    (context) => [
-                      PopupMenuItem(
-                        value: 'archive',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.archive_rounded,
-                              color: Colors.orange.shade600,
-                            ),
-                            const SizedBox(width: 12),
-                            const Text('Archivar'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete_rounded,
-                              color: Colors.red.shade600,
-                            ),
-                            const SizedBox(width: 12),
-                            const Text('Eliminar'),
-                          ],
-                        ),
-                      ),
-                    ],
-                onSelected: (value) {
-                  if (value == 'archive') _archiveCourse();
-                  if (value == 'delete') _deleteCourse();
-                },
-              ),
-            ],
           ),
 
           SliverToBoxAdapter(
             child: SafeArea(
               top: false,
-              child: Padding(
+              child: PageContainer(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,7 +368,8 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                     ] else ...[
-                      Card(
+                      FocusCard(
+                        padding: EdgeInsets.zero,
                         child: ListTile(
                           leading: const Icon(Icons.event_available),
                           title: const Text('Asistencia'),
@@ -405,185 +388,172 @@ class _CourseDetailEditableScreenState
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.grading_rounded,
-                                    color: colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Calificaciones',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  FilledButton.tonalIcon(
-                                    onPressed: () async {
-                                      await _showAddGradeDialog(context);
-                                    },
-                                    icon: const Icon(
-                                      Icons.add_rounded,
-                                      size: 18,
-                                    ),
-                                    label: const Text('Añadir'),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              StreamBuilder<List<GradeEntry>>(
-                                stream: widget.svc.streamGrades(
-                                  courseId: widget.course.id,
+                      FocusCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.grading_rounded,
+                                  color: colorScheme.primary,
                                 ),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: Text(
-                                        'No se pudieron cargar las calificaciones.',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          color: colorScheme.error,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Calificaciones',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                FilledButton.tonalIcon(
+                                  onPressed: () async {
+                                    await _showAddGradeDialog(context);
+                                  },
+                                  icon: const Icon(Icons.add_rounded, size: 18),
+                                  label: const Text('Añadir'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            StreamBuilder<List<GradeEntry>>(
+                              stream: widget.svc.streamGrades(
+                                courseId: widget.course.id,
+                              ),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      'No se pudieron cargar las calificaciones.',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: colorScheme.error,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                    );
-                                  }
-
-                                  final grades = _mergeGrades(
-                                    snapshot.data ?? const <GradeEntry>[],
+                                    ),
                                   );
-                                  if (grades.isEmpty) {
-                                    return Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(14),
+                                }
+
+                                final grades = _mergeGrades(
+                                  snapshot.data ?? const <GradeEntry>[],
+                                );
+                                if (grades.isEmpty) {
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: colorScheme.surfaceContainerHighest
+                                          .withOpacity(0.45),
+                                    ),
+                                    child: const Text(
+                                      'Aún no hay calificaciones registradas',
+                                    ),
+                                  );
+                                }
+
+                                final average =
+                                    grades
+                                        .map((grade) => grade.grade)
+                                        .reduce((a, b) => a + b) /
+                                    grades.length;
+
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
-                                        color: colorScheme
-                                            .surfaceContainerHighest
-                                            .withOpacity(0.45),
+                                        color: colorScheme.primaryContainer
+                                            .withOpacity(0.55),
                                       ),
-                                      child: const Text(
-                                        'Aún no hay calificaciones registradas',
-                                      ),
-                                    );
-                                  }
-
-                                  final average =
-                                      grades
-                                          .map((grade) => grade.grade)
-                                          .reduce((a, b) => a + b) /
-                                      grades.length;
-
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 10,
+                                      child: Text(
+                                        'Promedio actual: ${average.toStringAsFixed(2)}',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontWeight: FontWeight.w700,
+                                          color: colorScheme.onPrimaryContainer,
                                         ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 8,
+                                      ),
+                                    ),
+                                    ...grades.map(
+                                      (grade) => Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 8,
                                         ),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(
                                             12,
                                           ),
-                                          color: colorScheme.primaryContainer
-                                              .withOpacity(0.55),
-                                        ),
-                                        child: Text(
-                                          'Promedio actual: ${average.toStringAsFixed(2)}',
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontWeight: FontWeight.w700,
-                                            color:
-                                                colorScheme.onPrimaryContainer,
+                                          color:
+                                              colorScheme.surfaceContainerHigh,
+                                          border: Border.all(
+                                            color: colorScheme.outlineVariant,
                                           ),
                                         ),
-                                      ),
-                                      ...grades.map(
-                                        (grade) => Container(
-                                          margin: const EdgeInsets.only(
-                                            bottom: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            color:
-                                                colorScheme
-                                                    .surfaceContainerHigh,
-                                            border: Border.all(
-                                              color: colorScheme.outlineVariant,
-                                            ),
-                                          ),
-                                          child: ListTile(
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                            leading: const Icon(
-                                              Icons.assignment_outlined,
-                                            ),
-                                            title: Text(
-                                              grade.taskId,
-                                              style:
-                                                  GoogleFonts.plusJakartaSans(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                            ),
-                                            subtitle: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  '${grade.assessmentType ?? 'Evaluación'} · Nota ${grade.grade.toStringAsFixed(2)} · ${_formatGradeDate(grade.date)}${grade.weight == null ? '' : ' · Peso ${grade.weight!.toStringAsFixed(0)}%'}',
-                                                ),
-                                                if ((grade.notes ?? '')
-                                                    .trim()
-                                                    .isNotEmpty) ...[
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    grade.notes!.trim(),
-                                                    style: GoogleFonts.plusJakartaSans(
-                                                      color:
-                                                          colorScheme
-                                                              .onSurfaceVariant,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                            trailing: IconButton(
-                                              icon: const Icon(
-                                                Icons.delete_outline,
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 6,
                                               ),
-                                              onPressed:
-                                                  () => widget.svc.deleteGrade(
-                                                    grade.id,
-                                                  ),
+                                          leading: const Icon(
+                                            Icons.assignment_outlined,
+                                          ),
+                                          title: Text(
+                                            grade.taskId,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.w600,
                                             ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                '${grade.assessmentType ?? 'Evaluación'} · Nota ${grade.grade.toStringAsFixed(2)} · ${_formatGradeDate(grade.date)}${grade.weight == null ? '' : ' · Peso ${grade.weight!.toStringAsFixed(0)}%'}',
+                                              ),
+                                              if ((grade.notes ?? '')
+                                                  .trim()
+                                                  .isNotEmpty) ...[
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  grade.notes!.trim(),
+                                                  style:
+                                                      GoogleFonts.plusJakartaSans(
+                                                        color:
+                                                            colorScheme
+                                                                .onSurfaceVariant,
+                                                      ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                          trailing: IconButton(
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                            ),
+                                            onPressed:
+                                                () => widget.svc.deleteGrade(
+                                                  grade.id,
+                                                ),
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -708,6 +678,167 @@ class _CourseDetailEditableScreenState
           return b.id.compareTo(a.id);
         });
     return result;
+  }
+}
+
+class _CourseDetailHero extends StatelessWidget {
+  const _CourseDetailHero({
+    required this.course,
+    required this.color,
+    required this.isEditing,
+  });
+
+  final Course course;
+  final Color color;
+  final bool isEditing;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return FocusCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: color.withOpacity(
+        Theme.of(context).brightness == Brightness.dark ? 0.24 : 0.12,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          border: Border(left: BorderSide(color: color, width: 5)),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 680;
+            final titleBlock = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FocusBadge(
+                  label: isEditing ? 'Edición activa' : 'Curso activo',
+                  color: color,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  course.name,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: scheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  course.teacher?.trim().isNotEmpty == true
+                      ? course.teacher!.trim()
+                      : 'Profesor no asignado',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            );
+            final meta = Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _CourseHeroPill(
+                  icon: Icons.star_rounded,
+                  label: 'Créditos',
+                  value: course.credits?.toString() ?? '-',
+                ),
+                _CourseHeroPill(
+                  icon: Icons.access_time_rounded,
+                  label: 'Meta',
+                  value:
+                      course.goalHours == null ? '-' : '${course.goalHours} h',
+                ),
+                _CourseHeroPill(
+                  icon: Icons.how_to_reg_rounded,
+                  label: 'Asistencia',
+                  value:
+                      course.attendanceRequired == null
+                          ? '-'
+                          : '${course.attendanceRequired!.toStringAsFixed(0)}%',
+                ),
+              ],
+            );
+
+            if (compact) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [titleBlock, const SizedBox(height: 16), meta],
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: titleBlock),
+                const SizedBox(width: 20),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 360),
+                  child: meta,
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _CourseHeroPill extends StatelessWidget {
+  const _CourseHeroPill({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 112),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.surface.withOpacity(0.72),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: scheme.primary),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

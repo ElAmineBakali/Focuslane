@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -50,18 +50,19 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     final subtitle = widget.debt == null ? 'Nueva deuda' : 'Editar deuda';
 
     return FinanceShell(
-      selectedIndex: 5,
+      selectedIndex: 4,
       title: 'Finanzas',
       subtitle: subtitle,
-      actions: widget.debt != null
-          ? [
-              IconButton(
-                icon: const Icon(Icons.history),
-                onPressed: _showLedger,
-                tooltip: 'Ver pagos',
-              ),
-            ]
-          : null,
+      actions:
+          widget.debt != null
+              ? [
+                IconButton(
+                  icon: const Icon(Icons.history),
+                  onPressed: _showLedger,
+                  tooltip: 'Ver pagos',
+                ),
+              ]
+              : null,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _save,
         heroTag: null,
@@ -123,7 +124,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
       controller: _nameCtrl,
       decoration: InputDecoration(
         labelText: 'Nombre *',
-        hintText: 'Ej: Prestamo personal',
+        hintText: 'Ej: Préstamo personal',
         prefixIcon: const Icon(Icons.title),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -161,7 +162,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
       validator: (v) {
         if (v == null || v.isEmpty) return 'Requerido';
         final amount = double.tryParse(v);
-        if (amount == null || amount <= 0) return 'Importe invalido';
+        if (amount == null || amount <= 0) return 'Importe inválido';
         return null;
       },
     );
@@ -171,7 +172,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     return TextFormField(
       controller: _interestRateCtrl,
       decoration: InputDecoration(
-        labelText: 'Tasa de interes',
+        labelText: 'Tasa de interés',
         hintText: '0.00',
         prefixIcon: const Icon(Icons.percent),
         suffixText: '%',
@@ -212,7 +213,8 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
-          initialDate: _dueDate ?? DateTime.now().add(const Duration(days: 365)),
+          initialDate:
+              _dueDate ?? DateTime.now().add(const Duration(days: 365)),
           firstDate: _startDate,
           lastDate: DateTime(2100),
         );
@@ -228,7 +230,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
         child: Text(
           _dueDate != null
               ? DateFormat('d MMMM yyyy', 'es').format(_dueDate!)
-              : 'Sin fecha limite',
+              : 'Sin fecha límite',
         ),
       ),
     );
@@ -261,10 +263,7 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
               const Text('Balance actual'),
               Text(
                 '${debt.balance.toStringAsFixed(2)} EUR',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: cs.error,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w700, color: cs.error),
               ),
             ],
           ),
@@ -289,64 +288,76 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
 
     final result = await showDialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Registrar pago'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: amountCtrl,
-                decoration: InputDecoration(
-                  labelText: 'Importe',
-                  suffixText: 'EUR',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                autofocus: true,
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: ctx,
-                    initialDate: date,
-                    firstDate: widget.debt!.startDate,
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) setDialogState(() => date = picked);
-                },
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: 'Fecha',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => AlertDialog(
+                  title: const Text('Registrar pago'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: amountCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Importe',
+                          suffixText: 'EUR',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        autofocus: true,
+                      ),
+                      const SizedBox(height: 16),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: date,
+                            firstDate: widget.debt!.startDate,
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => date = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'Fecha',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(DateFormat('d MMM yyyy').format(date)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: notesCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Notas',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        maxLines: 2,
+                      ),
+                    ],
                   ),
-                  child: Text(DateFormat('d MMM yyyy').format(date)),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Guardar'),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: notesCtrl,
-                decoration: InputDecoration(
-                  labelText: 'Notas',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                maxLines: 2,
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Guardar'),
-            ),
-          ],
-        ),
-      ),
     );
 
     if (result == true && amountCtrl.text.isNotEmpty) {
@@ -371,38 +382,50 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.95,
-        minChildSize: 0.5,
-        expand: false,
-        builder: (_, controller) => FocusCard(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              const Text('Historial de pagos', style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              Expanded(
-                child: debt.ledger.isEmpty
-                    ? const Center(child: Text('Sin pagos registrados'))
-                    : ListView.builder(
-                        controller: controller,
-                        itemCount: debt.ledger.length,
-                        itemBuilder: (context, i) {
-                          final p = debt.ledger[i];
-                          return ListTile(
-                            leading: const Icon(Icons.payment),
-                            title: Text('${p.amount.toStringAsFixed(2)} EUR'),
-                            subtitle: Text(DateFormat('d MMM yyyy').format(p.date)),
-                          );
-                        },
+      builder:
+          (ctx) => DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            maxChildSize: 0.95,
+            minChildSize: 0.5,
+            expand: false,
+            builder:
+                (_, controller) => FocusCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Historial de pagos',
+                        style: TextStyle(fontWeight: FontWeight.w700),
                       ),
-              ),
-            ],
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child:
+                            debt.ledger.isEmpty
+                                ? const Center(
+                                  child: Text('Sin pagos registrados'),
+                                )
+                                : ListView.builder(
+                                  controller: controller,
+                                  itemCount: debt.ledger.length,
+                                  itemBuilder: (context, i) {
+                                    final p = debt.ledger[i];
+                                    return ListTile(
+                                      leading: const Icon(Icons.payment),
+                                      title: Text(
+                                        '${p.amount.toStringAsFixed(2)} EUR',
+                                      ),
+                                      subtitle: Text(
+                                        DateFormat('d MMM yyyy').format(p.date),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
           ),
-        ),
-      ),
     );
   }
 
@@ -416,9 +439,10 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
       creditor: _creditorCtrl.text.trim(),
       originalAmount: double.parse(_originalAmountCtrl.text),
       balance: widget.debt?.balance ?? double.parse(_originalAmountCtrl.text),
-      interestRate: _interestRateCtrl.text.isEmpty
-          ? null
-          : double.tryParse(_interestRateCtrl.text),
+      interestRate:
+          _interestRateCtrl.text.isEmpty
+              ? null
+              : double.tryParse(_interestRateCtrl.text),
       startDate: _startDate,
       dueDate: _dueDate,
       notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text.trim(),
@@ -455,6 +479,3 @@ class _DebtFormScreenState extends State<DebtFormScreen> {
     super.dispose();
   }
 }
-
-
-

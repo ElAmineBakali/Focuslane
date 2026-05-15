@@ -61,7 +61,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
             : 'Editar suscripción';
 
     return FinanceShell(
-      selectedIndex: 3,
+      selectedIndex: 2,
       title: 'Finanzas',
       subtitle: subtitle,
       floatingActionButton: FloatingActionButton.extended(
@@ -146,7 +146,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
       validator: (v) {
         if (v == null || v.isEmpty) return 'Requerido';
         final amount = double.tryParse(v);
-        if (amount == null || amount <= 0) return 'Importe invalido';
+        if (amount == null || amount <= 0) return 'Importe inválido';
         return null;
       },
     );
@@ -181,7 +181,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'Proximo pago',
+          labelText: 'Próximo pago',
           prefixIcon: const Icon(Icons.calendar_today),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -196,9 +196,9 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
     return FocusCard(
       padding: const EdgeInsets.all(8),
       child: SwitchListTile(
-        title: const Text('Suscripcion activa'),
+        title: const Text('Suscripción activa'),
         subtitle: Text(
-          _isActive ? 'Generando pagos recurrentes' : 'No se generaran pagos',
+          _isActive ? 'Generando pagos recurrentes' : 'No se generarán pagos',
         ),
         value: _isActive,
         onChanged: (v) => setState(() => _isActive = v),
@@ -213,8 +213,8 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         title: const Text('Auto-marcar como pagado'),
         subtitle: Text(
           _autoMarkAsPaid
-              ? 'Creara transaccion automaticamente en la fecha'
-              : 'Deberas crear la transaccion manualmente',
+              ? 'Creará transacción automáticamente en la fecha'
+              : 'Deberás crear la transacción manualmente',
         ),
         value: _autoMarkAsPaid,
         onChanged: (v) => setState(() => _autoMarkAsPaid = v),
@@ -269,8 +269,8 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
         FocusFeedback.showSuccess(
           context,
           widget.subscription == null
-              ? 'Suscripcion creada'
-              : 'Suscripcion actualizada',
+              ? 'Suscripción creada'
+              : 'Suscripción actualizada',
         );
       }
     } catch (e) {

@@ -1,17 +1,9 @@
-﻿import 'package:flutter/material.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
-import 'package:focuslane/design/ui/layouts/module_shell.dart';
-import 'package:focuslane/design/ui/layouts/module_sidebar.dart';
+import 'package:flutter/material.dart';
+
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 
 class FinanceShell extends StatelessWidget {
-  final int selectedIndex;
-  final String title;
-  final String subtitle;
-  final Widget child;
-  final List<Widget>? actions;
-  final Widget? floatingActionButton;
-  final bool showExit;
-
   const FinanceShell({
     super.key,
     required this.selectedIndex,
@@ -23,6 +15,14 @@ class FinanceShell extends StatelessWidget {
     this.showExit = false,
   });
 
+  final int selectedIndex;
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final List<Widget>? actions;
+  final Widget? floatingActionButton;
+  final bool showExit;
+
   static const _routes = <String>[
     '/finance',
     '/finance/transactions',
@@ -33,57 +33,37 @@ class FinanceShell extends StatelessWidget {
     '/finance/settings',
   ];
 
-  static const _items = <ModuleSidebarItem>[
-    ModuleSidebarItem(icon: Icons.dashboard_outlined, label: 'Panel'),
-    ModuleSidebarItem(icon: Icons.receipt_long, label: 'Transacciones'),
-    ModuleSidebarItem(icon: Icons.subscriptions_outlined, label: 'Suscripciones'),
-    ModuleSidebarItem(icon: Icons.account_balance_wallet_outlined, label: 'Activos'),
-    ModuleSidebarItem(icon: Icons.account_balance_outlined, label: 'Deudas'),
-    ModuleSidebarItem(icon: Icons.analytics_outlined, label: 'Analítica'),
-    ModuleSidebarItem(icon: Icons.settings_outlined, label: 'Ajustes'),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isDesktop = width >= 1024;
+    final activeRoute =
+        selectedIndex >= 0 && selectedIndex < _routes.length
+            ? _routes[selectedIndex]
+            : AppRoutes.financeDashboard;
 
-    return ModuleShell(
-      items: _items,
-      selectedIndex: selectedIndex,
-      onItemSelected: (i) => _onSelect(context, i),
-      moduleTitle: 'Finanzas',
-      moduleIcon: Icons.account_balance_wallet,
-      actions: actions,
+    return AppShell(
+      title: title,
+      subtitle: subtitle,
+      activeRoute: activeRoute,
+      actions: [
+        FocusIconButton(
+          icon: showExit ? Icons.close_rounded : Icons.arrow_back_rounded,
+          tooltip: showExit ? 'Salir de Finanzas' : 'Volver a Finanzas',
+          onPressed: () => _goBack(context),
+        ),
+        const SizedBox(width: 10),
+        ...?actions,
+        if (actions != null && actions!.isNotEmpty) const SizedBox(width: 10),
+      ],
       floatingActionButton: floatingActionButton,
-      appBarOverride: isDesktop
-          ? FocusModuleHeader(
-              title: title,
-              subtitle: subtitle,
-              leadingMode: showExit
-                  ? FocusModuleLeadingMode.exitModule
-                  : FocusModuleLeadingMode.backToModuleDashboard,
-              onExit: () => _exitModule(context),
-              onBack: () => _onSelect(context, 0),
-              actions: actions,
-            )
-          : null,
-      body: Padding(
-        padding: EdgeInsets.all(isDesktop ? 24 : 12),
-        child: child,
-      ),
+      child: child,
     );
   }
 
-  void _onSelect(BuildContext context, int index) {
-    final route = _routes[index];
-    if (ModalRoute.of(context)?.settings.name == route) return;
-    Navigator.pushReplacementNamed(context, route);
-  }
-
-  void _exitModule(BuildContext context) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+  void _goBack(BuildContext context) {
+    if (showExit) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(AppRoutes.financeDashboard);
   }
 }
-
-

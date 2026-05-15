@@ -9,6 +9,7 @@ export 'components/focus_progress_bar.dart';
 export 'components/focus_progress_ring.dart';
 export 'components/focus_search_field.dart';
 export 'components/focus_secondary_button.dart';
+export 'components/focus_section_nav.dart';
 export 'components/focus_section_header.dart';
 export 'components/focus_stat_card.dart';
 export 'components/focus_text_field.dart';

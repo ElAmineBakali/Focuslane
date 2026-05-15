@@ -301,3 +301,100 @@ Fecha: 2026-05-15
 
 - Ejecutar una pasada manual en navegador con usuario real y permisos de notificacion reales.
 - No avanzar a Study, Food, Finance ni Gym hasta una fase posterior explicita.
+
+## Fase 9 - Estudio y Finanzas
+
+Fecha: 2026-05-15
+
+### Módulos rediseñados
+
+- Estudio: pantalla principal, panel, diario, cursos, detalle editable de curso, calificaciones, planificador, tareas e historial.
+- Finanzas: acceso protegido por contraseña, shell interno, panel, transacciones, suscripciones, activos, deudas, análisis y ajustes de seguridad.
+
+### Archivos modificados
+
+- `dash_new/lib/design/ui/components/focus_section_nav.dart`
+- `dash_new/lib/design/ui/focuslane_ui.dart`
+- `dash_new/lib/screens/study/screens/main/study_main_screen.dart`
+- `dash_new/lib/screens/study/screens/dashboard/study_dashboard_screen.dart`
+- `dash_new/lib/screens/study/screens/diary/study_diary_screen.dart`
+- `dash_new/lib/screens/study/screens/courses/courses_list_screen.dart`
+- `dash_new/lib/screens/study/screens/courses/course_detail_editable_screen.dart`
+- `dash_new/lib/screens/study/screens/schedule/schedule_screen.dart`
+- `dash_new/lib/screens/study/screens/schedule/schedule_widgets.dart`
+- `dash_new/lib/screens/study/screens/tasks/study_tasks_screen.dart`
+- `dash_new/lib/screens/study/screens/history/study_history_screen.dart`
+- `dash_new/lib/screens/study/screens/timer/presets_sheet.dart`
+- `dash_new/lib/screens/study/widgets/interactive_schedule_grid.dart`
+- `dash_new/lib/screens/finance/widgets/finance_access_gate.dart`
+- `dash_new/lib/screens/finance/widgets/finance_shell.dart`
+- `dash_new/lib/screens/finance/screens/main/finance_main_screen.dart`
+- `dash_new/lib/screens/finance/screens/dashboard/finance_dashboard_screen.dart`
+- `dash_new/lib/screens/finance/screens/transactions/transactions_screen.dart`
+- `dash_new/lib/screens/finance/screens/subscriptions/subscriptions_screen.dart`
+- `dash_new/lib/screens/finance/screens/assets/assets_screen.dart`
+- `dash_new/lib/screens/finance/screens/debts/debts_screen.dart`
+- `dash_new/lib/screens/finance/screens/analytics/analytics_screen.dart`
+- `dash_new/lib/screens/finance/screens/settings/finance_settings_screen.dart`
+- `dash_new/lib/screens/finance/screens/forms/transaction_form_screen.dart`
+- `dash_new/lib/screens/finance/screens/forms/subscription_form_screen.dart`
+- `dash_new/lib/screens/finance/screens/forms/asset_form_screen.dart`
+- `dash_new/lib/screens/finance/screens/forms/debt_form_screen.dart`
+- `dash_new/lib/screens/finance/services/finance_category_labels.dart`
+- `dash_new/lib/screens/finance/services/finance_ai_normalizer.dart`
+- `dash_new/lib/screens/finance/services/finance_receipt_ai_service.dart`
+- `dash_new/lib/screens/finance/services/settings_service.dart`
+
+### Componentes reutilizados
+
+- `AppShell`, `PageContainer`, `FocusSectionHeader`, `FocusCard`, `FocusStatCard`, `FocusBadge`, `FocusChip`, `FocusIconButton`, `FocusEmptyState`, `ResponsiveGrid` y el nuevo `FocusSectionNav`.
+- Se mantiene la navegación real por `AppRoutes` y los servicios existentes de Firestore/Firebase, seguridad financiera e IA financiera.
+
+### Cambios hechos
+
+- Estudio:
+  - `StudyMainScreen` usa el shell común con navegación interna por secciones.
+  - Panel, diario, cursos, tareas e historial se reconstruyeron con cards, métricas, estados vacíos y grids responsive usando datos reales.
+  - El detalle de curso quedó integrado en `AppShell`, conserva asistencia, edición, archivado/eliminación y calificaciones reales.
+  - Las calificaciones mantienen el guardado optimista existente para que no desaparezcan mientras llega el stream remoto.
+  - El historial resuelve nombres de cursos desde los datos cargados en vez de mostrar ids cuando hay curso disponible.
+  - El planificador conserva bloques reales de horario y edición por bottom sheet, con cabecera visual común.
+- Finanzas:
+  - La pantalla de contraseña se rehizo con aspecto premium y mantiene `FinanceSecurityService`.
+  - El panel financiero, transacciones, suscripciones, activos, deudas, análisis y ajustes usan cards, métricas, listas responsive y estados de error/carga controlados.
+  - `FinanceShell` quedó alineado con `AppShell` para formularios y secciones internas sin cambiar rutas ni servicios.
+  - Los formularios de transacciones, suscripciones, activos y deudas conservan guardado real, IA, recibos, fechas, categorías y navegación.
+
+### Componentes antiguos eliminados o reemplazados
+
+- Se reemplazaron los mini-shells visuales propios de Estudio y Finanzas por `AppShell` y `FocusSectionNav`.
+- Se retiró la cabecera antigua con `FocusModuleHeader` del detalle editable de curso y del planificador.
+- No se eliminaron servicios, modelos ni lógica real.
+
+### UTF-8 y textos
+
+- Corregidos textos visibles y etiquetas en Estudio/Finanzas: Estudio, Finanzas, Panel, Cursos, Calificaciones, Historial, Sesión, Contraseña, Presupuesto, Transacción, Suscripción, Categoría, Importe, Fecha, Guardar, Eliminar, Cancelar, Editar, Buscar, Añadir y Análisis.
+- Corregidos textos de formularios financieros: `Vehículo`, `Inversión`, `Préstamo`, `Tasa de interés`, `Importe inválido`, `Valor inválido`, `Suscripción activa`, `Suscripción creada/actualizada`, `Categoría`, `Subcategoría` y `Transacción creada/actualizada`.
+- Corregidas etiquetas financieras normalizadas y exportaciones CSV: `Alimentación`, `Educación`, `Transporte público`, `Médico`, `Membresía`, `Título`, `Categoría` y `Subcategoría`.
+- Barrido de mojibake ejecutado sobre Estudio/Finanzas: sin resultados.
+
+### Funcionalidad mantenida intacta
+
+- Estudio: cursos, tareas, sesiones, planificador, calificaciones, historial, asistencia, temporizador, Firestore y navegación real.
+- Finanzas: contraseña/bloqueo, seguridad, transacciones, suscripciones, activos, deudas, análisis, clasificación IA, recibos, Firestore y navegación real.
+- No se tocaron Gym/Gimnasio ni Food/Alimentación.
+
+### Validación ejecutada
+
+- `dart format` sobre los archivos Dart modificados: correcto.
+- `flutter analyze`: ejecutado. Resultado: código 1 por 328 `info` heredados/no bloqueantes; sin errores ni warnings.
+- `flutter analyze --no-fatal-infos`: código 0.
+- `flutter build web`: código 0, build generado en `dash_new/build/web`.
+- Aviso de build: Flutter mantiene avisos de dry-run Wasm en dependencias (`device_info_plus`, `image`, `flutter_timezone`). El build web normal se generó correctamente.
+
+### Pruebas manuales y límites
+
+- Verificado por análisis de rutas y código que Estudio sigue abriendo desde sidebar, conserva cursos, detalle de curso, calificaciones, tareas, sesiones e historial.
+- Verificado por análisis de rutas y código que Finanzas sigue pasando por pantalla protegida por contraseña y mantiene dashboard, transacciones, suscripciones, activos, deudas, análisis y ajustes de seguridad.
+- Verificada por compilación la integración con sidebar, topbar, responsive y dark/light al usar `AppShell`, `ColorScheme` y componentes comunes.
+- Pendiente de prueba interactiva con una sesión autenticada y datos reales: crear/abrir curso, añadir calificación, revisar que queda visible tras sincronizar, introducir contraseña de Finanzas, crear/editar registros financieros y revisar visualmente desktop/móvil y light/dark click a click.

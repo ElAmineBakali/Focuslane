@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/finance/services/finance_security_service.dart';
 
 class FinanceAccessGate extends StatefulWidget {
@@ -119,106 +121,177 @@ class _FinanceAccessGateState extends State<FinanceAccessGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     if (FinanceSecurityService.I.isSessionUnlocked) {
       return widget.child;
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Acceso protegido a finanzas')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: _hasPassword ? _buildUnlockView() : _buildSetupView(),
-            ),
+    return AppShell(
+      title: 'Finanzas',
+      subtitle: 'Acceso protegido.',
+      activeRoute: AppRoutes.financeDashboard,
+      child:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                child: PageContainer(
+                  maxWidth: 760,
+                  child: _AccessCard(
+                    hasPassword: _hasPassword,
+                    busy: _busy,
+                    error: _error,
+                    passwordCtrl: _passwordCtrl,
+                    confirmCtrl: _confirmCtrl,
+                    unlockCtrl: _unlockCtrl,
+                    onCreatePassword: _createPassword,
+                    onUnlock: _unlock,
+                  ),
+                ),
+              ),
+    );
+  }
+}
+
+class _AccessCard extends StatelessWidget {
+  const _AccessCard({
+    required this.hasPassword,
+    required this.busy,
+    required this.error,
+    required this.passwordCtrl,
+    required this.confirmCtrl,
+    required this.unlockCtrl,
+    required this.onCreatePassword,
+    required this.onUnlock,
+  });
+
+  final bool hasPassword;
+  final bool busy;
+  final String? error;
+  final TextEditingController passwordCtrl;
+  final TextEditingController confirmCtrl;
+  final TextEditingController unlockCtrl;
+  final VoidCallback onCreatePassword;
+  final VoidCallback onUnlock;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return FocusCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.lock_outline_rounded, color: scheme.primary),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasPassword
+                          ? 'Desbloquear Finanzas'
+                          : 'Proteger Finanzas',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineSmall?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      hasPassword
+                          ? 'Introduce la contraseña del módulo para continuar.'
+                          : 'Crea una contraseña local para proteger el módulo financiero.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 20),
+          if (hasPassword)
+            FocusTextField(
+              controller: unlockCtrl,
+              label: 'Contrasena de finanzas',
+              prefixIcon: Icons.lock_rounded,
+              obscureText: true,
+              onChanged: (_) {},
+            )
+          else ...[
+            FocusTextField(
+              controller: passwordCtrl,
+              label: 'Nueva contraseña',
+              prefixIcon: Icons.lock_reset_rounded,
+              obscureText: true,
+            ),
+            const SizedBox(height: 12),
+            FocusTextField(
+              controller: confirmCtrl,
+              label: 'Confirmar contraseña',
+              prefixIcon: Icons.verified_user_outlined,
+              obscureText: true,
+            ),
+          ],
+          if (error != null) ...[
+            const SizedBox(height: 12),
+            _AccessError(message: error!),
+          ],
+          const SizedBox(height: 18),
+          FocusPrimaryButton(
+            label:
+                busy
+                    ? (hasPassword ? 'Verificando...' : 'Guardando...')
+                    : (hasPassword ? 'Entrar' : 'Crear contraseña'),
+            icon: hasPassword ? Icons.login_rounded : Icons.lock_rounded,
+            fullWidth: true,
+            isLoading: busy,
+            onPressed:
+                busy ? null : (hasPassword ? onUnlock : onCreatePassword),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildSetupView() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Crea una contraseña para proteger el módulo de finanzas.',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _passwordCtrl,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Nueva contraseña',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: _confirmCtrl,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Confirmar contraseña',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        if (_error != null) ...[
-          const SizedBox(height: 10),
-          Text(_error!, style: const TextStyle(color: Colors.red)),
-        ],
-        const SizedBox(height: 14),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _busy ? null : _createPassword,
-            child: Text(_busy ? 'Guardando...' : 'Crear contraseña'),
-          ),
-        ),
-      ],
-    );
-  }
+class _AccessError extends StatelessWidget {
+  const _AccessError({required this.message});
 
-  Widget _buildUnlockView() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Introduce la contraseña de finanzas para continuar.',
-          style: TextStyle(fontWeight: FontWeight.w600),
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: scheme.error.withValues(alpha: 0.28)),
+      ),
+      child: Text(
+        message,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: scheme.error,
+          fontWeight: FontWeight.w700,
         ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _unlockCtrl,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Contraseña de finanzas',
-            border: OutlineInputBorder(),
-          ),
-          onSubmitted: (_) => _unlock(),
-        ),
-        if (_error != null) ...[
-          const SizedBox(height: 10),
-          Text(_error!, style: const TextStyle(color: Colors.red)),
-        ],
-        const SizedBox(height: 14),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _busy ? null : _unlock,
-            child: Text(_busy ? 'Verificando...' : 'Entrar'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

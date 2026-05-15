@@ -18,8 +18,13 @@ import 'package:focuslane/design/ui/components/responsive_kpi_grid.dart';
 
 class GymDashboardScreen extends StatelessWidget {
   final GymFirestoreService svc;
+  final bool embedded;
 
-  const GymDashboardScreen({super.key, required this.svc});
+  const GymDashboardScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   Widget _buildAlerts(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -126,12 +131,15 @@ class GymDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: FocusModuleHeader(
-        title: 'Gym',
-        subtitle: 'Rutinas, progreso y objetivos',
-        leadingMode: FocusModuleLeadingMode.exitModule,
-        actions: const [],
-      ),
+      appBar:
+          embedded
+              ? null
+              : FocusModuleHeader(
+                title: 'Gimnasio',
+                subtitle: 'Rutinas, progreso y objetivos',
+                leadingMode: FocusModuleLeadingMode.exitModule,
+                actions: const [],
+              ),
       body: SingleChildScrollView(
         padding: FocuslaneTokens.pagePaddingCompact,
         child: Column(

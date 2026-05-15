@@ -77,7 +77,10 @@ class FinanceAiNormalizer {
     final rawSubCategory = result['subCategory']?.toString().trim();
 
     final category = _normalizeCategory(rawCategory);
-    final subCategory = _normalizeSubCategory(rawSubCategory, fallbackCategory: category);
+    final subCategory = _normalizeSubCategory(
+      rawSubCategory,
+      fallbackCategory: category,
+    );
     final tags = _normalizeTags(result['tags']);
 
     return FinanceAiNormalizedResult(
@@ -114,7 +117,9 @@ class FinanceAiNormalizer {
   }) {
     final slug = _slug(raw);
     if (slug.isEmpty) {
-      return fallbackCategory == 'otros' ? 'otros' : '${fallbackCategory}_otros';
+      return fallbackCategory == 'otros'
+          ? 'otros'
+          : '${fallbackCategory}_otros';
     }
     return slug;
   }
@@ -141,10 +146,11 @@ class FinanceAiNormalizer {
     final raw = input.trim().toLowerCase();
     if (raw.isEmpty) return null;
 
-    final compact = raw
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .replaceAll(RegExp(r'[\u{1F300}-\u{1FAFF}]', unicode: true), '')
-        .trim();
+    final compact =
+        raw
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .replaceAll(RegExp(r'[\u{1F300}-\u{1FAFF}]', unicode: true), '')
+            .trim();
 
     if (compact.isEmpty) return null;
 
@@ -172,7 +178,7 @@ class FinanceAiNormalizer {
       'á': 'a',
       'à': 'a',
       'ä': 'a',
-      'â': 'a',
+      '\u00e2': 'a',
       'ã': 'a',
       'é': 'e',
       'è': 'e',

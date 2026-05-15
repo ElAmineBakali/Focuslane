@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:csv/csv.dart';
 import 'dart:io';
@@ -15,7 +15,13 @@ class FinanceSettingsService {
 
   Future<Map<String, dynamic>> getSettings() async {
     try {
-      final doc = await _db.collection('users').doc(_uid).collection('settings').doc('finance').get();
+      final doc =
+          await _db
+              .collection('users')
+              .doc(_uid)
+              .collection('settings')
+              .doc('finance')
+              .get();
       return doc.data() ?? {};
     } catch (e) {
       return {};
@@ -37,25 +43,38 @@ class FinanceSettingsService {
 
     // Create CSV
     final rows = [
-      ['Fecha', 'Tipo', 'TÃ­tulo', 'Importe', 'CategorÃ­a', 'SubcategorÃ­a', 'Cuenta', 'Etiquetas', 'Notas'],
-      ...txs.map((tx) => [
-            DateFormat('yyyy-MM-dd HH:mm:ss').format(tx.date),
-            tx.type.name,
-            tx.title,
-            tx.amount.toStringAsFixed(2),
-            tx.category ?? '',
-            tx.subCategory ?? '',
-            tx.accountId ?? '',
-            tx.tags.join(', '),
-            tx.notes ?? '',
-          ]),
+      [
+        'Fecha',
+        'Tipo',
+        'Título',
+        'Importe',
+        'Categoría',
+        'Subcategoría',
+        'Cuenta',
+        'Etiquetas',
+        'Notas',
+      ],
+      ...txs.map(
+        (tx) => [
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(tx.date),
+          tx.type.name,
+          tx.title,
+          tx.amount.toStringAsFixed(2),
+          tx.category ?? '',
+          tx.subCategory ?? '',
+          tx.accountId ?? '',
+          tx.tags.join(', '),
+          tx.notes ?? '',
+        ],
+      ),
     ];
 
     final csv = const ListToCsvConverter().convert(rows);
 
     // Save to file
     final dir = await getApplicationDocumentsDirectory();
-    final fileName = 'transacciones_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+    final fileName =
+        'transacciones_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
     final file = File('${dir.path}/$fileName');
     await file.writeAsString(csv);
 
@@ -65,10 +84,18 @@ class FinanceSettingsService {
   Future<void> clearAllData() async {
     // WARNING: This deletes ALL finance data
     final batch = _db.batch();
-    
-    final collections = ['transactions', 'subscriptions', 'debts', 'assets', 'deposits', 'variable_expenses'];
+
+    final collections = [
+      'transactions',
+      'subscriptions',
+      'debts',
+      'assets',
+      'deposits',
+      'variable_expenses',
+    ];
     for (final col in collections) {
-      final snapshot = await _db.collection('users').doc(_uid).collection(col).get();
+      final snapshot =
+          await _db.collection('users').doc(_uid).collection(col).get();
       for (final doc in snapshot.docs) {
         batch.delete(doc.reference);
       }
@@ -77,5 +104,3 @@ class FinanceSettingsService {
     await batch.commit();
   }
 }
-
-

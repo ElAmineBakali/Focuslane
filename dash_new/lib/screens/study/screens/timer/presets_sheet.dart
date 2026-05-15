@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/screens/study/services/study_firestore_service.dart';
@@ -151,9 +151,10 @@ class _PresetsSheetState extends State<PresetsSheet> {
                           return Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest
+                                  .withOpacity(0.3),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: Theme.of(
@@ -185,7 +186,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Crea uno nuevo en la secciÃ³n de abajo',
+                                  'Crea uno nuevo en la sección de abajo',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 13,
                                     color: Theme.of(context)
@@ -400,7 +401,7 @@ class _PresetsSheetState extends State<PresetsSheet> {
                           const SizedBox(height: 20),
 
                           Text(
-                            'MÃ©todo de estudio',
+                            'Método de estudio',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -619,7 +620,7 @@ class _ParamsEditorState extends State<_ParamsEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ParÃ¡metros',
+          'Parámetros',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -740,5 +741,3 @@ class _ParamsEditorState extends State<_ParamsEditor> {
     );
   }
 }
-
-
