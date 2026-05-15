@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
@@ -267,7 +267,7 @@ class CalendarController extends ChangeNotifier {
   }
 
   String humanDateTime(DateTime d, bool allDay) {
-    if (allDay) return '${humanDate(d)} (todo el dia)';
+    if (allDay) return '${humanDate(d)} (todo el día)';
     final hh = d.hour.toString().padLeft(2, '0');
     final mm = d.minute.toString().padLeft(2, '0');
     return '${humanDate(d)} · $hh:$mm';
@@ -373,31 +373,33 @@ class CalendarController extends ChangeNotifier {
     _rangeTo = to;
 
     _rangeSub?.cancel();
-    _rangeSub = _agg.combinedItems(from, to).listen(
-      (items) {
-        final byDay = <DateTime, List<CalendarItem>>{};
-        for (final item in items) {
-          final key = DateTime(
-            item.startAt.year,
-            item.startAt.month,
-            item.startAt.day,
-          );
-          (byDay[key] ??= <CalendarItem>[]).add(item);
-        }
-        for (final list in byDay.values) {
-          list.sort((a, b) => a.startAt.compareTo(b.startAt));
-        }
+    _rangeSub = _agg
+        .combinedItems(from, to)
+        .listen(
+          (items) {
+            final byDay = <DateTime, List<CalendarItem>>{};
+            for (final item in items) {
+              final key = DateTime(
+                item.startAt.year,
+                item.startAt.month,
+                item.startAt.day,
+              );
+              (byDay[key] ??= <CalendarItem>[]).add(item);
+            }
+            for (final list in byDay.values) {
+              list.sort((a, b) => a.startAt.compareTo(b.startAt));
+            }
 
-        _rangeItems = items;
-        _itemsByDay = byDay;
-        notifyListeners();
-      },
-      onError: (_, __) {
-        _rangeItems = const [];
-        _itemsByDay = const {};
-        notifyListeners();
-      },
-    );
+            _rangeItems = items;
+            _itemsByDay = byDay;
+            notifyListeners();
+          },
+          onError: (_, __) {
+            _rangeItems = const [];
+            _itemsByDay = const {};
+            notifyListeners();
+          },
+        );
   }
 }
 
@@ -427,4 +429,3 @@ class CalendarYearMonthStat {
     required this.doneTasks,
   });
 }
-

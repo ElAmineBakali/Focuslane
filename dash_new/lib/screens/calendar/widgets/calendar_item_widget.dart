@@ -1,5 +1,6 @@
-﻿import 'package:flutter/gestures.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 
 class CalendarItemVisuals {
@@ -42,24 +43,24 @@ class CalendarItemVisuals {
   static String sourceLabel(CalendarSourceModule source) {
     switch (source) {
       case CalendarSourceModule.planner:
-        return 'Planner';
+        return 'Calendario';
       case CalendarSourceModule.task:
-        return 'Tasks';
+        return 'Tareas';
       case CalendarSourceModule.study:
-        return 'Study';
+        return 'Estudio';
       case CalendarSourceModule.gym:
-        return 'Gym';
+        return 'Gimnasio';
       case CalendarSourceModule.food:
-        return 'Food';
+        return 'Alimentación';
       case CalendarSourceModule.finance:
-        return 'Finance';
+        return 'Finanzas';
       case CalendarSourceModule.habit:
-        return 'Habits';
+        return 'Hábitos';
     }
   }
 
   static String timeLabel(CalendarItem item) {
-    if (item.isAllDay) return 'Todo el dia';
+    if (item.isAllDay) return 'Todo el día';
     final h = item.startAt.hour.toString().padLeft(2, '0');
     final m = item.startAt.minute.toString().padLeft(2, '0');
     if (item.endAt == null) return '$h:$m';
@@ -94,36 +95,54 @@ class CalendarFilterChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = prefs;
     if (p == null) return const SizedBox.shrink();
+    final scheme = Theme.of(context).colorScheme;
 
-    FilterChip chip(CalendarType t, String label, IconData icon) => FilterChip(
-      label: Text(label),
-      selected: p.enabled.contains(t),
-      avatar: Icon(icon, size: 18),
-      onSelected: (v) => onTypeToggle(t, v),
-    );
+    FilterChip chip(CalendarType t, String label, IconData icon) {
+      final selected = p.enabled.contains(t);
+      return FilterChip(
+        label: Text(label),
+        selected: selected,
+        avatar: Icon(icon, size: 18),
+        onSelected: (v) => onTypeToggle(t, v),
+        selectedColor: scheme.primaryContainer.withValues(alpha: 0.55),
+        backgroundColor: scheme.surfaceContainerLowest,
+        side: BorderSide(
+          color:
+              selected
+                  ? scheme.primary.withValues(alpha: 0.36)
+                  : scheme.outlineVariant,
+        ),
+      );
+    }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Row(
+    return FocusCard(
+      padding: const EdgeInsets.all(14),
+      elevated: false,
+      backgroundColor: scheme.surfaceContainerLow,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          chip(CalendarType.task, 'Tareas', Icons.checklist),
-          const SizedBox(width: 6),
-          chip(CalendarType.study, 'Estudio', Icons.school),
-          const SizedBox(width: 6),
-          chip(CalendarType.gym, 'Gym', Icons.fitness_center),
-          const SizedBox(width: 6),
-          chip(CalendarType.finance, 'Pagos', Icons.payments),
-          const SizedBox(width: 6),
-          chip(CalendarType.food, 'Comidas', Icons.restaurant),
-          const SizedBox(width: 6),
-          chip(CalendarType.other, 'Otros', Icons.event_note),
-          const SizedBox(width: 12),
+          chip(CalendarType.task, 'Tareas', Icons.checklist_rounded),
+          chip(CalendarType.study, 'Estudio', Icons.school_rounded),
+          chip(CalendarType.gym, 'Gimnasio', Icons.fitness_center_rounded),
+          chip(CalendarType.finance, 'Pagos', Icons.payments_rounded),
+          chip(CalendarType.food, 'Comidas', Icons.restaurant_rounded),
+          chip(CalendarType.other, 'Otros', Icons.event_note_rounded),
           FilterChip(
-            label: const Text('Solo prioridad alta'),
+            label: const Text('Prioridad alta'),
             selected: p.highOnly,
-            avatar: const Icon(Icons.priority_high),
+            avatar: const Icon(Icons.priority_high_rounded, size: 18),
             onSelected: onHighOnlyToggle,
+            selectedColor: scheme.errorContainer.withValues(alpha: 0.62),
+            backgroundColor: scheme.surfaceContainerLowest,
+            side: BorderSide(
+              color:
+                  p.highOnly
+                      ? scheme.error.withValues(alpha: 0.36)
+                      : scheme.outlineVariant,
+            ),
           ),
         ],
       ),
@@ -239,35 +258,30 @@ class CalendarDayItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Text('No hay elementos para este dia'),
+      return const FocusEmptyState(
+        icon: Icons.event_available_rounded,
+        message: 'No hay eventos para este día',
+        subtitle: 'Puedes crear uno desde el botón de nuevo evento.',
       );
     }
 
     final scheme = Theme.of(context).colorScheme;
 
     return ListView.separated(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.all(12),
       shrinkWrap: !scrollable,
       physics:
           scrollable
               ? const BouncingScrollPhysics()
               : const NeverScrollableScrollPhysics(),
       itemCount: items.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
         final item = items[i];
         final icon = CalendarItemVisuals.iconFor(item.type);
-        final color =
-            item.priority == CalendarPriority.high
-                ? Colors.redAccent
-                : scheme.primary;
+        final color = CalendarItemVisuals.colorForItem(context, item);
 
-        final timeLabel =
-            item.isAllDay
-                ? 'Todo el dia'
-                : '${item.startAt.hour.toString().padLeft(2, '0')}:${item.startAt.minute.toString().padLeft(2, '0')}';
+        final timeLabel = CalendarItemVisuals.timeLabel(item);
 
         final isCompleted =
             item.type == CalendarType.task && item.completed == true;
@@ -277,30 +291,102 @@ class CalendarDayItemList extends StatelessWidget {
           color: isCompleted ? scheme.onSurface.withValues(alpha: .65) : null,
         );
 
-        return ListTile(
-          dense: false,
-          leading: CircleAvatar(
-            backgroundColor:
-                isCompleted ? scheme.surfaceContainerHighest : color,
-            child: Icon(
-              icon,
-              color: isCompleted ? scheme.onSurfaceVariant : scheme.onPrimary,
+        return Material(
+          color: scheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            onTap: () => onTap(item),
+            onLongPress: item.isEditable ? () => onDelete(item.id) : null,
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: scheme.outlineVariant),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color:
+                          isCompleted
+                              ? scheme.surfaceContainerHigh
+                              : color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: color.withValues(alpha: 0.22)),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: isCompleted ? scheme.onSurfaceVariant : color,
+                      size: 21,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: titleStyle.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            FocusChip(
+                              label: timeLabel,
+                              icon: Icons.schedule_rounded,
+                              color: color,
+                            ),
+                            FocusChip(
+                              label: CalendarItemVisuals.sourceLabel(
+                                item.sourceModule,
+                              ),
+                              icon: Icons.hub_outlined,
+                              color: scheme.secondary,
+                            ),
+                            if (item.priority == CalendarPriority.high)
+                              FocusChip(
+                                label: 'Alta prioridad',
+                                icon: Icons.priority_high_rounded,
+                                color: scheme.error,
+                              ),
+                          ],
+                        ),
+                        if ((item.description ?? '').trim().isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            item.description!.trim(),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    item.isEditable
+                        ? Icons.edit_outlined
+                        : Icons.open_in_new_rounded,
+                    size: 18,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
             ),
           ),
-          title: Text(item.title, style: titleStyle),
-          subtitle: Text(
-            [
-              timeLabel,
-              CalendarItemVisuals.sourceLabel(item.sourceModule),
-              if ((item.description ?? '').isNotEmpty) item.description!,
-            ].join(' · '),
-          ),
-          trailing:
-              item.isEditable
-                  ? const Icon(Icons.edit_outlined, size: 18)
-                  : const Icon(Icons.open_in_new, size: 18),
-          onTap: () => onTap(item),
-          onLongPress: item.isEditable ? () => onDelete(item.id) : null,
         );
       },
     );
@@ -453,4 +539,3 @@ class CalendarTimedItemCard extends StatelessWidget {
     );
   }
 }
-

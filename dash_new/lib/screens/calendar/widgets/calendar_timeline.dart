@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +121,7 @@ class CalendarAllDayRow extends StatelessWidget {
                 height: 78,
                 alignment: Alignment.topCenter,
                 padding: const EdgeInsets.only(top: 10),
-                child: const Text('Todo dia'),
+                child: const Text('Todo el día'),
               ),
               ...days.map((day) {
                 final allDay =
@@ -163,7 +163,7 @@ class CalendarAllDayRow extends StatelessWidget {
                                 child: const Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    'Soltar o tocar para crear',
+                                    'Tocar para crear',
                                     style: TextStyle(fontSize: 12),
                                   ),
                                 ),
@@ -465,4 +465,3 @@ class _CalendarTimelineDayColumn extends StatelessWidget {
     );
   }
 }
-

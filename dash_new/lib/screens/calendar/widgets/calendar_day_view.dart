@@ -1,5 +1,6 @@
-﻿import 'package:flutter/gestures.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_item_widget.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_timeline.dart';
@@ -61,6 +62,8 @@ class CalendarDayView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         CalendarFilterChips(
@@ -68,65 +71,120 @@ class CalendarDayView extends StatelessWidget {
           onTypeToggle: onTypeToggle,
           onHighOnlyToggle: onHighOnlyToggle,
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  humanDateLong(day),
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-              const Text('Zoom'),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 140,
-                child: Slider(
-                  value: slotHeight,
-                  min: 34,
-                  max: 120,
-                  onChanged: onSlotHeightChanged,
-                ),
-              ),
-            ],
+        const SizedBox(height: 12),
+        FocusCard(
+          padding: const EdgeInsets.all(14),
+          elevated: false,
+          backgroundColor: scheme.surfaceContainerLow,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 620;
+              final title = Row(
+                children: [
+                  Icon(Icons.view_day_rounded, color: scheme.primary, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      humanDateLong(day),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+              final zoom = Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Zoom',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: compact ? 180 : 160,
+                    child: Slider(
+                      value: slotHeight,
+                      min: 34,
+                      max: 120,
+                      onChanged: onSlotHeightChanged,
+                    ),
+                  ),
+                ],
+              );
+
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    title,
+                    const SizedBox(height: 8),
+                    Align(alignment: Alignment.centerLeft, child: zoom),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: title),
+                  const SizedBox(width: 16),
+                  zoom,
+                ],
+              );
+            },
           ),
         ),
-        CalendarAllDayRow(
-          days: [day],
-          dayWidth: dayWidth,
-          timeAxisWidth: timeAxisWidth,
-          itemsFor: itemsFor,
-          canMoveItem: canMoveItem,
-          onMoveItemToDay: onMoveItemToDay,
-          onTapItem: onTapItem,
-          onCreateEvent: onCreateEvent,
-        ),
-        const Divider(height: 1),
+        const SizedBox(height: 12),
         Expanded(
-          child: CalendarTimelineSurface(
-            days: [day],
-            dayWidth: dayWidth,
-            timeAxisWidth: timeAxisWidth,
-            timelineStartHour: timelineStartHour,
-            timelineEndHour: timelineEndHour,
-            timelineHeight: timelineHeight,
-            slotHeight: slotHeight,
-            itemsFor: itemsFor,
-            topFor: topFor,
-            durationMinutes: durationMinutes,
-            canMoveItem: canMoveItem,
-            canResizeItem: canResizeItem,
-            onMoveItemToSlot: onMoveItemToSlot,
-            onResizeItem: onResizeItem,
-            onTapItem: onTapItem,
-            onCreateEvent: onCreateEvent,
-            onPointerSignal: onPointerSignal,
-            onScaleUpdate: onScaleUpdate,
+          child: FocusCard(
+            padding: EdgeInsets.zero,
+            backgroundColor: scheme.surfaceContainerLowest,
+            child: Column(
+              children: [
+                CalendarAllDayRow(
+                  days: [day],
+                  dayWidth: dayWidth,
+                  timeAxisWidth: timeAxisWidth,
+                  itemsFor: itemsFor,
+                  canMoveItem: canMoveItem,
+                  onMoveItemToDay: onMoveItemToDay,
+                  onTapItem: onTapItem,
+                  onCreateEvent: onCreateEvent,
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: CalendarTimelineSurface(
+                    days: [day],
+                    dayWidth: dayWidth,
+                    timeAxisWidth: timeAxisWidth,
+                    timelineStartHour: timelineStartHour,
+                    timelineEndHour: timelineEndHour,
+                    timelineHeight: timelineHeight,
+                    slotHeight: slotHeight,
+                    itemsFor: itemsFor,
+                    topFor: topFor,
+                    durationMinutes: durationMinutes,
+                    canMoveItem: canMoveItem,
+                    canResizeItem: canResizeItem,
+                    onMoveItemToSlot: onMoveItemToSlot,
+                    onResizeItem: onResizeItem,
+                    onTapItem: onTapItem,
+                    onCreateEvent: onCreateEvent,
+                    onPointerSignal: onPointerSignal,
+                    onScaleUpdate: onScaleUpdate,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 }
-

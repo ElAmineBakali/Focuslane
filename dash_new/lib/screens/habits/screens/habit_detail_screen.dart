@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/design/widgets/ui_scaffold.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:focuslane/screens/habits/models/habit_model.dart';
@@ -117,7 +118,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   }
 
   String _asHex(Color c) =>
-      '0x${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+      '0x${c.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
   double? _parseGoalValue() {
     final raw = _goalValueController.text.trim();
@@ -196,12 +197,19 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
             key: _formKey,
             child: ListView(
               children: [
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                FocusCard(
+                  backgroundColor: cs.surfaceContainerLowest,
+                  child: const FocusSectionHeader(
+                    title: 'Editar hábito',
+                    subtitle: 'Actualiza datos, estado y meta del hábito.',
+                    icon: Icons.edit_note_rounded,
                   ),
+                ),
+                const SizedBox(height: 16),
+                FocusCard(
+                  padding: EdgeInsets.zero,
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
                   child: InkWell(
                     onTap: _pickEmojiIcon,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -213,10 +221,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                             width: isMobile ? 50 : 56,
                             height: isMobile ? 50 : 56,
                             decoration: BoxDecoration(
-                              color: _selectedColor.withOpacity(0.15),
+                              color: _selectedColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _selectedColor.withOpacity(0.3),
+                                color: _selectedColor.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),
@@ -302,12 +310,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                  ),
+                FocusCard(
+                  padding: EdgeInsets.zero,
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
                   child: InkWell(
                     onTap: _manageTags,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -379,12 +385,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                     onChanged: (val) => setState(() => _unit = val),
                   ),
                   const SizedBox(height: 12),
-                  Card(
-                    elevation: 0,
-                    color: cs.surfaceContainerHigh,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                    ),
+                  FocusCard(
+                    padding: EdgeInsets.zero,
+                    elevated: false,
+                    backgroundColor: cs.surfaceContainerLow,
                     child: Padding(
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
                       child: Column(
@@ -445,7 +449,9 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: cs.primaryContainer.withOpacity(0.55),
+                                color: cs.primaryContainer.withValues(
+                                  alpha: 0.55,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
@@ -486,18 +492,59 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                ListTile(
-                  title: const Text('Color'),
-                  leading: CircleAvatar(backgroundColor: _selectedColor),
-                  trailing: TextButton(
-                    onPressed: _pickColor,
-                    child: const Text('Cambiar color'),
+                FocusCard(
+                  padding: const EdgeInsets.all(14),
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
+                  child: InkWell(
+                    onTap: _pickColor,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Row(
+                      children: [
+                        Icon(Icons.palette_outlined, color: cs.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Color',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        CircleAvatar(backgroundColor: _selectedColor),
+                      ],
+                    ),
                   ),
                 ),
-                SwitchListTile(
-                  title: const Text('¿Está activo?'),
-                  value: _isActive,
-                  onChanged: (val) => setState(() => _isActive = val),
+                const SizedBox(height: 12),
+                FocusCard(
+                  padding: EdgeInsets.zero,
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
+                  child: SwitchListTile(
+                    title: const Text('¿Está activo?'),
+                    secondary: const Icon(Icons.toggle_on_outlined),
+                    value: _isActive,
+                    onChanged: (val) => setState(() => _isActive = val),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    FocusSecondaryButton(
+                      label: 'Cancelar',
+                      icon: Icons.close_rounded,
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FocusPrimaryButton(
+                      label: 'Guardar cambios',
+                      icon: Icons.save_rounded,
+                      onPressed: _saveChanges,
+                    ),
+                  ],
                 ),
               ],
             ),

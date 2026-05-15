@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -381,7 +381,7 @@ class CalendarAggregatorService {
               if (start == null) return null;
               final minutes = (m['minutes'] as num?)?.toInt() ?? 45;
               final courseName =
-                  (m['courseName'] ?? 'SesiÃ³n de estudio').toString();
+                  (m['courseName'] ?? 'Sesión de estudio').toString();
               return _buildItem(
                 id: 'study-session-${d.id}',
                 sourceModule: CalendarSourceModule.study,
@@ -477,38 +477,43 @@ class CalendarAggregatorService {
           .startAt([fromId])
           .endAt([toId]);
 
-      yield* col.snapshots().map((s) {
-        return s.docs
-            .map((d) {
-              final date = _dateFromPayload(d.id);
-              if (date == null) return null;
-              final m = d.data();
-              final entries = (m['entries'] as List?) ?? const [];
-              if (entries.isEmpty) return null;
-              final totals = Map<String, dynamic>.from(m['totals'] ?? const {});
-              final kcal = (totals['kcal'] as num?)?.toDouble() ?? 0;
-              final note = <String>[
-                '${entries.length} items',
-                if (kcal > 0) '${kcal.toStringAsFixed(0)} kcal',
-              ].join(' â€¢ ');
-              return _buildItem(
-                id: d.id,
-                sourceModule: CalendarSourceModule.food,
-                title: 'Registro de comida',
-                description: note,
-                startAt: DateTime(date.year, date.month, date.day),
-                isAllDay: true,
-                type: CalendarType.food,
-                priority: CalendarPriority.low,
-                deepLink: CalendarDeepLink(
-                  routeName: CoreRoutes.foodDashboard,
-                  arguments: {'dayId': d.id},
-                ),
-              );
-            })
-            .whereType<CalendarItem>()
-            .toList(growable: false);
-          }).handleError((Object _, StackTrace __) {});
+      yield* col
+          .snapshots()
+          .map((s) {
+            return s.docs
+                .map((d) {
+                  final date = _dateFromPayload(d.id);
+                  if (date == null) return null;
+                  final m = d.data();
+                  final entries = (m['entries'] as List?) ?? const [];
+                  if (entries.isEmpty) return null;
+                  final totals = Map<String, dynamic>.from(
+                    m['totals'] ?? const {},
+                  );
+                  final kcal = (totals['kcal'] as num?)?.toDouble() ?? 0;
+                  final note = <String>[
+                    '${entries.length} items',
+                    if (kcal > 0) '${kcal.toStringAsFixed(0)} kcal',
+                  ].join(' â€¢ ');
+                  return _buildItem(
+                    id: d.id,
+                    sourceModule: CalendarSourceModule.food,
+                    title: 'Registro de comida',
+                    description: note,
+                    startAt: DateTime(date.year, date.month, date.day),
+                    isAllDay: true,
+                    type: CalendarType.food,
+                    priority: CalendarPriority.low,
+                    deepLink: CalendarDeepLink(
+                      routeName: CoreRoutes.foodDashboard,
+                      arguments: {'dayId': d.id},
+                    ),
+                  );
+                })
+                .whereType<CalendarItem>()
+                .toList(growable: false);
+          })
+          .handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }
@@ -528,57 +533,61 @@ class CalendarAggregatorService {
             isGreaterThanOrEqualTo: Timestamp.fromDate(_day0(from)),
           )
           .where('date', isLessThanOrEqualTo: Timestamp.fromDate(_dayEnd(to)));
-      yield* col.snapshots().map((s) {
-        return s.docs
-            .map((d) {
-              final m = d.data();
-              if (m['sourceRecurringId'] != null) return null;
-              final planned =
-                  (m['planned'] == true) ||
-                  (m['isBill'] == true) ||
-                  (m['dueDate'] != null);
-              if (!planned) return null;
+      yield* col
+          .snapshots()
+          .map((s) {
+            return s.docs
+                .map((d) {
+                  final m = d.data();
+                  if (m['sourceRecurringId'] != null) return null;
+                  final planned =
+                      (m['planned'] == true) ||
+                      (m['isBill'] == true) ||
+                      (m['dueDate'] != null);
+                  if (!planned) return null;
 
-              final date =
-                  _dateFromPayload(m['dueDate']) ?? _dateFromPayload(m['date']);
-              if (date == null) return null;
+                  final date =
+                      _dateFromPayload(m['dueDate']) ??
+                      _dateFromPayload(m['date']);
+                  if (date == null) return null;
 
-              final type = (m['type'] ?? 'expense').toString();
-              final category = (m['category'] ?? '').toString();
-              final amount = (m['amount'] as num?)?.toDouble() ?? 0;
-              final title = (m['title'] ?? '').toString().trim();
-              final label =
-                  title.isEmpty
-                      ? (type == 'income'
-                          ? 'Ingreso planificado'
-                          : 'Gasto planificado')
-                      : title;
+                  final type = (m['type'] ?? 'expense').toString();
+                  final category = (m['category'] ?? '').toString();
+                  final amount = (m['amount'] as num?)?.toDouble() ?? 0;
+                  final title = (m['title'] ?? '').toString().trim();
+                  final label =
+                      title.isEmpty
+                          ? (type == 'income'
+                              ? 'Ingreso planificado'
+                              : 'Gasto planificado')
+                          : title;
 
-              final note = <String>[
-                if (category.isNotEmpty) category,
-                if (amount != 0) amount.toStringAsFixed(2),
-              ].join(' â€¢ ');
+                  final note = <String>[
+                    if (category.isNotEmpty) category,
+                    if (amount != 0) amount.toStringAsFixed(2),
+                  ].join(' â€¢ ');
 
-              return _buildItem(
-                id: d.id,
-                sourceModule: CalendarSourceModule.finance,
-                title: label,
-                description: note.isEmpty ? null : note,
-                startAt: DateTime(date.year, date.month, date.day),
-                isAllDay: true,
-                type: CalendarType.finance,
-                priority: CalendarPriority.normal,
-                relatedTxId: (m['relatedTxId'] ?? d.id).toString(),
-                dedupeKey: m['dedupeKey']?.toString(),
-                deepLink: CalendarDeepLink(
-                  routeName: CoreRoutes.financeTransactions,
-                  arguments: {'txId': d.id},
-                ),
-              );
-            })
-            .whereType<CalendarItem>()
-            .toList(growable: false);
-          }).handleError((Object _, StackTrace __) {});
+                  return _buildItem(
+                    id: d.id,
+                    sourceModule: CalendarSourceModule.finance,
+                    title: label,
+                    description: note.isEmpty ? null : note,
+                    startAt: DateTime(date.year, date.month, date.day),
+                    isAllDay: true,
+                    type: CalendarType.finance,
+                    priority: CalendarPriority.normal,
+                    relatedTxId: (m['relatedTxId'] ?? d.id).toString(),
+                    dedupeKey: m['dedupeKey']?.toString(),
+                    deepLink: CalendarDeepLink(
+                      routeName: CoreRoutes.financeTransactions,
+                      arguments: {'txId': d.id},
+                    ),
+                  );
+                })
+                .whereType<CalendarItem>()
+                .toList(growable: false);
+          })
+          .handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }
@@ -604,42 +613,45 @@ class CalendarAggregatorService {
           )
           .orderBy('nextDue');
 
-      yield* col.snapshots().map((s) {
-        return s.docs
-            .map((d) {
-              final m = d.data();
-              final nextDue =
-                  _dateFromPayload(m['nextDue']) ??
-                  _dateFromPayload(m['nextPaymentDate']);
-              if (nextDue == null) return null;
-              final title =
-                  (m['title'] ?? m['name'] ?? 'SuscripciÃ³n').toString();
-              final amount = (m['amount'] as num?)?.toDouble() ?? 0;
-              final daysLeft =
-                  _day0(nextDue).difference(_day0(DateTime.now())).inDays;
-              final prio =
-                  daysLeft <= 2
-                      ? CalendarPriority.high
-                      : CalendarPriority.normal;
-              return _buildItem(
-                id: 'sub-${d.id}',
-                sourceModule: CalendarSourceModule.finance,
-                title: title,
-                description: amount == 0 ? null : amount.toStringAsFixed(2),
-                startAt: DateTime(nextDue.year, nextDue.month, nextDue.day),
-                isAllDay: true,
-                type: CalendarType.finance,
-                priority: prio,
-                dedupeKey: 'sub-${d.id}-${_dayId(nextDue)}',
-                deepLink: CalendarDeepLink(
-                  routeName: '/finance/subscriptions',
-                  arguments: {'subId': d.id},
-                ),
-              );
-            })
-            .whereType<CalendarItem>()
-            .toList(growable: false);
-      }).handleError((Object _, StackTrace __) {});
+      yield* col
+          .snapshots()
+          .map((s) {
+            return s.docs
+                .map((d) {
+                  final m = d.data();
+                  final nextDue =
+                      _dateFromPayload(m['nextDue']) ??
+                      _dateFromPayload(m['nextPaymentDate']);
+                  if (nextDue == null) return null;
+                  final title =
+                      (m['title'] ?? m['name'] ?? 'Suscripción').toString();
+                  final amount = (m['amount'] as num?)?.toDouble() ?? 0;
+                  final daysLeft =
+                      _day0(nextDue).difference(_day0(DateTime.now())).inDays;
+                  final prio =
+                      daysLeft <= 2
+                          ? CalendarPriority.high
+                          : CalendarPriority.normal;
+                  return _buildItem(
+                    id: 'sub-${d.id}',
+                    sourceModule: CalendarSourceModule.finance,
+                    title: title,
+                    description: amount == 0 ? null : amount.toStringAsFixed(2),
+                    startAt: DateTime(nextDue.year, nextDue.month, nextDue.day),
+                    isAllDay: true,
+                    type: CalendarType.finance,
+                    priority: prio,
+                    dedupeKey: 'sub-${d.id}-${_dayId(nextDue)}',
+                    deepLink: CalendarDeepLink(
+                      routeName: '/finance/subscriptions',
+                      arguments: {'subId': d.id},
+                    ),
+                  );
+                })
+                .whereType<CalendarItem>()
+                .toList(growable: false);
+          })
+          .handleError((Object _, StackTrace __) {});
     } catch (_) {
       yield const <CalendarItem>[];
     }
@@ -663,7 +675,7 @@ class CalendarAggregatorService {
         final items = <CalendarItem>[];
         for (final d in s.docs) {
           final m = d.data();
-          final name = (m['name'] ?? 'HÃ¡bito').toString();
+          final name = (m['name'] ?? 'Hábito').toString();
           final completedDates =
               (m['completedDates'] as List?)
                   ?.map((e) => e.toString())
@@ -1030,4 +1042,3 @@ class CalendarAggregatorService {
         });
   }
 }
-

@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/calendar/controllers/calendar_controller.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_item_widget.dart';
@@ -37,12 +38,12 @@ class CalendarYearView extends StatelessWidget {
         ),
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 88),
+            padding: const EdgeInsets.only(top: 12, bottom: 16),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1.36,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              childAspectRatio: 1.42,
             ),
             itemCount: stats.length,
             itemBuilder: (ctx, i) {
@@ -80,55 +81,65 @@ class _YearMonthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return FocusCard(
       onTap: onTap,
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      elevated: false,
+      backgroundColor: colorScheme.surfaceContainerLowest,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(monthLabel, style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 10),
-              Text('Eventos: $totalItems'),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text('Alta: $highItems'),
-                ],
-              ),
-              const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(999),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: Icon(
+                  Icons.calendar_month_rounded,
+                  color: colorScheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Text(
-                  'Tasks completadas: $doneTasks',
-                  style: TextStyle(color: colorScheme.primary, fontSize: 12),
+                  monthLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FocusBadge(
+                label: '$totalItems eventos',
+                color: colorScheme.primary,
+              ),
+              FocusBadge(
+                label: '$highItems alta prioridad',
+                color: colorScheme.error,
+              ),
+            ],
+          ),
+          const Spacer(),
+          FocusChip(
+            label: '$doneTasks tareas completadas',
+            icon: Icons.task_alt_rounded,
+            color: colorScheme.secondary,
+          ),
+        ],
       ),
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/habits/models/habit_model.dart';
 import 'package:focuslane/screens/habits/services/habit_firestore_service.dart';
 import 'package:focuslane/screens/habits/utils/habit_constants.dart';
@@ -64,7 +65,7 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
   }
 
   String _asHex(Color c) =>
-      '0x${c.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+      '0x${c.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
 
   double? _parseGoalValue() {
     final raw = _goalValueController.text.trim();
@@ -232,12 +233,23 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                FocusCard(
+                  backgroundColor: cs.surfaceContainerLowest,
+                  child: FocusSectionHeader(
+                    title: _isEditing ? 'Editar hábito' : 'Nuevo hábito',
+                    subtitle:
+                        'Define nombre, frecuencia, etiquetas y tipo de registro.',
+                    icon:
+                        _isEditing
+                            ? Icons.edit_note_rounded
+                            : Icons.add_task_rounded,
                   ),
+                ),
+                const SizedBox(height: 16),
+                FocusCard(
+                  padding: EdgeInsets.zero,
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
                   child: InkWell(
                     onTap: _pickEmojiIcon,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -249,10 +261,10 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                             width: isMobile ? 50 : 56,
                             height: isMobile ? 50 : 56,
                             decoration: BoxDecoration(
-                              color: _selectedColor.withOpacity(0.15),
+                              color: _selectedColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _selectedColor.withOpacity(0.3),
+                                color: _selectedColor.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),
@@ -349,12 +361,10 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 16),
 
-                Card(
-                  elevation: 0,
-                  color: cs.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                  ),
+                FocusCard(
+                  padding: EdgeInsets.zero,
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
                   child: InkWell(
                     onTap: _manageTags,
                     borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
@@ -448,12 +458,10 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
                                 : null,
                   ),
                   const SizedBox(height: 12),
-                  Card(
-                    elevation: 0,
-                    color: cs.surfaceContainerHigh,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
-                    ),
+                  FocusCard(
+                    padding: EdgeInsets.zero,
+                    elevated: false,
+                    backgroundColor: cs.surfaceContainerLow,
                     child: Padding(
                       padding: EdgeInsets.all(isMobile ? 14 : 16),
                       child: Column(
@@ -514,46 +522,57 @@ class _HabitCreateScreenState extends State<HabitCreateScreen> {
 
                 const SizedBox(height: 20),
 
-                Row(
-                  children: [
-                    const Text(
-                      'Color del hábito:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: _pickColor,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: _selectedColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black54),
+                FocusCard(
+                  padding: const EdgeInsets.all(14),
+                  elevated: false,
+                  backgroundColor: cs.surfaceContainerLow,
+                  child: InkWell(
+                    onTap: _pickColor,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Row(
+                      children: [
+                        Icon(Icons.palette_outlined, color: cs.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Color del hábito',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
-                      ),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: _selectedColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: cs.outlineVariant),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
 
                 const SizedBox(height: 24),
 
-                Center(
-                  child: FilledButton.icon(
-                    onPressed: _submit,
-                    icon: Icon(
-                      _isEditing ? Icons.save_rounded : Icons.add_rounded,
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    FocusSecondaryButton(
+                      label: 'Cancelar',
+                      icon: Icons.close_rounded,
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    label: Text(
-                      _isEditing ? 'Guardar cambios' : 'Crear hábito',
+                    FocusPrimaryButton(
+                      label: _isEditing ? 'Guardar cambios' : 'Crear hábito',
+                      icon: _isEditing ? Icons.save_rounded : Icons.add_rounded,
+                      onPressed: _submit,
                     ),
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 24 : 32,
-                        vertical: isMobile ? 12 : 14,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),

@@ -119,7 +119,7 @@ class CalendarInteractionController {
               startAt: start,
               onError: onError,
             )) {
-              onSuccess('Sesion de estudio reprogramada.');
+              onSuccess('Sesión de estudio reprogramada.');
               return true;
             }
           } else {
@@ -146,7 +146,7 @@ class CalendarInteractionController {
             startAt: start,
             onError: onError,
           )) {
-            onSuccess('Sesion de gym reprogramada.');
+            onSuccess('Sesión de gimnasio reprogramada.');
             return true;
           }
           return false;
@@ -162,7 +162,7 @@ class CalendarInteractionController {
               slotDay,
               onError: onError,
             )) {
-              onSuccess('Suscripcion reprogramada.');
+              onSuccess('Suscripción reprogramada.');
               return true;
             }
           } else {
@@ -217,11 +217,11 @@ class CalendarInteractionController {
           );
 
           await _svc.updateEvent(updated);
-          onSuccess('Evento movido al dia.');
+          onSuccess('Evento movido al día.');
           return true;
         case CalendarSourceModule.task:
           if (await _updateTaskDueDate(item.id, start, onError: onError)) {
-            onSuccess('Tarea movida al dia.');
+            onSuccess('Tarea movida al día.');
             return true;
           }
           return false;
@@ -241,7 +241,7 @@ class CalendarInteractionController {
               startAt: sessionStart,
               onError: onError,
             )) {
-              onSuccess('Sesion de estudio movida al dia.');
+              onSuccess('Sesión de estudio movida al día.');
               return true;
             }
           } else {
@@ -250,7 +250,7 @@ class CalendarInteractionController {
               start,
               onError: onError,
             )) {
-              onSuccess('Tarea de estudio movida al dia.');
+              onSuccess('Tarea de estudio movida al día.');
               return true;
             }
           }
@@ -268,7 +268,7 @@ class CalendarInteractionController {
             startAt: sessionStart,
             onError: onError,
           )) {
-            onSuccess('Sesion de gym movida al dia.');
+            onSuccess('Sesión de gimnasio movida al día.');
             return true;
           }
           return false;
@@ -284,7 +284,7 @@ class CalendarInteractionController {
               start,
               onError: onError,
             )) {
-              onSuccess('Suscripcion movida al dia.');
+              onSuccess('Suscripción movida al día.');
               return true;
             }
           } else {
@@ -293,7 +293,7 @@ class CalendarInteractionController {
               start,
               onError: onError,
             )) {
-              onSuccess('Movimiento financiero movido al dia.');
+              onSuccess('Movimiento financiero movido al día.');
               return true;
             }
           }
@@ -303,7 +303,7 @@ class CalendarInteractionController {
           return false;
       }
     } catch (_) {
-      onError('No se pudo mover el elemento al dia.');
+      onError('No se pudo mover el elemento al día.');
       return false;
     }
   }
@@ -367,7 +367,7 @@ class CalendarInteractionController {
           durationMin: nextMinutes,
           onError: onError,
         )) {
-          onSuccess('Duracion de sesion de gym actualizada.');
+          onSuccess('Duración de sesión de gimnasio actualizada.');
           return true;
         }
         return false;
@@ -519,7 +519,7 @@ class CalendarInteractionController {
   }) async {
     final uid = _currentUid();
     if (uid == null || uid.isEmpty) {
-      onError('Inicia sesion para editar sesiones de gym.');
+      onError('Inicia sesión para editar sesiones de gimnasio.');
       return false;
     }
 

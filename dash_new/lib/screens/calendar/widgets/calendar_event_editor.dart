@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 
 Future<void> showCalendarEventEditor({
@@ -14,6 +15,7 @@ Future<void> showCalendarEventEditor({
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
+    backgroundColor: Colors.transparent,
     builder: (sheetContext) {
       return _CalendarEventEditorSheet(
         event: event,
@@ -112,9 +114,10 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
       priority: _priority,
       start: _when,
       allDay: _allDay,
-      end: _allDay
-          ? DateTime(_when.year, _when.month, _when.day, 23, 59)
-          : widget.event?.end,
+      end:
+          _allDay
+              ? DateTime(_when.year, _when.month, _when.day, 23, 59)
+              : widget.event?.end,
       notes: _notesText.trim().isNotEmpty ? _notesText.trim() : null,
       relatedActionId: widget.event?.relatedActionId,
       relatedTxId: widget.event?.relatedTxId,
@@ -126,9 +129,9 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('No se pudo guardar el evento: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo guardar el evento: $e')),
+      );
       return;
     }
 
@@ -146,9 +149,9 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('No se pudo eliminar el evento: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo eliminar el evento: $e')),
+      );
       return;
     }
 
@@ -160,95 +163,169 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     final editing = widget.event != null;
+    final scheme = Theme.of(context).colorScheme;
 
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + bottom),
+        child: FocusCard(
+          padding: EdgeInsets.fromLTRB(18, 16, 18, 16 + bottom),
+          backgroundColor: scheme.surfaceContainerLowest,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
-                  Text(
-                    editing ? 'Editar evento' : 'Nuevo evento',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      editing ? Icons.edit_calendar_rounded : Icons.add_rounded,
+                      color: scheme.primary,
+                    ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      editing ? 'Editar evento' : 'Nuevo evento',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
                   IconButton(
                     tooltip: 'Cerrar',
-                    onPressed: _saving ? null : () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close),
+                    onPressed:
+                        _saving ? null : () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
               TextFormField(
                 initialValue: _titleText,
                 onChanged: (value) => _titleText = value,
-                decoration: const InputDecoration(labelText: 'Titulo del evento'),
+                decoration: const InputDecoration(
+                  labelText: 'Título del evento',
+                  prefixIcon: Icon(Icons.title_rounded),
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<CalendarType>(
                       initialValue: _type,
-                      items: CalendarType.values
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value.name),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: _saving
-                          ? null
-                          : (value) => setState(() => _type = value ?? _type),
-                      decoration: const InputDecoration(labelText: 'Tipo'),
+                      items:
+                          CalendarType.values
+                              .map(
+                                (value) => DropdownMenuItem(
+                                  value: value,
+                                  child: Text(_calendarTypeLabel(value)),
+                                ),
+                              )
+                              .toList(),
+                      onChanged:
+                          _saving
+                              ? null
+                              : (value) =>
+                                  setState(() => _type = value ?? _type),
+                      decoration: const InputDecoration(
+                        labelText: 'Tipo',
+                        prefixIcon: Icon(Icons.category_rounded),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<CalendarPriority>(
                       initialValue: _priority,
-                      items: CalendarPriority.values
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value.name),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: _saving
-                          ? null
-                          : (value) => setState(() => _priority = value ?? _priority),
-                      decoration: const InputDecoration(labelText: 'Prioridad'),
+                      items:
+                          CalendarPriority.values
+                              .map(
+                                (value) => DropdownMenuItem(
+                                  value: value,
+                                  child: Text(_priorityLabel(value)),
+                                ),
+                              )
+                              .toList(),
+                      onChanged:
+                          _saving
+                              ? null
+                              : (value) => setState(
+                                () => _priority = value ?? _priority,
+                              ),
+                      decoration: const InputDecoration(
+                        labelText: 'Prioridad',
+                        prefixIcon: Icon(Icons.flag_rounded),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              SwitchListTile(
-                value: _allDay,
-                onChanged: _saving ? null : (value) => setState(() => _allDay = value),
-                title: const Text('Todo el dia'),
-                contentPadding: EdgeInsets.zero,
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: scheme.outlineVariant),
+                ),
+                child: SwitchListTile(
+                  value: _allDay,
+                  onChanged:
+                      _saving
+                          ? null
+                          : (value) => setState(() => _allDay = value),
+                  title: const Text('Todo el día'),
+                  secondary: const Icon(Icons.event_available_rounded),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
               ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.event),
-                title: Text(widget.humanDateTime(_when, _allDay)),
+              const SizedBox(height: 12),
+              InkWell(
                 onTap: _saving ? null : _pickDateTime,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.event_rounded, color: scheme.primary),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          widget.humanDateTime(_when, _allDay),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                ),
               ),
+              const SizedBox(height: 12),
               TextFormField(
                 initialValue: _notesText,
                 onChanged: (value) => _notesText = value,
                 maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Notas / detalles'),
+                decoration: const InputDecoration(
+                  labelText: 'Notas / detalles',
+                  prefixIcon: Icon(Icons.notes_rounded),
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   if (editing)
@@ -258,7 +335,8 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
                     ),
                   const Spacer(),
                   TextButton(
-                    onPressed: _saving ? null : () => Navigator.of(context).pop(),
+                    onPressed:
+                        _saving ? null : () => Navigator.of(context).pop(),
                     child: const Text('Cancelar'),
                   ),
                   const SizedBox(width: 8),
@@ -276,3 +354,30 @@ class _CalendarEventEditorSheetState extends State<_CalendarEventEditorSheet> {
   }
 }
 
+String _calendarTypeLabel(CalendarType type) {
+  switch (type) {
+    case CalendarType.task:
+      return 'Tareas';
+    case CalendarType.study:
+      return 'Estudio';
+    case CalendarType.gym:
+      return 'Gimnasio';
+    case CalendarType.finance:
+      return 'Finanzas';
+    case CalendarType.food:
+      return 'Alimentación';
+    case CalendarType.other:
+      return 'Otros';
+  }
+}
+
+String _priorityLabel(CalendarPriority priority) {
+  switch (priority) {
+    case CalendarPriority.low:
+      return 'Baja';
+    case CalendarPriority.normal:
+      return 'Normal';
+    case CalendarPriority.high:
+      return 'Alta';
+  }
+}

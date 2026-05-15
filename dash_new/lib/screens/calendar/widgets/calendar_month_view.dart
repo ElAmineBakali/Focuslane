@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 import 'package:focuslane/screens/calendar/widgets/calendar_item_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -54,14 +55,43 @@ class CalendarMonthView extends StatelessWidget {
         firstDay: DateTime(2020),
         lastDay: DateTime(2100),
         focusedDay: focusedDay,
+        locale: 'es_ES',
         startingDayOfWeek: StartingDayOfWeek.monday,
         selectedDayPredicate: (day) => isSameDay(day, selectedDay),
         onDaySelected: onDaySelected,
         onPageChanged: onPageChanged,
         rowHeight: monthRowHeight,
-        headerStyle: const HeaderStyle(
+        headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
+          leftChevronIcon: Icon(
+            Icons.chevron_left_rounded,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          rightChevronIcon: Icon(
+            Icons.chevron_right_rounded,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          titleTextStyle:
+              Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: colorScheme.onSurface,
+              ) ??
+              const TextStyle(fontWeight: FontWeight.w900),
+        ),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle:
+              Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w800,
+              ) ??
+              const TextStyle(fontWeight: FontWeight.w800),
+          weekendStyle:
+              Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w800,
+              ) ??
+              const TextStyle(fontWeight: FontWeight.w800),
         ),
         eventLoader: itemsFor,
         calendarStyle: CalendarStyle(
@@ -69,6 +99,10 @@ class CalendarMonthView extends StatelessWidget {
             color: colorScheme.secondary,
             shape: BoxShape.circle,
           ),
+          outsideDaysVisible: true,
+          cellMargin: const EdgeInsets.all(5),
+          weekendTextStyle: TextStyle(color: colorScheme.onSurface),
+          defaultTextStyle: TextStyle(color: colorScheme.onSurface),
           todayDecoration: const BoxDecoration(),
           selectedDecoration: BoxDecoration(
             color: colorScheme.primary,
@@ -117,9 +151,7 @@ class CalendarMonthView extends StatelessWidget {
             return Center(
               child: Text(
                 '${day.day}',
-                style: TextStyle(
-                  color: cs.onSurface.withValues(alpha: .7),
-                ),
+                style: TextStyle(color: cs.onSurface.withValues(alpha: .7)),
               ),
             );
           },
@@ -141,10 +173,7 @@ class CalendarMonthView extends StatelessWidget {
                       height: high ? 7 : 5,
                       margin: const EdgeInsets.symmetric(horizontal: 1),
                       decoration: BoxDecoration(
-                        color:
-                            high
-                                ? Colors.redAccent
-                                : colorScheme.secondary,
+                        color: high ? Colors.redAccent : colorScheme.secondary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -157,22 +186,47 @@ class CalendarMonthView extends StatelessWidget {
       ),
     );
 
+    final monthCard = FocusCard(
+      padding: const EdgeInsets.all(12),
+      backgroundColor: colorScheme.surfaceContainerLowest,
+      child: calendar,
+    );
+
     final dayPanel = SizedBox(
       height: dayListHeaderHeight + dayListBodyHeight + 1,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12),
+      child: FocusCard(
+        padding: EdgeInsets.zero,
+        backgroundColor: colorScheme.surfaceContainerLowest,
         child: Column(
           children: [
             SizedBox(
               height: dayListHeaderHeight,
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
-                  Text(
-                    'Eventos del ${humanDate(selectedDay)}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  const SizedBox(width: 16),
+                  Icon(
+                    Icons.event_note_rounded,
+                    size: 20,
+                    color: colorScheme.primary,
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Eventos del ${humanDate(selectedDay)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  FocusBadge(
+                    label: '${selectedItems.length}',
+                    color: colorScheme.secondary,
+                  ),
+                  const SizedBox(width: 12),
                 ],
               ),
             ),
@@ -197,16 +251,18 @@ class CalendarMonthView extends StatelessWidget {
 
         if (isCompactHeight) {
           return ListView(
+            padding: EdgeInsets.zero,
             children: [
               CalendarFilterChips(
                 prefs: prefs,
                 onTypeToggle: onTypeToggle,
                 onHighOnlyToggle: onHighOnlyToggle,
               ),
-              calendar,
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
+              monthCard,
+              const SizedBox(height: 12),
               dayPanel,
-              SizedBox(height: 16 + bottomPadding + 72),
+              SizedBox(height: 16 + bottomPadding),
             ],
           );
         }
@@ -218,14 +274,14 @@ class CalendarMonthView extends StatelessWidget {
               onTypeToggle: onTypeToggle,
               onHighOnlyToggle: onHighOnlyToggle,
             ),
-            Expanded(child: calendar),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Expanded(child: monthCard),
+            const SizedBox(height: 12),
             dayPanel,
-            SizedBox(height: 16 + bottomPadding + 72),
+            SizedBox(height: 16 + bottomPadding),
           ],
         );
       },
     );
   }
 }
-

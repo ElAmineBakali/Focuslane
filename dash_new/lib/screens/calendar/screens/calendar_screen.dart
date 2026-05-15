@@ -311,26 +311,6 @@ class _CalendarScreenState extends State<CalendarScreen>
                 title: 'Calendario',
                 subtitle: _calendarController.appBarTitle(),
                 activeRoute: AppRoutes.calendarDashboard,
-                actions: [
-                  FocusIconButton(
-                    icon: Icons.chevron_left_rounded,
-                    tooltip: 'Anterior',
-                    onPressed: () => _calendarController.shiftVisible(-1),
-                  ),
-                  const SizedBox(width: 10),
-                  FocusIconButton(
-                    icon: Icons.chevron_right_rounded,
-                    tooltip: 'Siguiente',
-                    onPressed: () => _calendarController.shiftVisible(1),
-                  ),
-                  const SizedBox(width: 10),
-                  FocusIconButton(
-                    icon: Icons.today_rounded,
-                    tooltip: 'Hoy',
-                    onPressed: _calendarController.goToday,
-                  ),
-                  const SizedBox(width: 10),
-                ],
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final width = constraints.maxWidth;
@@ -364,9 +344,8 @@ class _CalendarScreenState extends State<CalendarScreen>
                                       _calendarController.rangeItems.length,
                                   onSelectView: _selectView,
                                   onPrevious:
-                                      () => _calendarController.shiftVisible(
-                                        -1,
-                                      ),
+                                      () =>
+                                          _calendarController.shiftVisible(-1),
                                   onNext:
                                       () => _calendarController.shiftVisible(1),
                                   onToday: _calendarController.goToday,
@@ -537,11 +516,7 @@ class _CalendarWorkspaceHeader extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 520),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    viewSwitcher,
-                    const SizedBox(height: 14),
-                    actions,
-                  ],
+                  children: [viewSwitcher, const SizedBox(height: 14), actions],
                 ),
               ),
             ],

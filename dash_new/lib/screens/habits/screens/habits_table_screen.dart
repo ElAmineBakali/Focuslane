@@ -1,7 +1,9 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:intl/intl.dart';
 import 'package:focuslane/screens/habits/models/habit_model.dart';
 import 'package:focuslane/screens/habits/services/habit_firestore_service.dart';
@@ -78,9 +80,11 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       _loadedTimelineDays = _maxTimelineDays;
     }
 
-    final expectedLastDate =
-        today.subtract(Duration(days: _loadedTimelineDays - 1));
-    final shouldRebuildDates = _dates.isEmpty ||
+    final expectedLastDate = today.subtract(
+      Duration(days: _loadedTimelineDays - 1),
+    );
+    final shouldRebuildDates =
+        _dates.isEmpty ||
         _dates.length != _loadedTimelineDays ||
         _dates.first != today ||
         _dates.last != expectedLastDate;
@@ -136,7 +140,8 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       return;
     }
 
-    final supportsDesktopPointer = kIsWeb ||
+    final supportsDesktopPointer =
+        kIsWeb ||
         defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.macOS ||
         defaultTargetPlatform == TargetPlatform.linux;
@@ -144,9 +149,8 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
       return;
     }
 
-    final step = event.scrollDelta.dx != 0
-        ? event.scrollDelta.dx
-        : event.scrollDelta.dy;
+    final step =
+        event.scrollDelta.dx != 0 ? event.scrollDelta.dx : event.scrollDelta.dy;
     if (step == 0) {
       return;
     }
@@ -207,20 +211,20 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   Color _cellBg(dynamic value, ThemeData theme) {
     final status = normalizeHabitStatus(value);
     if (status == habitCompletedValue) {
-      return theme.colorScheme.secondaryContainer.withOpacity(0.72);
+      return theme.colorScheme.secondaryContainer.withValues(alpha: 0.76);
     }
     if (status == habitMissedValue) {
-      return theme.colorScheme.errorContainer.withOpacity(0.82);
+      return theme.colorScheme.errorContainer.withValues(alpha: 0.82);
     }
     if (status == habitSkippedValue) {
-      return theme.colorScheme.tertiaryContainer.withOpacity(0.78);
+      return theme.colorScheme.tertiaryContainer.withValues(alpha: 0.78);
     }
 
     final isLight = theme.brightness == Brightness.light;
     final hasValue = value != null;
-    final base = theme.colorScheme.surfaceContainerHighest;
+    final base = theme.colorScheme.surfaceContainerLow;
     final opacity = isLight ? (hasValue ? .35 : .18) : (hasValue ? .40 : .22);
-    return base.withOpacity(opacity);
+    return base.withValues(alpha: opacity);
   }
 
   Widget _valueContent(Habit habit, dynamic value, ThemeData theme) {
@@ -240,9 +244,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
 
     if (habit.isQuantitative && value != null) {
       final numericValue = parseHabitNumericValue(value);
-      final displayValue = numericValue.abs() >= 1000
-          ? formatHabitCompactNumber(numericValue)
-          : formatHabitStatNumber(numericValue);
+      final displayValue =
+          numericValue.abs() >= 1000
+              ? formatHabitCompactNumber(numericValue)
+              : formatHabitStatNumber(numericValue);
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -256,7 +261,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
               habit.unit,
               style: TextStyle(
                 fontSize: 10,
-                color: theme.colorScheme.onSurface.withOpacity(.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: .6),
               ),
             ),
         ],
@@ -264,7 +269,9 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
     }
     return Text(
       '—',
-      style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(.45)),
+      style: TextStyle(
+        color: theme.colorScheme.onSurface.withValues(alpha: .45),
+      ),
     );
   }
 
@@ -279,21 +286,37 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         builder:
             (_) => AlertDialog(
               title: const Text('¿Qué quieres marcar?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.check_circle_rounded, color: sec),
+                    title: const Text('Completado'),
+                    onTap: () => Navigator.pop(context, habitCompletedValue),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.cancel_rounded,
+                      color: theme.colorScheme.error,
+                    ),
+                    title: const Text('No completado'),
+                    onTap: () => Navigator.pop(context, habitMissedValue),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.remove_circle_rounded,
+                      color: theme.colorScheme.tertiary,
+                    ),
+                    title: const Text('Saltado'),
+                    onTap: () => Navigator.pop(context, habitSkippedValue),
+                  ),
+                ],
+              ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, habitCompletedValue),
+                  onPressed: () => Navigator.pop(context, null),
                   style: TextButton.styleFrom(foregroundColor: sec),
-                  child: const Icon(Icons.check_rounded),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, habitMissedValue),
-                  style: TextButton.styleFrom(foregroundColor: sec),
-                  child: const Icon(Icons.close_rounded),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, habitSkippedValue),
-                  style: TextButton.styleFrom(foregroundColor: sec),
-                  child: const Text('Saltar'),
+                  child: const Text('Cancelar'),
                 ),
               ],
             ),
@@ -313,7 +336,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             ),
           );
 
-          _showConfetti(habit: habit, isPerfectDay: allCompleted && allHabits.isNotEmpty);
+          _showConfetti(
+            habit: habit,
+            isPerfectDay: allCompleted && allHabits.isNotEmpty,
+          );
         }
 
         setState(() {});
@@ -364,7 +390,10 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             ),
           );
 
-          _showConfetti(habit: habit, isPerfectDay: allCompleted && allHabits.isNotEmpty);
+          _showConfetti(
+            habit: habit,
+            isPerfectDay: allCompleted && allHabits.isNotEmpty,
+          );
         }
 
         setState(() {});
@@ -381,7 +410,8 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
 
   Future<void> _updateStreak(Habit habit) async {
     final streaks = computeHabitStreakStats(habit);
-    if (streaks.current == habit.currentStreak && streaks.best == habit.bestStreak) {
+    if (streaks.current == habit.currentStreak &&
+        streaks.best == habit.bestStreak) {
       return;
     }
 
@@ -432,44 +462,57 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
     final h = _selectedHabit!;
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder:
-          (_) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Editar hábito'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final result = await Navigator.pushNamed(
-                    context,
-                    '/habits/detail',
-                    arguments: h,
-                  );
-                  if (result == true) setState(() {});
-                },
-              ),
-              if (h.isActive)
-                ListTile(
-                  leading: const Icon(Icons.archive_rounded),
-                  title: const Text('Archivar hábito'),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await _habitService.archiveHabit(h.id);
-                    setState(() => _selectedHabit = null);
-                  },
-                )
-              else
-                ListTile(
-                  leading: const Icon(Icons.unarchive_rounded),
-                  title: const Text('Desarchivar hábito'),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await _habitService.unarchiveHabit(h.id);
-                    setState(() => _selectedHabit = null);
-                  },
+          (_) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: FocusCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.edit_outlined),
+                      title: const Text('Editar hábito'),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final result = await Navigator.pushNamed(
+                          context,
+                          '/habits/detail',
+                          arguments: h,
+                        );
+                        if (result == true) setState(() {});
+                      },
+                    ),
+                    Divider(
+                      height: 1,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                    if (h.isActive)
+                      ListTile(
+                        leading: const Icon(Icons.archive_rounded),
+                        title: const Text('Archivar hábito'),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await _habitService.archiveHabit(h.id);
+                          setState(() => _selectedHabit = null);
+                        },
+                      )
+                    else
+                      ListTile(
+                        leading: const Icon(Icons.unarchive_rounded),
+                        title: const Text('Desarchivar hábito'),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await _habitService.unarchiveHabit(h.id);
+                          setState(() => _selectedHabit = null);
+                        },
+                      ),
+                  ],
                 ),
-            ],
+              ),
+            ),
           ),
     );
   }
@@ -486,6 +529,17 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
     ThemeData theme,
   ) {
     final value = habitHistoryIndexedValue(historyIndex, date);
+    final status = normalizeHabitStatus(value);
+    final scheme = theme.colorScheme;
+    final borderColor =
+        status == habitCompletedValue
+            ? scheme.secondary.withValues(alpha: 0.34)
+            : status == habitMissedValue
+            ? scheme.error.withValues(alpha: 0.34)
+            : status == habitSkippedValue
+            ? scheme.tertiary.withValues(alpha: 0.34)
+            : scheme.outlineVariant.withValues(alpha: 0.72);
+
     return GestureDetector(
       onTap: () => _updateHistoryValue(habit, date),
       child: Container(
@@ -496,6 +550,7 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
         decoration: BoxDecoration(
           color: _cellBg(value, theme),
           borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor),
         ),
         child: _valueContent(habit, value, theme),
       ),
@@ -510,39 +565,33 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             ? HabitFirestoreService.getArchivedHabits()
             : HabitFirestoreService.getHabits();
 
-    return Scaffold(
-      backgroundColor:
-          Theme.of(context).brightness == Brightness.light
-              ? const Color.fromARGB(255, 255, 255, 255)
-              : Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Hábitos'),
-        actions: [
-          IconButton(
-            tooltip: _showArchived ? 'Ver activos' : 'Ver archivados',
-            onPressed:
-                () => setState(() {
-                  _orderedHabits = null;
-                  _showArchived = !_showArchived;
-                }),
-            icon: Icon(
-              _showArchived ? Icons.inbox_rounded : Icons.archive_outlined,
-            ),
+    return AppShell(
+      title: 'Hábitos',
+      subtitle:
+          _showArchived
+              ? 'Archivo de hábitos pausados.'
+              : 'Matriz diaria, progreso semanal y rachas.',
+      activeRoute: AppRoutes.habitsDashboard,
+      actions: [
+        if (_editMode && _selectedHabit != null) ...[
+          FocusIconButton(
+            icon: Icons.more_vert_rounded,
+            tooltip: 'Opciones',
+            onPressed: _showEditOptions,
           ),
-          if (_editMode && _selectedHabit != null)
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: _showEditOptions,
-            ),
-          if (_editMode)
-            IconButton(icon: const Icon(Icons.close), onPressed: _exitEditMode),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/habits/create'),
-        child: const Icon(Icons.add),
-      ),
-      body: SafeArea(
+        if (_editMode) ...[
+          const SizedBox(width: 10),
+          FocusIconButton(
+            icon: Icons.close_rounded,
+            tooltip: 'Salir de edición',
+            isActive: true,
+            onPressed: _exitEditMode,
+          ),
+        ],
+        const SizedBox(width: 10),
+      ],
+      child: SafeArea(
         bottom: true,
         child: StreamBuilder<List<Habit>>(
           stream: stream,
@@ -564,186 +613,392 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
             final double gridWidth =
                 _dates.length * (_cellWidth + _cellMargin.horizontal);
 
-            if (habits.isEmpty) {
-              return const Center(child: Text('No hay hábitos para mostrar.'));
-            }
+            final summary = _HabitDashboardSummary.fromHabits(habits);
 
-            return Row(
-              children: [
-                SizedBox(
-                  width: _nameColWidth,
-                  child: Column(
-                    children: [
-                      SizedBox(height: _rowHeight),
-                      const SizedBox(height: 2),
-                      Expanded(
-                        child:
-                            _editMode
-                                ? PrimaryScrollController(
-                                  controller: _leftV,
-                                  child: ReorderableListView.builder(
-                                    padding: const EdgeInsets.only(
-                                      bottom: _bottomSafeGap,
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final padding =
+                    width < 720
+                        ? FocuslaneTokens.spacing16
+                        : width < 1180
+                        ? FocuslaneTokens.spacing24
+                        : FocuslaneTokens.spacing32;
+                final nameColWidth = width < 620 ? 152.0 : _nameColWidth;
+
+                if (habits.isEmpty) {
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: FocuslaneTokens.containerMaxWidth,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(padding),
+                        child: FocusCard(
+                          child: FocusEmptyState(
+                            icon:
+                                _showArchived
+                                    ? Icons.archive_outlined
+                                    : Icons.repeat_rounded,
+                            message:
+                                _showArchived
+                                    ? 'No hay hábitos archivados'
+                                    : 'No hay hábitos para mostrar',
+                            subtitle:
+                                _showArchived
+                                    ? 'Los hábitos archivados aparecerán aquí.'
+                                    : 'Crea tu primer hábito para empezar la matriz.',
+                            actionLabel: _showArchived ? null : 'Crear hábito',
+                            onAction:
+                                _showArchived
+                                    ? null
+                                    : () => Navigator.pushNamed(
+                                      context,
+                                      '/habits/create',
                                     ),
-                                    itemCount: habits.length,
-                                    buildDefaultDragHandles: false,
-                                    onReorder: _onReorder,
-                                    physics: const ClampingScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      final habit = habits[index];
-                                      return _NameRow(
-                                        key: ValueKey(habit.id),
-                                        habit: habit,
-                                        editMode: true,
-                                        onTap:
-                                            () => setState(
-                                              () => _selectedHabit = habit,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: FocuslaneTokens.containerMaxWidth,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(padding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _HabitsHeader(
+                            summary: summary,
+                            showArchived: _showArchived,
+                            editMode: _editMode,
+                            onCreateHabit:
+                                () => Navigator.pushNamed(
+                                  context,
+                                  '/habits/create',
+                                ),
+                            onToggleArchived:
+                                () => setState(() {
+                                  _orderedHabits = null;
+                                  _showArchived = !_showArchived;
+                                }),
+                          ),
+                          const SizedBox(height: 16),
+                          _HabitsSummaryGrid(summary: summary),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: FocusCard(
+                              padding: EdgeInsets.zero,
+                              backgroundColor:
+                                  theme.colorScheme.surfaceContainerLowest,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: nameColWidth,
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: _rowHeight,
+                                          margin: _cellMargin,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                          ),
+                                          alignment: Alignment.centerLeft,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                theme
+                                                    .colorScheme
+                                                    .surfaceContainerLow,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
                                             ),
-                                        trailing: ReorderableDragStartListener(
-                                          index: index,
-                                          child: const Padding(
-                                            padding: EdgeInsets.only(right: 6),
-                                            child: Icon(
-                                              Icons.drag_handle_rounded,
-                                              size: 18,
-                                              color: Colors.grey,
+                                            border: Border.all(
+                                              color:
+                                                  theme
+                                                      .colorScheme
+                                                      .outlineVariant,
                                             ),
+                                          ),
+                                          child: Text(
+                                            'Hábito',
+                                            style: theme.textTheme.labelMedium
+                                                ?.copyWith(
+                                                  color:
+                                                      theme
+                                                          .colorScheme
+                                                          .onSurfaceVariant,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
                                           ),
                                         ),
-                                      );
-                                    },
+                                        const SizedBox(height: 2),
+                                        Expanded(
+                                          child:
+                                              _editMode
+                                                  ? PrimaryScrollController(
+                                                    controller: _leftV,
+                                                    child: ReorderableListView.builder(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            bottom:
+                                                                _bottomSafeGap,
+                                                          ),
+                                                      itemCount: habits.length,
+                                                      buildDefaultDragHandles:
+                                                          false,
+                                                      onReorder: _onReorder,
+                                                      physics:
+                                                          const ClampingScrollPhysics(),
+                                                      itemBuilder: (
+                                                        context,
+                                                        index,
+                                                      ) {
+                                                        final habit =
+                                                            habits[index];
+                                                        return _NameRow(
+                                                          key: ValueKey(
+                                                            habit.id,
+                                                          ),
+                                                          habit: habit,
+                                                          editMode: true,
+                                                          selected:
+                                                              _selectedHabit
+                                                                  ?.id ==
+                                                              habit.id,
+                                                          onTap:
+                                                              () => setState(
+                                                                () =>
+                                                                    _selectedHabit =
+                                                                        habit,
+                                                              ),
+                                                          trailing: ReorderableDragStartListener(
+                                                            index: index,
+                                                            child: const Padding(
+                                                              padding:
+                                                                  EdgeInsets.only(
+                                                                    right: 6,
+                                                                  ),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .drag_handle_rounded,
+                                                                size: 18,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  )
+                                                  : ListView.builder(
+                                                    controller: _leftV,
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          bottom:
+                                                              _bottomSafeGap,
+                                                        ),
+                                                    physics:
+                                                        const ClampingScrollPhysics(),
+                                                    itemExtent: _rowHeight,
+                                                    itemCount: habits.length,
+                                                    itemBuilder: (
+                                                      context,
+                                                      index,
+                                                    ) {
+                                                      final habit =
+                                                          habits[index];
+                                                      final todayValue =
+                                                          habitHistoryIndexedValue(
+                                                            _historyIndexByHabit[habit
+                                                                    .id] ??
+                                                                const <
+                                                                  String,
+                                                                  dynamic
+                                                                >{},
+                                                            DateTime.now(),
+                                                          );
+                                                      return _NameRow(
+                                                        habit: habit,
+                                                        editMode: false,
+                                                        todayValue: todayValue,
+                                                        onTap:
+                                                            () => Navigator.pushNamed(
+                                                              context,
+                                                              '/habits/stats',
+                                                              arguments: habit,
+                                                            ),
+                                                      );
+                                                    },
+                                                  ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                )
-                                : ListView.builder(
-                                  controller: _leftV,
-                                  padding: const EdgeInsets.only(
-                                    bottom: _bottomSafeGap,
-                                  ),
-                                  physics: const ClampingScrollPhysics(),
-                                  itemExtent: _rowHeight,
-                                  itemCount: habits.length,
-                                  itemBuilder: (context, index) {
-                                    final habit = habits[index];
-                                    final todayValue = habitHistoryIndexedValue(
-                                      _historyIndexByHabit[habit.id] ??
-                                          const <String, dynamic>{},
-                                      DateTime.now(),
-                                    );
-                                    return _NameRow(
-                                      habit: habit,
-                                      editMode: false,
-                                      todayValue: todayValue,
-                                      onTap:
-                                          () => Navigator.pushNamed(
-                                            context,
-                                            '/habits/stats',
-                                            arguments: habit,
-                                          ),
-                                    );
-                                  },
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
 
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, cons) {
-                      final bodyHeight = cons.maxHeight - _rowHeight - 2;
-                      return Listener(
-                        onPointerSignal: _handleHorizontalPointerSignal,
-                        child: ScrollConfiguration(
-                          behavior: const _HabitsTableScrollBehavior(),
-                          child: Scrollbar(
-                            controller: _horizontal,
-                            thumbVisibility: true,
-                            trackVisibility: true,
-                            interactive: true,
-                            notificationPredicate: (notification) =>
-                                notification.metrics.axis == Axis.horizontal,
-                            child: SingleChildScrollView(
-                              controller: _horizontal,
-                              scrollDirection: Axis.horizontal,
-                              child: SizedBox(
-                                width: gridWidth,
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: _rowHeight,
-                                      child: Row(
-                                        children:
-                                            _dates.map((d) {
-                                              return Container(
-                                                width: _cellWidth,
-                                                height: _cellHeight,
-                                                margin: _cellMargin,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color: theme
-                                                      .colorScheme
-                                                      .surfaceContainerHighest
-                                                      .withOpacity(.25),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: Text(
-                                                  DateFormat('E\ndd').format(d),
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: theme
-                                                        .colorScheme
-                                                        .onSurface
-                                                        .withOpacity(.8),
+                                  Expanded(
+                                    child: LayoutBuilder(
+                                      builder: (context, cons) {
+                                        final bodyHeight =
+                                            cons.maxHeight - _rowHeight - 2;
+                                        return Listener(
+                                          onPointerSignal:
+                                              _handleHorizontalPointerSignal,
+                                          child: ScrollConfiguration(
+                                            behavior:
+                                                const _HabitsTableScrollBehavior(),
+                                            child: Scrollbar(
+                                              controller: _horizontal,
+                                              thumbVisibility: true,
+                                              trackVisibility: true,
+                                              interactive: true,
+                                              notificationPredicate:
+                                                  (notification) =>
+                                                      notification
+                                                          .metrics
+                                                          .axis ==
+                                                      Axis.horizontal,
+                                              child: SingleChildScrollView(
+                                                controller: _horizontal,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: SizedBox(
+                                                  width: gridWidth,
+                                                  child: Column(
+                                                    children: [
+                                                      SizedBox(
+                                                        height: _rowHeight,
+                                                        child: Row(
+                                                          children:
+                                                              _dates.map((d) {
+                                                                final isToday =
+                                                                    _isToday(d);
+                                                                return Container(
+                                                                  width:
+                                                                      _cellWidth,
+                                                                  height:
+                                                                      _cellHeight,
+                                                                  margin:
+                                                                      _cellMargin,
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  decoration: BoxDecoration(
+                                                                    color:
+                                                                        isToday
+                                                                            ? theme.colorScheme.primaryContainer.withValues(
+                                                                              alpha:
+                                                                                  0.42,
+                                                                            )
+                                                                            : theme.colorScheme.surfaceContainerLow,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          10,
+                                                                        ),
+                                                                    border: Border.all(
+                                                                      color:
+                                                                          isToday
+                                                                              ? theme.colorScheme.primary.withValues(
+                                                                                alpha:
+                                                                                    0.38,
+                                                                              )
+                                                                              : theme.colorScheme.outlineVariant,
+                                                                    ),
+                                                                  ),
+                                                                  child: Text(
+                                                                    DateFormat(
+                                                                      'E\ndd',
+                                                                      'es_ES',
+                                                                    ).format(d),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          isToday
+                                                                              ? theme.colorScheme.primary
+                                                                              : theme.colorScheme.onSurfaceVariant,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }).toList(),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 2),
+                                                      SizedBox(
+                                                        height: bodyHeight,
+                                                        child: ListView.builder(
+                                                          controller: _rightV,
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                bottom:
+                                                                    _bottomSafeGap,
+                                                              ),
+                                                          physics:
+                                                              const ClampingScrollPhysics(),
+                                                          itemExtent:
+                                                              _rowHeight,
+                                                          itemCount:
+                                                              habits.length,
+                                                          itemBuilder: (
+                                                            context,
+                                                            row,
+                                                          ) {
+                                                            final habit =
+                                                                habits[row];
+                                                            final historyIndex =
+                                                                _historyIndexByHabit[habit
+                                                                    .id] ??
+                                                                const <
+                                                                  String,
+                                                                  dynamic
+                                                                >{};
+                                                            return Row(
+                                                              children:
+                                                                  _dates
+                                                                      .map(
+                                                                        (
+                                                                          d,
+                                                                        ) => _cell(
+                                                                          habit,
+                                                                          historyIndex,
+                                                                          d,
+                                                                          theme,
+                                                                        ),
+                                                                      )
+                                                                      .toList(),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    const SizedBox(height: 2),
-                                    SizedBox(
-                                      height: bodyHeight,
-                                      child: ListView.builder(
-                                        controller: _rightV,
-                                        padding: const EdgeInsets.only(
-                                          bottom: _bottomSafeGap,
-                                        ),
-                                        physics: const ClampingScrollPhysics(),
-                                        itemExtent: _rowHeight,
-                                        itemCount: habits.length,
-                                        itemBuilder: (context, row) {
-                                          final habit = habits[row];
-                                          final historyIndex =
-                                              _historyIndexByHabit[habit.id] ??
-                                              const <String, dynamic>{};
-                                          return Row(
-                                            children:
-                                                _dates
-                                                    .map(
-                                                      (d) => _cell(
-                                                        habit,
-                                                        historyIndex,
-                                                        d,
-                                                        theme,
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             );
           },
         ),
@@ -752,9 +1007,234 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
   }
 }
 
+class _HabitDashboardSummary {
+  const _HabitDashboardSummary({
+    required this.habitCount,
+    required this.todayCompleted,
+    required this.weeklyCompleted,
+    required this.weeklyTotal,
+    required this.weeklyProgress,
+    required this.maxCurrentStreak,
+    required this.bestStreak,
+  });
+
+  final int habitCount;
+  final int todayCompleted;
+  final int weeklyCompleted;
+  final int weeklyTotal;
+  final double weeklyProgress;
+  final int maxCurrentStreak;
+  final int bestStreak;
+
+  static _HabitDashboardSummary fromHabits(List<Habit> habits) {
+    final today = normalizeHabitDate(DateTime.now());
+    final weekStart = today.subtract(Duration(days: today.weekday - 1));
+    var weeklyCompleted = 0;
+    var weeklyTotal = 0;
+    var todayCompleted = 0;
+    var maxCurrentStreak = 0;
+    var bestStreak = 0;
+
+    for (final habit in habits) {
+      final streaks = computeHabitStreakStats(habit);
+      if (streaks.current > maxCurrentStreak) {
+        maxCurrentStreak = streaks.current;
+      }
+      if (streaks.best > bestStreak) {
+        bestStreak = streaks.best;
+      }
+
+      final todayValue = habitHistoryValueForDate(habit.history, today);
+      if (isHabitCompletedValue(habit, todayValue)) {
+        todayCompleted += 1;
+      }
+
+      for (var offset = 0; offset < 7; offset++) {
+        final day = weekStart.add(Duration(days: offset));
+        weeklyTotal += 1;
+        final value = habitHistoryValueForDate(habit.history, day);
+        if (isHabitCompletedValue(habit, value)) {
+          weeklyCompleted += 1;
+        }
+      }
+    }
+
+    final weeklyProgress =
+        weeklyTotal == 0 ? 0.0 : weeklyCompleted / weeklyTotal;
+    return _HabitDashboardSummary(
+      habitCount: habits.length,
+      todayCompleted: todayCompleted,
+      weeklyCompleted: weeklyCompleted,
+      weeklyTotal: weeklyTotal,
+      weeklyProgress: weeklyProgress,
+      maxCurrentStreak: maxCurrentStreak,
+      bestStreak: bestStreak,
+    );
+  }
+}
+
+class _HabitsHeader extends StatelessWidget {
+  const _HabitsHeader({
+    required this.summary,
+    required this.showArchived,
+    required this.editMode,
+    required this.onCreateHabit,
+    required this.onToggleArchived,
+  });
+
+  final _HabitDashboardSummary summary;
+  final bool showArchived;
+  final bool editMode;
+  final VoidCallback onCreateHabit;
+  final VoidCallback onToggleArchived;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return FocusCard(
+      backgroundColor: scheme.surfaceContainerLowest,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 780;
+          final copy = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hábitos',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                showArchived
+                    ? 'Revisa hábitos archivados sin perder su historial.'
+                    : 'Marca días, revisa rachas y mantén la matriz ordenada.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FocusBadge(
+                    label:
+                        showArchived
+                            ? '${summary.habitCount} archivados'
+                            : '${summary.habitCount} activos',
+                    color: scheme.primary,
+                  ),
+                  FocusBadge(
+                    label:
+                        '${summary.todayCompleted}/${summary.habitCount} hoy',
+                    color: scheme.secondary,
+                  ),
+                  if (editMode)
+                    FocusBadge(
+                      label: 'Ordenación activa',
+                      color: scheme.tertiary,
+                    ),
+                ],
+              ),
+            ],
+          );
+
+          final actions = Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              if (!showArchived)
+                FocusPrimaryButton(
+                  label: 'Crear hábito',
+                  icon: Icons.add_rounded,
+                  onPressed: onCreateHabit,
+                ),
+              FocusSecondaryButton(
+                label: showArchived ? 'Ver activos' : 'Ver archivados',
+                icon:
+                    showArchived ? Icons.inbox_rounded : Icons.archive_outlined,
+                onPressed: onToggleArchived,
+              ),
+            ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [copy, const SizedBox(height: 16), actions],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: copy),
+              const SizedBox(width: 20),
+              actions,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _HabitsSummaryGrid extends StatelessWidget {
+  const _HabitsSummaryGrid({required this.summary});
+
+  final _HabitDashboardSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final progressLabel = '${(summary.weeklyProgress * 100).round()}%';
+
+    return ResponsiveGrid(
+      minItemWidth: 200,
+      spacing: 16,
+      children: [
+        FocusStatCard(
+          title: 'Progreso semanal',
+          value: progressLabel,
+          subtitle:
+              '${summary.weeklyCompleted}/${summary.weeklyTotal} marcas completas',
+          icon: Icons.trending_up_rounded,
+          color: scheme.primary,
+        ),
+        FocusStatCard(
+          title: 'Completados hoy',
+          value: '${summary.todayCompleted}/${summary.habitCount}',
+          subtitle: 'sobre hábitos visibles',
+          icon: Icons.today_rounded,
+          color: scheme.secondary,
+        ),
+        FocusStatCard(
+          title: 'Racha actual',
+          value: '${summary.maxCurrentStreak}',
+          subtitle: 'mejor racha activa',
+          icon: Icons.local_fire_department_rounded,
+          color: scheme.tertiary,
+        ),
+        FocusStatCard(
+          title: 'Mejor racha',
+          value: '${summary.bestStreak}',
+          subtitle: 'histórico visible',
+          icon: Icons.emoji_events_rounded,
+          color: scheme.error,
+        ),
+      ],
+    );
+  }
+}
+
 class _NameRow extends StatelessWidget {
   final Habit habit;
   final bool editMode;
+  final bool selected;
   final dynamic todayValue;
   final VoidCallback onTap;
   final Widget? trailing;
@@ -763,6 +1243,7 @@ class _NameRow extends StatelessWidget {
     super.key,
     required this.habit,
     required this.editMode,
+    this.selected = false,
     this.todayValue,
     required this.onTap,
     this.trailing,
@@ -770,6 +1251,9 @@ class _NameRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tone = habit.color;
+
     return SizedBox(
       height: _HabitsTableScreenState._rowHeight,
       child: Row(
@@ -787,24 +1271,51 @@ class _NameRow extends StatelessWidget {
                   }
                 }
               },
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 4),
+              child: Container(
+                margin: _HabitsTableScreenState._cellMargin,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color:
+                      selected
+                          ? scheme.primaryContainer.withValues(alpha: 0.35)
+                          : scheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color:
+                        selected
+                            ? scheme.primary.withValues(alpha: 0.34)
+                            : scheme.outlineVariant,
+                  ),
+                ),
                 child: Row(
                   children: [
-                    if (habit.emoji != null)
-                      Text(habit.emoji!, style: const TextStyle(fontSize: 20))
-                    else if (habit.iconCode != null)
-                      Icon(
-                        HabitIcons.getIcon(habit.iconCode),
-                        color: habit.color,
-                        size: 20,
-                      )
-                    else
-                      Icon(
-                        Icons.check_circle_outline,
-                        color: habit.color,
-                        size: 20,
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: tone.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: Center(
+                        child:
+                            habit.emoji != null
+                                ? Text(
+                                  habit.emoji!,
+                                  style: const TextStyle(fontSize: 18),
+                                )
+                                : habit.iconCode != null
+                                ? Icon(
+                                  HabitIcons.getIcon(habit.iconCode),
+                                  color: tone,
+                                  size: 18,
+                                )
+                                : Icon(
+                                  Icons.check_circle_outline,
+                                  color: tone,
+                                  size: 18,
+                                ),
+                      ),
+                    ),
                     const SizedBox(width: 6),
 
                     Expanded(
@@ -814,8 +1325,8 @@ class _NameRow extends StatelessWidget {
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: habit.color,
+                          fontWeight: FontWeight.w800,
+                          color: scheme.onSurface,
                           fontSize: 13,
                         ),
                       ),
@@ -895,17 +1406,19 @@ class _TodayStatusBadge extends StatelessWidget {
 
     final progress = computeHabitGoalProgress(habit, value: value);
     return Tooltip(
-      message: progress.hasGoal
-          ? '${formatHabitStatNumber(progress.percent)}% de la meta de hoy'
-          : 'Registro cuantitativo guardado',
+      message:
+          progress.hasGoal
+              ? '${formatHabitStatNumber(progress.percent)}% de la meta de hoy'
+              : 'Registro cuantitativo guardado',
       child: Icon(
         isHabitCompletedValue(habit, value)
             ? Icons.check_circle_rounded
             : Icons.radio_button_checked_rounded,
         size: 16,
-        color: isHabitCompletedValue(habit, value)
-            ? theme.colorScheme.secondary
-            : habit.color,
+        color:
+            isHabitCompletedValue(habit, value)
+                ? theme.colorScheme.secondary
+                : habit.color,
       ),
     );
   }
@@ -921,6 +1434,3 @@ class _HabitsTableScrollBehavior extends MaterialScrollBehavior {
     PointerDeviceKind.trackpad,
   };
 }
-
-
-

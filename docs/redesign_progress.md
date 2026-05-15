@@ -176,3 +176,71 @@ Fecha: 2026-05-15
 
 - Hacer una pasada visual interactiva con datos reales para detectar overflow puntual en contenidos extremos.
 - Decidir el siguiente modulo a redisenar en una fase separada.
+
+## Fase 7 - Calendario y Habitos
+
+Fecha: 2026-05-15
+
+### Archivos tocados
+
+- `dash_new/lib/screens/calendar/screens/calendar_screen.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_month_view.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_day_view.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_agenda_view.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_year_view.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_item_widget.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_event_editor.dart`
+- `dash_new/lib/screens/calendar/widgets/calendar_timeline.dart`
+- `dash_new/lib/screens/calendar/controllers/calendar_controller.dart`
+- `dash_new/lib/screens/calendar/controllers/calendar_interaction_controller.dart`
+- `dash_new/lib/screens/calendar/services/calendar_aggregator_service.dart`
+- `dash_new/lib/screens/habits/screens/habits_table_screen.dart`
+- `dash_new/lib/screens/habits/screens/habit_create_screen.dart`
+- `dash_new/lib/screens/habits/screens/habit_detail_screen.dart`
+
+### Cambios hechos
+
+- Calendario:
+  - Pantalla principal migrada a `AppShell`, topbar comun, `FocusCard`, `FocusBadge`, `FocusChip`, `FocusPrimaryButton`, `FocusSecondaryButton` y `FocusIconButton`.
+  - Header limpio con titulo `Calendario`, periodo visible, acciones de anterior/siguiente/hoy y boton `Nuevo evento`.
+  - Selector visual de vista `Anual / Mensual / Dia / Agenda` sin cambiar el `TabController` ni la logica existente.
+  - Vista mensual envuelta en card, dias con eventos mas legibles, panel del dia redisenado y empty state para dias sin eventos.
+  - Agenda redisenada con buscador, secciones por dia, cards de eventos, modulo/hora en chips y empty state.
+  - Vista diaria con controles de zoom y superficie de timeline dentro de card, manteniendo drag/drop, resize y creacion por slot.
+  - Editor de evento redisenado como bottom sheet, con campos y selectores mas limpios y etiquetas en castellano.
+  - Etiquetas visibles de modulos y mensajes de calendario corregidos a castellano.
+- Habitos:
+  - Pantalla principal de matriz migrada a `AppShell`, header visual, acciones de crear/ver archivados y metricas superiores reales.
+  - Resumen superior con progreso semanal, completados hoy, racha actual y mejor racha calculados desde los habitos reales.
+  - Matriz redisenada con columna de nombres mas clara, cabecera de dias alineada, celda de hoy destacada, bordes y estados visuales para completado/no completado/saltado/valor numerico.
+  - Empty state de habitos y archivados actualizado con accion real de crear habito.
+  - Modo edicion/ordenacion conserva reorder real y muestra estado visual cuando esta activo.
+  - Dialogo de marcado diario y bottom sheet de opciones redisenados sin cambiar los callbacks de Firestore.
+  - Formularios de crear/editar habito limpiados con `FocusCard`, cabeceras de seccion, selector de color y acciones primarias/secundarias coherentes.
+
+### Funcionalidad mantenida intacta
+
+- Calendario: creacion, edicion, eliminacion de eventos, seleccion de dia, vistas anual/mensual/dia/agenda, navegacion de periodo, filtros por modulo/prioridad, busqueda de agenda, drag/drop/resize, deep links, rutas reales, Firebase/Firestore y sincronizacion con otros modulos.
+- Habitos: creacion, edicion, archivado/desarchivado, matriz real, marcado diario completado/no completado/saltado/valor numerico, orden manual, estadisticas por ruta existente, progreso/rachas, modelos, servicios, Firestore y rutas reales.
+- No se tocaron Study, Food, Finance, Gym ni Ajustes. Tampoco se tocaron Home, Tareas ni Notas.
+
+### Validacion ejecutada
+
+- `dart format` sobre los 14 archivos Dart modificados: correcto. Fue necesario ejecutarlo fuera del sandbox porque Dart/Flutter quedaban bloqueados dentro del sandbox.
+- `flutter analyze`: ejecutado. Resultado: codigo 1 por 358 `info` heredados del repo; no se detectaron errores ni warnings bloqueantes.
+- `flutter analyze` limitado a los 14 archivos modificados: codigo 0, `No issues found`.
+- `flutter build web`: codigo 0, build generado en `dash_new/build/web`.
+- Aviso de build: Flutter mantiene incompatibilidades de dry-run Wasm en dependencias (`device_info_plus`, `image`, `flutter_timezone`). El build web normal se genero correctamente.
+
+### Pruebas manuales
+
+- Verificado por analisis de rutas y codigo que Calendario mantiene `/calendar` y sus callbacks reales de crear, editar, eliminar, seleccionar dia, cambiar periodo/vista, filtros, agenda y vuelta mediante sidebar/topbar.
+- Verificado por analisis de rutas y codigo que Habitos mantiene `/habits`, `/habits/create`, `/habits/detail` y `/habits/stats` sin cambiar destinos ni modelos.
+- Verificada por compilacion la integracion con sidebar/topbar comun, light/dark por uso de `ColorScheme` y superficies tokenizadas, y responsive por layouts con `LayoutBuilder`, `Wrap`, `Expanded` y scroll horizontal limitado a la matriz.
+- Pendiente de prueba interactiva con usuario real en navegador: crear/editar/eliminar evento, crear/editar/archivar habito, marcar varias celdas, comprobar progreso semanal con datos reales, revisar light/dark en desktop/medio/movil y navegacion click a click. No se puede completar desde esta sesion sin acceso a una sesion autenticada con datos reales.
+
+### Pendientes siguientes
+
+- Hacer una pasada manual en navegador con cuenta real para confirmar overflow puntual en contenidos extremos.
+- Revisar `habit_stats_screen.dart` en una fase posterior si se quiere un rediseño profundo de la pantalla de estadisticas; en esta fase se mantuvo para no ampliar alcance ni tocar logica pesada de graficas.
+- No avanzar a Study, Food, Finance, Gym ni Ajustes hasta nueva indicacion.
