@@ -67,6 +67,7 @@ Fecha: 2026-05-15
 - Fase 3 completada para la base comun: `AppShell`, sidebar, topbar y drawer movil con rutas reales. Tambien se mejoro visualmente `ModuleShell/ModuleSidebar` sin cambiar su logica interna.
 - Fase 4 completada: Home redisenada usando `HomeDashboardController` y datos reales.
 - Fase 5 completada en validacion tecnica: `flutter analyze`, `flutter analyze --no-fatal-infos` y `flutter build web`.
+- Fase 6 completada: rediseño visual de Tareas y Notas usando la base visual comun, sin cambiar servicios, modelos, rutas ni persistencia.
 
 ## Cambios realizados en esta fase
 
@@ -118,6 +119,60 @@ Fecha: 2026-05-15
 
 ## Proximos pasos
 
-1. Probar esta base en navegador con una cuenta real.
-2. Si Home queda validada, redisenar Tareas usando los componentes comunes sin tocar CRUD, filtros, recordatorios ni notificaciones.
-3. Despues, redisenar Notas con layout tipo workspace, manteniendo lista, creacion, edicion, guardado y carga reales.
+1. Probar esta base en navegador con una cuenta real y datos reales para cubrir los flujos manuales completos.
+2. Revisar visualmente light/dark en Tareas y Notas con contenido real abundante.
+3. Siguiente fase pendiente: elegir el proximo modulo a redisenar, sin avanzar todavia desde esta fase.
+
+## Fase 6 - Tareas y Notas
+
+Fecha: 2026-05-15
+
+### Archivos tocados
+
+- `dash_new/lib/screens/tasks/screens/tasks_main_screen.dart`
+- `dash_new/lib/screens/tasks/screens/task_create_screen.dart`
+- `dash_new/lib/screens/tasks/screens/task_edit_screen.dart`
+- `dash_new/lib/screens/notes/screens/notes_list_screen.dart`
+- `dash_new/lib/screens/notes/screens/note_editor_screen.dart`
+
+### Cambios hechos
+
+- Tareas:
+  - Pantalla principal migrada a `AppShell`, `PageContainer`, `FocusCard`, `FocusStatCard`, `FocusBadge`, `FocusChip`, `FocusPrimaryButton`, `FocusSecondaryButton`, `FocusIconButton` y `ResponsiveGrid`.
+  - Header visual con titulo `Tareas`, descripcion, boton de nueva tarea y control para ver completadas.
+  - Filtros visibles en una barra propia, sin cambiar el filtro real `showCompleted`.
+  - Lista agrupada redisenada con paneles colapsables, cards responsive, badges de prioridad, estado, fecha limite, origen/modulo, categoria, etiquetas y subtareas.
+  - Crear/editar tarea rediseñados con cards de seccion, campos coherentes, selectores de fecha/hora, switches y acciones responsive.
+- Notas:
+  - Lista real migrada a `AppShell` con header de workspace, boton de nueva nota, metricas y controles de orden/vista.
+  - Vista lista y vista cuadricula rediseñadas con cards, portada/fallback, titulo, resumen, fecha, fijadas, etiquetas y tareas vinculadas.
+  - Empty state de notas actualizado con accion real a `/notes/editor`.
+  - Editor real mejorado con cabecera de titulo, estado de autoguardado, acciones guardar/eliminar, superficie de escritura centrada y toolbar responsive.
+
+### Funcionalidad mantenida intacta
+
+- Tareas: creacion, edicion, eliminacion, marcado como completada, creacion de siguiente tarea repetida, subtareas, filtros de completadas, agrupacion/ordenacion existente, Firestore, rutas reales y navegacion.
+- Notas: carga por stream, ordenacion existente, vista lista/cuadricula, creacion, edicion, autoguardado, guardado, carga por `noteId`, eliminacion, Firestore y rutas reales.
+- No se tocaron servicios, repositorios, controladores, modelos, autenticacion, notificaciones globales, backend, Firebase ni otros modulos.
+- En `TaskEditScreen` se preservan los campos existentes de recordatorio y vinculos (`linkedNoteId`, `linkedStudyCourseId`, `syncedStudyTaskId`) al guardar para no perder sincronizacion al editar.
+
+### Validacion ejecutada
+
+- `dart format` sobre los cinco archivos modificados: correcto.
+- `flutter analyze` completo: ejecutado. Resultado: codigo 1 por 364 `info` heredados del repo; no se detectaron warnings nuevos en los archivos tocados tras la correccion.
+- `flutter analyze` limitado a los cinco archivos modificados: codigo 0, `No issues found`.
+- `flutter build web`: codigo 0, build generado en `dash_new/build/web`.
+- Servidor local estatico levantado desde `dash_new/build/web` en `http://127.0.0.1:5174`: responde con estado 200.
+- Aviso de build: Flutter sigue informando incompatibilidades de dry-run Wasm en dependencias (`device_info_plus`, `image`, `flutter_timezone`). El build web normal se genero correctamente.
+
+### Pruebas manuales
+
+- Verificado por analisis de rutas y codigo que Tareas mantiene `/tasks`, `/tasks/create` y `/tasks/detail` sin cambiar destinos.
+- Verificado por analisis de rutas y codigo que Notas mantiene `/notes`, `/notes/list` y `/notes/editor` sin cambiar destinos.
+- Verificada por compilacion la integracion con sidebar/topbar comun al usar `AppShell` en los modulos principales.
+- Pendiente de prueba interactiva con usuario real en navegador: crear/editar/eliminar tarea, marcar completada, filtrar, volver a Home, crear/abrir/editar/guardar nota, recargar, notificaciones, cierre de sesion y comprobacion visual light/dark en desktop, medio y movil.
+
+### Pendientes siguientes
+
+- Hacer una pasada visual interactiva con datos reales para detectar overflow puntual en contenidos extremos.
+- Decidir el siguiente modulo a redisenar en una fase separada.

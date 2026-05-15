@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/calendar/controllers/calendar_controller.dart';
 import 'package:focuslane/screens/calendar/controllers/calendar_interaction_controller.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
@@ -211,10 +213,13 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  Widget _buildDayTab(BuildContext context) {
+  Widget _buildDayTab(BuildContext context, double availableWidth) {
     final selected = _calendarController.selected;
     final day = DateTime(selected.year, selected.month, selected.day);
-    final dayWidth = math.max(280.0, MediaQuery.sizeOf(context).width - 94);
+    final dayWidth = math.max(
+      280.0,
+      availableWidth - CalendarController.timeAxisWidth - 2,
+    );
 
     return CalendarDayView(
       day: day,
@@ -257,6 +262,11 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
+  void _selectView(int index) {
+    if (_tabController.index == index) return;
+    _tabController.animateTo(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -297,62 +307,282 @@ class _CalendarScreenState extends State<CalendarScreen>
             },
             child: Focus(
               autofocus: true,
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text(_calendarController.appBarTitle()),
-                  actions: [
-                    IconButton(
-                      tooltip: 'Anterior',
-                      icon: const Icon(Icons.chevron_left),
-                      onPressed: () => _calendarController.shiftVisible(-1),
-                    ),
-                    IconButton(
-                      tooltip: 'Siguiente',
-                      icon: const Icon(Icons.chevron_right),
-                      onPressed: () => _calendarController.shiftVisible(1),
-                    ),
-                    IconButton(
-                      tooltip: 'Hoy',
-                      icon: const Icon(Icons.today),
-                      onPressed: _calendarController.goToday,
-                    ),
-                  ],
-                  bottom: TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabs: const [
-                      Tab(text: 'Anual', icon: Icon(Icons.calendar_view_month)),
-                      Tab(text: 'Mensual', icon: Icon(Icons.calendar_month)),
-                      Tab(text: 'Día', icon: Icon(Icons.today)),
-                      Tab(text: 'Agenda', icon: Icon(Icons.view_agenda)),
-                    ],
+              child: AppShell(
+                title: 'Calendario',
+                subtitle: _calendarController.appBarTitle(),
+                activeRoute: AppRoutes.calendarDashboard,
+                actions: [
+                  FocusIconButton(
+                    icon: Icons.chevron_left_rounded,
+                    tooltip: 'Anterior',
+                    onPressed: () => _calendarController.shiftVisible(-1),
                   ),
-                ),
-                body: SafeArea(
-                  bottom: true,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildYearTab(),
-                      _buildMonthTab(),
-                      _buildDayTab(context),
-                      _buildAgendaTab(),
-                    ],
+                  const SizedBox(width: 10),
+                  FocusIconButton(
+                    icon: Icons.chevron_right_rounded,
+                    tooltip: 'Siguiente',
+                    onPressed: () => _calendarController.shiftVisible(1),
                   ),
-                ),
-                floatingActionButton: FloatingActionButton.extended(
-                  onPressed:
-                      () => _openEventEditor(
-                        defaultDay: _calendarController.selected,
+                  const SizedBox(width: 10),
+                  FocusIconButton(
+                    icon: Icons.today_rounded,
+                    tooltip: 'Hoy',
+                    onPressed: _calendarController.goToday,
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final padding =
+                        width < 720
+                            ? FocuslaneTokens.spacing16
+                            : width < 1180
+                            ? FocuslaneTokens.spacing24
+                            : FocuslaneTokens.spacing32;
+
+                    return SafeArea(
+                      bottom: true,
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: FocuslaneTokens.containerMaxWidth,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(padding),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _CalendarWorkspaceHeader(
+                                  title: 'Calendario',
+                                  periodLabel:
+                                      _calendarController.appBarTitle(),
+                                  activeViewIndex:
+                                      _calendarController.activeViewIndex,
+                                  selectedDay: _calendarController.selected,
+                                  visibleItems:
+                                      _calendarController.rangeItems.length,
+                                  onSelectView: _selectView,
+                                  onPrevious:
+                                      () => _calendarController.shiftVisible(
+                                        -1,
+                                      ),
+                                  onNext:
+                                      () => _calendarController.shiftVisible(1),
+                                  onToday: _calendarController.goToday,
+                                  onNewEvent:
+                                      () => _openEventEditor(
+                                        defaultDay:
+                                            _calendarController.selected,
+                                      ),
+                                ),
+                                const SizedBox(height: 16),
+                                Expanded(
+                                  child: TabBarView(
+                                    controller: _tabController,
+                                    children: [
+                                      _buildYearTab(),
+                                      _buildMonthTab(),
+                                      _buildDayTab(
+                                        context,
+                                        constraints.maxWidth,
+                                      ),
+                                      _buildAgendaTab(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Evento'),
+                    );
+                  },
                 ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _CalendarWorkspaceHeader extends StatelessWidget {
+  const _CalendarWorkspaceHeader({
+    required this.title,
+    required this.periodLabel,
+    required this.activeViewIndex,
+    required this.selectedDay,
+    required this.visibleItems,
+    required this.onSelectView,
+    required this.onPrevious,
+    required this.onNext,
+    required this.onToday,
+    required this.onNewEvent,
+  });
+
+  final String title;
+  final String periodLabel;
+  final int activeViewIndex;
+  final DateTime selectedDay;
+  final int visibleItems;
+  final ValueChanged<int> onSelectView;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+  final VoidCallback onToday;
+  final VoidCallback onNewEvent;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return FocusCard(
+      backgroundColor: scheme.surfaceContainerLowest,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 780;
+          final viewSwitcher = _CalendarViewSwitcher(
+            activeIndex: activeViewIndex,
+            onSelected: onSelectView,
+          );
+          final actions = Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              FocusIconButton(
+                icon: Icons.chevron_left_rounded,
+                tooltip: 'Anterior',
+                onPressed: onPrevious,
+              ),
+              FocusIconButton(
+                icon: Icons.chevron_right_rounded,
+                tooltip: 'Siguiente',
+                onPressed: onNext,
+              ),
+              FocusSecondaryButton(
+                label: 'Hoy',
+                icon: Icons.today_rounded,
+                onPressed: onToday,
+              ),
+              FocusPrimaryButton(
+                label: 'Nuevo evento',
+                icon: Icons.add_rounded,
+                onPressed: onNewEvent,
+              ),
+            ],
+          );
+
+          final copy = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                periodLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FocusBadge(
+                    label: '$visibleItems elementos visibles',
+                    color: scheme.primary,
+                  ),
+                  FocusBadge(
+                    label:
+                        '${selectedDay.day.toString().padLeft(2, '0')}/'
+                        '${selectedDay.month.toString().padLeft(2, '0')}/'
+                        '${selectedDay.year}',
+                    color: scheme.secondary,
+                  ),
+                ],
+              ),
+            ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                copy,
+                const SizedBox(height: 16),
+                viewSwitcher,
+                const SizedBox(height: 16),
+                actions,
+              ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: copy),
+              const SizedBox(width: 20),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    viewSwitcher,
+                    const SizedBox(height: 14),
+                    actions,
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CalendarViewSwitcher extends StatelessWidget {
+  const _CalendarViewSwitcher({
+    required this.activeIndex,
+    required this.onSelected,
+  });
+
+  final int activeIndex;
+  final ValueChanged<int> onSelected;
+
+  static const _views = [
+    (label: 'Anual', icon: Icons.calendar_view_month_rounded),
+    (label: 'Mensual', icon: Icons.calendar_month_rounded),
+    (label: 'Día', icon: Icons.today_rounded),
+    (label: 'Agenda', icon: Icons.view_agenda_rounded),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.end,
+      children: [
+        for (int index = 0; index < _views.length; index++)
+          ChoiceChip(
+            selected: activeIndex == index,
+            label: Text(_views[index].label),
+            avatar: Icon(_views[index].icon, size: 18),
+            onSelected: (_) => onSelected(index),
+          ),
+      ],
     );
   }
 }
