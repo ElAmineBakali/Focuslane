@@ -1,24 +1,18 @@
-﻿import 'package:flutter/material.dart';
-import 'package:focuslane/design/ui/components/focus_card.dart';
-import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
+import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 
 class AuthFormCard extends StatelessWidget {
-  const AuthFormCard({
-    super.key,
-    required this.child,
-  });
+  const AuthFormCard({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
     return FocusCard(
-      backgroundColor: FocuslaneSemanticTokens.cardBackground(context),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: child,
-      ),
+      padding: EdgeInsets.all(width < 420 ? 18 : 24),
+      child: child,
     );
   }
 }
-

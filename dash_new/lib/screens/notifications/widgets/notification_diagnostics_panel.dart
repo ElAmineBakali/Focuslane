@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:focuslane/design/blocks/toast/app_toast.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/core/notifications/push/notification_diagnostics_service.dart';
 
 class NotificationDiagnosticsPanel extends StatefulWidget {
@@ -69,14 +70,7 @@ class _NotificationDiagnosticsPanelState
       future: _future,
       builder: (context, snapshot) {
         final data = snapshot.data;
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            color: cs.surface,
-            border: Border.all(color: cs.outlineVariant),
-          ),
+        return FocusCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

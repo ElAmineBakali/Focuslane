@@ -1,24 +1,27 @@
-﻿import 'package:flutter/material.dart';
-import 'package:focuslane/design/ui/tokens/focuslane_semantic_tokens.dart';
+import 'package:flutter/material.dart';
 
 class AuthShell extends StatelessWidget {
-  const AuthShell({
-    super.key,
-    required this.child,
-  });
+  const AuthShell({super.key, required this.child, this.maxWidth = 480});
 
   final Widget child;
+  final double maxWidth;
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+
     return Scaffold(
-      backgroundColor: FocuslaneSemanticTokens.backgroundMain(context),
+      backgroundColor: scheme.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(
+              horizontal: width < 640 ? 16 : 24,
+              vertical: width < 640 ? 18 : 32,
+            ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
+              constraints: BoxConstraints(maxWidth: maxWidth),
               child: child,
             ),
           ),
@@ -27,4 +30,3 @@ class AuthShell extends StatelessWidget {
     );
   }
 }
-

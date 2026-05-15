@@ -244,3 +244,60 @@ Fecha: 2026-05-15
 - Hacer una pasada manual en navegador con cuenta real para confirmar overflow puntual en contenidos extremos.
 - Revisar `habit_stats_screen.dart` en una fase posterior si se quiere un rediseño profundo de la pantalla de estadisticas; en esta fase se mantuvo para no ampliar alcance ni tocar logica pesada de graficas.
 - No avanzar a Study, Food, Finance, Gym ni Ajustes hasta nueva indicacion.
+
+## Fase 8 - Ajustes, Notificaciones, Login y Registro
+
+Fecha: 2026-05-15
+
+### Archivos tocados
+
+- `dash_new/lib/screens/auth/screens/login_screen.dart`
+- `dash_new/lib/screens/auth/screens/register_screen.dart`
+- `dash_new/lib/screens/auth/widgets/auth_shell.dart`
+- `dash_new/lib/screens/auth/widgets/auth_form_card.dart`
+- `dash_new/lib/screens/auth/widgets/auth_header.dart`
+- `dash_new/lib/screens/auth/widgets/auth_text_field.dart`
+- `dash_new/lib/screens/auth/widgets/auth_secondary_link.dart`
+- `dash_new/lib/screens/settings/screens/settings_screen.dart`
+- `dash_new/lib/screens/notifications/screens/global_notifications_screen.dart`
+- `dash_new/lib/screens/notifications/widgets/notification_diagnostics_panel.dart`
+- `dash_new/lib/design/ui/layouts/app_shell.dart`
+
+### Cambios hechos
+
+- Login y Registro se reconstruyeron con los widgets reutilizables de autenticacion, marca FocusLane, cards centradas, campos accesibles, errores en castellano, estados de carga y responsive movil/desktop.
+- Ajustes se migro a `AppShell`, `PageContainer` y cards profesionales para perfil/cuenta, apariencia, modulos activos, notificaciones, seguridad y cierre de sesion.
+- Notificaciones globales se migro a `AppShell`, con header, diagnostico integrado, modulos en cards expansibles, filas responsive por entidad y textos visibles en castellano natural.
+- El panel de diagnostico mantiene permisos, FCM, exact alarms y botones de prueba push/local, pero con `FocusCard` y una presentacion mas limpia.
+- El shell comun recibio ajustes minimos de textos visibles: Inicio, Habitos, Alimentacion, Cerrar sesion, Sesion activa y Abrir navegacion.
+
+### Funcionalidad mantenida intacta
+
+- Firebase Auth: login, registro, Google en web, recuperacion de contrasena, sesion persistente y rutas reales.
+- Perfil: Firestore, Storage, `displayName`, `photoURL`, bio y foto.
+- Tema: `ThemeMode` real y persistencia por el callback existente.
+- Modulos: `ModuleVisibilityService`, preferencias locales y ruta `/modules`.
+- Notificaciones: SharedPreferences de estudio, configuracion de alimentacion, recordatorios de gimnasio, store por entidad, scheduler, cancelacion por modulo, diagnostico FCM y pruebas push/local.
+- No se tocaron Study, Food, Finance ni Gym como pantallas principales.
+
+### Validacion ejecutada
+
+- `dart format` sobre los archivos modificados: correcto. Fue necesario ejecutarlo fuera del sandbox porque Dart quedaba bloqueado dentro del sandbox.
+- `dart analyze` limitado a los archivos tocados: codigo 0, `No issues found`.
+- `flutter analyze`: ejecutado. Resultado: codigo 1 por 348 `info` heredados del repo; no se detectaron errores ni warnings bloqueantes en los archivos tocados.
+- `flutter build web`: codigo 0, build generado en `dash_new/build/web`.
+- Servidor estatico temporal sobre `dash_new/build/web` en `http://127.0.0.1:5175`: respondio 200 durante la comprobacion.
+- Aviso de build: Flutter mantiene incompatibilidades de dry-run Wasm en dependencias (`device_info_plus`, `image`, `flutter_timezone`). El build web normal se genero correctamente.
+
+### Pruebas manuales y limites
+
+- Verificada por analisis de rutas y codigo la navegacion a Login, Registro, Ajustes, Notificaciones, modulos y vuelta desde configuraciones internas de notificaciones.
+- Verificada por compilacion la integracion con dark/light mode al usar `ColorScheme`, superficies tokenizadas y componentes comunes.
+- Verificada por revision estatica la adaptacion responsive con `LayoutBuilder`, `Wrap`, scrolls verticales, botones full-width en movil y filas que pasan a columna en espacios estrechos.
+- Se intentaron capturas headless con Edge en desktop, movil y tamano medio, pero la build release usa CanvasKit y el navegador headless produjo lienzos blancos; no se cuentan como validacion visual fiable.
+- Pendiente de prueba interactiva con cuenta real: iniciar sesion, cerrar sesion, registro con errores reales, cambio de tema, toggles de modulos, configuracion de notificaciones por entidad, push/local de prueba y revision visual click a click en desktop/medio/movil.
+
+### Pendientes siguientes
+
+- Ejecutar una pasada manual en navegador con usuario real y permisos de notificacion reales.
+- No avanzar a Study, Food, Finance ni Gym hasta una fase posterior explicita.

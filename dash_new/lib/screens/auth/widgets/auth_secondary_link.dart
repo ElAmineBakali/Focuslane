@@ -15,10 +15,16 @@ class AuthSecondaryLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    final scheme = Theme.of(context).colorScheme;
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Text(label, style: textTheme.bodySmall),
+        Text(
+          label,
+          style: textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+        ),
         TextButton(onPressed: onTap, child: Text(actionLabel)),
       ],
     );

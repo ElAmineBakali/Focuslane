@@ -175,7 +175,7 @@ class FocusTopBar extends StatelessWidget {
           if (showMenu) ...[
             FocusIconButton(
               icon: Icons.menu_rounded,
-              tooltip: 'Abrir navegacion',
+              tooltip: 'Abrir navegación',
               onPressed: onOpenMenu,
             ),
             const SizedBox(width: 10),
@@ -261,7 +261,7 @@ class FocusAppSidebar extends StatelessWidget {
 
   static const _items = <_AppNavItem>[
     _AppNavItem(
-      'Home',
+      'Inicio',
       Icons.home_outlined,
       Icons.home_rounded,
       AppRoutes.home,
@@ -273,7 +273,7 @@ class FocusAppSidebar extends StatelessWidget {
       AppRoutes.tasksDashboard,
     ),
     _AppNavItem(
-      'Habitos',
+      'Hábitos',
       Icons.repeat_rounded,
       Icons.repeat_rounded,
       AppRoutes.habitsDashboard,
@@ -297,7 +297,7 @@ class FocusAppSidebar extends StatelessWidget {
       AppRoutes.studyDashboard,
     ),
     _AppNavItem(
-      'Alimentacion',
+      'Alimentación',
       Icons.restaurant_outlined,
       Icons.restaurant_rounded,
       AppRoutes.foodDashboard,
@@ -430,7 +430,7 @@ class FocusAppSidebar extends StatelessWidget {
                   const SizedBox(height: 8),
                   _SidebarTile(
                     item: const _AppNavItem(
-                      'Cerrar sesion',
+                      'Cerrar sesión',
                       Icons.logout_rounded,
                       Icons.logout_rounded,
                       '',
@@ -580,7 +580,7 @@ class _ProfileSummary extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    user?.email ?? 'Sesion activa',
+                    user?.email ?? 'Sesión activa',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(

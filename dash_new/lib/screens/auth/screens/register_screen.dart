@@ -1,6 +1,13 @@
-﻿import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
-import 'package:focuslane/core/constants/app_strings.dart';
+import 'package:flutter/services.dart';
+import 'package:focuslane/navigation/app_routes.dart';
+import 'package:focuslane/screens/auth/widgets/auth_form_card.dart';
+import 'package:focuslane/screens/auth/widgets/auth_header.dart';
+import 'package:focuslane/screens/auth/widgets/auth_primary_button.dart';
+import 'package:focuslane/screens/auth/widgets/auth_secondary_link.dart';
+import 'package:focuslane/screens/auth/widgets/auth_shell.dart';
+import 'package:focuslane/screens/auth/widgets/auth_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,6 +23,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _pass = TextEditingController();
   final _confirm = TextEditingController();
   bool _busy = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
   String? _error;
 
   @override
@@ -29,18 +38,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _email.text.trim(),
-        password: _pass.text,
-      );
+      final credential = await fb_auth.FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _email.text.trim(),
+            password: _pass.text,
+          );
+      final displayName = _name.text.trim();
+      if (displayName.isNotEmpty) {
+        await credential.user?.updateDisplayName(displayName);
+      }
+      TextInput.finishAutofillContext();
       if (mounted) Navigator.of(context).pop();
     } on fb_auth.FirebaseAuthException catch (e) {
-      if (mounted) setState(() => _error = e.message ?? e.code);
+      if (mounted) setState(() => _error = _authError(e));
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error = 'No se pudo crear la cuenta. Inténtalo de nuevo.',
+        );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -48,256 +70,269 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isMobile = width < 760;
+    final compact = MediaQuery.sizeOf(context).width < 560;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0A0F18),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 980),
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFF2B3548), width: 1.5),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Container(
-                  color: const Color(0xFF0A0F18),
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(isMobile ? 16 : 24, isMobile ? 12 : 24, isMobile ? 16 : 24, isMobile ? 6 : 24),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 430),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 6),
-                              const Text(
-                                'FocusLane',
-                                style: TextStyle(
-                                  color: Color(0xFF84C8C1),
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                AppStrings.portalProductividad,
-                                style: TextStyle(color: Color(0xFF8691A4), fontSize: 14),
-                              ),
-                              SizedBox(height: isMobile ? 12 : 16),
-                              Container(
-                                padding: EdgeInsets.all(isMobile ? 14 : 20),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF353743),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      AppStrings.authCrearCuenta,
-                                      style: TextStyle(
-                                        color: Color(0xFFE3E2E9),
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 38,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      AppStrings.authSubtituloRegistro,
-                                      style: TextStyle(color: Color(0xFFA7AFBE), fontSize: 14),
-                                    ),
-                                    const SizedBox(height: 14),
-                                    _label(AppStrings.authNombreCompleto),
-                                    _field(
-                                      controller: _name,
-                                      hint: AppStrings.hintNombre,
-                                      validator: (v) => (v == null || v.trim().isEmpty) ? AppStrings.validacionRequerido : null,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _label(AppStrings.authCorreo),
-                                    _field(
-                                      controller: _email,
-                                      hint: AppStrings.hintCorreo,
-                                      validator: (v) {
-                                        final s = (v ?? '').trim();
-                                        if (s.isEmpty) return AppStrings.validacionRequerido;
-                                        if (!s.contains('@')) return AppStrings.validacionCorreoInvalido;
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 12),
-                                    if (isMobile)
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          _label(AppStrings.authContrasena),
-                                          _field(
-                                            controller: _pass,
-                                            hint: '••••••••',
-                                            obscureText: true,
-                                            validator: (v) => (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
-                                          ),
-                                          const SizedBox(height: 12),
-                                          _label(AppStrings.authConfirmar),
-                                          _field(
-                                            controller: _confirm,
-                                            hint: '••••••••',
-                                            obscureText: true,
-                                            validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                _label(AppStrings.authContrasena),
-                                                _field(
-                                                  controller: _pass,
-                                                  hint: '••••••••',
-                                                  obscureText: true,
-                                                  validator: (v) =>
-                                                      (v == null || v.length < 6) ? AppStrings.validacionMin6 : null,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                _label(AppStrings.authConfirmar),
-                                                _field(
-                                                  controller: _confirm,
-                                                  hint: '••••••••',
-                                                  obscureText: true,
-                                                  validator: (v) => v != _pass.text ? AppStrings.validacionNoCoincide : null,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    const SizedBox(height: 14),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: FilledButton(
-                                        onPressed: _busy ? null : _register,
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: const Color(0xFF70B0AB),
-                                          foregroundColor: const Color(0xFF10211F),
-                                          padding: const EdgeInsets.symmetric(vertical: 13),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        ),
-                                        child: _busy
-                                            ? const SizedBox(
-                                                width: 18,
-                                                height: 18,
-                                                child: CircularProgressIndicator(strokeWidth: 2),
-                                              )
-                                            : const Text(
-                                                AppStrings.authBotonCrearCuenta,
-                                                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                                              ),
-                                      ),
-                                    ),
-                                    if (_error != null) ...[
-                                      const SizedBox(height: 10),
-                                      Text(_error!, style: const TextStyle(color: Color(0xFFF44336))),
-                                    ],
-                                    const SizedBox(height: 18),
-                                    Wrap(
-                                      alignment: WrapAlignment.center,
-                                      children: [
-                                        const Text(
-                                          AppStrings.authYaTienesCuenta,
-                                          style: TextStyle(color: Color(0xFFA7AFBE)),
-                                        ),
-                                        InkWell(
-                                          onTap: () => Navigator.of(context).pop(),
-                                          child: const Text(
-                                            AppStrings.authEntrar,
-                                            style: TextStyle(
-                                              color: Color(0xFF84C8C1),
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'SECURE      ENCRYPTED',
-                                style: TextStyle(color: Color(0xFF6D778A), fontSize: 11, letterSpacing: 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+    return AuthShell(
+      maxWidth: 520,
+      child: Column(
+        children: [
+          const AuthHeader(
+            title: 'Crea tu cuenta',
+            subtitle:
+                'Prepara tu espacio para tareas, notas, calendario y hábitos.',
+          ),
+          const SizedBox(height: 24),
+          AuthFormCard(
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AuthTextField(
+                      label: 'Nombre completo',
+                      hint: 'Escribe tu nombre',
+                      controller: _name,
+                      prefixIcon: Icons.person_outline_rounded,
+                      autofillHints: const [AutofillHints.name],
+                      textInputAction: TextInputAction.next,
+                      validator:
+                          (value) =>
+                              (value == null || value.trim().isEmpty)
+                                  ? 'El nombre es obligatorio'
+                                  : null,
                     ),
-                  ),
+                    const SizedBox(height: 14),
+                    AuthTextField(
+                      label: 'Correo electrónico',
+                      hint: 'correo@empresa.com',
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: Icons.alternate_email_rounded,
+                      autofillHints: const [AutofillHints.email],
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        final s = (value ?? '').trim();
+                        if (s.isEmpty) return 'El correo es obligatorio';
+                        if (!s.contains('@')) {
+                          return 'Introduce un correo válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    if (compact)
+                      Column(
+                        children: [
+                          _PasswordField(
+                            label: 'Contraseña',
+                            controller: _pass,
+                            obscureText: _obscurePassword,
+                            onToggle:
+                                () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
+                            validator:
+                                (value) =>
+                                    (value == null || value.length < 6)
+                                        ? 'Mínimo 6 caracteres'
+                                        : null,
+                          ),
+                          const SizedBox(height: 14),
+                          _PasswordField(
+                            label: 'Confirmar contraseña',
+                            controller: _confirm,
+                            obscureText: _obscureConfirm,
+                            onToggle:
+                                () => setState(
+                                  () => _obscureConfirm = !_obscureConfirm,
+                                ),
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              if (!_busy) _register();
+                            },
+                            validator:
+                                (value) =>
+                                    value != _pass.text
+                                        ? 'Las contraseñas no coinciden'
+                                        : null,
+                          ),
+                        ],
+                      )
+                    else
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _PasswordField(
+                              label: 'Contraseña',
+                              controller: _pass,
+                              obscureText: _obscurePassword,
+                              onToggle:
+                                  () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
+                              validator:
+                                  (value) =>
+                                      (value == null || value.length < 6)
+                                          ? 'Mínimo 6 caracteres'
+                                          : null,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _PasswordField(
+                              label: 'Confirmar',
+                              controller: _confirm,
+                              obscureText: _obscureConfirm,
+                              onToggle:
+                                  () => setState(
+                                    () => _obscureConfirm = !_obscureConfirm,
+                                  ),
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) {
+                                if (!_busy) _register();
+                              },
+                              validator:
+                                  (value) =>
+                                      value != _pass.text
+                                          ? 'No coincide'
+                                          : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 14),
+                      _AuthMessage(message: _error!),
+                    ],
+                    const SizedBox(height: 18),
+                    AuthPrimaryButton(
+                      label: 'Crear cuenta',
+                      icon: Icons.person_add_alt_rounded,
+                      isLoading: _busy,
+                      onPressed: _busy ? null : _register,
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _label(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: Color(0xFFA9B0BF),
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 1.4,
-      ),
-    );
-  }
-
-  Widget _field({
-    required TextEditingController controller,
-    required String hint,
-    bool obscureText = false,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      validator: validator,
-      style: const TextStyle(color: Color(0xFFE3E2E9)),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF6D778A)),
-        filled: true,
-        fillColor: const Color(0xFF121826),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF414C5F)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF84C8C1)),
-        ),
+          const SizedBox(height: 18),
+          AuthSecondaryLink(
+            label: '¿Ya tienes una cuenta? ',
+            actionLabel: 'Iniciar sesión',
+            onTap:
+                () =>
+                    Navigator.of(context).canPop()
+                        ? Navigator.of(context).pop()
+                        : Navigator.of(
+                          context,
+                        ).pushReplacementNamed(AppRoutes.login),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _PasswordField extends StatelessWidget {
+  const _PasswordField({
+    required this.label,
+    required this.controller,
+    required this.obscureText,
+    required this.onToggle,
+    required this.validator,
+    this.textInputAction,
+    this.onFieldSubmitted,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final bool obscureText;
+  final VoidCallback onToggle;
+  final String? Function(String?) validator;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return AuthTextField(
+      label: label,
+      hint: 'Mínimo 6 caracteres',
+      controller: controller,
+      obscureText: obscureText,
+      prefixIcon: Icons.lock_outline_rounded,
+      suffixIcon: IconButton(
+        tooltip: obscureText ? 'Mostrar contraseña' : 'Ocultar contraseña',
+        onPressed: onToggle,
+        icon: Icon(
+          obscureText
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+        ),
+      ),
+      autofillHints: const [AutofillHints.newPassword],
+      textInputAction: textInputAction ?? TextInputAction.next,
+      onFieldSubmitted: onFieldSubmitted,
+      validator: validator,
+    );
+  }
+}
+
+class _AuthMessage extends StatelessWidget {
+  const _AuthMessage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: scheme.onErrorContainer,
+            size: 18,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: scheme.onErrorContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _authError(fb_auth.FirebaseAuthException e) {
+  switch (e.code) {
+    case 'email-already-in-use':
+      return 'Ya existe una cuenta con este correo electrónico.';
+    case 'invalid-email':
+      return 'El correo electrónico no tiene un formato válido.';
+    case 'weak-password':
+      return 'La contraseña es demasiado débil.';
+    case 'operation-not-allowed':
+      return 'El registro con correo y contraseña no está habilitado.';
+    case 'network-request-failed':
+      return 'No hay conexión suficiente para crear la cuenta.';
+    default:
+      return 'No se pudo crear la cuenta. Inténtalo de nuevo.';
+  }
+}

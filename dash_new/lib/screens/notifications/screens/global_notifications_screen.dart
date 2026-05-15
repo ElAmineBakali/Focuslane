@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:focuslane/design/blocks/toast/app_toast.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/core/notifications/models/notification_entity_ref.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/calendar/models/calendar_models.dart';
 import 'package:focuslane/screens/calendar/services/calendar_service.dart';
 import 'package:focuslane/screens/finance/models/subscription_model.dart';
@@ -514,43 +516,51 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     required List<_EntityNotificationTarget> targets,
   }) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: colors.surfaceContainerLow,
-        border: Border.all(color: colors.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 4),
-          Text(subtitle),
-          const SizedBox(height: 8),
-          if (targets.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('No hay elementos disponibles para configurar.'),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: FocusCard(
+        padding: const EdgeInsets.all(14),
+        elevated: false,
+        backgroundColor: colors.surfaceContainerLow,
+        borderSide: BorderSide(color: colors.outlineVariant),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
-          ...targets.map(
-            (target) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(target.label),
-              subtitle: Text(_cfgSummary(target)),
-              trailing: FilledButton.tonal(
-                onPressed: () => _openEntityConfig(target),
-                child: const Text('Configurar'),
+            const SizedBox(height: 4),
+            Text(subtitle),
+            const SizedBox(height: 8),
+            if (targets.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: colors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: colors.outlineVariant),
+                ),
+                child: Text(
+                  'No hay elementos disponibles para configurar.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ...targets.map(
+              (target) => _EntityNotificationRow(
+                target: target,
+                summary: _cfgSummary(target),
+                onConfigure: () => _openEntityConfig(target),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -563,12 +573,10 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     bool initiallyExpanded = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        color: colorScheme.surface,
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
+    return FocusCard(
+      padding: EdgeInsets.zero,
+      elevated: false,
+      backgroundColor: colorScheme.surfaceContainerLowest,
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
@@ -577,13 +585,13 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
           childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
           leading: Container(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10),
+              color: colorScheme.primary.withValues(alpha: 0.12),
             ),
-            child: Icon(icon, color: colorScheme.onPrimaryContainer),
+            child: Icon(icon, color: colorScheme.primary),
           ),
           title: Text(
             title,
@@ -604,9 +612,11 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        appBar: _GlobalNotificationsAppBar(),
-        body: Center(child: CircularProgressIndicator()),
+      return const AppShell(
+        title: 'Notificaciones',
+        subtitle: 'Recordatorios, permisos y pruebas de aviso.',
+        activeRoute: AppRoutes.notifications,
+        child: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -624,468 +634,487 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
         'Medidas: ${_gymMeasurementsEnabled ? 'activo' : 'inactivo'} · '
         'Inactividad: ${_gymInactivityEnabled ? 'activo' : 'inactivo'}';
 
-    return Scaffold(
-      appBar: const _GlobalNotificationsAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              color: Theme.of(context).colorScheme.surface,
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Centro de notificaciones',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${activeModules.length} de $totalModules módulos tienen avisos activos. Aquí puedes ajustar avisos generales, recordatorios por elemento y acciones rápidas sin mezclarlo todo.',
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _statusChip(
-                      label: 'Estudio',
-                      active: _studyClasses || _studyTasks,
-                    ),
-                    _statusChip(label: 'Nutrición', active: _foodMaster),
-                    _statusChip(
-                      label: 'Gimnasio',
-                      active:
-                          _gymWeightEnabled ||
-                          _gymMeasurementsEnabled ||
-                          _gymInactivityEnabled,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-          const NotificationDiagnosticsPanel(),
-          const SizedBox(height: 18),
-          _ScreenGroupHeader(
-            title: 'Recordatorios por módulo',
-            subtitle:
-                'Cada bloque reúne la configuración general y los avisos propios de ese módulo.',
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Tareas',
-            subtitle: 'Avisos por tareas pendientes y fechas límite',
-            icon: Icons.task_alt_outlined,
+    return AppShell(
+      title: 'Notificaciones',
+      subtitle: 'Recordatorios, permisos y pruebas de aviso.',
+      activeRoute: AppRoutes.notifications,
+      child: SingleChildScrollView(
+        child: PageContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              StreamBuilder<List<Task>>(
-                stream: TaskFirestoreService.getTasks(),
-                builder: (context, snapshot) {
-                  final tasks = (snapshot.data ?? const <Task>[])
-                      .where((task) => !task.completed)
-                      .toList(growable: false);
-                  final targets = tasks
-                      .map((task) {
-                        final ref = task.dueDate ?? task.remindAt;
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.tasks,
-                          entityKind: 'task',
-                          entityId: task.id,
-                          label: task.title,
-                          title: task.title,
-                          body: 'Recordatorio de tarea pendiente',
-                          route: '/tasks',
-                          defaultType: 'TASK_REMINDER',
-                          typeLabels: const {
-                            'TASK_REMINDER': 'Recordatorio de tarea',
-                            'TASK_DUE': 'Aviso de fecha límite',
-                            'TASK_FOCUS': 'Bloque de enfoque',
-                          },
-                          referenceAtLocal: ref,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por tarea',
-                    subtitle:
-                        'Configura cada tarea con fecha exacta o minutos antes.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Calendario',
-            subtitle: 'Recordatorios por evento y preparación previa',
-            icon: Icons.calendar_today_outlined,
-            children: [
-              StreamBuilder<List<CalendarEvent>>(
-                stream: _calendarService.watchRange(
-                  DateTime.now().subtract(const Duration(days: 7)),
-                  DateTime.now().add(const Duration(days: 365)),
-                ),
-                builder: (context, snapshot) {
-                  final events = (snapshot.data ?? const <CalendarEvent>[])
-                      .where(
-                        (event) => event.start.isAfter(
-                          DateTime.now().subtract(const Duration(minutes: 1)),
-                        ),
-                      )
-                      .toList(growable: false);
-                  final targets = events
-                      .map((event) {
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.calendar,
-                          entityKind: 'planner_event',
-                          entityId: event.id,
-                          label: event.title,
-                          title: event.title,
-                          body: event.notes ?? 'Recordatorio de evento',
-                          route: '/calendar',
-                          defaultType: 'PLANNER_EVENT_REMINDER',
-                          typeLabels: const {
-                            'PLANNER_EVENT_REMINDER':
-                                'Recordatorio antes del evento',
-                            'EVENT_PREP': 'Preparación previa al evento',
-                            'EVENT_CUSTOM': 'Aviso personalizado del evento',
-                          },
-                          referenceAtLocal: event.start,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por evento',
-                    subtitle:
-                        'Cada evento puede tener aviso exacto o relativo antes de su inicio.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Estudio',
-            subtitle: 'Clases, tareas, exámenes y cursos',
-            icon: Icons.school_outlined,
-            initiallyExpanded: true,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SwitchListTile.adaptive(
-                      value: _studyClasses,
-                      onChanged: _setStudyClasses,
-                      title: const Text('Recordatorios base de clases'),
-                      subtitle: const Text(
-                        'Mantiene la lógica automática de clases.',
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    SwitchListTile.adaptive(
-                      value: _studyTasks,
-                      onChanged: _setStudyTasks,
-                      title: const Text('Recordatorios base de tareas'),
-                      subtitle: const Text(
-                        'Mantiene la lógica automática de tareas.',
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12, bottom: 12),
-                        child: OutlinedButton.icon(
-                          onPressed: _openStudyDetails,
-                          icon: const Icon(Icons.tune),
-                          label: const Text(
-                            'Configuración avanzada de estudio',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              StreamBuilder<List<StudyTask>>(
-                stream: widget.studyService.streamTasks(),
-                builder: (context, snapshot) {
-                  final tasks = snapshot.data ?? const <StudyTask>[];
-                  final targets = tasks
-                      .map((task) {
-                        final type =
-                            task.type == StudyItemType.exam
-                                ? 'EXAM_REMINDER'
-                                : 'STUDY_TASK_REMINDER';
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.study,
-                          entityKind: 'study_task',
-                          entityId: task.id,
-                          label: task.title,
-                          title: task.title,
-                          body:
-                              task.type == StudyItemType.exam
-                                  ? 'Recordatorio de examen'
-                                  : 'Recordatorio de tarea de estudio',
-                          route: '/study',
-                          defaultType: type,
-                          typeLabels: const {
-                            'STUDY_TASK_REMINDER':
-                                'Recordatorio de tarea de estudio',
-                            'EXAM_REMINDER': 'Recordatorio de examen',
-                            'GRADE_REMINDER': 'Aviso de calificación',
-                          },
-                          referenceAtLocal: task.due,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por tarea y examen',
-                    subtitle: 'Avisos personalizados para cada tarea o examen.',
-                    targets: targets,
-                  );
-                },
-              ),
-              StreamBuilder<List<Course>>(
-                stream: widget.studyService.streamCourses(
-                  includeArchived: false,
-                ),
-                builder: (context, snapshot) {
-                  final courses = snapshot.data ?? const <Course>[];
-                  final targets = courses
-                      .map((course) {
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.study,
-                          entityKind: 'study_course',
-                          entityId: course.id,
-                          label: course.name,
-                          title: course.name,
-                          body: 'Recordatorio del curso',
-                          route: '/study',
-                          defaultType: 'COURSE_REMINDER',
-                          typeLabels: const {
-                            'COURSE_REMINDER': 'Recordatorio del curso',
-                            'COURSE_REVIEW': 'Repaso del curso',
-                            'COURSE_CLASS': 'Aviso de clase del curso',
-                          },
-                          referenceAtLocal: null,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por curso',
-                    subtitle: 'Permite avisos personalizados por cada curso.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Hábitos',
-            subtitle: 'Recordatorios para mantener tus rachas',
-            icon: Icons.checklist_outlined,
-            children: [
-              StreamBuilder<List<Habit>>(
-                stream: HabitFirestoreService.getHabits(activeOnly: true),
-                builder: (context, snapshot) {
-                  final habits = snapshot.data ?? const <Habit>[];
-                  final targets = habits
-                      .map((habit) {
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.habits,
-                          entityKind: 'habit',
-                          entityId: habit.id,
-                          label: habit.name,
-                          title: 'Hábito: ${habit.name}',
-                          body: 'Recordatorio para completar el hábito',
-                          route: '/habits',
-                          defaultType: 'HABIT_REMINDER',
-                          typeLabels: const {
-                            'HABIT_REMINDER': 'Recordatorio del hábito',
-                            'HABIT_STREAK': 'Aviso de racha',
-                            'HABIT_CUSTOM': 'Aviso personalizado del hábito',
-                          },
-                          referenceAtLocal: null,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por hábito',
-                    subtitle: 'Define avisos exactos por hábito concreto.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Gimnasio',
-            subtitle: 'Recordatorios de sesión, peso, medidas e inactividad',
-            icon: Icons.fitness_center_outlined,
-            children: [
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
+              FocusCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(gymState),
+                    Text(
+                      'Centro de notificaciones',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: _openGymDetails,
-                      icon: const Icon(Icons.tune),
-                      label: const Text('Ajustes automáticos de gimnasio'),
+                    Text(
+                      '${activeModules.length} de $totalModules módulos tienen avisos activos. Aquí puedes ajustar avisos generales, recordatorios por elemento y acciones rápidas sin mezclarlo todo.',
                     ),
-                  ],
-                ),
-              ),
-              StreamBuilder<List<SessionDoc>>(
-                stream: _gymService.streamSessions(limit: 30),
-                builder: (context, snapshot) {
-                  final sessions = snapshot.data ?? const <SessionDoc>[];
-                  final targets = sessions
-                      .map((session) {
-                        final label =
-                            '${session.routineName} · ${_fmtDateTime(session.date)}';
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.gym,
-                          entityKind: 'gym_session',
-                          entityId: session.id,
-                          label: label,
-                          title: 'Sesión de gym',
-                          body: session.dayName,
-                          route: '/gym',
-                          defaultType: 'GYM_SESSION_REMINDER',
-                          typeLabels: const {
-                            'GYM_SESSION_REMINDER': 'Recordatorio de sesión',
-                            'GYM_PREP': 'Preparación antes de entrenar',
-                            'GYM_CUSTOM': 'Aviso personalizado del gym',
-                          },
-                          referenceAtLocal: session.date,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por sesión de gym',
-                    subtitle: 'Permite configurar avisos por sesión concreta.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Finanzas',
-            subtitle: 'Avisos de suscripciones y pagos próximos',
-            icon: Icons.account_balance_wallet_outlined,
-            children: [
-              StreamBuilder<List<Subscription>>(
-                stream: SubscriptionService.I.watchAll(activeOnly: true),
-                builder: (context, snapshot) {
-                  final subscriptions = snapshot.data ?? const <Subscription>[];
-                  final targets = subscriptions
-                      .map((subscription) {
-                        return _EntityNotificationTarget(
-                          module: NotificationModule.finance,
-                          entityKind: 'subscription',
-                          entityId: subscription.id,
-                          label: subscription.name,
-                          title: 'Pago próximo: ${subscription.name}',
-                          body:
-                              'Monto ${subscription.amount.toStringAsFixed(2)}',
-                          route: '/finance',
-                          defaultType: 'SUBSCRIPTION_DUE_SOON',
-                          typeLabels: const {
-                            'SUBSCRIPTION_DUE_SOON': 'Próximo pago',
-                            'PAYMENT_WARNING': 'Aviso de pago',
-                            'FINANCE_CUSTOM': 'Aviso financiero personalizado',
-                          },
-                          referenceAtLocal: subscription.nextDue,
-                        );
-                      })
-                      .toList(growable: false);
-                  return _buildEntityList(
-                    title: 'Recordatorios por suscripción',
-                    subtitle:
-                        'Configura aviso exacto o relativo por cada suscripción.',
-                    targets: targets,
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _modulePanel(
-            title: 'Nutrición',
-            subtitle: 'Recordatorios de nutrición y horarios diarios',
-            icon: Icons.restaurant_outlined,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SwitchListTile.adaptive(
-                      value: _foodMaster,
-                      onChanged: _setFoodMaster,
-                      title: const Text('Activar notificaciones de nutrición'),
-                      subtitle: const Text(
-                        'Persistido en Firestore para recordatorios de comida.',
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12, bottom: 12),
-                        child: OutlinedButton.icon(
-                          onPressed: _openFoodDetails,
-                          icon: const Icon(Icons.tune),
-                          label: const Text('Configuración de nutrición'),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _statusChip(
+                          label: 'Estudio',
+                          active: _studyClasses || _studyTasks,
                         ),
-                      ),
+                        _statusChip(label: 'Alimentación', active: _foodMaster),
+                        _statusChip(
+                          label: 'Gimnasio',
+                          active:
+                              _gymWeightEnabled ||
+                              _gymMeasurementsEnabled ||
+                              _gymInactivityEnabled,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 18),
+              const NotificationDiagnosticsPanel(),
+              const SizedBox(height: 18),
+              _ScreenGroupHeader(
+                title: 'Recordatorios por módulo',
+                subtitle:
+                    'Cada bloque reúne la configuración general y los avisos propios de ese módulo.',
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Tareas',
+                subtitle: 'Avisos por tareas pendientes y fechas límite',
+                icon: Icons.task_alt_outlined,
+                children: [
+                  StreamBuilder<List<Task>>(
+                    stream: TaskFirestoreService.getTasks(),
+                    builder: (context, snapshot) {
+                      final tasks = (snapshot.data ?? const <Task>[])
+                          .where((task) => !task.completed)
+                          .toList(growable: false);
+                      final targets = tasks
+                          .map((task) {
+                            final ref = task.dueDate ?? task.remindAt;
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.tasks,
+                              entityKind: 'task',
+                              entityId: task.id,
+                              label: task.title,
+                              title: task.title,
+                              body: 'Recordatorio de tarea pendiente',
+                              route: '/tasks',
+                              defaultType: 'TASK_REMINDER',
+                              typeLabels: const {
+                                'TASK_REMINDER': 'Recordatorio de tarea',
+                                'TASK_DUE': 'Aviso de fecha límite',
+                                'TASK_FOCUS': 'Bloque de enfoque',
+                              },
+                              referenceAtLocal: ref,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por tarea',
+                        subtitle:
+                            'Configura cada tarea con fecha exacta o minutos antes.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Calendario',
+                subtitle: 'Recordatorios por evento y preparación previa',
+                icon: Icons.calendar_today_outlined,
+                children: [
+                  StreamBuilder<List<CalendarEvent>>(
+                    stream: _calendarService.watchRange(
+                      DateTime.now().subtract(const Duration(days: 7)),
+                      DateTime.now().add(const Duration(days: 365)),
+                    ),
+                    builder: (context, snapshot) {
+                      final events = (snapshot.data ?? const <CalendarEvent>[])
+                          .where(
+                            (event) => event.start.isAfter(
+                              DateTime.now().subtract(
+                                const Duration(minutes: 1),
+                              ),
+                            ),
+                          )
+                          .toList(growable: false);
+                      final targets = events
+                          .map((event) {
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.calendar,
+                              entityKind: 'planner_event',
+                              entityId: event.id,
+                              label: event.title,
+                              title: event.title,
+                              body: event.notes ?? 'Recordatorio de evento',
+                              route: '/calendar',
+                              defaultType: 'PLANNER_EVENT_REMINDER',
+                              typeLabels: const {
+                                'PLANNER_EVENT_REMINDER':
+                                    'Recordatorio antes del evento',
+                                'EVENT_PREP': 'Preparación previa al evento',
+                                'EVENT_CUSTOM':
+                                    'Aviso personalizado del evento',
+                              },
+                              referenceAtLocal: event.start,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por evento',
+                        subtitle:
+                            'Cada evento puede tener aviso exacto o relativo antes de su inicio.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Estudio',
+                subtitle: 'Clases, tareas, exámenes y cursos',
+                icon: Icons.school_outlined,
+                initiallyExpanded: true,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        SwitchListTile.adaptive(
+                          value: _studyClasses,
+                          onChanged: _setStudyClasses,
+                          title: const Text('Recordatorios base de clases'),
+                          subtitle: const Text(
+                            'Activa los avisos automáticos de clases.',
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile.adaptive(
+                          value: _studyTasks,
+                          onChanged: _setStudyTasks,
+                          title: const Text('Recordatorios base de tareas'),
+                          subtitle: const Text(
+                            'Activa los avisos automáticos de tareas.',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 12,
+                              bottom: 12,
+                            ),
+                            child: OutlinedButton.icon(
+                              onPressed: _openStudyDetails,
+                              icon: const Icon(Icons.tune),
+                              label: const Text(
+                                'Configuración avanzada de estudio',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  StreamBuilder<List<StudyTask>>(
+                    stream: widget.studyService.streamTasks(),
+                    builder: (context, snapshot) {
+                      final tasks = snapshot.data ?? const <StudyTask>[];
+                      final targets = tasks
+                          .map((task) {
+                            final type =
+                                task.type == StudyItemType.exam
+                                    ? 'EXAM_REMINDER'
+                                    : 'STUDY_TASK_REMINDER';
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.study,
+                              entityKind: 'study_task',
+                              entityId: task.id,
+                              label: task.title,
+                              title: task.title,
+                              body:
+                                  task.type == StudyItemType.exam
+                                      ? 'Recordatorio de examen'
+                                      : 'Recordatorio de tarea de estudio',
+                              route: '/study',
+                              defaultType: type,
+                              typeLabels: const {
+                                'STUDY_TASK_REMINDER':
+                                    'Recordatorio de tarea de estudio',
+                                'EXAM_REMINDER': 'Recordatorio de examen',
+                                'GRADE_REMINDER': 'Aviso de calificación',
+                              },
+                              referenceAtLocal: task.due,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por tarea y examen',
+                        subtitle:
+                            'Avisos personalizados para cada tarea o examen.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                  StreamBuilder<List<Course>>(
+                    stream: widget.studyService.streamCourses(
+                      includeArchived: false,
+                    ),
+                    builder: (context, snapshot) {
+                      final courses = snapshot.data ?? const <Course>[];
+                      final targets = courses
+                          .map((course) {
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.study,
+                              entityKind: 'study_course',
+                              entityId: course.id,
+                              label: course.name,
+                              title: course.name,
+                              body: 'Recordatorio del curso',
+                              route: '/study',
+                              defaultType: 'COURSE_REMINDER',
+                              typeLabels: const {
+                                'COURSE_REMINDER': 'Recordatorio del curso',
+                                'COURSE_REVIEW': 'Repaso del curso',
+                                'COURSE_CLASS': 'Aviso de clase del curso',
+                              },
+                              referenceAtLocal: null,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por curso',
+                        subtitle:
+                            'Permite avisos personalizados por cada curso.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Hábitos',
+                subtitle: 'Recordatorios para mantener tus rachas',
+                icon: Icons.checklist_outlined,
+                children: [
+                  StreamBuilder<List<Habit>>(
+                    stream: HabitFirestoreService.getHabits(activeOnly: true),
+                    builder: (context, snapshot) {
+                      final habits = snapshot.data ?? const <Habit>[];
+                      final targets = habits
+                          .map((habit) {
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.habits,
+                              entityKind: 'habit',
+                              entityId: habit.id,
+                              label: habit.name,
+                              title: 'Hábito: ${habit.name}',
+                              body: 'Recordatorio para completar el hábito',
+                              route: '/habits',
+                              defaultType: 'HABIT_REMINDER',
+                              typeLabels: const {
+                                'HABIT_REMINDER': 'Recordatorio del hábito',
+                                'HABIT_STREAK': 'Aviso de racha',
+                                'HABIT_CUSTOM':
+                                    'Aviso personalizado del hábito',
+                              },
+                              referenceAtLocal: null,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por hábito',
+                        subtitle: 'Define avisos exactos por hábito concreto.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Gimnasio',
+                subtitle:
+                    'Recordatorios de sesión, peso, medidas e inactividad',
+                icon: Icons.fitness_center_outlined,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: Theme.of(context).colorScheme.surfaceContainerLow,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(gymState),
+                        const SizedBox(height: 8),
+                        FilledButton.icon(
+                          onPressed: _openGymDetails,
+                          icon: const Icon(Icons.tune),
+                          label: const Text('Ajustes automáticos de gimnasio'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  StreamBuilder<List<SessionDoc>>(
+                    stream: _gymService.streamSessions(limit: 30),
+                    builder: (context, snapshot) {
+                      final sessions = snapshot.data ?? const <SessionDoc>[];
+                      final targets = sessions
+                          .map((session) {
+                            final label =
+                                '${session.routineName} · ${_fmtDateTime(session.date)}';
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.gym,
+                              entityKind: 'gym_session',
+                              entityId: session.id,
+                              label: label,
+                              title: 'Sesión de gimnasio',
+                              body: session.dayName,
+                              route: '/gym',
+                              defaultType: 'GYM_SESSION_REMINDER',
+                              typeLabels: const {
+                                'GYM_SESSION_REMINDER':
+                                    'Recordatorio de sesión',
+                                'GYM_PREP': 'Preparación antes de entrenar',
+                                'GYM_CUSTOM': 'Aviso personalizado de gimnasio',
+                              },
+                              referenceAtLocal: session.date,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por sesión de gimnasio',
+                        subtitle:
+                            'Permite configurar avisos por sesión concreta.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Finanzas',
+                subtitle: 'Avisos de suscripciones y pagos próximos',
+                icon: Icons.account_balance_wallet_outlined,
+                children: [
+                  StreamBuilder<List<Subscription>>(
+                    stream: SubscriptionService.I.watchAll(activeOnly: true),
+                    builder: (context, snapshot) {
+                      final subscriptions =
+                          snapshot.data ?? const <Subscription>[];
+                      final targets = subscriptions
+                          .map((subscription) {
+                            return _EntityNotificationTarget(
+                              module: NotificationModule.finance,
+                              entityKind: 'subscription',
+                              entityId: subscription.id,
+                              label: subscription.name,
+                              title: 'Pago próximo: ${subscription.name}',
+                              body:
+                                  'Monto ${subscription.amount.toStringAsFixed(2)}',
+                              route: '/finance',
+                              defaultType: 'SUBSCRIPTION_DUE_SOON',
+                              typeLabels: const {
+                                'SUBSCRIPTION_DUE_SOON': 'Próximo pago',
+                                'PAYMENT_WARNING': 'Aviso de pago',
+                                'FINANCE_CUSTOM':
+                                    'Aviso financiero personalizado',
+                              },
+                              referenceAtLocal: subscription.nextDue,
+                            );
+                          })
+                          .toList(growable: false);
+                      return _buildEntityList(
+                        title: 'Recordatorios por suscripción',
+                        subtitle:
+                            'Configura aviso exacto o relativo por cada suscripción.',
+                        targets: targets,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _modulePanel(
+                title: 'Alimentación',
+                subtitle: 'Recordatorios de comidas y horarios diarios',
+                icon: Icons.restaurant_outlined,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        SwitchListTile.adaptive(
+                          value: _foodMaster,
+                          onChanged: _setFoodMaster,
+                          title: const Text(
+                            'Activar notificaciones de alimentación',
+                          ),
+                          subtitle: const Text(
+                            'Mantiene activos los avisos de comidas configurados.',
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 12,
+                              bottom: 12,
+                            ),
+                            child: OutlinedButton.icon(
+                              onPressed: _openFoodDetails,
+                              icon: const Icon(Icons.tune),
+                              label: const Text(
+                                'Configuración de alimentación',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _quickActionsCard(context),
             ],
           ),
-          const SizedBox(height: 12),
-          _quickActionsCard(context),
-        ],
+        ),
       ),
     );
   }
@@ -1102,76 +1131,141 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
   }
 
   Widget _quickActionsCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
+    return FocusCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Acciones rápidas',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Utiliza estas acciones para cancelar notificaciones por módulo cuando necesites una limpieza rápida.',
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed:
+                    () => _cancelByModule(NotificationModule.tasks, 'tareas'),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar tareas'),
+              ),
+              OutlinedButton.icon(
+                onPressed:
+                    () => _cancelByModule(
+                      NotificationModule.calendar,
+                      'calendario',
+                    ),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar calendario'),
+              ),
+              OutlinedButton.icon(
+                onPressed:
+                    () => _cancelByModule(NotificationModule.habits, 'hábitos'),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar hábitos'),
+              ),
+              OutlinedButton.icon(
+                onPressed:
+                    () => _cancelByModule(NotificationModule.study, 'estudio'),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar estudio'),
+              ),
+              OutlinedButton.icon(
+                onPressed:
+                    () => _cancelByModule(NotificationModule.gym, 'gimnasio'),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar gimnasio'),
+              ),
+              OutlinedButton.icon(
+                onPressed:
+                    () =>
+                        _cancelByModule(NotificationModule.finance, 'finanzas'),
+                icon: const Icon(Icons.notifications_off_outlined),
+                label: const Text('Cancelar finanzas'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EntityNotificationRow extends StatelessWidget {
+  const _EntityNotificationRow({
+    required this.target,
+    required this.summary,
+    required this.onConfigure,
+  });
+
+  final _EntityNotificationTarget target;
+  final String summary;
+  final VoidCallback onConfigure;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 560;
+        final copy = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Acciones rápidas',
+              target.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              summary,
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Utiliza estas acciones para cancelar notificaciones por módulo cuando necesites una limpieza rápida.',
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                OutlinedButton.icon(
-                  onPressed:
-                      () => _cancelByModule(NotificationModule.tasks, 'tareas'),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Tareas'),
-                ),
-                OutlinedButton.icon(
-                  onPressed:
-                      () => _cancelByModule(
-                        NotificationModule.calendar,
-                        'calendario',
-                      ),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Calendario'),
-                ),
-                OutlinedButton.icon(
-                  onPressed:
-                      () =>
-                          _cancelByModule(NotificationModule.habits, 'hábitos'),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Hábitos'),
-                ),
-                OutlinedButton.icon(
-                  onPressed:
-                      () =>
-                          _cancelByModule(NotificationModule.study, 'estudio'),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Estudio'),
-                ),
-                OutlinedButton.icon(
-                  onPressed:
-                      () => _cancelByModule(NotificationModule.gym, 'gimnasio'),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Gimnasio'),
-                ),
-                OutlinedButton.icon(
-                  onPressed:
-                      () => _cancelByModule(
-                        NotificationModule.finance,
-                        'finanzas',
-                      ),
-                  icon: const Icon(Icons.notifications_off_outlined),
-                  label: const Text('Cancelar Finanzas'),
-                ),
-              ],
+              ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ],
-        ),
-      ),
+        );
+        final action = FilledButton.tonalIcon(
+          onPressed: onConfigure,
+          icon: const Icon(Icons.tune_rounded, size: 18),
+          label: const Text('Configurar'),
+        );
+
+        return Container(
+          margin: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: scheme.outlineVariant),
+          ),
+          child:
+              compact
+                  ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [copy, const SizedBox(height: 10), action],
+                  )
+                  : Row(
+                    children: [
+                      Expanded(child: copy),
+                      const SizedBox(width: 12),
+                      action,
+                    ],
+                  ),
+        );
+      },
     );
   }
 }
@@ -1300,19 +1394,6 @@ class _ScreenGroupHeader extends StatelessWidget {
   }
 }
 
-class _GlobalNotificationsAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
-  const _GlobalNotificationsAppBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(title: const Text('Notificaciones globales'));
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
 class _GymModuleNotificationsScreen extends StatefulWidget {
   const _GymModuleNotificationsScreen();
 
@@ -1406,11 +1487,11 @@ class _GymModuleNotificationsScreenState
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gym · Notificaciones')),
+      appBar: AppBar(title: const Text('Gimnasio · Notificaciones')),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          Card(
+          FocusCard(
             child: Column(
               children: [
                 SwitchListTile.adaptive(
@@ -1432,142 +1513,138 @@ class _GymModuleNotificationsScreenState
             ),
           ),
           const SizedBox(height: 10),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Día semanal',
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  DropdownButton<int>(
-                    value: _weightWeekday,
-                    items: const [
-                      DropdownMenuItem(
-                        value: DateTime.monday,
-                        child: Text('Lunes'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.tuesday,
-                        child: Text('Martes'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.wednesday,
-                        child: Text('Miércoles'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.thursday,
-                        child: Text('Jueves'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.friday,
-                        child: Text('Viernes'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.saturday,
-                        child: Text('Sábado'),
-                      ),
-                      DropdownMenuItem(
-                        value: DateTime.sunday,
-                        child: Text('Domingo'),
-                      ),
-                    ],
-                    onChanged: (v) async {
-                      if (v == null) return;
-                      setState(() => _weightWeekday = v);
-                      if (_weightEnabled) {
-                        await GymNotificationService.I
-                            .scheduleWeeklyWeightReminder(
-                              weekday: _weightWeekday,
-                              time: _weightTime,
-                            );
-                      }
-                      if (_measurementsEnabled) {
-                        await GymNotificationService.I
-                            .scheduleWeeklyMeasurementsReminder(
-                              weekday: _weightWeekday,
-                              time: _measurementsTime,
-                            );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Hora peso: ${_weightTime.format(context)}',
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: _weightTime,
+          FocusCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Día semanal',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                const SizedBox(height: 8),
+                DropdownButton<int>(
+                  value: _weightWeekday,
+                  isExpanded: true,
+                  items: const [
+                    DropdownMenuItem(
+                      value: DateTime.monday,
+                      child: Text('Lunes'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.tuesday,
+                      child: Text('Martes'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.wednesday,
+                      child: Text('Miércoles'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.thursday,
+                      child: Text('Jueves'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.friday,
+                      child: Text('Viernes'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.saturday,
+                      child: Text('Sábado'),
+                    ),
+                    DropdownMenuItem(
+                      value: DateTime.sunday,
+                      child: Text('Domingo'),
+                    ),
+                  ],
+                  onChanged: (v) async {
+                    if (v == null) return;
+                    setState(() => _weightWeekday = v);
+                    if (_weightEnabled) {
+                      await GymNotificationService.I
+                          .scheduleWeeklyWeightReminder(
+                            weekday: _weightWeekday,
+                            time: _weightTime,
                           );
-                          if (picked == null) return;
-                          setState(() => _weightTime = picked);
-                          if (_weightEnabled) {
-                            await GymNotificationService.I
-                                .scheduleWeeklyWeightReminder(
-                                  weekday: _weightWeekday,
-                                  time: _weightTime,
-                                );
-                          }
-                        },
-                        child: const Text('Cambiar'),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Hora medidas: ${_measurementsTime.format(context)}',
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: _measurementsTime,
+                    }
+                    if (_measurementsEnabled) {
+                      await GymNotificationService.I
+                          .scheduleWeeklyMeasurementsReminder(
+                            weekday: _weightWeekday,
+                            time: _measurementsTime,
                           );
-                          if (picked == null) return;
-                          setState(() => _measurementsTime = picked);
-                          if (_measurementsEnabled) {
-                            await GymNotificationService.I
-                                .scheduleWeeklyMeasurementsReminder(
-                                  weekday: _weightWeekday,
-                                  time: _measurementsTime,
-                                );
-                          }
-                        },
-                        child: const Text('Cambiar'),
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Hora peso: ${_weightTime.format(context)}'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: _weightTime,
+                        );
+                        if (picked == null) return;
+                        setState(() => _weightTime = picked);
+                        if (_weightEnabled) {
+                          await GymNotificationService.I
+                              .scheduleWeeklyWeightReminder(
+                                weekday: _weightWeekday,
+                                time: _weightTime,
+                              );
+                        }
+                      },
+                      child: const Text('Cambiar'),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Hora medidas: ${_measurementsTime.format(context)}',
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Días de inactividad: $_inactivityDays'),
-                  Slider(
-                    value: _inactivityDays.toDouble(),
-                    min: 1,
-                    max: 10,
-                    divisions: 9,
-                    label: '$_inactivityDays',
-                    onChanged:
-                        (v) => setState(() => _inactivityDays = v.round()),
-                    onChangeEnd: (v) async {
-                      if (_inactivityEnabled) {
-                        await GymNotificationService.I
-                            .scheduleInactivityReminder(days: v.round());
-                      }
-                    },
-                  ),
-                ],
-              ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: _measurementsTime,
+                        );
+                        if (picked == null) return;
+                        setState(() => _measurementsTime = picked);
+                        if (_measurementsEnabled) {
+                          await GymNotificationService.I
+                              .scheduleWeeklyMeasurementsReminder(
+                                weekday: _weightWeekday,
+                                time: _measurementsTime,
+                              );
+                        }
+                      },
+                      child: const Text('Cambiar'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text('Días de inactividad: $_inactivityDays'),
+                Slider(
+                  value: _inactivityDays.toDouble(),
+                  min: 1,
+                  max: 10,
+                  divisions: 9,
+                  label: '$_inactivityDays',
+                  onChanged: (v) => setState(() => _inactivityDays = v.round()),
+                  onChangeEnd: (v) async {
+                    if (_inactivityEnabled) {
+                      await GymNotificationService.I.scheduleInactivityReminder(
+                        days: v.round(),
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         ],
@@ -1582,7 +1659,7 @@ class _GymNotificationsAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(title: const Text('Gym · Notificaciones'));
+    return AppBar(title: const Text('Gimnasio · Notificaciones'));
   }
 
   @override
