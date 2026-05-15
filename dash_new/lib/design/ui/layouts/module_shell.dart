@@ -33,36 +33,40 @@ class ModuleShell extends StatelessWidget {
     final isDesktop = width >= 1024;
     final scaffoldKey = GlobalKey<ScaffoldState>();
     final title = items[selectedIndex].label;
+    final header =
+        appBarOverride ??
+        FocusHeader(title: title, subtitle: moduleTitle, actions: actions);
 
     return ModuleScaffold(
       child: Scaffold(
         key: scaffoldKey,
-        drawer: !isDesktop
-            ? Drawer(
-                child: ModuleSidebar(
-                  items: items,
-                  selectedIndex: selectedIndex,
-                  onItemSelected: (index) {
-                    onItemSelected(index);
-                    Navigator.pop(context);
-                  },
-                  title: moduleTitle,
-                  headerIcon: moduleIcon,
-                ),
-              )
-            : null,
-        appBar: appBarOverride ??
-            (!isDesktop
+        drawer:
+            !isDesktop
+                ? Drawer(
+                  child: ModuleSidebar(
+                    items: items,
+                    selectedIndex: selectedIndex,
+                    onItemSelected: (index) {
+                      onItemSelected(index);
+                      Navigator.pop(context);
+                    },
+                    title: moduleTitle,
+                    headerIcon: moduleIcon,
+                  ),
+                )
+                : null,
+        appBar:
+            !isDesktop
                 ? FocusHeader(
-                    title: title,
-                    leading: IconButton(
-                      icon: const Icon(Icons.menu),
-                      onPressed: () => scaffoldKey.currentState?.openDrawer(),
-                    ),
-                    actions: actions,
-                    useSoftGradient: true,
-                  )
-                : null),
+                  title: title,
+                  leading: IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => scaffoldKey.currentState?.openDrawer(),
+                  ),
+                  actions: actions,
+                  useSoftGradient: true,
+                )
+                : null,
         body: Row(
           children: [
             if (isDesktop)
@@ -74,11 +78,23 @@ class ModuleShell extends StatelessWidget {
                 headerIcon: moduleIcon,
               ),
             Expanded(
-              child: Padding(
-                padding: isDesktop
-                    ? const EdgeInsets.only(left: 0)
-                    : EdgeInsets.zero,
-                child: body,
+              child: Column(
+                children: [
+                  if (isDesktop)
+                    SizedBox(
+                      height: header.preferredSize.height,
+                      child: header,
+                    ),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          isDesktop
+                              ? const EdgeInsets.only(left: 0)
+                              : EdgeInsets.zero,
+                      child: body,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

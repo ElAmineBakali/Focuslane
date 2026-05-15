@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../tokens/focuslane_tokens.dart';
 
 class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final String? subtitle;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final double? leadingWidth;
-  final bool centerTitle;
-  final bool showExit;
-  final VoidCallback? onExit;
-  final bool useSoftGradient;
-
   const FocusHeader({
     super.key,
     required this.title,
@@ -25,44 +16,55 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
     this.useSoftGradient = false,
   });
 
+  final String title;
+  final String? subtitle;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final double? leadingWidth;
+  final bool centerTitle;
+  final bool showExit;
+  final VoidCallback? onExit;
+  final bool useSoftGradient;
+
   @override
-  Size get preferredSize => const Size.fromHeight(48);
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final scheme = theme.colorScheme;
     final exitAction = IconButton(
       icon: const Icon(Icons.logout, size: 18),
-      tooltip: 'Salir del módulo',
-      onPressed: onExit ?? () => Navigator.of(context).popUntil((r) => r.isFirst),
+      tooltip: 'Salir del modulo',
+      onPressed:
+          onExit ?? () => Navigator.of(context).popUntil((r) => r.isFirst),
     );
 
-    final mergedActions = <Widget>[
-      ...?actions,
-      if (showExit) exitAction,
-    ];
+    final mergedActions = <Widget>[...?actions, if (showExit) exitAction];
 
     return AppBar(
-      toolbarHeight: 48,
+      toolbarHeight: preferredSize.height,
       titleSpacing: 12,
       centerTitle: centerTitle,
+      backgroundColor: scheme.surface.withValues(alpha: 0.92),
+      surfaceTintColor: Colors.transparent,
       leading: leading,
       leadingWidth: leadingWidth,
-      flexibleSpace: useSoftGradient
-          ? Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    FocuslaneTokens.accentSurface(context, opacity: 0.35),
-                    FocuslaneTokens.accentSurface(context, opacity: 0.2),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      flexibleSpace:
+          useSoftGradient
+              ? Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      scheme.surface.withValues(alpha: 0.92),
+                      scheme.surfaceContainerLow.withValues(alpha: 0.92),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-              ),
-            )
-          : null,
+              )
+              : null,
       title: Column(
         crossAxisAlignment:
             centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -71,7 +73,8 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
           Text(
             title,
             style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w800,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -80,7 +83,7 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
             Text(
               subtitle!,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: cs.onSurfaceVariant,
+                color: scheme.onSurfaceVariant,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -93,7 +96,7 @@ class FocusHeader extends StatelessWidget implements PreferredSizeWidget {
         child: Divider(
           height: FocuslaneTokens.dividerW,
           thickness: FocuslaneTokens.dividerW,
-          color: FocuslaneTokens.dividerColor(context),
+          color: scheme.outlineVariant,
         ),
       ),
     );

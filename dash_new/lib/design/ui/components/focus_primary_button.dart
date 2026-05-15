@@ -23,22 +23,33 @@ class FocusPrimaryButton extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final bg = color ?? cs.primary;
 
-    final button = FilledButton.icon(
-      onPressed: isLoading ? null : onPressed,
-      icon: isLoading
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : Icon(icon ?? Icons.check, size: 18),
-      label: Text(label),
-      style: FilledButton.styleFrom(
-        backgroundColor: bg,
-        foregroundColor: cs.onPrimary,
-        minimumSize: const Size(0, 44),
-      ),
+    final style = FilledButton.styleFrom(
+      backgroundColor: bg,
+      foregroundColor: cs.onPrimary,
+      minimumSize: const Size(0, 44),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
+
+    final loadingIcon = SizedBox(
+      width: 16,
+      height: 16,
+      child: CircularProgressIndicator(strokeWidth: 2, color: cs.onPrimary),
+    );
+
+    final button =
+        (icon != null || isLoading)
+            ? FilledButton.icon(
+              onPressed: isLoading ? null : onPressed,
+              icon: isLoading ? loadingIcon : Icon(icon, size: 18),
+              label: Text(label),
+              style: style,
+            )
+            : FilledButton(
+              onPressed: onPressed,
+              style: style,
+              child: Text(label),
+            );
 
     if (!fullWidth) {
       return button;

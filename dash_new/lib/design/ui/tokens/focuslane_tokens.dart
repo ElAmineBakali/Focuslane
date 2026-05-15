@@ -3,19 +3,30 @@ import 'package:google_fonts/google_fonts.dart';
 import 'focuslane_semantic_tokens.dart';
 
 class FocuslaneTokens {
+  static const double sidebarWidth = 260.0;
+  static const double topBarHeight = 64.0;
+  static const double containerMaxWidth = 1440.0;
+
   static const double spacing8 = 8.0;
   static const double spacing12 = 12.0;
   static const double spacing16 = 16.0;
+  static const double spacing20 = 20.0;
+  static const double spacing24 = 24.0;
+  static const double spacing32 = 32.0;
 
+  static const double radius8 = 8.0;
   static const double radius12 = 12.0;
   static const double radius16 = 16.0;
   static const double radius20 = 20.0;
+  static const double radius24 = 24.0;
 
-  static const double borderW = 1.6;
-  static const double dividerW = 1.4;
+  static const double borderW = 1.0;
+  static const double dividerW = 1.0;
 
   static const EdgeInsets pagePaddingCompact = EdgeInsets.all(spacing16);
-  static const EdgeInsets cardPaddingCompact = EdgeInsets.all(spacing12);
+  static const EdgeInsets pagePadding = EdgeInsets.all(spacing24);
+  static const EdgeInsets cardPaddingCompact = EdgeInsets.all(spacing16);
+  static const EdgeInsets cardPadding = EdgeInsets.all(spacing24);
 
   static const Color pastelTeal = Color(0xFF7FBEB7);
   static const Color pastelTealClaro = Color(0xFF9FD0CB);
@@ -40,18 +51,28 @@ class FocuslaneTokens {
 
   static Color borderColorFromScheme(ColorScheme scheme) {
     return scheme.brightness == Brightness.dark
-      ? FocuslaneSemanticTokens.darkBorder
-      : FocuslaneSemanticTokens.lightBorder;
+        ? FocuslaneSemanticTokens.darkBorder
+        : FocuslaneSemanticTokens.lightBorder;
   }
 
   static Color dividerColor(BuildContext c) {
-    return Theme.of(c)
-        .dividerColor
-        .withOpacity(isDark(c) ? 0.55 : 0.35);
+    return Theme.of(c).dividerColor.withValues(alpha: isDark(c) ? 0.55 : 0.35);
   }
 
   static Color surfaceColor(BuildContext c) {
-    return FocuslaneSemanticTokens.cardBackground(c);
+    return Theme.of(c).colorScheme.surfaceContainerLowest;
+  }
+
+  static Color surfaceLow(BuildContext c) {
+    return Theme.of(c).colorScheme.surfaceContainerLow;
+  }
+
+  static Color surfaceContainer(BuildContext c) {
+    return Theme.of(c).colorScheme.surfaceContainer;
+  }
+
+  static Color surfaceHigh(BuildContext c) {
+    return Theme.of(c).colorScheme.surfaceContainerHigh;
   }
 
   static Color mutedTextColor(BuildContext c) {
@@ -62,19 +83,39 @@ class FocuslaneTokens {
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        accent(c),
-        accent(c),
-      ],
+      colors: [accent(c), FocuslaneSemanticTokens.secondary(c)],
     );
   }
 
   static Color accentSurface(BuildContext c, {double opacity = 0.14}) {
-    return accent(c).withOpacity(opacity);
+    return accent(c).withValues(alpha: opacity);
   }
 
   static List<BoxShadow> cardShadow(BuildContext c) {
-    return const [];
+    final dark = isDark(c);
+    return [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: dark ? 0.28 : 0.06),
+        blurRadius: dark ? 22 : 18,
+        offset: const Offset(0, 8),
+      ),
+      BoxShadow(
+        color: Colors.black.withValues(alpha: dark ? 0.12 : 0.03),
+        blurRadius: 4,
+        offset: const Offset(0, 1),
+      ),
+    ];
+  }
+
+  static List<BoxShadow> subtleShadow(BuildContext c) {
+    final dark = isDark(c);
+    return [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: dark ? 0.20 : 0.04),
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+    ];
   }
 }
 
@@ -107,7 +148,7 @@ class FocusColors {
 
   static LinearGradient createGradient(Color color) {
     return LinearGradient(
-      colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+      colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
@@ -117,7 +158,7 @@ class FocusColors {
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [primary, secondary.withOpacity(0.8)],
+      colors: [primary, secondary.withValues(alpha: 0.8)],
     );
   }
 }
@@ -311,31 +352,31 @@ class AppTypography {
       FocusTypography.button(context, color: color);
 }
 
-  class FocuslaneUI {
-    static const double borderW = FocuslaneTokens.borderW;
-    static const double dividerW = FocuslaneTokens.dividerW;
-    static const double radius = FocuslaneTokens.radius16;
-    static const EdgeInsets pagePaddingCompact =
+class FocuslaneUI {
+  static const double borderW = FocuslaneTokens.borderW;
+  static const double dividerW = FocuslaneTokens.dividerW;
+  static const double radius = FocuslaneTokens.radius16;
+  static const EdgeInsets pagePaddingCompact =
       FocuslaneTokens.pagePaddingCompact;
-    static const EdgeInsets cardPaddingCompact =
+  static const EdgeInsets cardPaddingCompact =
       FocuslaneTokens.cardPaddingCompact;
 
-    static bool isDark(BuildContext c) => FocuslaneTokens.isDark(c);
-    static Color borderColor(BuildContext c) => FocuslaneTokens.borderColor(c);
-    static Color dividerColor(BuildContext c) => FocuslaneTokens.dividerColor(c);
+  static bool isDark(BuildContext c) => FocuslaneTokens.isDark(c);
+  static Color borderColor(BuildContext c) => FocuslaneTokens.borderColor(c);
+  static Color dividerColor(BuildContext c) => FocuslaneTokens.dividerColor(c);
 
-    static const Color pastelTeal = FocuslaneTokens.pastelTeal;
-    static const Color pastelTealClaro = FocuslaneTokens.pastelTealClaro;
-    static const Color pastelTealSuavizado = FocuslaneTokens.pastelTealSuavizado;
-    static const Color pastelTealClaroSuavizado =
+  static const Color pastelTeal = FocuslaneTokens.pastelTeal;
+  static const Color pastelTealClaro = FocuslaneTokens.pastelTealClaro;
+  static const Color pastelTealSuavizado = FocuslaneTokens.pastelTealSuavizado;
+  static const Color pastelTealClaroSuavizado =
       FocuslaneTokens.pastelTealClaroSuavizado;
 
-    static Color accent(BuildContext c) => FocuslaneTokens.accent(c);
-    static Color accent2(BuildContext c) => FocuslaneTokens.accent2(c);
+  static Color accent(BuildContext c) => FocuslaneTokens.accent(c);
+  static Color accent2(BuildContext c) => FocuslaneTokens.accent2(c);
 
-    static LinearGradient primaryGradient(BuildContext c) =>
+  static LinearGradient primaryGradient(BuildContext c) =>
       FocuslaneTokens.primaryGradient(c);
 
-    static Color accentSurface(BuildContext c, {double opacity = 0.14}) =>
+  static Color accentSurface(BuildContext c, {double opacity = 0.14}) =>
       FocuslaneTokens.accentSurface(c, opacity: opacity);
-  }
+}

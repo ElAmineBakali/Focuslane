@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'package:focuslane/core/auth/auth_gate.dart';
 import 'package:focuslane/navigation/app_routes.dart';
@@ -52,19 +52,22 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
   return {
     AppRoutes.login: (_) => const LoginScreen(),
     AppRoutes.register: (_) => const RegisterScreen(),
-    AppRoutes.home: (_) => AuthGate(
-      authenticated: const HomeScreen(),
-      unauthenticated: const LoginScreen(),
-    ),
-    '/settings': (_) => SettingsScreen(
-      currentThemeMode: deps.themeMode(),
-      onThemeModeChanged: deps.onThemeModeChanged,
-    ),
-    AppRoutes.notifications: (_) => GlobalNotificationsScreen(
-      foodService: deps.foodService(),
-      studyService: deps.studyService(),
-    ),
-    '/modules': (_) => const ModulesScreen(),
+    AppRoutes.home:
+        (_) => AuthGate(
+          authenticated: const HomeScreen(),
+          unauthenticated: const LoginScreen(),
+        ),
+    AppRoutes.settings:
+        (_) => SettingsScreen(
+          currentThemeMode: deps.themeMode(),
+          onThemeModeChanged: deps.onThemeModeChanged,
+        ),
+    AppRoutes.notifications:
+        (_) => GlobalNotificationsScreen(
+          foodService: deps.foodService(),
+          studyService: deps.studyService(),
+        ),
+    AppRoutes.modules: (_) => const ModulesScreen(),
     AppRoutes.tasksDashboard: (_) => const TasksMainScreen(),
     '/tasks/create': (_) => const TaskCreateScreen(),
     '/tasks/detail': (ctx) {
@@ -82,7 +85,7 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
       }
       return const NoteEditorScreen();
     },
-    '/habits': (_) => const HabitsTableScreen(),
+    AppRoutes.habitsDashboard: (_) => const HabitsTableScreen(),
     '/habits/create': (_) => const HabitCreateScreen(),
     '/habit-create': (_) => const HabitCreateScreen(),
     '/habits/detail': (ctx) {
@@ -128,5 +131,3 @@ Map<String, WidgetBuilder> buildAppRoutes(AppRouterDependencies deps) {
     ...financeRoutes,
   };
 }
-
-

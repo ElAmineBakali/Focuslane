@@ -26,7 +26,7 @@ class FocusModuleHeader extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(48);
+  Size get preferredSize => const Size.fromHeight(56);
 
   static Widget buildLeading(
     BuildContext context, {
@@ -35,11 +35,11 @@ class FocusModuleHeader extends StatelessWidget implements PreferredSizeWidget {
     VoidCallback? onBack,
     String? backRouteName,
   }) {
-    final label =
-        mode == FocusModuleLeadingMode.exitModule ? 'Salir' : 'Panel';
-    final icon = mode == FocusModuleLeadingMode.exitModule
-        ? Icons.close
-        : Icons.arrow_back_rounded;
+    final label = mode == FocusModuleLeadingMode.exitModule ? 'Salir' : 'Panel';
+    final icon =
+        mode == FocusModuleLeadingMode.exitModule
+            ? Icons.close
+            : Icons.arrow_back_rounded;
 
     return TextButton.icon(
       onPressed: () {
@@ -56,10 +56,9 @@ class FocusModuleHeader extends StatelessWidget implements PreferredSizeWidget {
           return;
         }
         if (backRouteName != null) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            backRouteName,
-            (route) => route.isFirst,
-          );
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil(backRouteName, (route) => route.isFirst);
           return;
         }
         Navigator.of(context).maybePop();

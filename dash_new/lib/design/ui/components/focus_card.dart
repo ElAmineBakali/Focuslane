@@ -10,27 +10,34 @@ class FocusCard extends StatelessWidget {
   final Color? backgroundColor;
   final BorderRadiusGeometry? borderRadius;
   final BorderSide? borderSide;
+  final bool elevated;
+  final Clip clipBehavior;
 
   const FocusCard({
     super.key,
     required this.child,
-    this.padding = FocuslaneTokens.cardPaddingCompact,
+    this.padding = FocuslaneTokens.cardPadding,
     this.onTap,
     this.maxHeight,
     this.maxWidth,
     this.backgroundColor,
     this.borderRadius,
     this.borderSide,
+    this.elevated = true,
+    this.clipBehavior = Clip.antiAlias,
   });
 
   @override
   Widget build(BuildContext context) {
-    final br = borderRadius ??
-        BorderRadius.circular(FocuslaneTokens.radius16);
+    final br = borderRadius ?? BorderRadius.circular(FocuslaneTokens.radius12);
+    final materialRadius =
+        br is BorderRadius
+            ? br
+            : BorderRadius.circular(FocuslaneTokens.radius12);
     final side =
         borderSide ??
         BorderSide(
-          color: FocuslaneTokens.borderColor(context),
+          color: Theme.of(context).colorScheme.outlineVariant,
           width: FocuslaneTokens.borderW,
         );
     final bg = backgroundColor ?? FocuslaneTokens.surfaceColor(context);
@@ -40,18 +47,16 @@ class FocusCard extends StatelessWidget {
         color: bg,
         borderRadius: br,
         border: Border.fromBorderSide(side),
+        boxShadow: elevated ? FocuslaneTokens.cardShadow(context) : null,
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: br as BorderRadius?,
-        clipBehavior: Clip.antiAlias,
+        borderRadius: materialRadius,
+        clipBehavior: clipBehavior,
         child: InkWell(
           onTap: onTap,
-          borderRadius: br as BorderRadius?,
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
+          borderRadius: materialRadius,
+          child: Padding(padding: padding, child: child),
         ),
       ),
     );

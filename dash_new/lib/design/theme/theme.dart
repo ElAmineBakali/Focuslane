@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
-import '../ui/tokens/focuslane_tokens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../ui/tokens/focuslane_semantic_tokens.dart';
+import '../ui/tokens/focuslane_tokens.dart';
 
 enum ThemePreset { ocean, forest, sunset, orchid, tealCarbon, graphite }
 
@@ -9,6 +11,7 @@ class AppTheme {
   static ThemeData darkTheme = _buildDark(ThemePreset.ocean);
 
   static List<ThemePreset> get presets => ThemePreset.values;
+
   static String presetLabel(ThemePreset p) {
     switch (p) {
       case ThemePreset.ocean:
@@ -29,141 +32,140 @@ class AppTheme {
   static ThemeData getLight(ThemePreset p) => _buildLight(p);
   static ThemeData getDark(ThemePreset p) => _buildDark(p);
 
-  static Color _seed(ThemePreset p) {
-    switch (p) {
-      case ThemePreset.ocean:
-        return const Color(0xFF2563EB);
-      case ThemePreset.forest:
-        return const Color(0xFF2E7D32);
-      case ThemePreset.sunset:
-        return const Color(0xFFF97316);
-      case ThemePreset.orchid:
-        return const Color(0xFF7C3AED);
-      case ThemePreset.tealCarbon:
-        return const Color(0xFF0EA5A4);
-      case ThemePreset.graphite:
-        return const Color(0xFF3F3F46);
-    }
-  }
-
   static ThemeData _buildLight(ThemePreset p) {
+    assert(p.index >= 0);
     final scheme = FocuslaneSemanticTokens.lightScheme();
-    return ThemeData(
-      useMaterial3: true,
+    final textTheme = GoogleFonts.interTextTheme().apply(
+      bodyColor: scheme.onSurface,
+      displayColor: scheme.onSurface,
+    );
+    return _buildBase(
       brightness: Brightness.light,
-      colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.surface,
-      appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
-        elevation: 0,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: scheme.primary,
-          foregroundColor: scheme.onPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: scheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
-          borderSide: BorderSide(
-            color: FocuslaneTokens.borderColorFromScheme(scheme),
-            width: FocuslaneTokens.borderW,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
-          borderSide: BorderSide(
-            color: FocuslaneTokens.borderColorFromScheme(scheme),
-            width: FocuslaneTokens.borderW,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
-          borderSide: BorderSide(
-            color: scheme.primary,
-            width: FocuslaneTokens.borderW,
-          ),
-        ),
-        hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
-      ),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
-          side: BorderSide(
-            color: FocuslaneTokens.borderColorFromScheme(scheme),
-            width: FocuslaneTokens.borderW,
-          ),
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        selectedColor: scheme.secondaryContainer,
-        labelStyle: TextStyle(color: scheme.onSecondaryContainer),
-      ),
-      sliderTheme: const SliderThemeData(
-        showValueIndicator: ShowValueIndicator.onDrag,
-      ),
+      scheme: scheme,
+      textTheme: textTheme,
     );
   }
 
   static ThemeData _buildDark(ThemePreset p) {
+    assert(p.index >= 0);
     final scheme = FocuslaneSemanticTokens.darkScheme();
+    final textTheme = GoogleFonts.interTextTheme(
+      ThemeData.dark().textTheme,
+    ).apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
+    return _buildBase(
+      brightness: Brightness.dark,
+      scheme: scheme,
+      textTheme: textTheme,
+    );
+  }
+
+  static ThemeData _buildBase({
+    required Brightness brightness,
+    required ColorScheme scheme,
+    required TextTheme textTheme,
+  }) {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: brightness,
       colorScheme: scheme,
+      textTheme: textTheme,
       scaffoldBackgroundColor: scheme.surface,
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
+        backgroundColor: scheme.surface.withValues(alpha: 0.92),
         foregroundColor: scheme.onSurface,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: textTheme.titleMedium?.copyWith(
+          color: scheme.onSurface,
+          fontWeight: FontWeight.w700,
+        ),
+        iconTheme: IconThemeData(color: scheme.onSurfaceVariant),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          minimumSize: const Size(0, 44),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
+          ),
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          minimumSize: const Size(0, 44),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
+          ),
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          minimumSize: const Size(0, 44),
+          side: BorderSide(color: scheme.outlineVariant),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
+          ),
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.primary,
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerHighest,
+        fillColor: scheme.surfaceContainerLowest,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
           borderSide: BorderSide(
             color: FocuslaneTokens.borderColorFromScheme(scheme),
             width: FocuslaneTokens.borderW,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
           borderSide: BorderSide(
             color: FocuslaneTokens.borderColorFromScheme(scheme),
             width: FocuslaneTokens.borderW,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
           borderSide: BorderSide(
             color: scheme.primary,
             width: FocuslaneTokens.borderW,
           ),
         ),
-        hintStyle: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+        labelStyle: TextStyle(color: scheme.onSurfaceVariant),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
+        color: scheme.surfaceContainerLowest,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
+          borderRadius: BorderRadius.circular(FocuslaneTokens.radius12),
           side: BorderSide(
             color: FocuslaneTokens.borderColorFromScheme(scheme),
             width: FocuslaneTokens.borderW,
@@ -172,12 +174,18 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         selectedColor: scheme.secondaryContainer,
+        backgroundColor: scheme.surfaceContainerLow,
+        side: BorderSide(color: scheme.outlineVariant),
         labelStyle: TextStyle(color: scheme.onSecondaryContainer),
+      ),
+      dividerTheme: DividerThemeData(
+        color: scheme.outlineVariant.withValues(alpha: 0.7),
+        thickness: FocuslaneTokens.dividerW,
       ),
       sliderTheme: const SliderThemeData(
         showValueIndicator: ShowValueIndicator.onDrag,
       ),
+      visualDensity: VisualDensity.standard,
     );
   }
 }
-
