@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
@@ -9,7 +9,12 @@ import 'recipe_edit_screen.dart';
 
 class RecipesListScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const RecipesListScreen({super.key, required this.svc});
+  final bool embedded;
+  const RecipesListScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   State<RecipesListScreen> createState() => _RecipesListScreenState();
@@ -22,23 +27,26 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Recetas',
-        subtitle: 'Catálogo',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, size: 18),
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RecipeEditScreen(svc: widget.svc),
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Recetas',
+                subtitle: 'Catálogo',
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.add, size: 18),
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RecipeEditScreen(svc: widget.svc),
+                          ),
+                        ),
+                    tooltip: 'Añadir receta',
                   ),
-                ),
-            tooltip: 'Añadir receta',
-          ),
-        ],
-      ),
+                ],
+              ),
       body: Column(
         children: [
           Container(
@@ -118,14 +126,15 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // En PC: 6 columnas, tablet: 4, móvil: 2
-        final crossAxisCount = constraints.maxWidth >= 1200
-            ? 6
-            : constraints.maxWidth >= 900
+        final crossAxisCount =
+            constraints.maxWidth >= 1200
+                ? 6
+                : constraints.maxWidth >= 900
                 ? 5
                 : constraints.maxWidth >= 600
-                    ? 4
-                    : 2;
-        
+                ? 4
+                : 2;
+
         return GridView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -138,17 +147,22 @@ class _RecipesListScreenState extends State<RecipesListScreen> {
           itemBuilder: (context, index) {
             final recipe = recipes[index];
             return _RecipeGridCard(
-              recipe: recipe,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RecipeEditScreen(
-                    svc: widget.svc,
-                    initial: recipe,
-                  ),
-                ),
-              ),
-            ).animate().fadeIn(delay: (50 + index * 30).ms).scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
+                  recipe: recipe,
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => RecipeEditScreen(
+                                svc: widget.svc,
+                                initial: recipe,
+                              ),
+                        ),
+                      ),
+                )
+                .animate()
+                .fadeIn(delay: (50 + index * 30).ms)
+                .scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
           },
         );
       },
@@ -226,5 +240,3 @@ class _RecipeGridCard extends StatelessWidget {
     );
   }
 }
-
-

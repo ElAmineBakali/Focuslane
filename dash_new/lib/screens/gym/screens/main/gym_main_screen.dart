@@ -31,7 +31,11 @@ class _GymMainScreenState extends State<GymMainScreen> {
 
   List<Widget> _screens() {
     return [
-      GymDashboardScreen(svc: widget.svc, embedded: true),
+      GymDashboardScreen(
+        svc: widget.svc,
+        embedded: true,
+        onOpenSection: _selectIndex,
+      ),
       RoutinesListScreen(svc: widget.svc, embedded: true),
       PresetRoutinesScreen(svc: widget.svc, embedded: true),
       GymAnalyticsScreen(svc: widget.svc, embedded: true),

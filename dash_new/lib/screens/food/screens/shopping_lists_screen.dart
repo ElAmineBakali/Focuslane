@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
@@ -9,7 +9,12 @@ import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 
 class ShoppingListsScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const ShoppingListsScreen({super.key, required this.svc});
+  final bool embedded;
+  const ShoppingListsScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   State<ShoppingListsScreen> createState() => _ShoppingListsScreenState();
@@ -19,17 +24,20 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Listas de compra',
-        subtitle: 'Listas activas',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, size: 18),
-            tooltip: 'Nueva lista',
-            onPressed: _createNewList,
-          ),
-        ],
-      ),
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Listas de compra',
+                subtitle: 'Listas activas',
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.add, size: 18),
+                    tooltip: 'Nueva lista',
+                    onPressed: _createNewList,
+                  ),
+                ],
+              ),
       body: _buildActiveListsTab(),
       floatingActionButton: Theme(
         data: Theme.of(context).copyWith(
@@ -160,7 +168,9 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
                                   : FocuslaneUI.borderColor(context),
                           width: FocuslaneUI.borderW,
                         ),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                         color: colorScheme.surfaceContainerHighest,
                       ),
                       child: Column(
@@ -307,7 +317,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
       builder:
           (context) => AlertDialog(
             title: const Text('Eliminar lista'),
-            content: Text('Â¿Seguro que quieres eliminar "${list.name}"?'),
+            content: Text('¿Seguro que quieres eliminar "${list.name}"?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -366,7 +376,7 @@ class _ShoppingListTile extends StatelessWidget {
     );
     final purchased = list.items.where((i) => i.checked).length;
     final subtitle =
-        '${list.items.length} productos â€¢ ${_getScopeLabel(list.scope)} â€¢ $purchased/${list.items.length} comprados${total > 0 ? ' â€¢ â‚¬${total.toStringAsFixed(2)}' : ''}';
+        '${list.items.length} productos - ${_getScopeLabel(list.scope)} - $purchased/${list.items.length} comprados${total > 0 ? ' - €${total.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -417,11 +427,7 @@ class _ShoppingListTile extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: colorScheme.error,
-                      ),
+                      Icon(Icons.delete, size: 20, color: colorScheme.error),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         'Eliminar',
@@ -449,4 +455,3 @@ class _ShoppingListTile extends StatelessWidget {
     }
   }
 }
-

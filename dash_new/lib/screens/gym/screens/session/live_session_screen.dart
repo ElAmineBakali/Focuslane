@@ -1,9 +1,8 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
-import 'package:focuslane/navigation/app_routes.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+
 import 'package:focuslane/core/notifications/local/android_channel_catalog.dart';
 import 'package:focuslane/core/notifications/models/notification_action.dart';
 import 'package:focuslane/core/notifications/models/notification_content.dart';
@@ -12,21 +11,24 @@ import 'package:focuslane/core/notifications/models/notification_entity_ref.dart
 import 'package:focuslane/core/notifications/models/notification_intent.dart';
 import 'package:focuslane/core/notifications/models/notification_schedule.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
+
 import 'session_summary_screen.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class LiveSessionScreen extends StatefulWidget {
-  final GymFirestoreService svc;
-  final Routine routine;
-  final RoutineDay day;
-
   const LiveSessionScreen({
     super.key,
     required this.svc,
     required this.routine,
     required this.day,
   });
+
+  final GymFirestoreService svc;
+  final Routine routine;
+  final RoutineDay day;
 
   @override
   State<LiveSessionScreen> createState() => _LiveSessionScreenState();
@@ -39,8 +41,8 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   final _notesCtrl = TextEditingController();
   late final DateTime _startAt;
 
-  String _restNotificationId(String exName) =>
-      'ntf_gym_rest_${widget.routine.id}_${widget.day.id}_$exName';
+  String _restNotificationId(String exerciseName) =>
+      'ntf_gym_rest_${widget.routine.id}_${widget.day.id}_$exerciseName';
 
   @override
   void initState() {
@@ -50,20 +52,20 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
   @override
   void dispose() {
-    for (final t in _timers.values) {
-      t?.cancel();
+    for (final timer in _timers.values) {
+      timer?.cancel();
     }
     _notesCtrl.dispose();
     super.dispose();
   }
 
-  void _startRest(String exName, int seconds) async {
+  Future<void> _startRest(String exerciseName, int seconds) async {
     await NotificationsFacade.I.cancelByNotificationId(
-      _restNotificationId(exName),
+      _restNotificationId(exerciseName),
     );
 
-    _timers[exName]?.cancel();
-    setState(() => _restLeft[exName] = seconds);
+    _timers[exerciseName]?.cancel();
+    setState(() => _restLeft[exerciseName] = seconds);
 
     final when = DateTime.now().add(Duration(seconds: seconds));
     final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'local';
@@ -74,9 +76,9 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
         entity: NotificationEntityRef(
           module: NotificationModule.gym,
           kind: 'rest_timer',
-          id: '${widget.routine.id}_${widget.day.id}_$exName',
+          id: '${widget.routine.id}_${widget.day.id}_$exerciseName',
         ),
-        content: NotificationContent(
+        content: const NotificationContent(
           title: 'Descanso terminado',
           body: 'Vuelve al ejercicio',
         ),
@@ -94,220 +96,87 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
           channel: AndroidChannelCatalog.gymReminders,
           priority: NotificationPriority.high,
         ),
-        dedupeKey: 'gym:rest:${widget.routine.id}:${widget.day.id}:$exName',
+        dedupeKey:
+            'gym:rest:${widget.routine.id}:${widget.day.id}:$exerciseName',
         userId: uid,
         source: 'gym.live_session',
-        notificationId: _restNotificationId(exName),
+        notificationId: _restNotificationId(exerciseName),
       ),
     );
 
-    _timers[exName] = Timer.periodic(const Duration(seconds: 1), (t) {
-      final left = (_restLeft[exName] ?? 0) - 1;
+    _timers[exerciseName] = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final left = (_restLeft[exerciseName] ?? 0) - 1;
       if (left <= 0) {
-        t.cancel();
-        setState(() => _restLeft[exName] = 0);
+        timer.cancel();
+        setState(() => _restLeft[exerciseName] = 0);
       } else {
-        setState(() => _restLeft[exName] = left);
+        setState(() => _restLeft[exerciseName] = left);
       }
     });
   }
 
-  void _stopRest(String exName) async {
-    _timers[exName]?.cancel();
-    setState(() => _restLeft[exName] = 0);
+  Future<void> _stopRest(String exerciseName) async {
+    _timers[exerciseName]?.cancel();
+    setState(() => _restLeft[exerciseName] = 0);
     await NotificationsFacade.I.cancelByNotificationId(
-      _restNotificationId(exName),
+      _restNotificationId(exerciseName),
     );
   }
 
-  Future<void> _addSetDialog(String exName) async {
-    final s = Theme.of(context).colorScheme;
+  Future<void> _addSetDialog(String exerciseName) async {
     final last =
-        (_performed[exName] ?? []).isNotEmpty ? _performed[exName]!.last : null;
-    final wCtrl = TextEditingController(
-      text: last?.weight.toStringAsFixed(1) ?? '',
+        (_performed[exerciseName] ?? []).isNotEmpty
+            ? _performed[exerciseName]!.last
+            : null;
+    final weightCtrl = TextEditingController(
+      text: last == null ? '' : last.weight.toStringAsFixed(1),
     );
-    final rCtrl = TextEditingController(text: last?.reps.toString() ?? '');
-    final rpeCtrl = TextEditingController(text: last?.rpe?.toString() ?? '');
+    final repsCtrl = TextEditingController(
+      text: last == null ? '' : last.reps.toString(),
+    );
+    final rpeCtrl = TextEditingController(
+      text: last?.rpe == null ? '' : last!.rpe!.toStringAsFixed(1),
+    );
 
-    final ok = await showDialog<bool>(
+    final result = await showDialog<SessionSet>(
       context: context,
       builder:
-          (_) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+          (dialogContext) => _SetDialog(
+            exerciseName: exerciseName,
+            weightCtrl: weightCtrl,
+            repsCtrl: repsCtrl,
+            rpeCtrl: rpeCtrl,
+            color: _routineTone(
+              widget.routine,
+              Theme.of(context).colorScheme.primary,
             ),
-            title: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: widget.routine.color.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.add_circle_rounded,
-                    color: widget.routine.color,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Nueva serie',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        exName,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: s.onSurfaceVariant,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: wCtrl,
-                        autofocus: true,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          labelText: 'Peso',
-                          suffixText: 'kg',
-                          prefixIcon: const Icon(Icons.fitness_center_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          filled: true,
-                          fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: rCtrl,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          labelText: 'Reps',
-                          prefixIcon: const Icon(Icons.repeat_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          filled: true,
-                          fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: rpeCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'RPE (opcional)',
-                    hintText: '1-10',
-                    prefixIcon: const Icon(Icons.trending_up_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    filled: true,
-                    fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              OutlinedButton(
-                onPressed: () => Navigator.pop(context, false),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton.icon(
-                onPressed: () => Navigator.pop(context, true),
-                icon: const Icon(Icons.check_rounded),
-                label: const Text('Añadir'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: widget.routine.color,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
           ),
     );
 
-    if (ok == true) {
-      final set = SessionSet(
-        weight: double.tryParse(wCtrl.text) ?? 0,
-        reps: int.tryParse(rCtrl.text) ?? 0,
-        rpe: rpeCtrl.text.trim().isEmpty ? null : double.tryParse(rpeCtrl.text),
-      );
-      setState(() {
-        _performed.putIfAbsent(exName, () => []);
-        _performed[exName]!.add(set);
-      });
-    }
+    if (result == null) return;
+    setState(() {
+      _performed.putIfAbsent(exerciseName, () => []);
+      _performed[exerciseName]!.add(result);
+    });
   }
 
   double _sessionVolume() {
     return _performed.values.fold<double>(
       0,
-      (a, sets) => a + sets.fold<double>(0, (x, s) => x + s.weight * s.reps),
+      (total, sets) =>
+          total +
+          sets.fold<double>(0, (sum, set) => sum + set.weight * set.reps),
     );
   }
 
-  Future<List<String>> _detectPRs(List<PerformedExercise> list) async {
+  Future<List<String>> _detectPRs(List<PerformedExercise> exercises) async {
     final prs = <String>[];
-    for (final e in list) {
-      final bestNow = e.bestE1rm;
+    for (final exercise in exercises) {
+      final bestNow = exercise.bestE1rm;
       if (bestNow == null) continue;
-      final hist = await widget.svc.bestE1rmForExercise(e.name);
-      if (hist == null || bestNow > hist) {
-        prs.add(e.name);
+      final historical = await widget.svc.bestE1rmForExercise(exercise.name);
+      if (historical == null || bestNow > historical) {
+        prs.add(exercise.name);
       }
     }
     return prs;
@@ -315,12 +184,12 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
   Future<void> _saveSession() async {
     final exercises =
-        _performed.entries.map((kv) {
-          return PerformedExercise(name: kv.key, sets: kv.value);
-        }).toList();
-
+        _performed.entries
+            .map(
+              (entry) => PerformedExercise(name: entry.key, sets: entry.value),
+            )
+            .toList();
     final prs = await _detectPRs(exercises);
-
     final minutes = DateTime.now().difference(_startAt).inMinutes;
 
     final doc = SessionDoc(
@@ -351,649 +220,836 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final svc = widget.svc;
-    final s = Theme.of(context).colorScheme;
+    final tone = _routineTone(
+      widget.routine,
+      Theme.of(context).colorScheme.primary,
+    );
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(
-            floating: false,
-            pinned: true,
-            expandedHeight: 160,
-            leading: FocusModuleHeader.buildLeading(
-              context,
-              mode: FocusModuleLeadingMode.backToModuleDashboard,
-              backRouteName: AppRoutes.gymDashboard,
-            ),
-            leadingWidth: 96,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(
-                left: 16,
-                bottom: 16,
-                right: 16,
+    return AppShell(
+      title: widget.day.name,
+      subtitle: '${widget.routine.name} - sesión activa',
+      activeRoute: AppRoutes.gymDashboard,
+      actions: [
+        FocusIconButton(
+          icon: Icons.check_rounded,
+          tooltip: 'Finalizar sesión',
+          onPressed: _saveSession,
+        ),
+        const SizedBox(width: 10),
+      ],
+      child: StreamBuilder<List<RoutineExercise>>(
+        stream: widget.svc.streamDayExercises(widget.routine.id, widget.day.id),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return PageContainer(
+              child: FocusEmptyState(
+                icon: Icons.error_outline_rounded,
+                message: 'No se pudo cargar la sesión',
+                subtitle: '${snapshot.error}',
               ),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+            );
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final exercises = snapshot.data ?? const <RoutineExercise>[];
+          final activeExercise = _activeExercise(exercises);
+          final totalTargetSets = exercises.fold<int>(
+            0,
+            (sum, exercise) => sum + exercise.targetSets,
+          );
+          final completedSets = _performed.values.fold<int>(
+            0,
+            (sum, sets) => sum + sets.length,
+          );
+          final activeRest = _activeRest();
+
+          return SingleChildScrollView(
+            child: PageContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Flexible(
-                    child: Text(
-                      widget.day.name,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 20,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  _SessionHero(
+                    routine: widget.routine,
+                    day: widget.day,
+                    activeExercise: activeExercise,
+                    completedSets: completedSets,
+                    totalTargetSets: totalTargetSets,
+                    volume: _sessionVolume(),
+                    color: tone,
+                    onFinish: _saveSession,
                   ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
+                  if (activeRest != null) ...[
+                    const SizedBox(height: 16),
+                    _RestFocusCard(
+                      exerciseName: activeRest.exerciseName,
+                      secondsLeft: activeRest.seconds,
+                      color: tone,
+                      onStop: () => _stopRest(activeRest.exerciseName),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.4),
-                        width: 1,
+                  ],
+                  const SizedBox(height: 16),
+                  if (exercises.isEmpty)
+                    FocusCard(
+                      child: FocusEmptyState(
+                        icon: Icons.fitness_center_rounded,
+                        message: 'Sin ejercicios',
+                        subtitle:
+                            'Añade ejercicios en el detalle de la rutina antes de iniciar una sesión completa.',
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    )
+                  else
+                    Column(
                       children: [
-                        const Icon(
-                          Icons.play_circle_filled_rounded,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'En vivo',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                        for (var i = 0; i < exercises.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: _ExerciseSessionCard(
+                              exercise: exercises[i],
+                              index: i,
+                              color: tone,
+                              sets: _performed[exercises[i].name] ?? const [],
+                              restLeft: _restLeft[exercises[i].name] ?? 0,
+                              onAddSet: () => _addSetDialog(exercises[i].name),
+                              onStartRest:
+                                  () => _startRest(
+                                    exercises[i].name,
+                                    exercises[i].restSec ??
+                                        widget.routine.restSecDefault,
+                                  ),
+                              onStopRest: () => _stopRest(exercises[i].name),
+                              onCopySet:
+                                  (set) => _copySet(exercises[i].name, set),
+                              onDeleteSet:
+                                  (setIndex) =>
+                                      _deleteSet(exercises[i].name, setIndex),
+                              onDeleteExercise:
+                                  () => _deleteExercise(context, exercises[i]),
+                            ),
                           ),
+                        FocusCard(
+                          child: FocusTextField(
+                            label: 'Notas de la sesión',
+                            hint: 'Sensaciones, ajustes o recordatorios',
+                            controller: _notesCtrl,
+                            prefixIcon: Icons.note_rounded,
+                            maxLines: 3,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        FocusPrimaryButton(
+                          label: 'Finalizar sesión',
+                          icon: Icons.check_rounded,
+                          fullWidth: true,
+                          color: tone,
+                          onPressed: _saveSession,
                         ),
                       ],
                     ),
-                  ),
                 ],
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      widget.routine.color,
-                      widget.routine.color.withOpacity(0.7),
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: -40,
-                      top: -40,
-                      child: Icon(
-                        Icons.fitness_center_rounded,
-                        size: 160,
-                        color: Colors.white.withOpacity(0.08),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  RoutineExercise? _activeExercise(List<RoutineExercise> exercises) {
+    for (final exercise in exercises) {
+      final done = _performed[exercise.name]?.length ?? 0;
+      if (done < exercise.targetSets) return exercise;
+    }
+    return exercises.isEmpty ? null : exercises.last;
+  }
+
+  ({String exerciseName, int seconds})? _activeRest() {
+    for (final entry in _restLeft.entries) {
+      if (entry.value > 0)
+        return (exerciseName: entry.key, seconds: entry.value);
+    }
+    return null;
+  }
+
+  void _copySet(String exerciseName, SessionSet set) {
+    setState(() {
+      _performed.putIfAbsent(exerciseName, () => []);
+      _performed[exerciseName]!.add(
+        SessionSet(weight: set.weight, reps: set.reps, rpe: set.rpe),
+      );
+    });
+  }
+
+  void _deleteSet(String exerciseName, int index) {
+    setState(() {
+      final sets = _performed[exerciseName];
+      if (sets == null || index < 0 || index >= sets.length) return;
+      sets.removeAt(index);
+    });
+  }
+
+  Future<void> _deleteExercise(
+    BuildContext context,
+    RoutineExercise exercise,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('Eliminar ejercicio'),
+            content: Text('¿Eliminar "${exercise.name}" de este día?'),
             actions: [
-              Container(
-                margin: const EdgeInsets.only(right: 8),
-                child: FilledButton.icon(
-                  onPressed: _saveSession,
-                  icon: const Icon(Icons.check_rounded, size: 20),
-                  label: const Text('Guardar'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: widget.routine.color,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
+                child: const Text('Eliminar'),
               ),
             ],
           ),
-          SliverToBoxAdapter(
-            child: StreamBuilder<List<RoutineExercise>>(
-              stream: svc.streamDayExercises(widget.routine.id, widget.day.id),
-              builder: (context, snap) {
-                if (!snap.hasData) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                final exs = snap.data!;
-                if (exs.isEmpty) {
-                  return Container(
-                    margin: const EdgeInsets.all(20),
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: s.surfaceContainerHighest.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.fitness_center_rounded,
-                          size: 64,
-                          color: s.primary.withOpacity(0.3),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Sin ejercicios',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: s.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Añade ejercicios a este día para empezar',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: s.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return Column(
-                  children: [
-                    for (int i = 0; i < exs.length; i++)
-                      _exerciseCard(exs[i], i)
-                          .animate()
-                          .fadeIn(delay: (50 * i).ms, duration: 400.ms)
-                          .slideY(begin: 0.2, end: 0),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: _notesCtrl,
-                        maxLines: 3,
-                        style: const TextStyle(fontSize: 16),
-                        decoration: InputDecoration(
-                          labelText: 'Notas de la sesión',
-                          hintText: 'Cómo te sentiste, observaciones...',
-                          prefixIcon: const Icon(Icons.note_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          filled: true,
-                          fillColor: s.surfaceContainerHighest.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 100),
-                  ],
-                );
-              },
+    );
+
+    if (confirmed != true) return;
+    await widget.svc.deleteRoutineExercise(
+      widget.routine.id,
+      widget.day.id,
+      exercise.id,
+    );
+    setState(() {
+      _performed.remove(exercise.name);
+      _restLeft.remove(exercise.name);
+    });
+    await NotificationsFacade.I.cancelByNotificationId(
+      _restNotificationId(exercise.name),
+    );
+    if (context.mounted) {
+      FocusFeedback.showSuccess(context, 'Ejercicio eliminado');
+    }
+  }
+}
+
+class _SessionHero extends StatelessWidget {
+  const _SessionHero({
+    required this.routine,
+    required this.day,
+    required this.activeExercise,
+    required this.completedSets,
+    required this.totalTargetSets,
+    required this.volume,
+    required this.color,
+    required this.onFinish,
+  });
+
+  final Routine routine;
+  final RoutineDay day;
+  final RoutineExercise? activeExercise;
+  final int completedSets;
+  final int totalTargetSets;
+  final double volume;
+  final Color color;
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final progress =
+        totalTargetSets == 0
+            ? 0.0
+            : (completedSets / totalTargetSets).clamp(0.0, 1.0);
+
+    return FocusCard(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 760;
+          final copy = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FocusBadge(label: 'Sesión activa', color: color),
+              const SizedBox(height: 12),
+              Text(
+                day.name,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                activeExercise == null
+                    ? routine.name
+                    : 'Ejercicio actual: ${activeExercise!.name}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FocusBadge(
+                    label: '$completedSets/$totalTargetSets series',
+                    color: scheme.secondary,
+                  ),
+                  FocusBadge(
+                    label: _volumeLabel(volume),
+                    color: scheme.tertiary,
+                  ),
+                  FocusBadge(
+                    label: '${routine.restSecDefault}s descanso base',
+                    color: color,
+                  ),
+                ],
+              ),
+            ],
+          );
+          final ring = Column(
+            children: [
+              FocusProgressRing(
+                value: progress,
+                size: compact ? 122 : 150,
+                strokeWidth: 11,
+                color: color,
+                label: '${(progress * 100).round()}%',
+                subtitle: 'progreso',
+              ),
+              const SizedBox(height: 12),
+              FocusPrimaryButton(
+                label: 'Finalizar',
+                icon: Icons.check_rounded,
+                color: color,
+                fullWidth: compact,
+                onPressed: onFinish,
+              ),
+            ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [copy, const SizedBox(height: 18), Center(child: ring)],
+            );
+          }
+
+          return Row(
+            children: [Expanded(child: copy), const SizedBox(width: 24), ring],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _RestFocusCard extends StatelessWidget {
+  const _RestFocusCard({
+    required this.exerciseName,
+    required this.secondsLeft,
+    required this.color,
+    required this.onStop,
+  });
+
+  final String exerciseName;
+  final int secondsLeft;
+  final Color color;
+  final VoidCallback onStop;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final minutes = (secondsLeft ~/ 60).toString().padLeft(2, '0');
+    final seconds = (secondsLeft % 60).toString().padLeft(2, '0');
+
+    return FocusCard(
+      backgroundColor: scheme.surfaceContainerLowest,
+      borderSide: BorderSide(color: color.withValues(alpha: 0.28)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Descanso',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            exerciseName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '$minutes:$seconds',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 16),
+          FocusSecondaryButton(
+            label: 'Parar descanso',
+            icon: Icons.stop_rounded,
+            onPressed: onStop,
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _exerciseCard(RoutineExercise e, int index) {
-    final exName = e.name;
-    final sets = _performed[exName] ?? const [];
-    final restLeft = _restLeft[exName] ?? 0;
-    final s = Theme.of(context).colorScheme;
+class _ExerciseSessionCard extends StatelessWidget {
+  const _ExerciseSessionCard({
+    required this.exercise,
+    required this.index,
+    required this.color,
+    required this.sets,
+    required this.restLeft,
+    required this.onAddSet,
+    required this.onStartRest,
+    required this.onStopRest,
+    required this.onCopySet,
+    required this.onDeleteSet,
+    required this.onDeleteExercise,
+  });
 
+  final RoutineExercise exercise;
+  final int index;
+  final Color color;
+  final List<SessionSet> sets;
+  final int restLeft;
+  final VoidCallback onAddSet;
+  final VoidCallback onStartRest;
+  final VoidCallback onStopRest;
+  final ValueChanged<SessionSet> onCopySet;
+  final ValueChanged<int> onDeleteSet;
+  final VoidCallback onDeleteExercise;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final complete = sets.length >= exercise.targetSets;
+    final progress =
+        exercise.targetSets == 0
+            ? 0.0
+            : (sets.length / exercise.targetSets).clamp(0.0, 1.0);
+
+    return FocusCard(
+      borderSide: BorderSide(
+        color: complete ? color.withValues(alpha: 0.40) : scheme.outlineVariant,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    '${index + 1}',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exercise.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      '${exercise.targetSets} series x ${exercise.targetReps} repeticiones',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                tooltip: 'Acciones',
+                onSelected: (value) {
+                  if (value == 'delete') onDeleteExercise();
+                },
+                itemBuilder:
+                    (_) => const [
+                      PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+                    ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          FocusProgressBar(value: progress, color: color),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FocusBadge(
+                label: '${sets.length}/${exercise.targetSets} series',
+                color: color,
+              ),
+              if (exercise.restSec != null)
+                FocusBadge(
+                  label: '${exercise.restSec}s descanso',
+                  color: scheme.secondary,
+                ),
+              if ((exercise.tempo ?? '').isNotEmpty)
+                FocusBadge(
+                  label: 'Tempo ${exercise.tempo}',
+                  color: scheme.tertiary,
+                ),
+              if (exercise.targetRPE != null)
+                FocusBadge(
+                  label: 'RPE ${exercise.targetRPE}',
+                  color: scheme.primary,
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 520;
+              final add = FocusPrimaryButton(
+                label: 'Completar serie',
+                icon: Icons.add_rounded,
+                fullWidth: compact,
+                color: color,
+                onPressed: onAddSet,
+              );
+              final rest = FocusSecondaryButton(
+                label: restLeft > 0 ? '${restLeft}s' : 'Iniciar descanso',
+                icon: Icons.timer_rounded,
+                fullWidth: compact,
+                onPressed: restLeft > 0 ? null : onStartRest,
+              );
+              final stop = FocusSecondaryButton(
+                label: 'Parar',
+                icon: Icons.stop_rounded,
+                fullWidth: compact,
+                onPressed: restLeft > 0 ? onStopRest : null,
+              );
+
+              if (compact) {
+                return Column(
+                  children: [
+                    add,
+                    const SizedBox(height: 10),
+                    rest,
+                    if (restLeft > 0) ...[const SizedBox(height: 10), stop],
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: add),
+                  const SizedBox(width: 10),
+                  Expanded(child: rest),
+                  if (restLeft > 0) ...[
+                    const SizedBox(width: 10),
+                    Expanded(child: stop),
+                  ],
+                ],
+              );
+            },
+          ),
+          if (sets.isEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: scheme.outlineVariant),
+              ),
+              child: Text(
+                'Sin series registradas en este ejercicio.',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 14),
+            Column(
+              children: [
+                for (var i = 0; i < sets.length; i++)
+                  _SetRow(
+                    index: i,
+                    set: sets[i],
+                    color: color,
+                    onCopy: () => onCopySet(sets[i]),
+                    onDelete: () => onDeleteSet(i),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: color.withValues(alpha: 0.22)),
+              ),
+              child: Text(
+                'Volumen: ${sets.fold<double>(0, (sum, set) => sum + set.weight * set.reps).toStringAsFixed(0)} kg',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SetRow extends StatelessWidget {
+  const _SetRow({
+    required this.index,
+    required this.set,
+    required this.color,
+    required this.onCopy,
+    required this.onDelete,
+  });
+
+  final int index;
+  final SessionSet set;
+  final Color color;
+  final VoidCallback onCopy;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [s.surfaceContainerHighest, s.surfaceContainer],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: widget.routine.color.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.13),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '${index + 1}',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${set.weight.toStringAsFixed(1)} kg x ${set.reps} repeticiones',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Text(
+                  'e1RM ${set.e1rm.toStringAsFixed(1)} kg${set.rpe == null ? '' : ' - RPE ${set.rpe}'}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Copiar serie',
+            onPressed: onCopy,
+            icon: const Icon(Icons.content_copy_rounded, size: 20),
+          ),
+          IconButton(
+            tooltip: 'Eliminar serie',
+            onPressed: onDelete,
+            icon: Icon(Icons.delete_rounded, size: 20, color: scheme.error),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    );
+  }
+}
+
+class _SetDialog extends StatelessWidget {
+  const _SetDialog({
+    required this.exerciseName,
+    required this.weightCtrl,
+    required this.repsCtrl,
+    required this.rpeCtrl,
+    required this.color,
+  });
+
+  final String exerciseName;
+  final TextEditingController weightCtrl;
+  final TextEditingController repsCtrl;
+  final TextEditingController rpeCtrl;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return AlertDialog(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Nueva serie',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            exerciseName,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 420,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        widget.routine.color,
-                        widget.routine.color.withOpacity(0.7),
-                      ],
+                Expanded(
+                  child: TextField(
+                    controller: weightCtrl,
+                    autofocus: true,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
                     ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+                    decoration: const InputDecoration(
+                      labelText: 'Peso',
+                      suffixText: 'kg',
+                      prefixIcon: Icon(Icons.monitor_weight_rounded),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        exName,
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: s.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          _buildMetaChip(
-                            '${e.targetSets} x ${e.targetReps}',
-                            Icons.repeat_rounded,
-                            s,
-                          ),
-                          if (e.restSec != null)
-                            _buildMetaChip(
-                              '${e.restSec}s',
-                              Icons.timer_rounded,
-                              s,
-                            ),
-                          if ((e.tempo ?? '').isNotEmpty)
-                            _buildMetaChip(e.tempo!, Icons.speed_rounded, s),
-                        ],
-                      ),
-                    ],
+                  child: TextField(
+                    controller: repsCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Repeticiones',
+                      prefixIcon: Icon(Icons.repeat_rounded),
+                    ),
                   ),
-                ),
-                PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.more_vert_rounded,
-                    color: s.onSurfaceVariant,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  onSelected: (v) async {
-                    if (v == 'del') {
-                      final ok = await showDialog<bool>(
-                        context: context,
-                        builder:
-                            (_) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              title: Text(
-                                'Eliminar ejercicio',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              content: Text('¿Eliminar "$exName" de este día?'),
-                              actions: [
-                                TextButton(
-                                  onPressed:
-                                      () => Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: s.error,
-                                  ),
-                                  child: const Text('Eliminar'),
-                                ),
-                              ],
-                            ),
-                      );
-                      if (ok == true) {
-                        await widget.svc.deleteRoutineExercise(
-                          widget.routine.id,
-                          widget.day.id,
-                          e.id,
-                        );
-                        setState(() {
-                          _performed.remove(exName);
-                          _restLeft.remove(exName);
-                        });
-                        await NotificationsFacade.I.cancelByNotificationId(
-                          _restNotificationId(exName),
-                        );
-                      }
-                    }
-                  },
-                  itemBuilder:
-                      (_) => const [
-                        PopupMenuItem(
-                          value: 'del',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_rounded, size: 20),
-                              SizedBox(width: 12),
-                              Text('Eliminar'),
-                            ],
-                          ),
-                        ),
-                      ],
                 ),
               ],
             ),
-            if (e.targetRPE != null || e.targetPercent1RM != null) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  if (e.targetRPE != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: s.tertiaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'RPE ${e.targetRPE}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: s.onTertiaryContainer,
-                        ),
-                      ),
-                    ),
-                  if (e.targetRPE != null && e.targetPercent1RM != null)
-                    const SizedBox(width: 8),
-                  if (e.targetPercent1RM != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: s.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${e.targetPercent1RM}% 1RM',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: s.onSecondaryContainer,
-                        ),
-                      ),
-                    ),
-                ],
+            const SizedBox(height: 12),
+            TextField(
+              controller: rpeCtrl,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-            ],
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilledButton.icon(
-                  icon: const Icon(Icons.add_rounded, size: 20),
-                  label: const Text('Serie'),
-                  onPressed: () => _addSetDialog(exName),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: widget.routine.color,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                FilledButton.tonalIcon(
-                  icon: Icon(
-                    restLeft > 0 ? Icons.timer_rounded : Icons.timer_outlined,
-                    size: 20,
-                  ),
-                  label: Text(restLeft > 0 ? '${restLeft}s' : 'Descansar'),
-                  onPressed:
-                      restLeft > 0
-                          ? null
-                          : () => _startRest(exName, e.restSec ?? 90),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                if (restLeft > 0)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.stop_rounded, size: 20),
-                    label: const Text('Parar'),
-                    onPressed: () => _stopRest(exName),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-              ],
+              decoration: const InputDecoration(
+                labelText: 'RPE opcional',
+                hintText: '1-10',
+                prefixIcon: Icon(Icons.trending_up_rounded),
+              ),
             ),
-            if (sets.isEmpty) ...[
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  'Añade tu primera serie',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: s.onSurfaceVariant,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            ] else ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: s.surfaceContainerHigh.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    for (int i = 0; i < sets.length; i++)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: s.surface,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: widget.routine.color.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${i + 1}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: widget.routine.color,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${sets[i].weight.toStringAsFixed(1)} kg x ${sets[i].reps} reps',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: s.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'e1RM: ${sets[i].e1rm.toStringAsFixed(1)} kg',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: s.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.content_copy_rounded,
-                                size: 20,
-                              ),
-                              tooltip: 'Copiar',
-                              onPressed: () {
-                                setState(() {
-                                  final set = sets[i];
-                                  _performed.putIfAbsent(exName, () => []);
-                                  _performed[exName]!.add(
-                                    SessionSet(
-                                      weight: set.weight,
-                                      reps: set.reps,
-                                      rpe: set.rpe,
-                                    ),
-                                  );
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete_rounded,
-                                size: 20,
-                                color: s.error,
-                              ),
-                              tooltip: 'Eliminar',
-                              onPressed: () {
-                                setState(() {
-                                  _performed[exName]!.removeAt(i);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: widget.routine.color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: widget.routine.color.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.bar_chart_rounded,
-                      size: 18,
-                      color: widget.routine.color,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Volumen: ${sets.fold<double>(0, (a, s) => a + s.weight * s.reps).toStringAsFixed(0)} kg',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: widget.routine.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton.icon(
+          onPressed: () {
+            final set = SessionSet(
+              weight:
+                  double.tryParse(weightCtrl.text.replaceAll(',', '.')) ?? 0,
+              reps: int.tryParse(repsCtrl.text) ?? 0,
+              rpe:
+                  rpeCtrl.text.trim().isEmpty
+                      ? null
+                      : double.tryParse(rpeCtrl.text.replaceAll(',', '.')),
+            );
+            Navigator.pop(context, set);
+          },
+          style: FilledButton.styleFrom(backgroundColor: color),
+          icon: const Icon(Icons.check_rounded),
+          label: const Text('Guardar'),
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildMetaChip(String label, IconData icon, ColorScheme s) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: s.surfaceContainerHigh.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: s.onSurfaceVariant),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: s.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
+Color _routineTone(Routine routine, Color fallback) {
+  final hex = routine.colorHex;
+  if (hex == null || hex.trim().isEmpty) return fallback;
+  try {
+    var value = hex.replaceAll('#', '').trim();
+    if (value.length == 6) value = 'FF$value';
+    return Color(int.parse(value, radix: 16));
+  } catch (_) {
+    return fallback;
   }
+}
+
+String _volumeLabel(double value) {
+  if (value <= 0) return '0 kg';
+  if (value >= 1000) return '${(value / 1000).toStringAsFixed(1)} ton';
+  return '${value.toStringAsFixed(0)} kg';
 }

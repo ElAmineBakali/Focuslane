@@ -1,414 +1,186 @@
-﻿import 'package:flutter/material.dart';
-import 'package:focuslane/navigation/app_routes.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/material.dart';
+
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
 import 'package:focuslane/design/ui/focuslane_ui.dart';
-import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
+import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/gym/models/gym_models.dart';
-import 'routine_detail_screen.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
+import 'package:focuslane/screens/gym/screens/routines/routine_detail_screen.dart';
+import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 
 class RoutinesListScreen extends StatelessWidget {
-  final GymFirestoreService svc;
-  final bool embedded;
-
   const RoutinesListScreen({
     super.key,
     required this.svc,
     this.embedded = false,
   });
 
+  final GymFirestoreService svc;
+  final bool embedded;
+
   @override
   Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
+    final content = _RoutinesContent(svc: svc);
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          if (!embedded)
-            SliverAppBar.large(
-              floating: true,
-              leading: FocusModuleHeader.buildLeading(
-                context,
-                mode: FocusModuleLeadingMode.backToModuleDashboard,
-                backRouteName: AppRoutes.gymDashboard,
-              ),
-              leadingWidth: 96,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  'Mis rutinas',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
-                ),
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        s.primaryContainer,
-                        s.secondaryContainer.withValues(alpha: 0.8),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (embedded)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
-                child: FocusSectionHeader(
-                  icon: Icons.list_alt_rounded,
-                  title: 'Rutinas',
-                  subtitle: 'Gestiona divisiones, días y descansos.',
-                  trailing: FilledButton.icon(
-                    onPressed: () => _newRoutineSheet(context),
-                    icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Nueva rutina'),
-                  ),
-                ),
-              ),
-            ),
-          SliverToBoxAdapter(
-            child: StreamBuilder<List<Routine>>(
-              stream: svc.streamRoutines(),
-              builder: (context, snap) {
-                if (!snap.hasData) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                final routines = snap.data!;
-                if (routines.isEmpty) {
-                  return SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.fitness_center_rounded,
-                            size: 80,
-                            color: s.primary.withOpacity(0.3),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Sin rutinas aún',
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: s.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Toca el botón + para crear tu primera rutina',
-                            style: TextStyle(color: s.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                  itemCount: routines.length,
-                  itemBuilder: (_, i) {
-                    final r = routines[i];
-                    return _buildRoutineCard(context, r, s)
-                        .animate()
-                        .fadeIn(delay: (50 * i).ms, duration: 400.ms)
-                        .slideX(begin: 0.2, end: 0);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _newRoutineSheet(context),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Nueva rutina'),
-      ),
-    );
-  }
+    if (embedded) return content;
 
-  Widget _buildRoutineCard(BuildContext context, Routine r, ColorScheme s) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [r.color.withOpacity(0.15), r.color.withOpacity(0.05)],
+    return AppShell(
+      title: 'Rutinas',
+      subtitle: 'Divisiones, días y descansos.',
+      activeRoute: AppRoutes.gymDashboard,
+      actions: [
+        FocusIconButton(
+          icon: Icons.add_rounded,
+          tooltip: 'Nueva rutina',
+          onPressed: () => _newRoutineSheet(context),
         ),
-        border: Border.all(
-          color: r.isDefault ? r.color : s.outlineVariant.withOpacity(0.5),
-          width: r.isDefault ? 2 : 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => RoutineDetailScreen(svc: svc, routine: r),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: r.color.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.fitness_center_rounded,
-                        color: r.color,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  r.name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: s.onSurface,
-                                  ),
-                                ),
-                              ),
-                              if (r.isDefault) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: s.primaryContainer,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    'ACTIVA',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: s.onPrimaryContainer,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                          if ((r.description ?? '').isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              r.description!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: s.onSurfaceVariant,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        color: s.onSurfaceVariant,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      onSelected: (v) async {
-                        if (v == 'default') await svc.setDefaultRoutine(r.id);
-                        if (v == 'edit') await _editRoutineSheet(context, r);
-                        if (v == 'dup') await svc.duplicateRoutine(r.id);
-                        if (v == 'del') {
-                          final ok = await showDialog<bool>(
-                            context: context,
-                            builder:
-                                (_) => AlertDialog(
-                                  title: Text(
-                                    'Eliminar rutina',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  content: Text(
-                                    '¿Eliminar "${r.name}" y todo su contenido?',
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed:
-                                          () => Navigator.pop(context, false),
-                                      child: const Text('Cancelar'),
-                                    ),
-                                    FilledButton(
-                                      onPressed:
-                                          () => Navigator.pop(context, true),
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor: s.error,
-                                      ),
-                                      child: const Text('Eliminar'),
-                                    ),
-                                  ],
-                                ),
-                          );
-                          if (ok == true) await svc.deleteRoutineCascade(r.id);
-                        }
-                      },
-                      itemBuilder:
-                          (_) => [
-                            const PopupMenuItem(
-                              value: 'default',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.star_rounded, size: 20),
-                                  SizedBox(width: 12),
-                                  Text('Hacer predeterminada'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit_rounded, size: 20),
-                                  SizedBox(width: 12),
-                                  Text('Editar'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'dup',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.content_copy_rounded, size: 20),
-                                  SizedBox(width: 12),
-                                  Text('Duplicar'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'del',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete_rounded, size: 20),
-                                  SizedBox(width: 12),
-                                  Text('Eliminar'),
-                                ],
-                              ),
-                            ),
-                          ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: [
-                    _buildInfoChip(Icons.splitscreen_rounded, r.splitType, s),
-                    _buildInfoChip(
-                      Icons.timer_rounded,
-                      '${r.restSecDefault}s descanso',
-                      s,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoChip(IconData icon, String label, ColorScheme s) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: s.surfaceContainerHighest.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: s.onSurfaceVariant),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: s.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
+        const SizedBox(width: 10),
+      ],
+      child: content,
     );
   }
 
   Future<void> _newRoutineSheet(BuildContext context) async {
-    final res = await showModalBottomSheet<_RoutineFormResult>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _RoutineFormSheet(title: 'Nueva rutina'),
-    );
-
-    if (res == null) return;
+    final result = await _showRoutineForm(context, title: 'Nueva rutina');
+    if (result == null || !context.mounted) return;
 
     final id = await svc.createRoutine(
-      name: res.name,
-      description: res.description,
-      splitType: res.splitType,
-      restSecDefault: res.restSecDefault,
-      colorHex: res.colorHex,
-      isDefault: res.isDefault,
+      name: result.name,
+      description: result.description,
+      splitType: result.splitType,
+      restSecDefault: result.restSecDefault,
+      colorHex: result.colorHex,
+      isDefault: result.isDefault,
     );
 
     final created = Routine(
       id: id,
-      name: res.name,
-      description: res.description,
-      splitType: res.splitType,
-      restSecDefault: res.restSecDefault,
-      colorHex: res.colorHex,
-      isDefault: res.isDefault,
+      name: result.name,
+      description: result.description,
+      splitType: result.splitType,
+      restSecDefault: result.restSecDefault,
+      colorHex: result.colorHex,
+      isDefault: result.isDefault,
     );
 
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RoutineDetailScreen(svc: svc, routine: created),
+      ),
+    );
+  }
+}
+
+class _RoutinesContent extends StatelessWidget {
+  const _RoutinesContent({required this.svc});
+
+  final GymFirestoreService svc;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Routine>>(
+      stream: svc.streamRoutines(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return PageContainer(
+            child: FocusEmptyState(
+              icon: Icons.error_outline_rounded,
+              message: 'No se pudieron cargar las rutinas',
+              subtitle: '${snapshot.error}',
+            ),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final routines = snapshot.data ?? const <Routine>[];
+
+        return SingleChildScrollView(
+          child: PageContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FocusSectionHeader(
+                  icon: Icons.list_alt_rounded,
+                  title: 'Rutinas',
+                  subtitle: 'Gestiona divisiones, días y descansos.',
+                  trailing: FocusPrimaryButton(
+                    label: 'Nueva rutina',
+                    icon: Icons.add_rounded,
+                    onPressed: () => _newRoutineSheet(context),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (routines.isEmpty)
+                  FocusCard(
+                    child: FocusEmptyState(
+                      icon: Icons.fitness_center_rounded,
+                      message: 'Sin rutinas todavía',
+                      subtitle:
+                          'Crea una rutina principal y añade días de entrenamiento.',
+                      actionLabel: 'Crear rutina',
+                      onAction: () => _newRoutineSheet(context),
+                    ),
+                  )
+                else
+                  ResponsiveGrid(
+                    minItemWidth: 320,
+                    spacing: 16,
+                    children: [
+                      for (final routine in routines)
+                        _RoutineCard(
+                          svc: svc,
+                          routine: routine,
+                          onOpen:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => RoutineDetailScreen(
+                                        svc: svc,
+                                        routine: routine,
+                                      ),
+                                ),
+                              ),
+                          onEdit: () => _editRoutineSheet(context, routine),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _newRoutineSheet(BuildContext context) async {
+    final result = await _showRoutineForm(context, title: 'Nueva rutina');
+    if (result == null || !context.mounted) return;
+
+    final id = await svc.createRoutine(
+      name: result.name,
+      description: result.description,
+      splitType: result.splitType,
+      restSecDefault: result.restSecDefault,
+      colorHex: result.colorHex,
+      isDefault: result.isDefault,
+    );
+
+    final created = Routine(
+      id: id,
+      name: result.name,
+      description: result.description,
+      splitType: result.splitType,
+      restSecDefault: result.restSecDefault,
+      colorHex: result.colorHex,
+      isDefault: result.isDefault,
+    );
+
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -417,47 +189,301 @@ class RoutinesListScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _editRoutineSheet(BuildContext context, Routine r) async {
-    final res = await showModalBottomSheet<_RoutineFormResult>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder:
-          (_) => _RoutineFormSheet(
-            title: 'Editar rutina',
-            initial: _RoutineFormResult(
-              name: r.name,
-              description: r.description,
-              splitType: r.splitType,
-              restSecDefault: r.restSecDefault,
-              colorHex: r.colorHex ?? _rgbToHex(r.color.value),
-              isDefault: r.isDefault,
-            ),
-            showDefaultToggle: false,
-          ),
+  Future<void> _editRoutineSheet(BuildContext context, Routine routine) async {
+    final result = await _showRoutineForm(
+      context,
+      title: 'Editar rutina',
+      initial: _RoutineFormResult(
+        name: routine.name,
+        description: routine.description,
+        splitType: routine.splitType,
+        restSecDefault: routine.restSecDefault,
+        colorHex: routine.colorHex ?? _colorToHex(routine.color),
+        isDefault: routine.isDefault,
+      ),
+      showDefaultToggle: false,
     );
+    if (result == null) return;
 
-    if (res == null) return;
-
-    await svc.updateRoutine(r.id, {
-      'name': res.name,
-      'description': res.description,
-      'splitType': res.splitType,
-      'restSecDefault': res.restSecDefault,
-      'colorHex': res.colorHex,
+    await svc.updateRoutine(routine.id, {
+      'name': result.name,
+      'description': result.description,
+      'splitType': result.splitType,
+      'restSecDefault': result.restSecDefault,
+      'colorHex': result.colorHex,
     });
   }
 }
 
-class _RoutineFormResult {
-  final String name;
-  final String? description;
-  final String splitType;
-  final int restSecDefault;
-  final String colorHex;
-  final bool isDefault;
+class _RoutineCard extends StatelessWidget {
+  const _RoutineCard({
+    required this.svc,
+    required this.routine,
+    required this.onOpen,
+    required this.onEdit,
+  });
 
-  _RoutineFormResult({
+  final GymFirestoreService svc;
+  final Routine routine;
+  final VoidCallback onOpen;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tone = _routineTone(routine, scheme.primary);
+
+    return StreamBuilder<List<RoutineDay>>(
+      stream: svc.streamDays(routine.id),
+      builder: (context, daysSnap) {
+        final days = daysSnap.data ?? const <RoutineDay>[];
+        return FocusCard(
+          onTap: onOpen,
+          borderSide: BorderSide(
+            color:
+                routine.isDefault
+                    ? tone.withValues(alpha: 0.44)
+                    : scheme.outlineVariant,
+            width: routine.isDefault ? 1.4 : 1,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: tone.withValues(alpha: 0.13),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.fitness_center_rounded, color: tone),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          routine.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          _splitLabel(routine.splitType),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    tooltip: 'Acciones',
+                    onSelected: (value) => _handleMenu(context, value),
+                    itemBuilder:
+                        (_) => const [
+                          PopupMenuItem(
+                            value: 'default',
+                            child: Text('Hacer predeterminada'),
+                          ),
+                          PopupMenuItem(value: 'edit', child: Text('Editar')),
+                          PopupMenuItem(
+                            value: 'duplicate',
+                            child: Text('Duplicar'),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Eliminar'),
+                          ),
+                        ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              if ((routine.description ?? '').isNotEmpty)
+                Text(
+                  routine.description!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              if ((routine.description ?? '').isNotEmpty)
+                const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FocusBadge(
+                    label: routine.isDefault ? 'Principal' : 'Rutina',
+                    color: tone,
+                  ),
+                  FocusBadge(
+                    label: '${days.length} días',
+                    color: scheme.secondary,
+                  ),
+                  FocusBadge(
+                    label: '${routine.restSecDefault}s descanso',
+                    color: scheme.tertiary,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _RoutineProgress(days: days, color: tone),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      days.isEmpty
+                          ? 'Añade días para empezar'
+                          : 'Próxima acción: iniciar día',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_rounded, color: tone),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleMenu(BuildContext context, String value) async {
+    if (value == 'default') {
+      await svc.setDefaultRoutine(routine.id);
+      return;
+    }
+    if (value == 'edit') {
+      onEdit();
+      return;
+    }
+    if (value == 'duplicate') {
+      await svc.duplicateRoutine(routine.id);
+      if (context.mounted) {
+        FocusFeedback.showSuccess(context, 'Rutina duplicada');
+      }
+      return;
+    }
+    if (value == 'delete') {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder:
+            (dialogContext) => AlertDialog(
+              title: const Text('Eliminar rutina'),
+              content: Text('¿Eliminar "${routine.name}" y todo su contenido?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: const Text('Cancelar'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: const Text('Eliminar'),
+                ),
+              ],
+            ),
+      );
+      if (confirmed == true) {
+        await svc.deleteRoutineCascade(routine.id);
+        if (context.mounted) {
+          FocusFeedback.showSuccess(context, 'Rutina eliminada');
+        }
+      }
+    }
+  }
+}
+
+class _RoutineProgress extends StatelessWidget {
+  const _RoutineProgress({required this.days, required this.color});
+
+  final List<RoutineDay> days;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final visible = days.take(7).toList(growable: false);
+
+    if (visible.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Text(
+          'Semana sin estructura todavía',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (var i = 0; i < visible.length; i++)
+          Container(
+            constraints: const BoxConstraints(minWidth: 64),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: color.withValues(alpha: 0.24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'D${i + 1}',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  visible[i].name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _RoutineFormResult {
+  const _RoutineFormResult({
     required this.name,
     required this.description,
     required this.splitType,
@@ -465,18 +491,45 @@ class _RoutineFormResult {
     required this.colorHex,
     required this.isDefault,
   });
+
+  final String name;
+  final String? description;
+  final String splitType;
+  final int restSecDefault;
+  final String colorHex;
+  final bool isDefault;
+}
+
+Future<_RoutineFormResult?> _showRoutineForm(
+  BuildContext context, {
+  required String title,
+  _RoutineFormResult? initial,
+  bool showDefaultToggle = true,
+}) {
+  return showModalBottomSheet<_RoutineFormResult>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    backgroundColor: Colors.transparent,
+    builder:
+        (_) => _RoutineFormSheet(
+          title: title,
+          initial: initial,
+          showDefaultToggle: showDefaultToggle,
+        ),
+  );
 }
 
 class _RoutineFormSheet extends StatefulWidget {
-  final String title;
-  final _RoutineFormResult? initial;
-  final bool showDefaultToggle;
-
   const _RoutineFormSheet({
     required this.title,
     this.initial,
-    this.showDefaultToggle = true,
+    required this.showDefaultToggle,
   });
+
+  final String title;
+  final _RoutineFormResult? initial;
+  final bool showDefaultToggle;
 
   @override
   State<_RoutineFormSheet> createState() => _RoutineFormSheetState();
@@ -485,292 +538,209 @@ class _RoutineFormSheet extends StatefulWidget {
 class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
+  final _descriptionCtrl = TextEditingController();
   final _restCtrl = TextEditingController(text: '90');
-  String _split = 'Custom';
-  bool _isDefault = false;
+  var _split = 'Custom';
+  var _isDefault = false;
+  late Color _selected;
 
   static const _palette = <Color>[
-    Color(0xFF6750A4),
-    Color(0xFF1E88E5),
-    Color(0xFFD81B60),
-    Color(0xFFF57C00),
+    Color(0xFF5B7CFA),
+    Color(0xFF16A085),
+    Color(0xFFE67E22),
+    Color(0xFFC0392B),
+    Color(0xFF8E44AD),
+    Color(0xFF2C3E50),
     Color(0xFF2E7D32),
-    Color(0xFF00897B),
-    Color(0xFF546E7A),
-    Color(0xFF9C27B0),
-    Color(0xFF26A69A),
-    Color(0xFF3949AB),
+    Color(0xFFD81B60),
   ];
-  late Color _selected;
 
   @override
   void initState() {
     super.initState();
-    final i = widget.initial;
-    _nameCtrl.text = i?.name ?? '';
-    _descCtrl.text = i?.description ?? '';
-    _split = i?.splitType ?? 'Custom';
-    _restCtrl.text = '${i?.restSecDefault ?? 90}';
-    _isDefault = i?.isDefault ?? false;
-
-    if (i?.colorHex != null) {
-      _selected = _hexToColor(i!.colorHex);
-    } else {
-      _selected = _palette.first;
-    }
+    final initial = widget.initial;
+    _nameCtrl.text = initial?.name ?? '';
+    _descriptionCtrl.text = initial?.description ?? '';
+    _restCtrl.text = '${initial?.restSecDefault ?? 90}';
+    _split = initial?.splitType ?? 'Custom';
+    _isDefault = initial?.isDefault ?? false;
+    _selected =
+        initial?.colorHex == null
+            ? _palette.first
+            : _hexToColor(initial!.colorHex);
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _descCtrl.dispose();
+    _descriptionCtrl.dispose();
     _restCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-    final cs = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Container(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 0,
-        bottom: 20 + viewInsets,
-      ),
       decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: scheme.outlineVariant),
       ),
-      child: Form(
-        key: _formKey,
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              Text(
-                widget.title,
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: _nameCtrl,
-                style: const TextStyle(fontSize: 16),
-                decoration: InputDecoration(
-                  labelText: 'Nombre de la rutina',
-                  hintText: 'Ej: PPL, Torso/Pierna, Full Body',
-                  prefixIcon: const Icon(Icons.fitness_center_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+          padding: const EdgeInsets.fromLTRB(20, 6, 20, 20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
                   ),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest.withOpacity(0.3),
                 ),
-                validator: (s) {
-                  final t = (s ?? '').trim();
-                  if (t.isEmpty) return 'Pon un nombre';
-                  if (t.length < 3) return 'Mínimo 3 caracteres';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descCtrl,
-                style: const TextStyle(fontSize: 16),
-                maxLines: 2,
-                decoration: InputDecoration(
-                  labelText: 'Descripción (opcional)',
-                  hintText: 'Detalles de tu rutina...',
-                  prefixIcon: const Icon(Icons.notes_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest.withOpacity(0.3),
+                const SizedBox(height: 16),
+                FocusTextField(
+                  label: 'Nombre de la rutina',
+                  hint: 'PPL, torso/pierna, full body...',
+                  controller: _nameCtrl,
+                  prefixIcon: Icons.fitness_center_rounded,
+                  validator: (value) {
+                    final text = (value ?? '').trim();
+                    if (text.isEmpty) return 'Pon un nombre';
+                    if (text.length < 3) return 'Mínimo 3 caracteres';
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: _split,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'PPL',
-                    child: Text('PPL (empuje/tirón/pierna)'),
-                  ),
-                  DropdownMenuItem(value: 'UL', child: Text('Torso/pierna')),
-                  DropdownMenuItem(value: 'FB', child: Text('Cuerpo completo')),
-                  DropdownMenuItem(
-                    value: 'Custom',
-                    child: Text('Personalizada'),
-                  ),
-                ],
-                onChanged: (v) => setState(() => _split = v ?? 'Custom'),
-                decoration: InputDecoration(
-                  labelText: 'Tipo de división',
-                  prefixIcon: const Icon(Icons.splitscreen_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest.withOpacity(0.3),
+                const SizedBox(height: 14),
+                FocusTextField(
+                  label: 'Descripción',
+                  hint: 'Objetivo, frecuencia o notas',
+                  controller: _descriptionCtrl,
+                  prefixIcon: Icons.notes_rounded,
+                  maxLines: 2,
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _restCtrl,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(fontSize: 16),
-                decoration: InputDecoration(
-                  labelText: 'Descanso por defecto',
-                  hintText: '90',
-                  suffixText: 'segundos',
-                  prefixIcon: const Icon(Icons.timer_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest.withOpacity(0.3),
-                ),
-                validator: (s) {
-                  if ((s ?? '').trim().isEmpty) return 'Indica segundos';
-                  final v = int.tryParse((s ?? '').trim());
-                  if (v == null) return 'Número entero';
-                  if (v < 0) return 'No negativo';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Color de la rutina',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
-                children:
-                    _palette.map((c) {
-                      final selected = c.value == _selected.value;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selected = c),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: selected ? 50 : 44,
-                          height: selected ? 50 : 44,
-                          decoration: BoxDecoration(
-                            color: c,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              if (selected)
-                                BoxShadow(
-                                  color: c.withOpacity(0.5),
-                                  blurRadius: 12,
-                                  spreadRadius: 2,
-                                ),
-                            ],
-                            border:
-                                selected
-                                    ? Border.all(color: cs.surface, width: 3)
-                                    : null,
-                          ),
-                          child:
-                              selected
-                                  ? const Icon(
-                                    Icons.check_rounded,
-                                    size: 24,
-                                    color: Colors.white,
-                                  )
-                                  : null,
-                        ),
-                      );
-                    }).toList(),
-              ),
-              if (widget.showDefaultToggle) ...[
-                const SizedBox(height: 20),
-                Container(
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: cs.primary.withOpacity(0.2),
-                      width: 1,
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  initialValue: _split,
+                  decoration: InputDecoration(
+                    labelText: 'Tipo de división',
+                    prefixIcon: const Icon(Icons.splitscreen_rounded),
+                    filled: true,
+                    fillColor: scheme.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: SwitchListTile(
-                    value: _isDefault,
-                    onChanged: (v) => setState(() => _isDefault = v),
-                    title: Text(
-                      'Marcar como predeterminada',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w500,
-                        color: cs.onSurface,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'PPL',
+                      child: Text('PPL - empuje, tirón, pierna'),
+                    ),
+                    DropdownMenuItem(value: 'UL', child: Text('Torso/pierna')),
+                    DropdownMenuItem(
+                      value: 'FB',
+                      child: Text('Cuerpo completo'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Custom',
+                      child: Text('Personalizada'),
+                    ),
+                  ],
+                  onChanged:
+                      (value) => setState(() => _split = value ?? 'Custom'),
+                ),
+                const SizedBox(height: 14),
+                FocusTextField(
+                  label: 'Descanso por defecto',
+                  hint: '90',
+                  suffix: 'segundos',
+                  controller: _restCtrl,
+                  prefixIcon: Icons.timer_rounded,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    final seconds = int.tryParse((value ?? '').trim());
+                    if (seconds == null) return 'Indica un número entero';
+                    if (seconds < 0) return 'No puede ser negativo';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'Color',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    for (final color in _palette)
+                      _ColorSwatch(
+                        color: color,
+                        selected: color.value == _selected.value,
+                        onTap: () => setState(() => _selected = color),
+                      ),
+                  ],
+                ),
+                if (widget.showDefaultToggle) ...[
+                  const SizedBox(height: 16),
+                  FocusCard(
+                    elevated: false,
+                    padding: EdgeInsets.zero,
+                    backgroundColor: scheme.surfaceContainerLow,
+                    child: SwitchListTile(
+                      value: _isDefault,
+                      onChanged: (value) => setState(() => _isDefault = value),
+                      title: const Text('Marcar como principal'),
+                      subtitle: const Text(
+                        'Se usará como rutina semanal por defecto.',
+                      ),
+                      secondary: Icon(
+                        Icons.star_rounded,
+                        color: scheme.primary,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Se usará por defecto en tus sesiones',
-                    ),
-                    secondary: Icon(Icons.star_rounded, color: cs.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                   ),
+                ],
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FocusSecondaryButton(
+                        label: 'Cancelar',
+                        fullWidth: true,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: FocusPrimaryButton(
+                        label:
+                            widget.title.startsWith('Editar')
+                                ? 'Guardar'
+                                : 'Crear rutina',
+                        icon: Icons.check_rounded,
+                        fullWidth: true,
+                        color: _selected,
+                        onPressed: _submit,
+                      ),
+                    ),
+                  ],
                 ),
               ],
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text('Cancelar'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: FilledButton(
-                      onPressed: _submit,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        widget.title.startsWith('Editar')
-                            ? 'Guardar'
-                            : 'Crear rutina',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -780,35 +750,103 @@ class _RoutineFormSheetState extends State<_RoutineFormSheet> {
   void _submit() {
     if (_formKey.currentState?.validate() != true) return;
 
-    final rgb = _selected.value & 0x00FFFFFF;
-    final hex = '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
-
     Navigator.pop(
       context,
       _RoutineFormResult(
         name: _nameCtrl.text.trim(),
         description:
-            _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            _descriptionCtrl.text.trim().isEmpty
+                ? null
+                : _descriptionCtrl.text.trim(),
         splitType: _split,
         restSecDefault: int.parse(_restCtrl.text.trim()),
-        colorHex: hex,
+        colorHex: _colorToHex(_selected),
         isDefault: _isDefault,
       ),
     );
   }
 }
 
-Color _hexToColor(String hex) {
-  var h = hex.replaceAll('#', '').toUpperCase();
-  if (h.length == 6) h = 'FF$h';
-  return Color(int.parse(h, radix: 16));
+class _ColorSwatch extends StatelessWidget {
+  const _ColorSwatch({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        width: selected ? 44 : 38,
+        height: selected ? 44 : 38,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color:
+                selected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Colors.transparent,
+            width: 2,
+          ),
+          boxShadow:
+              selected
+                  ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.28),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                  : null,
+        ),
+        child:
+            selected
+                ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                : null,
+      ),
+    );
+  }
 }
 
-String _rgbToHex(int argb) {
-  final rgb = argb & 0x00FFFFFF;
+Color _routineTone(Routine routine, Color fallback) {
+  final hex = routine.colorHex;
+  if (hex == null || hex.trim().isEmpty) return fallback;
+  try {
+    return _hexToColor(hex);
+  } catch (_) {
+    return fallback;
+  }
+}
+
+Color _hexToColor(String value) {
+  var hex = value.replaceAll('#', '').trim();
+  if (hex.length == 6) hex = 'FF$hex';
+  return Color(int.parse(hex, radix: 16));
+}
+
+String _colorToHex(Color color) {
+  final rgb = color.value & 0x00FFFFFF;
   return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 }
 
-
-
-
+String _splitLabel(String split) {
+  switch (split) {
+    case 'PPL':
+      return 'Empuje, tirón y pierna';
+    case 'UL':
+      return 'Torso y pierna';
+    case 'FB':
+      return 'Cuerpo completo';
+    default:
+      return 'Personalizada';
+  }
+}

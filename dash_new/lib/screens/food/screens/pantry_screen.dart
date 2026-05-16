@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
@@ -8,7 +8,8 @@ import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 
 class PantryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const PantryScreen({super.key, required this.svc});
+  final bool embedded;
+  const PantryScreen({super.key, required this.svc, this.embedded = false});
 
   @override
   State<PantryScreen> createState() => _PantryScreenState();
@@ -20,26 +21,34 @@ class _PantryScreenState extends State<PantryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Despensa',
-        subtitle: _showLowStockOnly ? 'Solo stock bajo' : 'Inventario',
-        actions: [
-          IconButton(
-            icon: Icon(
-              _showLowStockOnly ? Icons.warning_amber : Icons.inventory_2,
-              size: 18,
-            ),
-            tooltip: _showLowStockOnly ? 'Mostrar todo' : 'Solo stock bajo',
-            onPressed:
-                () => setState(() => _showLowStockOnly = !_showLowStockOnly),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, size: 18),
-            tooltip: 'Añadir producto',
-            onPressed: () => _editItem(),
-          ),
-        ],
-      ),
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Despensa',
+                subtitle: _showLowStockOnly ? 'Solo stock bajo' : 'Inventario',
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      _showLowStockOnly
+                          ? Icons.warning_amber
+                          : Icons.inventory_2,
+                      size: 18,
+                    ),
+                    tooltip:
+                        _showLowStockOnly ? 'Mostrar todo' : 'Solo stock bajo',
+                    onPressed:
+                        () => setState(
+                          () => _showLowStockOnly = !_showLowStockOnly,
+                        ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add, size: 18),
+                    tooltip: 'Añadir producto',
+                    onPressed: () => _editItem(),
+                  ),
+                ],
+              ),
       body: StreamBuilder<List<PantryItem>>(
         stream: widget.svc.streamPantry(),
         builder: (context, snapshot) {
@@ -116,14 +125,15 @@ class _PantryScreenState extends State<PantryScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // En PC: 6 columnas, tablet: 4, móvil: 2
-        final crossAxisCount = constraints.maxWidth >= 1200
-            ? 6
-            : constraints.maxWidth >= 900
+        final crossAxisCount =
+            constraints.maxWidth >= 1200
+                ? 6
+                : constraints.maxWidth >= 900
                 ? 5
                 : constraints.maxWidth >= 600
-                    ? 4
-                    : 2;
-        
+                ? 4
+                : 2;
+
         return GridView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -138,13 +148,19 @@ class _PantryScreenState extends State<PantryScreen> {
             final isLowStock = item.minQty != null && item.qty <= item.minQty!;
 
             return _PantryGridCard(
-              item: item,
-              isLowStock: isLowStock,
-              onTap: () => _showItemDetails(item),
-              onConsume: () => _consumeItem(item),
-              onEdit: () => _editItem(initial: item, id: item.id),
-              onDelete: () => _deleteItem(item),
-            ).animate().fadeIn(delay: Duration(milliseconds: index * 30)).scale(begin: const Offset(0.95, 0.95), duration: const Duration(milliseconds: 200));
+                  item: item,
+                  isLowStock: isLowStock,
+                  onTap: () => _showItemDetails(item),
+                  onConsume: () => _consumeItem(item),
+                  onEdit: () => _editItem(initial: item, id: item.id),
+                  onDelete: () => _deleteItem(item),
+                )
+                .animate()
+                .fadeIn(delay: Duration(milliseconds: index * 30))
+                .scale(
+                  begin: const Offset(0.95, 0.95),
+                  duration: const Duration(milliseconds: 200),
+                );
           },
         );
       },
@@ -231,11 +247,10 @@ class _PantryScreenState extends State<PantryScreen> {
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                      horizontal: 12,
-                                    ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 12,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                     FocuslaneUI.radius,
@@ -479,19 +494,16 @@ class _PantryScreenState extends State<PantryScreen> {
                         color:
                             isLowStock
                                 ? Theme.of(context).colorScheme.errorContainer
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMd,
                         ),
                       ),
                       child: Icon(
                         isLowStock ? Icons.warning_amber : Icons.kitchen,
-                        color:
-                            Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                         size: 32,
                       ),
                     ),
@@ -625,16 +637,18 @@ class _PantryGridCard extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: isLowStock
-                      ? colorScheme.errorContainer
-                      : colorScheme.primaryContainer,
+                  color:
+                      isLowStock
+                          ? colorScheme.errorContainer
+                          : colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   isLowStock ? Icons.warning_amber : Icons.kitchen,
-                  color: isLowStock
-                      ? colorScheme.error
-                      : colorScheme.onPrimaryContainer,
+                  color:
+                      isLowStock
+                          ? colorScheme.error
+                          : colorScheme.onPrimaryContainer,
                   size: 18,
                 ),
               ),
@@ -647,38 +661,46 @@ class _PantryGridCard extends StatelessWidget {
                   if (value == 'edit') onEdit();
                   if (value == 'delete') onDelete();
                 },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: 'consume',
-                    child: Row(
-                      children: [
-                        Icon(Icons.remove_circle_outline, size: 18),
-                        SizedBox(width: 8),
-                        Text('Consumir'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit, size: 18),
-                        SizedBox(width: 8),
-                        Text('Editar'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, size: 18, color: AppColors.error),
-                        SizedBox(width: 8),
-                        Text('Eliminar', style: TextStyle(color: AppColors.error)),
-                      ],
-                    ),
-                  ),
-                ],
+                itemBuilder:
+                    (context) => const [
+                      PopupMenuItem(
+                        value: 'consume',
+                        child: Row(
+                          children: [
+                            Icon(Icons.remove_circle_outline, size: 18),
+                            SizedBox(width: 8),
+                            Text('Consumir'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit, size: 18),
+                            SizedBox(width: 8),
+                            Text('Editar'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete,
+                              size: 18,
+                              color: AppColors.error,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Eliminar',
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
               ),
             ],
           ),
@@ -758,7 +780,7 @@ class _PantryTile extends StatelessWidget {
         ),
         title: item.name,
         subtitle:
-            'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}${item.minQty != null ? ' • Mín: ${item.minQty!.toStringAsFixed(0)}' : ''}',
+            'Stock: ${item.qty.toStringAsFixed(0)} ${_getUnitLabel(item.unit)}${item.minQty != null ? ' - Mín: ${item.minQty!.toStringAsFixed(0)}' : ''}',
         trailing: PopupMenuButton<String>(
           padding: EdgeInsets.zero,
           onSelected: (value) {
@@ -794,7 +816,10 @@ class _PantryTile extends StatelessWidget {
                     children: [
                       Icon(Icons.delete, size: 20, color: AppColors.error),
                       SizedBox(width: AppSpacing.sm),
-                      Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                      Text(
+                        'Eliminar',
+                        style: TextStyle(color: AppColors.error),
+                      ),
                     ],
                   ),
                 ),
@@ -837,13 +862,12 @@ class _DetailRow extends StatelessWidget {
         const Spacer(),
         Text(
           value,
-          style: AppTypography.label(
-            context,
-          ).copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+          style: AppTypography.label(context).copyWith(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
 }
-
-

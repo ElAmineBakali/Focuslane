@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/navigation/app_routes.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
 import 'package:focuslane/screens/gym/models/gym_models.dart';
@@ -273,7 +273,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                                               'RPE: ${e.targetRPE}',
                                             if (e.targetPercent1RM != null)
                                               '%1RM: ${e.targetPercent1RM}',
-                                          ].join(' • '),
+                                          ].join(' - '),
                                         ),
                                         trailing: PopupMenuButton<String>(
                                           onSelected: (v) async {
@@ -459,7 +459,3 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     }
   }
 }
-
-
-
-

@@ -1,14 +1,16 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import 'package:focuslane/design/ui/feedback/focus_feedback.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 import 'package:focuslane/navigation/app_routes.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
-import 'package:focuslane/design/ui/components/focus_module_header.dart';
 
 class SessionSummaryScreen extends StatefulWidget {
+  const SessionSummaryScreen({super.key, required this.session, this.svc});
+
   final SessionDoc session;
   final GymFirestoreService? svc;
-
-  const SessionSummaryScreen({super.key, required this.session, this.svc});
 
   @override
   State<SessionSummaryScreen> createState() => _SessionSummaryScreenState();
@@ -18,7 +20,7 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
   late int _energyValue;
   late int _fatigueValue;
   late int _motivationValue;
-  bool _feelingsSaved = false;
+  late bool _feelingsSaved;
 
   @override
   void initState() {
@@ -30,55 +32,46 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
   }
 
   Future<void> _saveFeelings() async {
-    if (widget.svc == null) return;
+    final service = widget.svc;
+    if (service == null) return;
 
     try {
-      await widget.svc!.updateSessionFeelings(
+      await service.updateSessionFeelings(
         widget.session.id,
         _energyValue,
         _fatigueValue,
         _motivationValue,
       );
+      if (!mounted) return;
       setState(() => _feelingsSaved = true);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sensaciones guardadas correctamente'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al guardar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      FocusFeedback.showSuccess(context, 'Sensaciones guardadas');
+    } catch (error) {
+      if (mounted) FocusFeedback.showError(context, 'Error al guardar: $error');
     }
   }
 
   Future<void> _deleteSession() async {
-    if (widget.svc == null) return;
+    final service = widget.svc;
+    if (service == null) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('¿Eliminar sesión?'),
+          (dialogContext) => AlertDialog(
+            title: const Text('Eliminar sesión'),
             content: const Text(
-              'Esta acción eliminará la sesión del historial y actualizará las estadísticas. No se puede deshacer.',
+              'La sesión se eliminará del historial y se actualizarán las estadísticas.',
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.pop(dialogContext, false),
                 child: const Text('Cancelar'),
               ),
               FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
                 child: const Text('Eliminar'),
               ),
             ],
@@ -88,340 +81,402 @@ class _SessionSummaryScreenState extends State<SessionSummaryScreen> {
     if (confirmed != true) return;
 
     try {
-      await widget.svc!.deleteSession(widget.session.id);
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sesion eliminada correctamente'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al eliminar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      await service.deleteSession(widget.session.id);
+      if (!mounted) return;
+      Navigator.pop(context);
+      FocusFeedback.showSuccess(context, 'Sesión eliminada');
+    } catch (error) {
+      if (mounted)
+        FocusFeedback.showError(context, 'Error al eliminar: $error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resumen de sesión'),
-        leading: FocusModuleHeader.buildLeading(
-          context,
-          mode: FocusModuleLeadingMode.backToModuleDashboard,
-          backRouteName: AppRoutes.gymDashboard,
+    return AppShell(
+      title: 'Resumen de sesión',
+      subtitle: '${widget.session.routineName} - ${widget.session.dayName}',
+      activeRoute: AppRoutes.gymDashboard,
+      actions: [
+        if (widget.svc != null)
+          FocusIconButton(
+            icon: Icons.delete_forever_rounded,
+            tooltip: 'Eliminar sesión',
+            onPressed: _deleteSession,
+          ),
+        const SizedBox(width: 10),
+      ],
+      child: SingleChildScrollView(
+        child: PageContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SummaryHero(session: widget.session),
+              const SizedBox(height: 16),
+              ResponsiveGrid(
+                minItemWidth: 220,
+                spacing: 16,
+                children: [
+                  FocusStatCard(
+                    title: 'Volumen total',
+                    value: _volumeLabel(widget.session.volumeKg),
+                    subtitle: 'Carga acumulada',
+                    icon: Icons.monitor_weight_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  FocusStatCard(
+                    title: 'Series',
+                    value:
+                        '${widget.session.exercises.fold<int>(0, (sum, exercise) => sum + exercise.sets.length)}',
+                    subtitle: '${widget.session.exercises.length} ejercicios',
+                    icon: Icons.repeat_rounded,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  FocusStatCard(
+                    title: 'Duración',
+                    value: '${widget.session.durationMin ?? 0} min',
+                    subtitle: 'Tiempo registrado',
+                    icon: Icons.timer_rounded,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                ],
+              ),
+              if (widget.session.prList.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _PrCard(prs: widget.session.prList),
+              ],
+              if ((widget.session.notes ?? '').isNotEmpty) ...[
+                const SizedBox(height: 16),
+                FocusCard(
+                  child: FocusSectionHeader(
+                    title: 'Notas',
+                    subtitle: widget.session.notes!,
+                    icon: Icons.note_rounded,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              _ExercisesSummary(exercises: widget.session.exercises),
+              const SizedBox(height: 16),
+              _FeelingsCard(
+                saved: _feelingsSaved,
+                energy: _energyValue,
+                fatigue: _fatigueValue,
+                motivation: _motivationValue,
+                canSave: widget.svc != null,
+                onEnergyChanged:
+                    (value) => setState(() => _energyValue = value),
+                onFatigueChanged:
+                    (value) => setState(() => _fatigueValue = value),
+                onMotivationChanged:
+                    (value) => setState(() => _motivationValue = value),
+                onSave: _saveFeelings,
+              ),
+              const SizedBox(height: 18),
+              FocusPrimaryButton(
+                label: 'Listo',
+                icon: Icons.check_rounded,
+                fullWidth: true,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         ),
-        leadingWidth: 96,
-        actions: [
-          if (widget.svc != null)
-            IconButton(
-              icon: const Icon(Icons.delete_forever_rounded),
-              tooltip: 'Eliminar sesión',
-              onPressed: _deleteSession,
-            ),
-        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            '${widget.session.routineName} – ${widget.session.dayName}',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Fecha: ${widget.session.date} • Duración: ${widget.session.durationMin ?? 0} min',
-          ),
-          const SizedBox(height: 12),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.scale),
-              title: Text(
-                'Volumen total: ${widget.session.volumeKg.toStringAsFixed(1)} kg',
-              ),
-              subtitle: Text(
-                'Series: ${widget.session.exercises.fold<int>(0, (a, e) => a + e.sets.length)}',
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          if (widget.session.prList.isNotEmpty)
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.emoji_events),
-                title: const Text('¡Nuevos PRs!'),
-                subtitle: Text(widget.session.prList.join(', ')),
-              ),
-            ),
-          const SizedBox(height: 8),
-          if ((widget.session.notes ?? '').isNotEmpty)
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.note),
-                title: const Text('Notas'),
-                subtitle: Text(widget.session.notes!),
-              ),
-            ),
-          const SizedBox(height: 12),
-          const Text('Detalle por ejercicio'),
-          const SizedBox(height: 4),
-          ...widget.session.exercises.map(
-            (e) => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      e.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
-                    for (int i = 0; i < e.sets.length; i++)
-                      Text(
-                        'Set ${i + 1}: ${e.sets[i].weight.toStringAsFixed(1)} kg x ${e.sets[i].reps} reps'
-                        '${e.sets[i].rpe != null ? ' • RPE ${e.sets[i].rpe}' : ''}',
-                      ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Volumen: ${e.volumeKg.toStringAsFixed(1)} kg'
-                      '${e.bestE1rm != null ? ' • Mejor E1RM: ${e.bestE1rm!.toStringAsFixed(1)}' : ''}',
-                      style: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                  ],
+    );
+  }
+}
+
+class _SummaryHero extends StatelessWidget {
+  const _SummaryHero({required this.session});
+
+  final SessionDoc session;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return FocusCard(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 760;
+          final copy = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FocusBadge(label: 'Sesión finalizada', color: scheme.primary),
+              const SizedBox(height: 12),
+              Text(
+                session.dayName,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          if (!_feelingsSaved) ...[
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+              const SizedBox(height: 6),
+              Text(
+                session.routineName,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              const SizedBox(height: 6),
+              Text(
+                DateFormat(
+                  'EEEE, d MMMM yyyy - HH:mm',
+                  'es_ES',
+                ).format(session.date),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          );
+          final icon = Container(
+            width: compact ? double.infinity : 154,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: scheme.primary.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: scheme.primary.withValues(alpha: 0.24)),
+            ),
+            child: Icon(
+              Icons.verified_rounded,
+              color: scheme.primary,
+              size: compact ? 46 : 58,
+            ),
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [copy, const SizedBox(height: 16), icon],
+            );
+          }
+
+          return Row(
+            children: [Expanded(child: copy), const SizedBox(width: 20), icon],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PrCard extends StatelessWidget {
+  const _PrCard({required this.prs});
+
+  final List<String> prs;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return FocusCard(
+      backgroundColor: scheme.tertiaryContainer.withValues(alpha: 0.32),
+      borderSide: BorderSide(color: scheme.tertiary.withValues(alpha: 0.24)),
+      child: FocusSectionHeader(
+        title: 'Nuevas marcas personales',
+        subtitle: prs.join(', '),
+        icon: Icons.emoji_events_rounded,
+      ),
+    );
+  }
+}
+
+class _ExercisesSummary extends StatelessWidget {
+  const _ExercisesSummary({required this.exercises});
+
+  final List<PerformedExercise> exercises;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return FocusCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FocusSectionHeader(
+            title: 'Detalle por ejercicio',
+            subtitle: 'Series, peso y volumen',
+            icon: Icons.list_alt_rounded,
+          ),
+          const SizedBox(height: 16),
+          if (exercises.isEmpty)
+            const FocusEmptyState(
+              icon: Icons.fitness_center_rounded,
+              message: 'Sin ejercicios registrados',
+            )
+          else
+            Column(
+              children: [
+                for (final exercise in exercises)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: scheme.outlineVariant),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: s.primaryContainer,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.psychology_rounded,
-                            color: s.primary,
-                            size: 24,
+                        Text(
+                          exercise.name,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge?.copyWith(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '¿Cómo te sentiste?',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Registra tus sensaciones del entreno',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: s.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    _buildFeelingSlider(
-                      'Energía',
-                      _energyValue,
-                      Icons.bolt_rounded,
-                      Colors.green,
-                      (v) => setState(() => _energyValue = v),
-                    ),
-                    const SizedBox(height: 20),
-
-                    _buildFeelingSlider(
-                      'Fatiga física',
-                      _fatigueValue,
-                      Icons.fitness_center_rounded,
-                      Colors.orange,
-                      (v) => setState(() => _fatigueValue = v),
-                    ),
-                    const SizedBox(height: 20),
-
-                    _buildFeelingSlider(
-                      'Motivación',
-                      _motivationValue,
-                      Icons.favorite_rounded,
-                      Colors.blue,
-                      (v) => setState(() => _motivationValue = v),
-                    ),
-                    const SizedBox(height: 24),
-
-                    if (widget.svc != null)
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: _saveFeelings,
-                          icon: const Icon(Icons.save_rounded),
-                          label: const Text('Guardar sensaciones'),
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 8),
+                        for (var i = 0; i < exercise.sets.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              'Serie ${i + 1}: ${exercise.sets[i].weight.toStringAsFixed(1)} kg x ${exercise.sets[i].reps} repeticiones${exercise.sets[i].rpe != null ? ' - RPE ${exercise.sets[i].rpe}' : ''}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
                             ),
                           ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ] else ...[
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.psychology_rounded, color: s.primary),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Sensaciones registradas',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        const SizedBox(height: 6),
+                        FocusBadge(
+                          label:
+                              'Volumen ${exercise.volumeKg.toStringAsFixed(0)} kg${exercise.bestE1rm != null ? ' - e1RM ${exercise.bestE1rm!.toStringAsFixed(1)} kg' : ''}',
+                          color: scheme.primary,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text('Energía: $_energyValue/5'),
-                    Text('Fatiga: $_fatigueValue/5'),
-                    Text('Motivación: $_motivationValue/5'),
-                  ],
-                ),
-              ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 16),
-          ],
-
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Listo'),
-          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildFeelingSlider(
-    String label,
-    int value,
-    IconData icon,
-    Color color,
-    ValueChanged<int> onChanged,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '$value',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
+class _FeelingsCard extends StatelessWidget {
+  const _FeelingsCard({
+    required this.saved,
+    required this.energy,
+    required this.fatigue,
+    required this.motivation,
+    required this.canSave,
+    required this.onEnergyChanged,
+    required this.onFatigueChanged,
+    required this.onMotivationChanged,
+    required this.onSave,
+  });
+
+  final bool saved;
+  final int energy;
+  final int fatigue;
+  final int motivation;
+  final bool canSave;
+  final ValueChanged<int> onEnergyChanged;
+  final ValueChanged<int> onFatigueChanged;
+  final ValueChanged<int> onMotivationChanged;
+  final VoidCallback onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FocusSectionHeader(
+            title: saved ? 'Sensaciones registradas' : '¿Cómo te sentiste?',
+            subtitle: 'Energía, fatiga y motivación',
+            icon: Icons.psychology_rounded,
+          ),
+          const SizedBox(height: 16),
+          _FeelingSlider(
+            label: 'Energía',
+            value: energy,
+            icon: Icons.bolt_rounded,
+            onChanged: onEnergyChanged,
+          ),
+          _FeelingSlider(
+            label: 'Fatiga',
+            value: fatigue,
+            icon: Icons.fitness_center_rounded,
+            onChanged: onFatigueChanged,
+          ),
+          _FeelingSlider(
+            label: 'Motivación',
+            value: motivation,
+            icon: Icons.favorite_rounded,
+            onChanged: onMotivationChanged,
+          ),
+          if (canSave) ...[
+            const SizedBox(height: 12),
+            FocusPrimaryButton(
+              label: saved ? 'Actualizar sensaciones' : 'Guardar sensaciones',
+              icon: Icons.save_rounded,
+              fullWidth: true,
+              onPressed: onSave,
             ),
           ],
-        ),
-        const SizedBox(height: 8),
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: color,
-            inactiveTrackColor: color.withOpacity(0.2),
-            thumbColor: color,
-            overlayColor: color.withOpacity(0.2),
-            trackHeight: 6,
+        ],
+      ),
+    );
+  }
+}
+
+class _FeelingSlider extends StatelessWidget {
+  const _FeelingSlider({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int value;
+  final IconData icon;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: scheme.primary, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              FocusBadge(label: '$value/5', color: scheme.primary),
+            ],
           ),
-          child: Slider(
+          Slider(
             value: value.toDouble(),
             min: 1,
             max: 5,
             divisions: 4,
             label: value.toString(),
-            onChanged: (v) => onChanged(v.round()),
+            onChanged: (newValue) => onChanged(newValue.round()),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(5, (i) {
-              return Text(
-                '${i + 1}',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight:
-                      value == i + 1 ? FontWeight.w700 : FontWeight.normal,
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-
-
-
+String _volumeLabel(double value) {
+  if (value <= 0) return '0 kg';
+  if (value >= 1000) return '${(value / 1000).toStringAsFixed(1)} ton';
+  return '${value.toStringAsFixed(0)} kg';
+}

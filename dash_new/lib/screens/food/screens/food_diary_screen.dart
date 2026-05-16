@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
@@ -6,6 +6,13 @@ import 'package:focuslane/design/ui/components/focus_badge.dart';
 import 'package:focuslane/design/ui/components/focus_list_card.dart';
 import 'package:focuslane/design/ui/components/focus_primary_button.dart';
 import 'package:focuslane/design/ui/components/focus_progress_bar.dart';
+import 'package:focuslane/design/ui/components/focus_card.dart';
+import 'package:focuslane/design/ui/components/focus_icon_button.dart';
+import 'package:focuslane/design/ui/components/focus_progress_ring.dart';
+import 'package:focuslane/design/ui/components/focus_secondary_button.dart';
+import 'package:focuslane/design/ui/components/focus_section_header.dart';
+import 'package:focuslane/design/ui/layouts/page_container.dart';
+import 'package:focuslane/design/ui/layouts/responsive_grid.dart';
 import 'package:focuslane/screens/food/widgets/food_compact_widgets.dart';
 import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'package:focuslane/screens/food/models/food_models.dart';
@@ -13,7 +20,8 @@ import 'package:intl/intl.dart';
 
 class FoodDiaryScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodDiaryScreen({super.key, required this.svc});
+  final bool embedded;
+  const FoodDiaryScreen({super.key, required this.svc, this.embedded = false});
 
   @override
   State<FoodDiaryScreen> createState() => _FoodDiaryScreenState();
@@ -28,17 +36,20 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
     final dayId = _dayId(_date);
 
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Diario',
-        subtitle: 'Registro diario',
-        actions: [
-          IconButton(
-            tooltip: 'Objetivos nutricionales',
-            icon: const Icon(Icons.flag_outlined, size: 18),
-            onPressed: () => _showGoalsSheet(context),
-          ),
-        ],
-      ),
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Diario',
+                subtitle: 'Registro diario',
+                actions: [
+                  IconButton(
+                    tooltip: 'Objetivos nutricionales',
+                    icon: const Icon(Icons.flag_outlined, size: 18),
+                    onPressed: () => _showGoalsSheet(context),
+                  ),
+                ],
+              ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'foodDiaryFab',
         onPressed: () => _showAddEntrySheet(context, dayId),
@@ -82,8 +93,7 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                             ),
                         onNext:
                             () => setState(
-                              () =>
-                                  _date = _date.add(const Duration(days: 1)),
+                              () => _date = _date.add(const Duration(days: 1)),
                             ),
                         onToday: () => setState(() => _date = DateTime.now()),
                       ).animate().slideY(begin: -0.2, duration: 300.ms),
@@ -101,25 +111,28 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
                     onEditGoals: () => _showGoalsSheet(context),
                   );
 
-                  return ListView(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    children: [
-                      if (isWide)
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: mainContent),
-                            const SizedBox(width: AppSpacing.md),
-                            SizedBox(width: 320, child: sidePanel),
+                  return SingleChildScrollView(
+                    child: PageContainer(
+                      child: Column(
+                        children: [
+                          if (isWide)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: mainContent),
+                                const SizedBox(width: 16),
+                                SizedBox(width: 340, child: sidePanel),
+                              ],
+                            )
+                          else ...[
+                            mainContent,
+                            const SizedBox(height: 16),
+                            sidePanel,
                           ],
-                        )
-                      else ...[
-                        mainContent,
-                        const SizedBox(height: AppSpacing.md),
-                        sidePanel,
-                      ],
-                      const SizedBox(height: 100),
-                    ],
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
                   );
                 },
               );
@@ -166,32 +179,34 @@ class _FoodDiaryScreenState extends State<FoodDiaryScreen> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: sections.map((section) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: _MealSection(
-            title: section.title,
-            entries: section.entries,
-            onDuplicate: (entry) => widget.svc.addEntry(
-              dayId,
-              IntakeEntry(
-                id: '',
-                type: entry.type,
-                refId: entry.refId,
-                qty: entry.qty,
-                unit: entry.unit,
-                nameSnapshot: entry.nameSnapshot,
-                macrosSnapshot: entry.macrosSnapshot,
-                meal: entry.meal,
+      children:
+          sections.map((section) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _MealSection(
+                title: section.title,
+                entries: section.entries,
+                onDuplicate:
+                    (entry) => widget.svc.addEntry(
+                      dayId,
+                      IntakeEntry(
+                        id: '',
+                        type: entry.type,
+                        refId: entry.refId,
+                        qty: entry.qty,
+                        unit: entry.unit,
+                        nameSnapshot: entry.nameSnapshot,
+                        macrosSnapshot: entry.macrosSnapshot,
+                        meal: entry.meal,
+                      ),
+                    ),
+                onDelete: (entry) {
+                  final index = entries.indexOf(entry);
+                  if (index >= 0) widget.svc.deleteEntry(dayId, index);
+                },
               ),
-            ),
-            onDelete: (entry) {
-              final index = entries.indexOf(entry);
-              if (index >= 0) widget.svc.deleteEntry(dayId, index);
-            },
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
     );
   }
 
@@ -239,34 +254,17 @@ class _ModernDaySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final isToday = _isToday(date);
     final dateStr = DateFormat('EEEE, d MMMM', 'es').format(date);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final colorScheme = theme.colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border:
-            isDark
-                ? Border.all(
-                    color: FocuslaneUI.borderColor(context),
-                    width: FocuslaneUI.borderW,
-                  )
-                : null,
-      ),
+    return FocusCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
             children: [
-              IconButton(
+              FocusIconButton(
                 onPressed: onPrev,
-                icon: const Icon(Icons.chevron_left),
-                style: IconButton.styleFrom(
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                ),
+                icon: Icons.chevron_left_rounded,
+                tooltip: 'Día anterior',
               ),
               Expanded(
                 child: Center(
@@ -286,22 +284,19 @@ class _ModernDaySelector extends StatelessWidget {
                   ),
                 ),
               ),
-              IconButton(
+              FocusIconButton(
                 onPressed: onNext,
-                icon: const Icon(Icons.chevron_right),
-                style: IconButton.styleFrom(
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                ),
+                icon: Icons.chevron_right_rounded,
+                tooltip: 'Día siguiente',
               ),
             ],
           ),
           if (!isToday) ...[
-            const SizedBox(height: AppSpacing.xs),
-            FocusPrimaryButton(
+            const SizedBox(height: 10),
+            FocusSecondaryButton(
               label: 'Ir a hoy',
-              icon: Icons.today,
+              icon: Icons.today_rounded,
               onPressed: onToday,
-              color: FocuslaneUI.accent(context),
             ),
           ],
         ],
@@ -326,63 +321,39 @@ class _KpiRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = day.totals;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 720;
-        final cards = [
-          _KpiCard(
-            label: 'Calorías',
-            value: (t['kcal'] ?? 0).toStringAsFixed(0),
-            unit: 'kcal',
-            target: targets['kcal'],
-            icon: Icons.local_fire_department,
-          ),
-          _KpiCard(
-            label: 'Proteína',
-            value: (t['protein'] ?? 0).toStringAsFixed(0),
-            unit: 'g',
-            target: targets['protein'],
-            icon: Icons.fitness_center,
-          ),
-          _KpiCard(
-            label: 'Carbohidratos',
-            value: (t['carbs'] ?? 0).toStringAsFixed(0),
-            unit: 'g',
-            target: targets['carbs'],
-            icon: Icons.bakery_dining,
-          ),
-          _KpiCard(
-            label: 'Grasas',
-            value: (t['fat'] ?? 0).toStringAsFixed(0),
-            unit: 'g',
-            target: targets['fat'],
-            icon: Icons.water_drop,
-          ),
-        ];
-
-        if (isWide) {
-          return Row(
-            children: [
-              for (int i = 0; i < cards.length; i++) ...[
-                Expanded(child: cards[i]),
-                if (i != cards.length - 1)
-                  const SizedBox(width: AppSpacing.sm),
-              ],
-            ],
-          );
-        }
-
-        return Column(
-          children: cards
-              .map(
-                (card) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: card,
-                ),
-              )
-              .toList(),
-        );
-      },
+    return ResponsiveGrid(
+      minItemWidth: 210,
+      spacing: 12,
+      children: [
+        _KpiCard(
+          label: 'Calorías',
+          value: (t['kcal'] ?? 0).toStringAsFixed(0),
+          unit: 'kcal',
+          target: targets['kcal'],
+          icon: Icons.local_fire_department,
+        ),
+        _KpiCard(
+          label: 'Proteína',
+          value: (t['protein'] ?? 0).toStringAsFixed(0),
+          unit: 'g',
+          target: targets['protein'],
+          icon: Icons.fitness_center,
+        ),
+        _KpiCard(
+          label: 'Carbohidratos',
+          value: (t['carbs'] ?? 0).toStringAsFixed(0),
+          unit: 'g',
+          target: targets['carbs'],
+          icon: Icons.bakery_dining,
+        ),
+        _KpiCard(
+          label: 'Grasas',
+          value: (t['fat'] ?? 0).toStringAsFixed(0),
+          unit: 'g',
+          target: targets['fat'],
+          icon: Icons.water_drop,
+        ),
+      ],
     );
   }
 }
@@ -409,41 +380,60 @@ class _KpiCard extends StatelessWidget {
     final targetText =
         target != null ? ' / ${target!.toStringAsFixed(0)} $unit' : '';
 
-    return FoodCompactCard(
-      maxHeight: 72,
-      padding: const EdgeInsets.all(10),
-      child: Row(
+    final numericValue = double.tryParse(value) ?? 0;
+    final progress =
+        target == null || target == 0
+            ? 0.0
+            : (numericValue / target!).clamp(0.0, 1.0);
+
+    return FocusCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: FocuslaneUI.accentSurface(context, opacity: 0.16),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, size: 16, color: FocuslaneUI.accent(context)),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: FocuslaneUI.accentSurface(context, opacity: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 20, color: FocuslaneUI.accent(context)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
                   label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  '$value $unit$targetText',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w800,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$value $unit',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w900,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            targetText.isEmpty ? 'Sin objetivo' : 'Objetivo$targetText',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          FocusProgressBar(
+            value: progress,
+            color: FocuslaneUI.accent(context),
+            height: 7,
           ),
         ],
       ),
@@ -483,19 +473,15 @@ class _MealSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return FoodCompactCard(
-      maxHeight: 240,
-      padding: const EdgeInsets.all(12),
+    return FocusCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: AppTypography.heading4(context),
-              ),
+              Text(title, style: AppTypography.heading4(context)),
               Text(
                 '${_kcalTotal().toStringAsFixed(0)} kcal',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -504,32 +490,31 @@ class _MealSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
           if (entries.isEmpty)
-            Text(
-              'Sin entradas',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: Text(
+                'Sin entradas',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             )
           else
-            ...entries.take(4).map((entry) {
+            ...entries.map((entry) {
               return _EntryCard(
                 entry: entry,
                 onDuplicate: () => onDuplicate(entry),
                 onDelete: () => onDelete(entry),
               );
             }),
-          if (entries.length > 4)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '+ ${entries.length - 4} más',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -552,7 +537,7 @@ class _SidePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final waterTarget = (targets['water'] ?? 2000).toInt();
+    final waterTarget = targets['water']?.toInt();
     final summary = [
       _GoalRow(label: 'Calorías', value: targets['kcal'], unit: 'kcal'),
       _GoalRow(label: 'Proteína', value: targets['protein'], unit: 'g'),
@@ -569,16 +554,18 @@ class _SidePanel extends StatelessWidget {
           onAdd: onAddWater,
         ),
         const SizedBox(height: AppSpacing.md),
-        FoodCompactCard(
-          maxHeight: 220,
-          padding: const EdgeInsets.all(12),
+        FocusCard(
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Objetivos del día', style: AppTypography.heading4(context)),
+                  Text(
+                    'Objetivos del día',
+                    style: AppTypography.heading4(context),
+                  ),
                   TextButton(
                     onPressed: onEditGoals,
                     style: TextButton.styleFrom(
@@ -601,9 +588,9 @@ class _SidePanel extends StatelessWidget {
                         row.value != null
                             ? '${row.value!.toStringAsFixed(0)} ${row.unit}'
                             : 'Sin objetivo',
-                        style: AppTypography.bodySmall(context).copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: AppTypography.bodySmall(
+                          context,
+                        ).copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -622,7 +609,11 @@ class _GoalRow {
   final double? value;
   final String unit;
 
-  const _GoalRow({required this.label, required this.value, required this.unit});
+  const _GoalRow({
+    required this.label,
+    required this.value,
+    required this.unit,
+  });
 }
 
 class _MealSelector extends StatelessWidget {
@@ -645,22 +636,24 @@ class _MealSelector extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
-      children: options.map((option) {
-        final selected = option.slot == value;
-        return ChoiceChip(
-          label: Text(option.label),
-          selected: selected,
-          onSelected: (_) => onChanged(option.slot),
-          labelStyle: theme.textTheme.bodySmall?.copyWith(
-            color: selected
-                ? FocuslaneUI.accent(context)
-                : colorScheme.onSurfaceVariant,
-          ),
-          selectedColor: FocuslaneUI.accentSurface(context, opacity: 0.16),
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        );
-      }).toList(),
+      children:
+          options.map((option) {
+            final selected = option.slot == value;
+            return ChoiceChip(
+              label: Text(option.label),
+              selected: selected,
+              onSelected: (_) => onChanged(option.slot),
+              labelStyle: theme.textTheme.bodySmall?.copyWith(
+                color:
+                    selected
+                        ? FocuslaneUI.accent(context)
+                        : colorScheme.onSurfaceVariant,
+              ),
+              selectedColor: FocuslaneUI.accentSurface(context, opacity: 0.16),
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            );
+          }).toList(),
     );
   }
 }
@@ -672,207 +665,9 @@ class _MealOption {
   const _MealOption(this.slot, this.label);
 }
 
-// ignore: unused_element
-class _MacrosSummary extends StatelessWidget {
-  final DailyIntakeDoc day;
-  final Map<String, double?> mergedTargets;
-
-  const _MacrosSummary({required this.day, required this.mergedTargets});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = day.totals;
-    final g = mergedTargets;
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Nutrición del Día', style: AppTypography.heading3(context)),
-          const SizedBox(height: AppSpacing.md),
-
-          FoodCompactCard(
-            maxHeight: 120,
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Calorías', style: AppTypography.heading4(context)),
-                    Icon(
-                      Icons.local_fire_department,
-                      color: colorScheme.primary,
-                      size: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      (t['kcal'] ?? 0).toStringAsFixed(0),
-                      style: AppTypography.heading2(context),
-                    ),
-                    if (g['kcal'] != null) ...[
-                      Text(
-                        ' / ${g['kcal']!.toStringAsFixed(0)}',
-                        style: AppTypography.bodySmall(context),
-                      ),
-                    ],
-                    Text(
-                      ' kcal',
-                      style: AppTypography.bodySmall(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                if (g['kcal'] != null)
-                  FocusProgressBar(
-                    value: _pct(t['kcal'] ?? 0, g['kcal']),
-                    color: colorScheme.primary,
-                    backgroundColor: colorScheme.outlineVariant,
-                    height: 6,
-                  ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: AppSpacing.sm,
-            crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 2.2,
-            children: [
-              _MacroCard(
-                label: 'Proteínas',
-                value: t['protein'] ?? 0,
-                target: g['protein'],
-                unit: 'g',
-                color: colorScheme.primary,
-                icon: Icons.fitness_center,
-              ),
-              _MacroCard(
-                label: 'Carbohidratos',
-                value: t['carbs'] ?? 0,
-                target: g['carbs'],
-                unit: 'g',
-                color: colorScheme.secondary,
-                icon: Icons.bakery_dining,
-              ),
-              _MacroCard(
-                label: 'Grasas',
-                value: t['fat'] ?? 0,
-                target: g['fat'],
-                unit: 'g',
-                color: colorScheme.tertiary,
-                icon: Icons.water_drop,
-              ),
-              _MacroCard(
-                label: 'Fibra',
-                value: t['fiber'] ?? 0,
-                target: g['fiber'],
-                unit: 'g',
-                color: colorScheme.primary,
-                icon: Icons.eco,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  double _pct(double v, double? t) {
-    if (t == null || t <= 0) return 0;
-    return (v / t).clamp(0, 1);
-  }
-}
-
-class _MacroCard extends StatelessWidget {
-  final String label;
-  final double value;
-  final double? target;
-  final String unit;
-  final Color color;
-  final IconData icon;
-
-  const _MacroCard({
-    required this.label,
-    required this.value,
-    this.target,
-    required this.unit,
-    required this.color,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final pct =
-        target != null && target! > 0
-            ? (value / target!).clamp(0.0, 1.0).toDouble()
-            : 0.0;
-
-    return FoodCompactCard(
-      maxHeight: 96,
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: AppSpacing.xs),
-              SizedBox(
-                width: 90,
-                child: Text(
-                  label,
-                  style: AppTypography.caption(context).copyWith(fontSize: 11),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                value.toStringAsFixed(0),
-                style: AppTypography.heading4(context, color: color),
-              ),
-              if (target != null) ...[
-                Text(
-                  '/${target!.toStringAsFixed(0)}',
-                  style: AppTypography.bodySmall(context),
-                ),
-              ],
-              const SizedBox(width: 2),
-              Text(unit, style: AppTypography.caption(context)),
-            ],
-          ),
-          if (target != null)
-            FocusProgressBar(value: pct, color: color, height: 3),
-        ],
-      ),
-    );
-  }
-}
-
 class _ModernWaterCard extends StatelessWidget {
   final int water;
-  final int waterTarget;
+  final int? waterTarget;
   final Function(int) onAdd;
 
   const _ModernWaterCard({
@@ -882,101 +677,71 @@ class _ModernWaterCard extends StatelessWidget {
   });
 
   double _pct() {
-    if (waterTarget <= 0) return 0;
-    return (water / waterTarget).clamp(0, 1).toDouble();
+    final target = waterTarget;
+    if (target == null || target <= 0) return 0;
+    return (water / target).clamp(0, 1).toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
-    final remaining = waterTarget - water;
+    final target = waterTarget;
+    final remaining = target == null ? null : target - water;
+    final scheme = Theme.of(context).colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: FoodCompactCard(
-        maxHeight: 160,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.water_drop,
-                    color:
-                        Theme.of(context).colorScheme.onPrimaryContainer,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Hidratación', style: AppTypography.heading4(context)),
-                    Text(
-                      '$water / $waterTarget ml',
-                      style: AppTypography.bodySmall(context),
-                    ),
-                    if (remaining > 0)
-                      Text(
-                        'Faltan ${remaining}ml',
-                        style: AppTypography.caption(context),
-                      ),
-                  ],
-                ),
-                const Spacer(),
-                Text(
-                  '${(_pct() * 100).toStringAsFixed(0)}%',
-                  style: AppTypography.heading4(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-                FocusProgressBar(
+    return FocusCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FocusSectionHeader(
+            title: 'Hidratación',
+            subtitle: 'Agua registrada hoy',
+            icon: Icons.water_drop_rounded,
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: FocusProgressRing(
               value: _pct(),
-              color: Theme.of(context).colorScheme.primary,
-              height: 6,
+              size: 124,
+              strokeWidth: 10,
+              label: '${(water / 1000).toStringAsFixed(1)} L',
+              subtitle: target == null ? 'sin objetivo' : 'agua',
+              color: scheme.primary,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                OutlinedButton(
-                  onPressed: () => onAdd(250),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(0, 36),
-                  ),
-                  child: const Text('250ml'),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                OutlinedButton(
-                  onPressed: () => onAdd(500),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(0, 36),
-                  ),
-                  child: const Text('500ml'),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                SizedBox(
-                  height: 36,
-                  child: FilledButton(
-                    onPressed: () => _showCustomWaterDialog(context),
-                    child: const Icon(Icons.edit, size: 16),
-                  ),
-                ),
-              ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            target == null
+                ? 'Sin objetivo de agua'
+                : '$water / $target ml${remaining != null && remaining > 0 ? ' - faltan $remaining ml' : ''}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FocusSecondaryButton(
+                label: '+250 ml',
+                icon: Icons.add_rounded,
+                onPressed: () => onAdd(250),
+              ),
+              FocusSecondaryButton(
+                label: '+500 ml',
+                icon: Icons.add_rounded,
+                onPressed: () => onAdd(500),
+              ),
+              FocusSecondaryButton(
+                label: 'Personalizar',
+                icon: Icons.edit_rounded,
+                onPressed: () => _showCustomWaterDialog(context),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -1036,14 +801,15 @@ class _EntryCard extends StatelessWidget {
     final protein = entry.macrosSnapshot['protein'] ?? 0;
     final carbs = entry.macrosSnapshot['carbs'] ?? 0;
     final fat = entry.macrosSnapshot['fat'] ?? 0;
-    final title = entry.type == FavoriteType.photoAi
-      ? (entry.nameSnapshot.trim().isEmpty
-        ? 'Foto (IA)'
-        : 'Foto (IA) · ${entry.nameSnapshot}')
-      : entry.nameSnapshot;
+    final title =
+        entry.type == FavoriteType.photoAi
+            ? (entry.nameSnapshot.trim().isEmpty
+                ? 'Foto (IA)'
+                : 'Foto (IA) · ${entry.nameSnapshot}')
+            : entry.nameSnapshot;
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle =
-        '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} • ${kcal.toStringAsFixed(0)} kcal • P ${protein.toStringAsFixed(0)}g • C ${carbs.toStringAsFixed(0)}g • G ${fat.toStringAsFixed(0)}g';
+        '${entry.qty.toStringAsFixed(0)} ${entry.unit.name} - ${kcal.toStringAsFixed(0)} kcal - P ${protein.toStringAsFixed(0)}g - C ${carbs.toStringAsFixed(0)}g - G ${fat.toStringAsFixed(0)}g';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -1093,11 +859,7 @@ class _EntryCard extends StatelessWidget {
                     value: 'del',
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: colorScheme.error,
-                        ),
+                        Icon(Icons.delete, size: 20, color: colorScheme.error),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           'Eliminar',
@@ -1169,7 +931,7 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               decoration: BoxDecoration(
                 color:
                     isDark
-                        ? colorScheme.onSurface.withOpacity(0.3)
+                        ? colorScheme.onSurface.withValues(alpha: 0.3)
                         : colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
@@ -1406,9 +1168,12 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
               decoration: InputDecoration(
                 isDense: true,
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                fillColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(FocuslaneUI.radius),
                   borderSide: BorderSide(
@@ -1439,9 +1204,9 @@ class _ModernAddEntrySheetState extends State<_ModernAddEntrySheet>
 
   Future<void> _addQuickEntry() async {
     final name =
-      _nameController.text.trim().isEmpty
-        ? 'Entrada rápida'
-        : _nameController.text.trim();
+        _nameController.text.trim().isEmpty
+            ? 'Entrada rápida'
+            : _nameController.text.trim();
     final kcal = double.tryParse(_kcalController.text) ?? 0;
     final protein = double.tryParse(_proteinController.text) ?? 0;
 
@@ -1648,7 +1413,7 @@ class _ModernGoalsSheetState extends State<_ModernGoalsSheet> {
                   decoration: BoxDecoration(
                     color:
                         isDark
-                            ? colorScheme.onSurface.withOpacity(0.3)
+                            ? colorScheme.onSurface.withValues(alpha: 0.3)
                             : colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
@@ -1834,7 +1599,7 @@ class _FavList extends StatelessWidget {
             final f = list[i];
             final colorScheme = Theme.of(context).colorScheme;
             return FocusListCard(
-              title: f.alias ?? '${f.type.name} • ${f.refId}',
+              title: f.alias ?? '${f.type.name} - ${f.refId}',
               subtitle:
                   'Por defecto: ${f.defaultQty.toStringAsFixed(0)} ${f.defaultUnit.name}',
               leadingIcon:
@@ -1954,7 +1719,7 @@ class _RecipeList extends StatelessWidget {
             final r = list[i];
             final macrosText =
                 r.kcal != null
-                    ? '${r.kcal!.toStringAsFixed(0)} kcal • ${r.servings} raciones'
+                    ? '${r.kcal!.toStringAsFixed(0)} kcal - ${r.servings} raciones'
                     : '${r.servings} raciones';
 
             return FocusListCard(
@@ -1971,5 +1736,3 @@ class _RecipeList extends StatelessWidget {
     );
   }
 }
-
-

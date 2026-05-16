@@ -398,3 +398,90 @@ Fecha: 2026-05-15
 - Verificado por análisis de rutas y código que Finanzas sigue pasando por pantalla protegida por contraseña y mantiene dashboard, transacciones, suscripciones, activos, deudas, análisis y ajustes de seguridad.
 - Verificada por compilación la integración con sidebar, topbar, responsive y dark/light al usar `AppShell`, `ColorScheme` y componentes comunes.
 - Pendiente de prueba interactiva con una sesión autenticada y datos reales: crear/abrir curso, añadir calificación, revisar que queda visible tras sincronizar, introducir contraseña de Finanzas, crear/editar registros financieros y revisar visualmente desktop/móvil y light/dark click a click.
+
+## Fase 10 - Gimnasio y Alimentación
+
+Fecha: 2026-05-16
+
+### Módulos rediseñados
+
+- Gimnasio: panel, rutinas, detalle de rutina, sesión activa, contador de descanso, historial y resumen de sesión.
+- Alimentación: panel, diario, objetivos, comidas, hidratación, análisis con IA por imagen, recetas/listas enlazadas y navegación interna.
+
+### Archivos modificados
+
+- `dash_new/lib/screens/gym/screens/main/gym_main_screen.dart`
+- `dash_new/lib/screens/gym/screens/dashboard/gym_dashboard_screen.dart`
+- `dash_new/lib/screens/gym/screens/routines/routines_list_screen.dart`
+- `dash_new/lib/screens/gym/screens/routines/routine_detail_screen.dart`
+- `dash_new/lib/screens/gym/screens/routines/routine_builder_screen.dart`
+- `dash_new/lib/screens/gym/screens/session/live_session_screen.dart`
+- `dash_new/lib/screens/gym/screens/session/session_history_screen.dart`
+- `dash_new/lib/screens/gym/screens/session/session_summary_screen.dart`
+- `dash_new/lib/screens/gym/widgets/rest_timer.dart`
+- `dash_new/lib/screens/gym/widgets/exercise_picker_sheet.dart`
+- `dash_new/lib/screens/food/screens/main/food_main_screen.dart`
+- `dash_new/lib/screens/food/screens/food_dashboard_screen.dart`
+- `dash_new/lib/screens/food/screens/food_diary_screen.dart`
+- `dash_new/lib/screens/food/screens/foods_list_screen.dart`
+- `dash_new/lib/screens/food/screens/recipes_list_screen.dart`
+- `dash_new/lib/screens/food/screens/food_planner_screen.dart`
+- `dash_new/lib/screens/food/screens/shopping_lists_screen.dart`
+- `dash_new/lib/screens/food/screens/shopping_list_detail_screen.dart`
+- `dash_new/lib/screens/food/screens/pantry_screen.dart`
+- Eliminado: `dash_new/lib/screens/food/screens/food_dashboard_widgets.dart`
+
+### Componentes reutilizados
+
+- `AppShell`, `PageContainer`, `FocusSectionNav`, `FocusSectionHeader`, `FocusCard`, `FocusStatCard`, `FocusProgressRing`, `FocusProgressBar`, `FocusBadge`, `FocusIconButton`, `FocusPrimaryButton`, `FocusSecondaryButton`, `FocusTextField`, `FocusEmptyState`, `ResponsiveGrid` y `FocusFeedback`.
+
+### Cambios hechos
+
+- Gimnasio:
+  - `GymMainScreen` mantiene el header interno por secciones y ahora el panel puede abrir Rutinas, Progreso e Historial sin salir del shell.
+  - El dashboard se reconstruyó como bento premium con sesión activa/próxima sesión, métricas, rutina semanal, últimas sesiones, alertas y progreso.
+  - Rutinas dejó la lista plana y pasó a cards responsive con estado, días, progreso visual, acciones y bottom sheets modernos para crear/editar.
+  - Detalle de rutina se rediseñó con hero, resumen por días, ejercicios en cards, añadir ejercicio, duplicar/eliminar día e iniciar sesión.
+  - Sesión activa se rediseñó con card fuerte del ejercicio actual, progreso circular, controles grandes, series en cards, descanso activo y acciones móviles claras.
+  - El contador de descanso usa card visual con anillo grande, presets y controles limpios, conservando notificaciones.
+  - Historial y resumen de sesión usan cards agrupadas, métricas, sensaciones, PRs y acciones sin cambiar guardado ni borrado.
+- Alimentación:
+  - `FoodMainScreen` migró a `AppShell` y `FocusSectionNav`, alineado con Estudio y Finanzas.
+  - El panel se reconstruyó como bento con card principal de calorías, macros, hidratación, análisis con IA, registro diario, recetas recientes, alertas y lista de compra.
+  - Se eliminaron los cálculos falsos del panel de recetas y se usan los valores reales de `Recipe`.
+  - El diario se rediseñó con selector de día en card, métricas responsive, comidas por cards, hidratación con anillo y objetivos del día.
+  - Los formularios principales de Food conservan los callbacks reales y reciben embedded mode para integrarse dentro del shell sin appbars duplicadas.
+  - Se limpiaron separadores raros y mojibake visible en pantallas/widgets de Gym y Food.
+
+### Componentes antiguos eliminados o reemplazados
+
+- Eliminado `food_dashboard_widgets.dart`, ya sin referencias tras el nuevo panel de Alimentación.
+- Reemplazadas las cards y secciones planas del dashboard de Food por componentes `Focus*`.
+- Reemplazadas las listas planas principales de Gym por cards responsive y bento sections.
+- No se eliminaron servicios, modelos, repositorios, rutas globales, Firebase, IA, notificaciones, timers ni lógica real.
+
+### UTF-8 y textos
+
+- Barrido ejecutado sobre `lib/screens/gym` y `lib/screens/food`: no quedan caracteres raros en pantallas/widgets tocados.
+- Queda un texto con mojibake en `lib/screens/food/services/food_photo_ai_service.dart`, dentro de un servicio que se dejó intacto por restricción explícita de la fase.
+
+### Funcionalidad mantenida intacta
+
+- Gimnasio: rutinas, días, ejercicios, sesión activa, series, descanso, historial, resumen, notificaciones, Firestore y navegación real.
+- Alimentación: objetivos, diario, comidas, hidratación, recetas, compra, despensa, planificación, análisis IA por foto, Firestore y navegación real.
+- No se tocaron Home, Tareas, Notas, Calendario, Hábitos, Ajustes, Notificaciones, Login, Registro, Estudio ni Finanzas.
+
+### Validación ejecutada
+
+- `dart format` sobre los archivos Dart modificados: correcto.
+- `flutter analyze`: ejecutado. Resultado: código 1 por 265 `info` heredados/no bloqueantes; sin errores de compilación.
+- `flutter build web`: código 0, build generado en `dash_new/build/web`.
+- Servidor estático temporal sobre `dash_new/build/web` en `http://127.0.0.1:5176`: respondió `HTTP 200`.
+- Aviso de build: Flutter mantiene avisos de dry-run Wasm en dependencias (`device_info_plus`, `image`, `flutter_timezone`). El build web normal se generó correctamente.
+
+### Pruebas manuales y límites
+
+- Verificado por análisis de rutas y código que Gimnasio mantiene panel, rutinas, detalle, sesión activa, descanso, historial y resumen sin cambiar servicios ni modelos.
+- Verificado por análisis de rutas y código que Alimentación mantiene panel, diario, registro, hidratación, análisis IA, recetas, compra, plan y despensa sin cambiar servicios ni modelos.
+- Verificada por compilación la integración con sidebar/topbar común, navegación interna, responsive y dark/light al usar `AppShell`, `ColorScheme` y componentes comunes.
+- Pendiente de prueba interactiva con sesión autenticada y datos reales: abrir Gimnasio y Alimentación click a click, iniciar sesión activa, probar descanso, registrar comida, probar análisis IA con imagen, revisar historial, móvil y dark mode en navegador real.

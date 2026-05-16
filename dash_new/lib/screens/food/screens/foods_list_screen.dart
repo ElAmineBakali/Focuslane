@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
 import 'package:focuslane/design/ui/components/focus_chip.dart';
@@ -10,7 +10,8 @@ import 'food_edit_sheet.dart';
 
 class FoodsListScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodsListScreen({super.key, required this.svc});
+  final bool embedded;
+  const FoodsListScreen({super.key, required this.svc, this.embedded = false});
 
   @override
   State<FoodsListScreen> createState() => _FoodsListScreenState();
@@ -24,17 +25,20 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Alimentos',
-        subtitle: 'Catálogo',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, size: 18),
-            onPressed: () => _showAddFoodSheet(context),
-            tooltip: 'Añadir alimento',
-          ),
-        ],
-      ),
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Alimentos',
+                subtitle: 'Catálogo',
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.add, size: 18),
+                    onPressed: () => _showAddFoodSheet(context),
+                    tooltip: 'Añadir alimento',
+                  ),
+                ],
+              ),
       body: Column(
         children: [
           Container(
@@ -69,7 +73,9 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
                         color:
                             _suppsOnly
                                 ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.onSurfaceVariant,
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                         onTap: () => setState(() => _suppsOnly = !_suppsOnly),
                       ),
                     ),
@@ -135,14 +141,15 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // En PC: 6 columnas, tablet: 4, móvil: 2
-        final crossAxisCount = constraints.maxWidth >= 1200
-            ? 6
-            : constraints.maxWidth >= 900
+        final crossAxisCount =
+            constraints.maxWidth >= 1200
+                ? 6
+                : constraints.maxWidth >= 900
                 ? 5
                 : constraints.maxWidth >= 600
-                    ? 4
-                    : 2;
-        
+                ? 4
+                : 2;
+
         return GridView.builder(
           padding: const EdgeInsets.all(AppSpacing.md),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -155,10 +162,13 @@ class _FoodsListScreenState extends State<FoodsListScreen> {
           itemBuilder: (context, index) {
             final food = foods[index];
             return _FoodGridCard(
-              food: food,
-              onTap: () => _showEditFoodSheet(context, food),
-              onToggleFavorite: () => _toggleFavorite(food),
-            ).animate().fadeIn(delay: (50 + index * 30).ms).scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
+                  food: food,
+                  onTap: () => _showEditFoodSheet(context, food),
+                  onToggleFavorite: () => _toggleFavorite(food),
+                )
+                .animate()
+                .fadeIn(delay: (50 + index * 30).ms)
+                .scale(begin: const Offset(0.95, 0.95), duration: 200.ms);
           },
         );
       },
@@ -272,7 +282,9 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  widget.food.isSupplement ? Icons.medication : Icons.restaurant,
+                  widget.food.isSupplement
+                      ? Icons.medication
+                      : Icons.restaurant,
                   color: colorScheme.onPrimaryContainer,
                   size: 18,
                 ),
@@ -283,7 +295,10 @@ class _FoodGridCardState extends State<_FoodGridCard> {
                 child: Icon(
                   isFavorite ? Icons.star : Icons.star_border,
                   size: 20,
-                  color: isFavorite ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  color:
+                      isFavorite
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -361,7 +376,7 @@ class _FoodListCardState extends State<_FoodListCard> {
   Widget _buildCard(BuildContext context, bool isFavorite) {
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle =
-        '${widget.food.kcal.toStringAsFixed(0)} kcal • ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}${widget.food.brand != null ? ' • ${widget.food.brand!}' : ''}';
+        '${widget.food.kcal.toStringAsFixed(0)} kcal - ${widget.food.unitSize.toStringAsFixed(0)}${widget.food.perUnit.name}${widget.food.brand != null ? ' - ${widget.food.brand!}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -386,9 +401,7 @@ class _FoodListCardState extends State<_FoodListCard> {
         trailing: IconButton(
           icon: Icon(isFavorite ? Icons.star : Icons.star_border),
           color:
-              isFavorite
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
+              isFavorite ? colorScheme.primary : colorScheme.onSurfaceVariant,
           onPressed: widget.onToggleFavorite,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints.tightFor(width: 32, height: 32),
@@ -397,5 +410,3 @@ class _FoodListCardState extends State<_FoodListCard> {
     );
   }
 }
-
-

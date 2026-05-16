@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:focuslane/design/ui/components/focus_empty_state.dart';
@@ -22,8 +22,7 @@ class ShoppingListDetailScreen extends StatefulWidget {
       _ShoppingListDetailScreenState();
 }
 
-class _ShoppingListDetailScreenState
-    extends State<ShoppingListDetailScreen> {
+class _ShoppingListDetailScreenState extends State<ShoppingListDetailScreen> {
   bool _hideCompleted = false;
 
   @override
@@ -172,9 +171,9 @@ class _ShoppingListDetailScreenState
                               ),
                               Text(
                                 '${(progress * 100).toStringAsFixed(0)}%',
-                                style: AppTypography.label(context).copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AppTypography.label(
+                                  context,
+                                ).copyWith(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -337,11 +336,10 @@ class _ShoppingListDetailScreenState
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                      horizontal: 12,
-                                    ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 12,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                     FocuslaneUI.radius,
@@ -514,11 +512,10 @@ class _ShoppingListDetailScreenState
                               isExpanded: true,
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                      horizontal: 12,
-                                    ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 12,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                     FocuslaneUI.radius,
@@ -759,16 +756,15 @@ class _SummaryItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: AppTypography.heading3(context).copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.heading3(
+            context,
+          ).copyWith(color: colorScheme.onSurface, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: AppTypography.caption(context).copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: AppTypography.caption(
+            context,
+          ).copyWith(color: colorScheme.onSurfaceVariant),
         ),
       ],
     );
@@ -794,7 +790,7 @@ class _ShoppingItemCard extends StatelessWidget {
     final qtyText =
         '${item.qty.toStringAsFixed(item.qty % 1 == 0 ? 0 : 1)} ${_getUnitShort(item.unit)}';
     final subtitle =
-        '$qtyText${item.total != null ? ' • €${item.total!.toStringAsFixed(2)}' : ''}';
+        '$qtyText${item.total != null ? ' - €${item.total!.toStringAsFixed(2)}' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -838,11 +834,7 @@ class _ShoppingItemCard extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: colorScheme.error,
-                      ),
+                      Icon(Icons.delete, size: 20, color: colorScheme.error),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         'Eliminar',
@@ -868,5 +860,3 @@ class _ShoppingItemCard extends StatelessWidget {
     }
   }
 }
-
-

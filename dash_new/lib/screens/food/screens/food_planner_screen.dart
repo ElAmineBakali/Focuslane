@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,7 +43,12 @@ IconData _iconFromCodePoint(int codePoint) {
 
 class FoodPlannerScreen extends StatefulWidget {
   final FoodFirestoreService svc;
-  const FoodPlannerScreen({super.key, required this.svc});
+  final bool embedded;
+  const FoodPlannerScreen({
+    super.key,
+    required this.svc,
+    this.embedded = false,
+  });
 
   @override
   State<FoodPlannerScreen> createState() => _FoodPlannerScreenState();
@@ -145,104 +150,107 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
       (s) => s['slot'] == slotKey,
       orElse: () => {'icon': _getSlotIcon(slot).codePoint},
     );
-    return _iconFromCodePoint(
-      config['icon'] ?? _getSlotIcon(slot).codePoint,
-    );
+    return _iconFromCodePoint(config['icon'] ?? _getSlotIcon(slot).codePoint);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FoodCompactAppBar(
-        title: 'Planificador',
-        subtitle: _getPlannerName(),
-        actions: [
-          IconButton(
-            onPressed:
-                () => setState(() => _showPlannersList = !_showPlannersList),
-            icon: const Icon(Icons.restaurant_menu, size: 18),
-            tooltip: 'Cambiar planner',
-          ),
-          PopupMenuButton<ShoppingScope>(
-            icon: const Icon(Icons.calendar_today, size: 18),
-            tooltip: 'Alcance del planner',
-            onSelected: (scope) => setState(() => _scope = scope),
-            itemBuilder:
-                (context) => [
-                  PopupMenuItem(
-                    value: ShoppingScope.weekly,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _scope == ShoppingScope.weekly
-                              ? Icons.check
-                              : Icons.calendar_view_week,
-                          size: 18,
+      appBar:
+          widget.embedded
+              ? null
+              : FoodCompactAppBar(
+                title: 'Planificador',
+                subtitle: _getPlannerName(),
+                actions: [
+                  IconButton(
+                    onPressed:
+                        () => setState(
+                          () => _showPlannersList = !_showPlannersList,
                         ),
-                        const SizedBox(width: 8),
-                        const Text('Semanal'),
-                      ],
-                    ),
+                    icon: const Icon(Icons.restaurant_menu, size: 18),
+                    tooltip: 'Cambiar planner',
                   ),
-                  PopupMenuItem(
-                    value: ShoppingScope.biweekly,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _scope == ShoppingScope.biweekly
-                              ? Icons.check
-                              : Icons.calendar_view_week,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('Quincenal (x2)'),
-                      ],
-                    ),
+                  PopupMenuButton<ShoppingScope>(
+                    icon: const Icon(Icons.calendar_today, size: 18),
+                    tooltip: 'Alcance del planner',
+                    onSelected: (scope) => setState(() => _scope = scope),
+                    itemBuilder:
+                        (context) => [
+                          PopupMenuItem(
+                            value: ShoppingScope.weekly,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _scope == ShoppingScope.weekly
+                                      ? Icons.check
+                                      : Icons.calendar_view_week,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Semanal'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: ShoppingScope.biweekly,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _scope == ShoppingScope.biweekly
+                                      ? Icons.check
+                                      : Icons.calendar_view_week,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Quincenal (x2)'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: ShoppingScope.monthly,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _scope == ShoppingScope.monthly
+                                      ? Icons.check
+                                      : Icons.calendar_view_month,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Mensual (x4)'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: ShoppingScope.custom,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _scope == ShoppingScope.custom
+                                      ? Icons.check
+                                      : Icons.settings,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Personalizado'),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
-                  PopupMenuItem(
-                    value: ShoppingScope.monthly,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _scope == ShoppingScope.monthly
-                              ? Icons.check
-                              : Icons.calendar_view_month,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('Mensual (x4)'),
-                      ],
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_calendar, size: 18),
+                    tooltip: 'Configurar comidas',
+                    onPressed: _configureMealSlots,
                   ),
-                  PopupMenuItem(
-                    value: ShoppingScope.custom,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _scope == ShoppingScope.custom
-                              ? Icons.check
-                              : Icons.settings,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('Personalizado'),
-                      ],
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart_checkout, size: 18),
+                    tooltip: 'Generar lista',
+                    onPressed: _generateShoppingList,
                   ),
                 ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit_calendar, size: 18),
-            tooltip: 'Configurar comidas',
-            onPressed: _configureMealSlots,
-          ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_checkout, size: 18),
-            tooltip: 'Generar lista',
-            onPressed: _generateShoppingList,
-          ),
-        ],
-      ),
+              ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 800;
@@ -282,7 +290,9 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
             final alerts = alertsSnap.data ?? const {};
             final proteinLow = alerts['foodProteinLowAfterWorkout'] == true;
             final extremeDeficit = alerts['foodExtremeDeficitWorkout'] == true;
-            debugPrint('[FoodPlanner][statusBar] targets=kcal:$targetKcal protein:$targetProtein proteinLow=$proteinLow extremeDeficit=$extremeDeficit');
+            debugPrint(
+              '[FoodPlanner][statusBar] targets=kcal:$targetKcal protein:$targetProtein proteinLow=$proteinLow extremeDeficit=$extremeDeficit',
+            );
 
             return Container(
               width: double.infinity,
@@ -298,11 +308,15 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Chip(
-                    label: Text('Objetivo kcal ${targetKcal.toStringAsFixed(0)}'),
+                    label: Text(
+                      'Objetivo kcal ${targetKcal.toStringAsFixed(0)}',
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
                   Chip(
-                    label: Text('Objetivo proteína ${targetProtein.toStringAsFixed(0)}g'),
+                    label: Text(
+                      'Objetivo proteína ${targetProtein.toStringAsFixed(0)}g',
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
                   if (proteinLow)
@@ -405,7 +419,9 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).dividerColor.withOpacity(0.3),
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -433,7 +449,7 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                 style: AppTypography.label(context).copyWith(
                                   color:
                                       isSelected
-                                      ? FocuslaneUI.accent(context)
+                                          ? FocuslaneUI.accent(context)
                                           : AppColors.textSecondary,
                                   fontWeight:
                                       isSelected
@@ -521,12 +537,12 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                   children: [
                                     Icon(
                                       Icons.info_outline,
-                                        size: 14,
+                                      size: 14,
                                       color: AppColors.textSecondary,
                                     ),
-                                      const SizedBox(width: AppSpacing.xs),
+                                    const SizedBox(width: AppSpacing.xs),
                                     Text(
-                                      'Toca para añadir • Mantén pulsado para eliminar',
+                                      'Toca para añadir - mantén pulsado para eliminar',
                                       style: AppTypography.caption(
                                         context,
                                       ).copyWith(
@@ -553,7 +569,9 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Theme.of(context).dividerColor.withOpacity(0.2),
+                                    color: Theme.of(
+                                      context,
+                                    ).dividerColor.withOpacity(0.2),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -973,11 +991,10 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                             final food = foods[index];
                             return ListTile(
                               leading: CircleAvatar(
-                                backgroundColor:
-                                    FocuslaneUI.accentSurface(
-                                      context,
-                                      opacity: 0.18,
-                                    ),
+                                backgroundColor: FocuslaneUI.accentSurface(
+                                  context,
+                                  opacity: 0.18,
+                                ),
                                 child: const Icon(Icons.restaurant, size: 20),
                               ),
                               title: Text(
@@ -1271,10 +1288,13 @@ class _FoodPlannerScreenState extends State<FoodPlannerScreen> {
                             ),
                             title: Text(food.name),
                             subtitle: Text(
-                              '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal • ${entry.servings}x porción',
+                              '${(food.kcal * entry.servings).toStringAsFixed(0)} kcal - ${entry.servings}x porción',
                             ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: AppColors.error),
+                              icon: const Icon(
+                                Icons.delete,
+                                color: AppColors.error,
+                              ),
                               onPressed:
                                   () => _deleteEntry(
                                     planner,
@@ -1534,7 +1554,10 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
                           hintText: 'Nombre de la comida',
                           enabled: slot['enabled'],
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                         ),
                         style: AppTypography.body(context),
                         onChanged: (v) => slot['name'] = v,
@@ -1645,5 +1668,3 @@ class _MealSlotsConfigSheetState extends State<_MealSlotsConfigSheet> {
     );
   }
 }
-
-
