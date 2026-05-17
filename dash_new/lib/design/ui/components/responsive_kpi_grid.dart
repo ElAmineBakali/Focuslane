@@ -25,28 +25,34 @@ class ResponsiveKpiGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Determinar número de columnas según el ancho
-        final int cols = crossAxisCount ??
+        final compact = FocuslaneTokens.isCompact(context);
+        final effectiveSpacing =
+            compact ? FocuslaneTokens.gridGapFor(context, spacing) : spacing;
+        final int cols =
+            crossAxisCount ??
             (constraints.maxWidth >= 1200
                 ? 4
                 : constraints.maxWidth >= 600
-                    ? 2
-                    : 2); // Mobile siempre 2x2
+                ? 2
+                : 2); // Mobile siempre 2x2
 
         // Ajustar aspect ratio para desktop
         final double aspectRatio =
-            constraints.maxWidth >= 600 ? 3.2 : childAspectRatio;
+            constraints.maxWidth >= 600
+                ? 3.2
+                : compact
+                ? 2.55
+                : childAspectRatio;
 
         // Si estamos en móvil y tenemos menos de 2 columnas, hacer una sola fila
         if (constraints.maxWidth < 600 && children.length == 1) {
-          return SizedBox(
-            child: children.first,
-          );
+          return SizedBox(child: children.first);
         }
 
         return GridView.count(
           crossAxisCount: cols,
-          mainAxisSpacing: spacing,
-          crossAxisSpacing: spacing,
+          mainAxisSpacing: effectiveSpacing,
+          crossAxisSpacing: effectiveSpacing,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           childAspectRatio: aspectRatio,

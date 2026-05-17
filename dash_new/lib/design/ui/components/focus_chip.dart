@@ -20,18 +20,24 @@ class FocusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tone = color ?? FocuslaneTokens.accent(context);
+    final compact = FocuslaneTokens.isCompact(context);
 
     final chip = InputChip(
       label: Text(label),
-      avatar: icon != null ? Icon(icon, size: 16, color: tone) : null,
+      avatar:
+          icon != null
+              ? Icon(icon, size: compact ? 14 : 16, color: tone)
+              : null,
       onPressed: onTap,
       onDeleted: onDelete,
-      backgroundColor: tone.withOpacity(0.1),
-      side: BorderSide(color: tone.withOpacity(0.18)),
+      visualDensity: compact ? VisualDensity.compact : VisualDensity.standard,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      backgroundColor: tone.withValues(alpha: 0.1),
+      side: BorderSide(color: tone.withValues(alpha: 0.18)),
       labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: tone,
-            fontWeight: FontWeight.w600,
-          ),
+        color: tone,
+        fontWeight: FontWeight.w600,
+      ),
       deleteIconColor: tone,
     );
 

@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return AuthShell(
       child: Column(
@@ -125,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
             title: 'Bienvenido de nuevo',
             subtitle: 'Accede a tu espacio de productividad con tu cuenta.',
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: compact ? 14 : 24),
           AuthFormCard(
             child: AutofillGroup(
               child: Form(
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: compact ? 12 : 14),
                     AuthTextField(
                       label: 'Contraseña',
                       hint: 'Mínimo 6 caracteres',
@@ -194,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     if (_error != null) ...[
                       _AuthMessage(message: _error!, isError: true),
-                      const SizedBox(height: 12),
+                      SizedBox(height: compact ? 10 : 12),
                     ],
                     AuthPrimaryButton(
                       label: 'Iniciar sesión',
@@ -202,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       isLoading: _busy,
                       onPressed: _busy ? null : _signin,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: compact ? 12 : 14),
                     Row(
                       children: [
                         Expanded(child: Divider(color: scheme.outlineVariant)),
@@ -221,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider(color: scheme.outlineVariant)),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: compact ? 12 : 14),
                     FocusSecondaryButton(
                       label: 'Google',
                       icon: Icons.g_mobiledata_rounded,
@@ -233,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: compact ? 14 : 18),
           AuthSecondaryLink(
             label: '¿No tienes cuenta? ',
             actionLabel: 'Crear cuenta',

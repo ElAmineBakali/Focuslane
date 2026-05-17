@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'focuslane_semantic_tokens.dart';
 
 class FocuslaneTokens {
+  static const double mobileBreakpoint = 600.0;
+  static const double tabletBreakpoint = 1024.0;
   static const double sidebarWidth = 260.0;
   static const double topBarHeight = 64.0;
   static const double containerMaxWidth = 1440.0;
@@ -35,6 +37,142 @@ class FocuslaneTokens {
 
   static bool isDark(BuildContext c) {
     return Theme.of(c).brightness == Brightness.dark;
+  }
+
+  static bool isCompact(BuildContext c) {
+    return MediaQuery.sizeOf(c).width < mobileBreakpoint;
+  }
+
+  static bool isTablet(BuildContext c) {
+    final width = MediaQuery.sizeOf(c).width;
+    return width >= mobileBreakpoint && width < tabletBreakpoint;
+  }
+
+  static bool isDesktop(BuildContext c) {
+    return MediaQuery.sizeOf(c).width >= tabletBreakpoint;
+  }
+
+  static double topBarHeightFor(BuildContext c) {
+    return isCompact(c) ? 56.0 : topBarHeight;
+  }
+
+  static double headerHeightFor(BuildContext c) {
+    return isCompact(c) ? 52.0 : 56.0;
+  }
+
+  static double iconButtonSizeFor(BuildContext c) {
+    return isCompact(c) ? 36.0 : 40.0;
+  }
+
+  static double buttonHeightFor(BuildContext c) {
+    return isCompact(c) ? 40.0 : 44.0;
+  }
+
+  static double buttonHPaddingFor(BuildContext c) {
+    return isCompact(c) ? 14.0 : 18.0;
+  }
+
+  static double buttonVPaddingFor(BuildContext c) {
+    return isCompact(c) ? 9.0 : 12.0;
+  }
+
+  static double pageGapFor(BuildContext c) {
+    return isCompact(c) ? spacing12 : spacing24;
+  }
+
+  static double sectionGapFor(BuildContext c) {
+    return isCompact(c) ? 10.0 : 18.0;
+  }
+
+  static double gridGapFor(BuildContext c, [double desktop = spacing16]) {
+    return isCompact(c) ? 10.0 : desktop;
+  }
+
+  static EdgeInsets pagePaddingFor(BuildContext c) {
+    final width = MediaQuery.sizeOf(c).width;
+    final bottomSafe = MediaQuery.paddingOf(c).bottom;
+    if (width < mobileBreakpoint) {
+      return EdgeInsets.fromLTRB(12, 10, 12, 14 + bottomSafe);
+    }
+    if (width < 1180) {
+      return const EdgeInsets.all(spacing24);
+    }
+    return const EdgeInsets.all(spacing32);
+  }
+
+  static EdgeInsets cardPaddingFor(BuildContext c) {
+    if (isCompact(c)) {
+      return const EdgeInsets.all(12);
+    }
+    if (isTablet(c)) {
+      return const EdgeInsets.all(18);
+    }
+    return cardPadding;
+  }
+
+  static EdgeInsets sectionNavPaddingFor(BuildContext c) {
+    return isCompact(c)
+        ? const EdgeInsets.symmetric(horizontal: 12, vertical: 7)
+        : const EdgeInsets.symmetric(horizontal: 16, vertical: 10);
+  }
+
+  static ThemeData adaptiveTheme(BuildContext c, ThemeData base) {
+    if (!isCompact(c)) return base;
+    final buttonMinimum = WidgetStatePropertyAll<Size>(
+      Size(0, buttonHeightFor(c)),
+    );
+    final buttonPadding = WidgetStatePropertyAll<EdgeInsetsGeometry>(
+      EdgeInsets.symmetric(
+        horizontal: buttonHPaddingFor(c),
+        vertical: buttonVPaddingFor(c),
+      ),
+    );
+    return base.copyWith(
+      textTheme: _compactTextTheme(base.textTheme),
+      visualDensity: VisualDensity.compact,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: base.elevatedButtonTheme.style?.copyWith(
+          minimumSize: buttonMinimum,
+          padding: buttonPadding,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: base.filledButtonTheme.style?.copyWith(
+          minimumSize: buttonMinimum,
+          padding: buttonPadding,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: base.outlinedButtonTheme.style?.copyWith(
+          minimumSize: buttonMinimum,
+          padding: buttonPadding,
+        ),
+      ),
+      inputDecorationTheme: base.inputDecorationTheme.copyWith(
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      ),
+    );
+  }
+
+  static TextTheme _compactTextTheme(TextTheme base) {
+    return base.copyWith(
+      displayLarge: _reduceText(base.displayLarge, 5),
+      displayMedium: _reduceText(base.displayMedium, 5),
+      displaySmall: _reduceText(base.displaySmall, 4),
+      headlineLarge: _reduceText(base.headlineLarge, 4),
+      headlineMedium: _reduceText(base.headlineMedium, 3),
+      headlineSmall: _reduceText(base.headlineSmall, 2),
+      titleLarge: _reduceText(base.titleLarge, 1),
+    );
+  }
+
+  static TextStyle? _reduceText(TextStyle? style, double amount) {
+    final size = style?.fontSize;
+    if (style == null || size == null) return style;
+    return style.copyWith(
+      fontSize: (size - amount).clamp(11.0, size).toDouble(),
+    );
   }
 
   static Color accent(BuildContext c) {
@@ -194,7 +332,7 @@ class FocusTypography {
   static TextStyle heading1(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 32,
+      fontSize: FocuslaneTokens.isCompact(context) ? 28 : 32,
       fontWeight: FontWeight.bold,
       color: color ?? (isDark ? Colors.white : FocusColors.grey900),
       height: 1.2,
@@ -204,7 +342,7 @@ class FocusTypography {
   static TextStyle heading2(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 24,
+      fontSize: FocuslaneTokens.isCompact(context) ? 21 : 24,
       fontWeight: FontWeight.w600,
       color: color ?? (isDark ? Colors.white : FocusColors.grey900),
       height: 1.3,
@@ -214,7 +352,7 @@ class FocusTypography {
   static TextStyle heading3(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 20,
+      fontSize: FocuslaneTokens.isCompact(context) ? 18 : 20,
       fontWeight: FontWeight.w600,
       color: color ?? (isDark ? Colors.white : FocusColors.grey900),
       height: 1.4,
@@ -224,7 +362,7 @@ class FocusTypography {
   static TextStyle heading4(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 16,
+      fontSize: FocuslaneTokens.isCompact(context) ? 15 : 16,
       fontWeight: FontWeight.w600,
       color: color ?? (isDark ? Colors.white : FocusColors.grey900),
       height: 1.5,
@@ -234,7 +372,7 @@ class FocusTypography {
   static TextStyle body(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 14,
+      fontSize: FocuslaneTokens.isCompact(context) ? 13.5 : 14,
       fontWeight: FontWeight.w400,
       color: color ?? (isDark ? FocusColors.grey200 : FocusColors.grey800),
       height: 1.5,
@@ -244,7 +382,7 @@ class FocusTypography {
   static TextStyle bodySmall(BuildContext context, {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GoogleFonts.poppins(
-      fontSize: 13,
+      fontSize: FocuslaneTokens.isCompact(context) ? 12.5 : 13,
       fontWeight: FontWeight.w400,
       color: color ?? (isDark ? FocusColors.grey300 : FocusColors.grey700),
       height: 1.4,
@@ -273,7 +411,7 @@ class FocusTypography {
 
   static TextStyle button(BuildContext context, {Color? color}) {
     return GoogleFonts.poppins(
-      fontSize: 14,
+      fontSize: FocuslaneTokens.isCompact(context) ? 13 : 14,
       fontWeight: FontWeight.w600,
       color: color ?? Colors.white,
       letterSpacing: 0.5,

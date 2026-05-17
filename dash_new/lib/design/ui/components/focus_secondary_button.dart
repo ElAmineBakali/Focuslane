@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/focuslane_tokens.dart';
+
 class FocusSecondaryButton extends StatelessWidget {
   const FocusSecondaryButton({
     super.key,
@@ -16,9 +18,13 @@ class FocusSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = FocuslaneTokens.isCompact(context);
     final style = OutlinedButton.styleFrom(
-      minimumSize: const Size(0, 44),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      minimumSize: Size(0, FocuslaneTokens.buttonHeightFor(context)),
+      padding: EdgeInsets.symmetric(
+        horizontal: FocuslaneTokens.buttonHPaddingFor(context),
+        vertical: FocuslaneTokens.buttonVPaddingFor(context),
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
 
@@ -32,7 +38,7 @@ class FocusSecondaryButton extends StatelessWidget {
             : OutlinedButton.icon(
               onPressed: onPressed,
               style: style,
-              icon: Icon(icon, size: 18),
+              icon: Icon(icon, size: compact ? 17 : 18),
               label: Text(label),
             );
 

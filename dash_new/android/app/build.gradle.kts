@@ -43,7 +43,7 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
-            manifestPlaceholders["appLabel"] = "FocusLane Beta"
+            manifestPlaceholders["appLabel"] = "FocusLane"
         }
     }
 

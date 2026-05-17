@@ -23,10 +23,11 @@ class FocusMetricCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final accent = FocuslaneTokens.accent(context);
+    final compact = FocuslaneTokens.isCompact(context);
 
     return FocusCard(
-      maxHeight: 96,
-      padding: const EdgeInsets.all(10),
+      maxHeight: compact ? 88 : 96,
+      padding: EdgeInsets.all(compact ? 9 : 10),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,13 +37,13 @@ class FocusMetricCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 24,
-                height: 24,
+                width: compact ? 22 : 24,
+                height: compact ? 22 : 24,
                 decoration: BoxDecoration(
                   color: FocuslaneTokens.accentSurface(context, opacity: 0.16),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: accent, size: 14),
+                child: Icon(icon, color: accent, size: compact ? 13 : 14),
               ),
               Icon(
                 Icons.arrow_forward_ios,

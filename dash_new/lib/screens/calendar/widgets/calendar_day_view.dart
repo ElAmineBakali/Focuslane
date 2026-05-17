@@ -32,6 +32,7 @@ class CalendarDayView extends StatelessWidget {
     required this.onHighOnlyToggle,
     this.onPointerSignal,
     this.onScaleUpdate,
+    this.usePageScroll = false,
   });
 
   final DateTime day;
@@ -59,131 +60,145 @@ class CalendarDayView extends StatelessWidget {
   final Future<void> Function(bool value) onHighOnlyToggle;
   final ValueChanged<PointerSignalEvent>? onPointerSignal;
   final GestureScaleUpdateCallback? onScaleUpdate;
+  final bool usePageScroll;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
+    final filters = CalendarFilterChips(
+      prefs: prefs,
+      onTypeToggle: onTypeToggle,
+      onHighOnlyToggle: onHighOnlyToggle,
+    );
+    final header = FocusCard(
+      padding: const EdgeInsets.all(14),
+      elevated: false,
+      backgroundColor: scheme.surfaceContainerLow,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 620;
+          final title = Row(
+            children: [
+              Icon(Icons.view_day_rounded, color: scheme.primary, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  humanDateLong(day),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          );
+          final zoom = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Zoom',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: compact ? 180 : 160,
+                child: Slider(
+                  value: slotHeight,
+                  min: 34,
+                  max: 120,
+                  onChanged: onSlotHeightChanged,
+                ),
+              ),
+            ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                title,
+                const SizedBox(height: 8),
+                Align(alignment: Alignment.centerLeft, child: zoom),
+              ],
+            );
+          }
+
+          return Row(
+            children: [Expanded(child: title), const SizedBox(width: 16), zoom],
+          );
+        },
+      ),
+    );
+    final timelineSurface = CalendarTimelineSurface(
+      days: [day],
+      dayWidth: dayWidth,
+      timeAxisWidth: timeAxisWidth,
+      timelineStartHour: timelineStartHour,
+      timelineEndHour: timelineEndHour,
+      timelineHeight: timelineHeight,
+      slotHeight: slotHeight,
+      itemsFor: itemsFor,
+      topFor: topFor,
+      durationMinutes: durationMinutes,
+      canMoveItem: canMoveItem,
+      canResizeItem: canResizeItem,
+      onMoveItemToSlot: onMoveItemToSlot,
+      onResizeItem: onResizeItem,
+      onTapItem: onTapItem,
+      onCreateEvent: onCreateEvent,
+      onPointerSignal: onPointerSignal,
+      onScaleUpdate: onScaleUpdate,
+    );
+    final timelineCard = FocusCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: scheme.surfaceContainerLowest,
+      child: Column(
+        mainAxisSize: usePageScroll ? MainAxisSize.min : MainAxisSize.max,
+        children: [
+          CalendarAllDayRow(
+            days: [day],
+            dayWidth: dayWidth,
+            timeAxisWidth: timeAxisWidth,
+            itemsFor: itemsFor,
+            canMoveItem: canMoveItem,
+            onMoveItemToDay: onMoveItemToDay,
+            onTapItem: onTapItem,
+            onCreateEvent: onCreateEvent,
+          ),
+          const Divider(height: 1),
+          if (usePageScroll)
+            SizedBox(height: timelineHeight, child: timelineSurface)
+          else
+            Expanded(child: timelineSurface),
+        ],
+      ),
+    );
+
+    if (usePageScroll) {
+      return Column(
+        children: [
+          filters,
+          const SizedBox(height: 12),
+          header,
+          const SizedBox(height: 12),
+          timelineCard,
+        ],
+      );
+    }
+
     return Column(
       children: [
-        CalendarFilterChips(
-          prefs: prefs,
-          onTypeToggle: onTypeToggle,
-          onHighOnlyToggle: onHighOnlyToggle,
-        ),
+        filters,
         const SizedBox(height: 12),
-        FocusCard(
-          padding: const EdgeInsets.all(14),
-          elevated: false,
-          backgroundColor: scheme.surfaceContainerLow,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 620;
-              final title = Row(
-                children: [
-                  Icon(Icons.view_day_rounded, color: scheme.primary, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      humanDateLong(day),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ],
-              );
-              final zoom = Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Zoom',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: compact ? 180 : 160,
-                    child: Slider(
-                      value: slotHeight,
-                      min: 34,
-                      max: 120,
-                      onChanged: onSlotHeightChanged,
-                    ),
-                  ),
-                ],
-              );
-
-              if (compact) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    title,
-                    const SizedBox(height: 8),
-                    Align(alignment: Alignment.centerLeft, child: zoom),
-                  ],
-                );
-              }
-
-              return Row(
-                children: [
-                  Expanded(child: title),
-                  const SizedBox(width: 16),
-                  zoom,
-                ],
-              );
-            },
-          ),
-        ),
+        header,
         const SizedBox(height: 12),
-        Expanded(
-          child: FocusCard(
-            padding: EdgeInsets.zero,
-            backgroundColor: scheme.surfaceContainerLowest,
-            child: Column(
-              children: [
-                CalendarAllDayRow(
-                  days: [day],
-                  dayWidth: dayWidth,
-                  timeAxisWidth: timeAxisWidth,
-                  itemsFor: itemsFor,
-                  canMoveItem: canMoveItem,
-                  onMoveItemToDay: onMoveItemToDay,
-                  onTapItem: onTapItem,
-                  onCreateEvent: onCreateEvent,
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: CalendarTimelineSurface(
-                    days: [day],
-                    dayWidth: dayWidth,
-                    timeAxisWidth: timeAxisWidth,
-                    timelineStartHour: timelineStartHour,
-                    timelineEndHour: timelineEndHour,
-                    timelineHeight: timelineHeight,
-                    slotHeight: slotHeight,
-                    itemsFor: itemsFor,
-                    topFor: topFor,
-                    durationMinutes: durationMinutes,
-                    canMoveItem: canMoveItem,
-                    canResizeItem: canResizeItem,
-                    onMoveItemToSlot: onMoveItemToSlot,
-                    onResizeItem: onResizeItem,
-                    onTapItem: onTapItem,
-                    onCreateEvent: onCreateEvent,
-                    onPointerSignal: onPointerSignal,
-                    onScaleUpdate: onScaleUpdate,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        Expanded(child: timelineCard),
       ],
     );
   }

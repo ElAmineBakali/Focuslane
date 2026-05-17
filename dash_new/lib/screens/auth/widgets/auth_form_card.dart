@@ -11,7 +11,13 @@ class AuthFormCard extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
 
     return FocusCard(
-      padding: EdgeInsets.all(width < 420 ? 18 : 24),
+      padding: EdgeInsets.all(
+        width < 420
+            ? 14
+            : width < 640
+            ? 18
+            : 24,
+      ),
       child: child,
     );
   }

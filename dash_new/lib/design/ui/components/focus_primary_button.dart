@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/focuslane_tokens.dart';
+
 class FocusPrimaryButton extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -22,12 +24,16 @@ class FocusPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final bg = color ?? cs.primary;
+    final compact = FocuslaneTokens.isCompact(context);
 
     final style = FilledButton.styleFrom(
       backgroundColor: bg,
       foregroundColor: cs.onPrimary,
-      minimumSize: const Size(0, 44),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      minimumSize: Size(0, FocuslaneTokens.buttonHeightFor(context)),
+      padding: EdgeInsets.symmetric(
+        horizontal: FocuslaneTokens.buttonHPaddingFor(context),
+        vertical: FocuslaneTokens.buttonVPaddingFor(context),
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
 
@@ -41,7 +47,8 @@ class FocusPrimaryButton extends StatelessWidget {
         (icon != null || isLoading)
             ? FilledButton.icon(
               onPressed: isLoading ? null : onPressed,
-              icon: isLoading ? loadingIcon : Icon(icon, size: 18),
+              icon:
+                  isLoading ? loadingIcon : Icon(icon, size: compact ? 17 : 18),
               label: Text(label),
               style: style,
             )

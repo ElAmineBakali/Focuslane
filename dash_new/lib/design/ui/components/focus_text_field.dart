@@ -36,6 +36,7 @@ class FocusTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     final field = TextFormField(
       controller: controller,
@@ -50,9 +51,18 @@ class FocusTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 18) : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: compact ? 8 : 10,
+          horizontal: 12,
+        ),
+        prefixIcon:
+            prefixIcon != null
+                ? Icon(prefixIcon, size: compact ? 17 : 18)
+                : null,
+        prefixIconConstraints: BoxConstraints(
+          minWidth: compact ? 32 : 34,
+          minHeight: compact ? 32 : 34,
+        ),
         suffixIcon: suffixIcon,
         suffixText: suffix,
         filled: true,
@@ -88,7 +98,7 @@ class FocusTextField extends StatelessWidget {
     );
 
     if (maxLines == 1) {
-      return SizedBox(height: 40, child: field);
+      return SizedBox(height: compact ? 38 : 40, child: field);
     }
 
     return field;

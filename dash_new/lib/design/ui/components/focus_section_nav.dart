@@ -38,7 +38,7 @@ class FocusSectionNav extends StatelessWidget {
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: FocuslaneTokens.sectionNavPaddingFor(context),
         child: Row(
           children: [
             for (var index = 0; index < items.length; index++) ...[
@@ -70,6 +70,7 @@ class _SectionNavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
     final tone = selected ? scheme.primary : scheme.onSurfaceVariant;
     final bg =
         selected
@@ -85,8 +86,8 @@ class _SectionNavButton extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
           child: Container(
-            height: 42,
-            padding: const EdgeInsets.symmetric(horizontal: 13),
+            height: compact ? 36 : 42,
+            padding: EdgeInsets.symmetric(horizontal: compact ? 11 : 13),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),
               border: Border.all(
@@ -99,8 +100,8 @@ class _SectionNavButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(item.icon, color: tone, size: 19),
-                const SizedBox(width: 8),
+                Icon(item.icon, color: tone, size: compact ? 17 : 19),
+                SizedBox(width: compact ? 6 : 8),
                 Text(
                   item.label,
                   maxLines: 1,
@@ -111,7 +112,7 @@ class _SectionNavButton extends StatelessWidget {
                   ),
                 ),
                 if (item.badge != null) ...[
-                  const SizedBox(width: 8),
+                  SizedBox(width: compact ? 6 : 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 7,

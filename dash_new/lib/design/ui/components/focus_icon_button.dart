@@ -26,6 +26,8 @@ class FocusIconButton extends StatelessWidget {
         isActive
             ? scheme.primaryContainer.withValues(alpha: 0.24)
             : scheme.surfaceContainerLow;
+    final size = FocuslaneTokens.iconButtonSizeFor(context);
+    final iconSize = FocuslaneTokens.isCompact(context) ? 18.0 : 20.0;
 
     return Tooltip(
       message: tooltip,
@@ -39,14 +41,14 @@ class FocusIconButton extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(icon, color: tone, size: 20),
+                width: size,
+                height: size,
+                child: Icon(icon, color: tone, size: iconSize),
               ),
               if (badge)
                 Positioned(
-                  top: 9,
-                  right: 9,
+                  top: FocuslaneTokens.isCompact(context) ? 8 : 9,
+                  right: FocuslaneTokens.isCompact(context) ? 8 : 9,
                   child: Container(
                     width: 7,
                     height: 7,

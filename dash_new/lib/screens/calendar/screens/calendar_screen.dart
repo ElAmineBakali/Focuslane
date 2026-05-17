@@ -176,7 +176,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  Widget _buildYearTab() {
+  Widget _buildYearTab({bool usePageScroll = false}) {
     final focused = _calendarController.focused;
     return CalendarYearView(
       year: focused.year,
@@ -190,10 +190,11 @@ class _CalendarScreenState extends State<CalendarScreen>
       prefs: _calendarController.prefs,
       onTypeToggle: _calendarController.setTypeEnabled,
       onHighOnlyToggle: _calendarController.setHighOnly,
+      usePageScroll: usePageScroll,
     );
   }
 
-  Widget _buildMonthTab() {
+  Widget _buildMonthTab({bool usePageScroll = false}) {
     return CalendarMonthView(
       focusedDay: _calendarController.focused,
       selectedDay: _calendarController.selected,
@@ -210,10 +211,15 @@ class _CalendarScreenState extends State<CalendarScreen>
       monthRowHeight: CalendarController.monthRowHeight,
       dayListHeaderHeight: CalendarController.dayListHeaderHeight,
       dayListBodyHeight: CalendarController.dayListBodyHeight,
+      usePageScroll: usePageScroll,
     );
   }
 
-  Widget _buildDayTab(BuildContext context, double availableWidth) {
+  Widget _buildDayTab(
+    BuildContext context,
+    double availableWidth, {
+    bool usePageScroll = false,
+  }) {
     final selected = _calendarController.selected;
     final day = DateTime(selected.year, selected.month, selected.day);
     final dayWidth = math.max(
@@ -246,10 +252,11 @@ class _CalendarScreenState extends State<CalendarScreen>
       onHighOnlyToggle: _calendarController.setHighOnly,
       onPointerSignal: _onTimelinePointerSignal,
       onScaleUpdate: _onTimelineScaleUpdate,
+      usePageScroll: usePageScroll,
     );
   }
 
-  Widget _buildAgendaTab() {
+  Widget _buildAgendaTab({bool usePageScroll = false}) {
     return CalendarAgendaView(
       rows: _calendarController.agendaRows(),
       searchController: _calendarController.agendaSearchCtrl,
@@ -259,7 +266,30 @@ class _CalendarScreenState extends State<CalendarScreen>
       prefs: _calendarController.prefs,
       onTypeToggle: _calendarController.setTypeEnabled,
       onHighOnlyToggle: _calendarController.setHighOnly,
+      usePageScroll: usePageScroll,
     );
+  }
+
+  Widget _buildActiveTab(
+    BuildContext context,
+    double availableWidth, {
+    required bool usePageScroll,
+  }) {
+    switch (_calendarController.activeViewIndex) {
+      case 0:
+        return _buildYearTab(usePageScroll: usePageScroll);
+      case 1:
+        return _buildMonthTab(usePageScroll: usePageScroll);
+      case 2:
+        return _buildDayTab(
+          context,
+          availableWidth,
+          usePageScroll: usePageScroll,
+        );
+      case 3:
+      default:
+        return _buildAgendaTab(usePageScroll: usePageScroll);
+    }
   }
 
   void _selectView(int index) {
@@ -313,13 +343,27 @@ class _CalendarScreenState extends State<CalendarScreen>
                 activeRoute: AppRoutes.calendarDashboard,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final width = constraints.maxWidth;
-                    final padding =
-                        width < 720
-                            ? FocuslaneTokens.spacing16
-                            : width < 1180
-                            ? FocuslaneTokens.spacing24
-                            : FocuslaneTokens.spacing32;
+                    final padding = FocuslaneTokens.pagePaddingFor(context);
+                    final isMobile = FocuslaneTokens.isCompact(context);
+                    final availableWidth = math.max(
+                      0.0,
+                      constraints.maxWidth - padding.horizontal,
+                    );
+                    final header = _CalendarWorkspaceHeader(
+                      title: 'Calendario',
+                      periodLabel: _calendarController.appBarTitle(),
+                      activeViewIndex: _calendarController.activeViewIndex,
+                      selectedDay: _calendarController.selected,
+                      visibleItems: _calendarController.rangeItems.length,
+                      onSelectView: _selectView,
+                      onPrevious: () => _calendarController.shiftVisible(-1),
+                      onNext: () => _calendarController.shiftVisible(1),
+                      onToday: _calendarController.goToday,
+                      onNewEvent:
+                          () => _openEventEditor(
+                            defaultDay: _calendarController.selected,
+                          ),
+                    );
 
                     return SafeArea(
                       bottom: true,
@@ -329,49 +373,54 @@ class _CalendarScreenState extends State<CalendarScreen>
                             maxWidth: FocuslaneTokens.containerMaxWidth,
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(padding),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _CalendarWorkspaceHeader(
-                                  title: 'Calendario',
-                                  periodLabel:
-                                      _calendarController.appBarTitle(),
-                                  activeViewIndex:
-                                      _calendarController.activeViewIndex,
-                                  selectedDay: _calendarController.selected,
-                                  visibleItems:
-                                      _calendarController.rangeItems.length,
-                                  onSelectView: _selectView,
-                                  onPrevious:
-                                      () =>
-                                          _calendarController.shiftVisible(-1),
-                                  onNext:
-                                      () => _calendarController.shiftVisible(1),
-                                  onToday: _calendarController.goToday,
-                                  onNewEvent:
-                                      () => _openEventEditor(
-                                        defaultDay:
-                                            _calendarController.selected,
+                            padding: padding,
+                            child:
+                                isMobile
+                                    ? SingleChildScrollView(
+                                      physics: const BouncingScrollPhysics(),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          header,
+                                          const SizedBox(height: 10),
+                                          _buildActiveTab(
+                                            context,
+                                            availableWidth,
+                                            usePageScroll: true,
+                                          ),
+                                          SizedBox(
+                                            height:
+                                                16 +
+                                                MediaQuery.paddingOf(
+                                                  context,
+                                                ).bottom,
+                                          ),
+                                        ],
                                       ),
-                                ),
-                                const SizedBox(height: 16),
-                                Expanded(
-                                  child: TabBarView(
-                                    controller: _tabController,
-                                    children: [
-                                      _buildYearTab(),
-                                      _buildMonthTab(),
-                                      _buildDayTab(
-                                        context,
-                                        constraints.maxWidth,
-                                      ),
-                                      _buildAgendaTab(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                                    )
+                                    : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        header,
+                                        const SizedBox(height: 16),
+                                        Expanded(
+                                          child: TabBarView(
+                                            controller: _tabController,
+                                            children: [
+                                              _buildYearTab(),
+                                              _buildMonthTab(),
+                                              _buildDayTab(
+                                                context,
+                                                availableWidth,
+                                              ),
+                                              _buildAgendaTab(),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                           ),
                         ),
                       ),
@@ -421,9 +470,12 @@ class _CalendarWorkspaceHeader extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 780;
+          final mobile =
+              constraints.maxWidth < FocuslaneTokens.mobileBreakpoint;
           final viewSwitcher = _CalendarViewSwitcher(
             activeIndex: activeViewIndex,
             onSelected: onSelectView,
+            compact: mobile,
           );
           final actions = Wrap(
             spacing: 10,
@@ -494,6 +546,69 @@ class _CalendarWorkspaceHeader extends StatelessWidget {
             ],
           );
 
+          if (mobile) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        periodLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FocusBadge(
+                      label: '$visibleItems visibles',
+                      color: scheme.primary,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                viewSwitcher,
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    FocusIconButton(
+                      icon: Icons.chevron_left_rounded,
+                      tooltip: 'Anterior',
+                      onPressed: onPrevious,
+                    ),
+                    const SizedBox(width: 8),
+                    FocusIconButton(
+                      icon: Icons.chevron_right_rounded,
+                      tooltip: 'Siguiente',
+                      onPressed: onNext,
+                    ),
+                    const SizedBox(width: 8),
+                    FocusSecondaryButton(
+                      label: 'Hoy',
+                      icon: Icons.today_rounded,
+                      onPressed: onToday,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FocusPrimaryButton(
+                        label: 'Nuevo',
+                        icon: Icons.add_rounded,
+                        onPressed: onNewEvent,
+                        fullWidth: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }
+
           if (compact) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,10 +646,12 @@ class _CalendarViewSwitcher extends StatelessWidget {
   const _CalendarViewSwitcher({
     required this.activeIndex,
     required this.onSelected,
+    this.compact = false,
   });
 
   final int activeIndex;
   final ValueChanged<int> onSelected;
+  final bool compact;
 
   static const _views = [
     (label: 'Anual', icon: Icons.calendar_view_month_rounded),
@@ -545,6 +662,33 @@ class _CalendarViewSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      return DropdownButtonFormField<int>(
+        initialValue: activeIndex,
+        isExpanded: true,
+        decoration: const InputDecoration(
+          labelText: 'Vista',
+          prefixIcon: Icon(Icons.view_module_rounded),
+        ),
+        items: [
+          for (int index = 0; index < _views.length; index++)
+            DropdownMenuItem<int>(
+              value: index,
+              child: Row(
+                children: [
+                  Icon(_views[index].icon, size: 18),
+                  const SizedBox(width: 10),
+                  Text(_views[index].label),
+                ],
+              ),
+            ),
+        ],
+        onChanged: (value) {
+          if (value != null) onSelected(value);
+        },
+      );
+    }
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,

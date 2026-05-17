@@ -516,10 +516,11 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     required List<_EntityNotificationTarget> targets,
   }) {
     final colors = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: compact ? 8 : 10),
       child: FocusCard(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(compact ? 10 : 14),
         elevated: false,
         backgroundColor: colors.surfaceContainerLow,
         borderSide: BorderSide(color: colors.outlineVariant),
@@ -534,11 +535,11 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
             ),
             const SizedBox(height: 4),
             Text(subtitle),
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 6 : 8),
             if (targets.isEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(compact ? 10 : 14),
                 decoration: BoxDecoration(
                   color: colors.surfaceContainerLowest,
                   borderRadius: BorderRadius.circular(10),
@@ -573,6 +574,7 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
     bool initiallyExpanded = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
     return FocusCard(
       padding: EdgeInsets.zero,
       elevated: false,
@@ -581,12 +583,20 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+          tilePadding: EdgeInsets.symmetric(
+            horizontal: compact ? 12 : 18,
+            vertical: compact ? 4 : 8,
+          ),
+          childrenPadding: EdgeInsets.fromLTRB(
+            compact ? 12 : 18,
+            0,
+            compact ? 12 : 18,
+            compact ? 12 : 18,
+          ),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
           leading: Container(
-            width: 40,
-            height: 40,
+            width: compact ? 34 : 40,
+            height: compact ? 34 : 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: colorScheme.primary.withValues(alpha: 0.12),
@@ -679,15 +689,15 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: FocuslaneTokens.pageGapFor(context)),
               const NotificationDiagnosticsPanel(),
-              const SizedBox(height: 18),
+              SizedBox(height: FocuslaneTokens.pageGapFor(context)),
               _ScreenGroupHeader(
                 title: 'Recordatorios por módulo',
                 subtitle:
                     'Cada bloque reúne la configuración general y los avisos propios de ese módulo.',
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
               _modulePanel(
                 title: 'Tareas',
                 subtitle: 'Avisos por tareas pendientes y fechas límite',
@@ -730,7 +740,7 @@ class _GlobalNotificationsScreenState extends State<GlobalNotificationsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
               _modulePanel(
                 title: 'Calendario',
                 subtitle: 'Recordatorios por evento y preparación previa',

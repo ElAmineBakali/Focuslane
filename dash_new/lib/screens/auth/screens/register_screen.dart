@@ -81,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             subtitle:
                 'Prepara tu espacio para tareas, notas, calendario y hábitos.',
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: compact ? 14 : 24),
           AuthFormCard(
             child: AutofillGroup(
               child: Form(
@@ -102,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ? 'El nombre es obligatorio'
                                   : null,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: compact ? 12 : 14),
                     AuthTextField(
                       label: 'Correo electrónico',
                       hint: 'correo@empresa.com',
@@ -120,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: compact ? 12 : 14),
                     if (compact)
                       Column(
                         children: [
@@ -138,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         ? 'Mínimo 6 caracteres'
                                         : null,
                           ),
-                          const SizedBox(height: 14),
+                          SizedBox(height: compact ? 12 : 14),
                           _PasswordField(
                             label: 'Confirmar contraseña',
                             controller: _confirm,
@@ -203,10 +203,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
                       ),
                     if (_error != null) ...[
-                      const SizedBox(height: 14),
+                      SizedBox(height: compact ? 12 : 14),
                       _AuthMessage(message: _error!),
                     ],
-                    const SizedBox(height: 18),
+                    SizedBox(height: compact ? 14 : 18),
                     AuthPrimaryButton(
                       label: 'Crear cuenta',
                       icon: Icons.person_add_alt_rounded,
@@ -218,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: compact ? 14 : 18),
           AuthSecondaryLink(
             label: '¿Ya tienes una cuenta? ',
             actionLabel: 'Iniciar sesión',

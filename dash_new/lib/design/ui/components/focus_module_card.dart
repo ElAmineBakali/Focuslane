@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/focuslane_tokens.dart';
 import 'focus_card.dart';
 
 class FocusModuleCard extends StatelessWidget {
@@ -22,10 +23,11 @@ class FocusModuleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tone = color ?? scheme.primary;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return FocusCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(compact ? 12 : 16),
       elevated: false,
       backgroundColor: scheme.surfaceContainerLow,
       child: Column(
@@ -33,15 +35,15 @@ class FocusModuleCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: compact ? 34 : 40,
+            height: compact ? 34 : 40,
             decoration: BoxDecoration(
               color: tone.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: tone, size: 22),
+            child: Icon(icon, color: tone, size: compact ? 18 : 22),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: compact ? 10 : 14),
           Text(
             title,
             maxLines: 1,

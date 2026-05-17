@@ -28,9 +28,10 @@ class ModuleSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Container(
-      width: FocuslaneTokens.sidebarWidth,
+      width: compact ? 248 : FocuslaneTokens.sidebarWidth,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         border: Border(
@@ -44,12 +45,17 @@ class ModuleSidebar extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              compact ? 16 : 24,
+              16,
+              compact ? 14 : 18,
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: compact ? 38 : 42,
+                  height: compact ? 38 : 42,
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(12),
@@ -58,7 +64,7 @@ class ModuleSidebar extends StatelessWidget {
                   child: Icon(
                     headerIcon,
                     color: colorScheme.onPrimary,
-                    size: 24,
+                    size: compact ? 22 : 24,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -97,7 +103,10 @@ class ModuleSidebar extends StatelessWidget {
           ),
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: compact ? 10 : 14,
+              ),
               itemCount: items.length,
               separatorBuilder: (_, __) => const SizedBox(height: 4),
               itemBuilder: (context, index) {
@@ -133,14 +142,14 @@ class ModuleSidebar extends StatelessWidget {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 10,
+                          vertical: compact ? 8 : 10,
                         ),
                         child: Row(
                           children: [
-                            Icon(item.icon, color: fg, size: 20),
-                            const SizedBox(width: 12),
+                            Icon(item.icon, color: fg, size: compact ? 18 : 20),
+                            SizedBox(width: compact ? 10 : 12),
                             Expanded(
                               child: Text(
                                 item.label,

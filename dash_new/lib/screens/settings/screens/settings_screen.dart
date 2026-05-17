@@ -258,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         displayName: _displayName,
                         email: FirebaseAuth.instance.currentUser?.email ?? '',
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: FocuslaneTokens.pageGapFor(context)),
                       LayoutBuilder(
                         builder: (context, constraints) {
                           final twoColumns = constraints.maxWidth >= 980;
@@ -274,24 +274,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onPickPhoto: _pickAndUploadPhoto,
                                   onSave: _saveProfile,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(
+                                  height: FocuslaneTokens.pageGapFor(context),
+                                ),
                                 _AppearanceCard(
                                   selectedThemeMode: _selectedThemeMode,
                                   onChanged: _setThemeMode,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(
+                                  height: FocuslaneTokens.pageGapFor(context),
+                                ),
                                 _ModulesCard(
                                   visibility: _visibility,
                                   onChanged: _toggleModule,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(
+                                  height: FocuslaneTokens.pageGapFor(context),
+                                ),
                                 _NotificationAccessCard(
                                   onOpen:
                                       () => Navigator.of(
                                         context,
                                       ).pushNamed(AppRoutes.notifications),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(
+                                  height: FocuslaneTokens.pageGapFor(context),
+                                ),
                                 _SecurityCard(
                                   passwordController: _passwordController,
                                   passwordConfirmController:
@@ -299,7 +307,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   changingPassword: _changingPassword,
                                   onChangePassword: _changePassword,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(
+                                  height: FocuslaneTokens.pageGapFor(context),
+                                ),
                                 _SignOutCard(
                                   signingOut: _signingOut,
                                   onSignOut: _signOut,
@@ -324,7 +334,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       onPickPhoto: _pickAndUploadPhoto,
                                       onSave: _saveProfile,
                                     ),
-                                    const SizedBox(height: 16),
+                                    SizedBox(
+                                      height: FocuslaneTokens.pageGapFor(
+                                        context,
+                                      ),
+                                    ),
                                     _ModulesCard(
                                       visibility: _visibility,
                                       onChanged: _toggleModule,
@@ -341,7 +355,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       selectedThemeMode: _selectedThemeMode,
                                       onChanged: _setThemeMode,
                                     ),
-                                    const SizedBox(height: 16),
+                                    SizedBox(
+                                      height: FocuslaneTokens.pageGapFor(
+                                        context,
+                                      ),
+                                    ),
                                     _NotificationAccessCard(
                                       onOpen:
                                           () => Navigator.of(

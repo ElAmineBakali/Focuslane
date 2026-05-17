@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../tokens/focuslane_tokens.dart';
+
 class FocusProgressRing extends StatelessWidget {
   const FocusProgressRing({
     super.key,
@@ -26,20 +28,23 @@ class FocusProgressRing extends StatelessWidget {
     final progress = value.clamp(0.0, 1.0);
     final tone = color ?? scheme.primary;
     final textLabel = label ?? '${(progress * 100).round()}%';
+    final compact = FocuslaneTokens.isCompact(context);
+    final resolvedSize = compact && size == 132 ? 108.0 : size;
+    final resolvedStroke = compact && strokeWidth == 10 ? 8.0 : strokeWidth;
 
     return SizedBox(
-      width: size,
-      height: size,
+      width: resolvedSize,
+      height: resolvedSize,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size: Size.square(size),
+            size: Size.square(resolvedSize),
             painter: _RingPainter(
               value: progress,
               color: tone,
               trackColor: scheme.surfaceContainerHigh,
-              strokeWidth: strokeWidth,
+              strokeWidth: resolvedStroke,
             ),
           ),
           Column(

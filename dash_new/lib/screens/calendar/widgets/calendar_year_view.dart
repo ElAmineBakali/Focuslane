@@ -14,6 +14,7 @@ class CalendarYearView extends StatelessWidget {
     required this.prefs,
     required this.onTypeToggle,
     required this.onHighOnlyToggle,
+    this.usePageScroll = false,
   });
 
   final int year;
@@ -23,11 +24,55 @@ class CalendarYearView extends StatelessWidget {
   final PlannerPrefs? prefs;
   final Future<void> Function(CalendarType type, bool value) onTypeToggle;
   final Future<void> Function(bool value) onHighOnlyToggle;
+  final bool usePageScroll;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final cols = width >= 1400 ? 4 : (width >= 900 ? 3 : 2);
+    final cols =
+        width < 520
+            ? 1
+            : width >= 1400
+            ? 4
+            : (width >= 900 ? 3 : 2);
+    final grid = GridView.builder(
+      shrinkWrap: usePageScroll,
+      physics:
+          usePageScroll
+              ? const NeverScrollableScrollPhysics()
+              : const ClampingScrollPhysics(),
+      padding: const EdgeInsets.only(top: 12, bottom: 16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: width < 520 ? 1.95 : 1.42,
+      ),
+      itemCount: stats.length,
+      itemBuilder: (ctx, i) {
+        final stat = stats[i];
+        return _YearMonthCard(
+          monthLabel: monthLabel(stat.month),
+          totalItems: stat.totalItems,
+          highItems: stat.highItems,
+          doneTasks: stat.doneTasks,
+          onTap: () => onSelectMonth(stat.month),
+        );
+      },
+    );
+
+    if (usePageScroll) {
+      return Column(
+        children: [
+          CalendarFilterChips(
+            prefs: prefs,
+            onTypeToggle: onTypeToggle,
+            onHighOnlyToggle: onHighOnlyToggle,
+          ),
+          grid,
+        ],
+      );
+    }
 
     return Column(
       children: [
@@ -36,28 +81,7 @@ class CalendarYearView extends StatelessWidget {
           onTypeToggle: onTypeToggle,
           onHighOnlyToggle: onHighOnlyToggle,
         ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.only(top: 12, bottom: 16),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: cols,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 1.42,
-            ),
-            itemCount: stats.length,
-            itemBuilder: (ctx, i) {
-              final stat = stats[i];
-              return _YearMonthCard(
-                monthLabel: monthLabel(stat.month),
-                totalItems: stat.totalItems,
-                highItems: stat.highItems,
-                doneTasks: stat.doneTasks,
-                onTap: () => onSelectMonth(stat.month),
-              );
-            },
-          ),
-        ),
+        Expanded(child: grid),
       ],
     );
   }

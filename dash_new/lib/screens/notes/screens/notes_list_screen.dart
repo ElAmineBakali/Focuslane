@@ -137,7 +137,7 @@ class _NotesWorkspace extends StatelessWidget {
               onNewNote: () => Navigator.pushNamed(context, '/notes/editor'),
               onGridChanged: onGridChanged,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: FocuslaneTokens.pageGapFor(context)),
             _NotesControls(
               sortField: sortField,
               sortDirection: sortDirection,
@@ -146,7 +146,7 @@ class _NotesWorkspace extends StatelessWidget {
               onSortDirectionChanged: onSortDirectionChanged,
               onGridChanged: onGridChanged,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: FocuslaneTokens.pageGapFor(context)),
             if (notes.isEmpty)
               FocusCard(
                 child: FocusEmptyState(
@@ -160,7 +160,7 @@ class _NotesWorkspace extends StatelessWidget {
             else if (grid)
               ResponsiveGrid(
                 minItemWidth: 240,
-                spacing: 16,
+                spacing: FocuslaneTokens.gridGapFor(context),
                 children: [
                   for (final note in notes)
                     _NoteCard(key: ValueKey(note.id), note: note),
@@ -174,7 +174,8 @@ class _NotesWorkspace extends StatelessWidget {
                       key: ValueKey(notes[index].id),
                       note: notes[index],
                     ),
-                    if (index != notes.length - 1) const SizedBox(height: 12),
+                    if (index != notes.length - 1)
+                      SizedBox(height: FocuslaneTokens.pageGapFor(context)),
                   ],
                 ],
               ),
@@ -270,7 +271,11 @@ class _NotesHeader extends StatelessWidget {
           if (compact) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [copy, const SizedBox(height: 18), actions],
+              children: [
+                copy,
+                SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
+                actions,
+              ],
             );
           }
 
@@ -312,7 +317,7 @@ class _NotesControls extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return FocusCard(
-      padding: const EdgeInsets.all(16),
+      padding: FocuslaneTokens.cardPaddingFor(context),
       elevated: false,
       backgroundColor: scheme.surfaceContainerLow,
       child: LayoutBuilder(
@@ -391,7 +396,7 @@ class _NotesControls extends StatelessWidget {
                   subtitle: 'Orden y tipo de vista',
                   icon: Icons.dashboard_customize_rounded,
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
                 sortDropdown,
                 const SizedBox(height: 10),
                 iconControls,
@@ -451,7 +456,11 @@ class _NoteTile extends StatelessWidget {
           if (compact) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [visual, const SizedBox(height: 14), content],
+              children: [
+                visual,
+                SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
+                content,
+              ],
             );
           }
 
@@ -572,9 +581,12 @@ class _NoteCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _NoteCover(note: note, height: 112),
+          _NoteCover(
+            note: note,
+            height: FocuslaneTokens.isCompact(context) ? 96 : 112,
+          ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: FocuslaneTokens.cardPaddingFor(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -633,7 +645,7 @@ class _NoteVisual extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (compact) {
-      return _NoteCover(note: note, height: 132);
+      return _NoteCover(note: note, height: 104);
     }
 
     return SizedBox(width: 148, child: _NoteCover(note: note, height: 112));

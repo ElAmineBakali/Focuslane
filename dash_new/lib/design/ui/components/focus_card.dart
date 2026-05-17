@@ -41,6 +41,10 @@ class FocusCard extends StatelessWidget {
           width: FocuslaneTokens.borderW,
         );
     final bg = backgroundColor ?? FocuslaneTokens.surfaceColor(context);
+    final resolvedPadding =
+        padding == FocuslaneTokens.cardPadding
+            ? FocuslaneTokens.cardPaddingFor(context)
+            : padding;
 
     final card = Container(
       decoration: BoxDecoration(
@@ -56,7 +60,7 @@ class FocusCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: materialRadius,
-          child: Padding(padding: padding, child: child),
+          child: Padding(padding: resolvedPadding, child: child),
         ),
       ),
     );

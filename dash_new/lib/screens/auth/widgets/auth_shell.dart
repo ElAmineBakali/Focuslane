@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class AuthShell extends StatelessWidget {
   const AuthShell({super.key, required this.child, this.maxWidth = 480});
@@ -10,6 +11,7 @@ class AuthShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final width = MediaQuery.sizeOf(context).width;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -17,8 +19,13 @@ class AuthShell extends StatelessWidget {
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
-              horizontal: width < 640 ? 16 : 24,
-              vertical: width < 640 ? 18 : 32,
+              horizontal: width < 640 ? 12 : 24,
+              vertical:
+                  compact
+                      ? 12
+                      : width < 640
+                      ? 18
+                      : 32,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: maxWidth),

@@ -83,6 +83,7 @@ class _AppShellState extends State<AppShell> {
           isDesktop
               ? null
               : Drawer(
+                width: width < 600 ? width * 0.88 : null,
                 child: SafeArea(
                   child: FocusAppSidebar(
                     activeRoute: activeRoute,
@@ -94,34 +95,39 @@ class _AppShellState extends State<AppShell> {
                   ),
                 ),
               ),
-      body: Row(
-        children: [
-          if (isDesktop)
-            FocusAppSidebar(
-              activeRoute: activeRoute,
-              onNavigate: _navigate,
-              onSignOut: _signOut,
+      body: SafeArea(
+        top: true,
+        bottom: true,
+        child: Row(
+          children: [
+            if (isDesktop)
+              FocusAppSidebar(
+                activeRoute: activeRoute,
+                onNavigate: _navigate,
+                onSignOut: _signOut,
+              ),
+            Expanded(
+              child: Column(
+                children: [
+                  FocusTopBar(
+                    title: widget.title,
+                    subtitle: widget.subtitle,
+                    showMenu: !isDesktop,
+                    showSearch: widget.showSearch,
+                    searchHint: widget.searchHint,
+                    actions: widget.actions,
+                    onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
+                    onSearchSubmitted: widget.onSearchSubmitted,
+                    onOpenNotifications:
+                        () => _navigate(AppRoutes.notifications),
+                    onOpenSettings: () => _navigate(AppRoutes.settings),
+                  ),
+                  Expanded(child: widget.child),
+                ],
+              ),
             ),
-          Expanded(
-            child: Column(
-              children: [
-                FocusTopBar(
-                  title: widget.title,
-                  subtitle: widget.subtitle,
-                  showMenu: !isDesktop,
-                  showSearch: widget.showSearch,
-                  searchHint: widget.searchHint,
-                  actions: widget.actions,
-                  onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
-                  onSearchSubmitted: widget.onSearchSubmitted,
-                  onOpenNotifications: () => _navigate(AppRoutes.notifications),
-                  onOpenSettings: () => _navigate(AppRoutes.settings),
-                ),
-                Expanded(child: widget.child),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: widget.floatingActionButton,
     );
@@ -159,12 +165,11 @@ class FocusTopBar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;
     final label = _userInitial(user);
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Container(
-      height: FocuslaneTokens.topBarHeight,
-      padding: EdgeInsets.symmetric(
-        horizontal: MediaQuery.sizeOf(context).width < 720 ? 12 : 24,
-      ),
+      height: FocuslaneTokens.topBarHeightFor(context),
+      padding: EdgeInsets.symmetric(horizontal: compact ? 10 : 24),
       decoration: BoxDecoration(
         color: scheme.surface.withValues(alpha: 0.92),
         border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
@@ -178,7 +183,7 @@ class FocusTopBar extends StatelessWidget {
               tooltip: 'Abrir navegación',
               onPressed: onOpenMenu,
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: compact ? 8 : 10),
           ],
           Expanded(
             child: Column(
@@ -189,10 +194,13 @@ class FocusTopBar extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: scheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: (compact
+                          ? Theme.of(context).textTheme.titleSmall
+                          : Theme.of(context).textTheme.titleMedium)
+                      ?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
                 if (subtitle != null)
                   Text(
@@ -224,19 +232,22 @@ class FocusTopBar extends StatelessWidget {
             badge: true,
             onPressed: onOpenNotifications,
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: compact ? 8 : 10),
           Tooltip(
             message: 'Ajustes',
             child: InkWell(
               onTap: onOpenSettings,
               borderRadius: BorderRadius.circular(999),
               child: CircleAvatar(
-                radius: 18,
+                radius: compact ? 16 : 18,
                 backgroundColor: scheme.primaryContainer,
                 foregroundColor: scheme.onPrimaryContainer,
                 child: Text(
                   label,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    fontSize: compact ? 12 : null,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ),
@@ -320,9 +331,10 @@ class FocusAppSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Container(
-      width: FocuslaneTokens.sidebarWidth,
+      width: compact ? 248 : FocuslaneTokens.sidebarWidth,
       color: scheme.surfaceContainerLow,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -332,12 +344,17 @@ class FocusAppSidebar extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                compact ? 16 : 24,
+                16,
+                compact ? 14 : 18,
+              ),
               child: Row(
                 children: [
                   Container(
-                    width: 42,
-                    height: 42,
+                    width: compact ? 38 : 42,
+                    height: compact ? 38 : 42,
                     decoration: BoxDecoration(
                       color: scheme.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -346,7 +363,7 @@ class FocusAppSidebar extends StatelessWidget {
                     child: Icon(
                       Icons.psychology_rounded,
                       color: scheme.onPrimary,
-                      size: 24,
+                      size: compact ? 22 : 24,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -388,7 +405,10 @@ class FocusAppSidebar extends StatelessWidget {
                       )
                       .toList(growable: false);
                   return ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: compact ? 2 : 0,
+                    ),
                     children: [
                       for (final item in items)
                         _SidebarTile(
@@ -465,6 +485,7 @@ class _SidebarTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
     final fg =
         isDestructive
             ? scheme.error
@@ -491,15 +512,20 @@ class _SidebarTile extends StatelessWidget {
                 ),
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            padding: EdgeInsets.fromLTRB(
+              12,
+              compact ? 8 : 10,
+              12,
+              compact ? 8 : 10,
+            ),
             child: Row(
               children: [
                 Icon(
                   selected ? item.activeIcon : item.icon,
                   color: fg,
-                  size: 21,
+                  size: compact ? 19 : 21,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: compact ? 10 : 12),
                 Expanded(
                   child: Text(
                     item.label,

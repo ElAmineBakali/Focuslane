@@ -557,6 +557,369 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
     );
   }
 
+  Widget _buildHabitsPage({
+    required BuildContext context,
+    required ThemeData theme,
+    required List<Habit> habits,
+    required _HabitDashboardSummary summary,
+    required double nameColWidth,
+    required double gridWidth,
+    required bool isMobileLayout,
+  }) {
+    final header = _HabitsHeader(
+      summary: summary,
+      showArchived: _showArchived,
+      editMode: _editMode,
+      onCreateHabit: () => Navigator.pushNamed(context, '/habits/create'),
+      onToggleArchived:
+          () => setState(() {
+            _orderedHabits = null;
+            _showArchived = !_showArchived;
+          }),
+    );
+    final gap = isMobileLayout ? 10.0 : 16.0;
+
+    if (isMobileLayout) {
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            header,
+            SizedBox(height: gap),
+            _HabitsSummaryGrid(summary: summary, compact: true),
+            SizedBox(height: gap),
+            _buildMobileMatrixCard(
+              theme: theme,
+              habits: habits,
+              nameColWidth: nameColWidth,
+              gridWidth: gridWidth,
+            ),
+            SizedBox(height: 20 + MediaQuery.paddingOf(context).bottom),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        header,
+        SizedBox(height: gap),
+        _HabitsSummaryGrid(summary: summary),
+        SizedBox(height: gap),
+        Expanded(
+          child: _buildDesktopMatrixCard(
+            theme: theme,
+            habits: habits,
+            nameColWidth: nameColWidth,
+            gridWidth: gridWidth,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopMatrixCard({
+    required ThemeData theme,
+    required List<Habit> habits,
+    required double nameColWidth,
+    required double gridWidth,
+  }) {
+    return FocusCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+      child: Row(
+        children: [
+          _buildNameColumn(
+            theme: theme,
+            habits: habits,
+            nameColWidth: nameColWidth,
+            scrollable: true,
+          ),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, cons) {
+                final bodyHeight = math.max(
+                  0.0,
+                  cons.maxHeight - _rowHeight - 2,
+                );
+                return _buildHorizontalMatrix(
+                  theme: theme,
+                  habits: habits,
+                  gridWidth: gridWidth,
+                  scrollableVertically: true,
+                  bodyHeight: bodyHeight,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileMatrixCard({
+    required ThemeData theme,
+    required List<Habit> habits,
+    required double nameColWidth,
+    required double gridWidth,
+  }) {
+    return FocusCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildNameColumn(
+            theme: theme,
+            habits: habits,
+            nameColWidth: nameColWidth,
+            scrollable: false,
+          ),
+          Expanded(
+            child: _buildHorizontalMatrix(
+              theme: theme,
+              habits: habits,
+              gridWidth: gridWidth,
+              scrollableVertically: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameColumn({
+    required ThemeData theme,
+    required List<Habit> habits,
+    required double nameColWidth,
+    required bool scrollable,
+  }) {
+    final rows = _buildNameRows(habits: habits, scrollable: scrollable);
+
+    return SizedBox(
+      width: nameColWidth,
+      child: Column(
+        children: [
+          _buildNameHeader(theme),
+          const SizedBox(height: 2),
+          if (scrollable) Expanded(child: rows) else rows,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameHeader(ThemeData theme) {
+    return Container(
+      height: _rowHeight,
+      margin: _cellMargin,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Text(
+        'Hábito',
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNameRows({
+    required List<Habit> habits,
+    required bool scrollable,
+  }) {
+    if (_editMode) {
+      final list = ReorderableListView.builder(
+        padding: EdgeInsets.only(bottom: scrollable ? _bottomSafeGap : 0),
+        shrinkWrap: !scrollable,
+        primary: false,
+        buildDefaultDragHandles: false,
+        onReorder: _onReorder,
+        physics:
+            scrollable
+                ? const ClampingScrollPhysics()
+                : const NeverScrollableScrollPhysics(),
+        itemCount: habits.length,
+        itemBuilder: (context, index) {
+          final habit = habits[index];
+          return _NameRow(
+            key: ValueKey(habit.id),
+            habit: habit,
+            editMode: true,
+            selected: _selectedHabit?.id == habit.id,
+            onTap: () => setState(() => _selectedHabit = habit),
+            trailing: ReorderableDragStartListener(
+              index: index,
+              child: const Padding(
+                padding: EdgeInsets.only(right: 6),
+                child: Icon(
+                  Icons.drag_handle_rounded,
+                  size: 18,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          );
+        },
+      );
+
+      if (!scrollable) {
+        return list;
+      }
+
+      return PrimaryScrollController(controller: _leftV, child: list);
+    }
+
+    if (!scrollable) {
+      return Column(
+        children: [for (final habit in habits) _buildNameRowForHabit(habit)],
+      );
+    }
+
+    return ListView.builder(
+      controller: _leftV,
+      padding: const EdgeInsets.only(bottom: _bottomSafeGap),
+      physics: const ClampingScrollPhysics(),
+      itemExtent: _rowHeight,
+      itemCount: habits.length,
+      itemBuilder: (context, index) => _buildNameRowForHabit(habits[index]),
+    );
+  }
+
+  Widget _buildNameRowForHabit(Habit habit) {
+    final todayValue = habitHistoryIndexedValue(
+      _historyIndexByHabit[habit.id] ?? const <String, dynamic>{},
+      DateTime.now(),
+    );
+    return _NameRow(
+      habit: habit,
+      editMode: false,
+      todayValue: todayValue,
+      onTap:
+          () => Navigator.pushNamed(context, '/habits/stats', arguments: habit),
+    );
+  }
+
+  Widget _buildHorizontalMatrix({
+    required ThemeData theme,
+    required List<Habit> habits,
+    required double gridWidth,
+    required bool scrollableVertically,
+    double? bodyHeight,
+  }) {
+    return Listener(
+      onPointerSignal: _handleHorizontalPointerSignal,
+      child: ScrollConfiguration(
+        behavior: const _HabitsTableScrollBehavior(),
+        child: Scrollbar(
+          controller: _horizontal,
+          thumbVisibility: true,
+          trackVisibility: true,
+          interactive: true,
+          notificationPredicate:
+              (notification) => notification.metrics.axis == Axis.horizontal,
+          child: SingleChildScrollView(
+            controller: _horizontal,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: gridWidth,
+              child: Column(
+                children: [
+                  _buildDateHeaderRow(theme),
+                  const SizedBox(height: 2),
+                  if (scrollableVertically)
+                    SizedBox(
+                      height: bodyHeight ?? 0,
+                      child: _buildScrollableGridRows(theme, habits),
+                    )
+                  else
+                    _buildStaticGridRows(theme, habits),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateHeaderRow(ThemeData theme) {
+    return SizedBox(
+      height: _rowHeight,
+      child: Row(
+        children:
+            _dates.map((d) {
+              final isToday = _isToday(d);
+              return Container(
+                width: _cellWidth,
+                height: _cellHeight,
+                margin: _cellMargin,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color:
+                      isToday
+                          ? theme.colorScheme.primaryContainer.withValues(
+                            alpha: 0.42,
+                          )
+                          : theme.colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color:
+                        isToday
+                            ? theme.colorScheme.primary.withValues(alpha: 0.38)
+                            : theme.colorScheme.outlineVariant,
+                  ),
+                ),
+                child: Text(
+                  DateFormat('E\ndd', 'es_ES').format(d),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color:
+                        isToday
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              );
+            }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildScrollableGridRows(ThemeData theme, List<Habit> habits) {
+    return ListView.builder(
+      controller: _rightV,
+      padding: const EdgeInsets.only(bottom: _bottomSafeGap),
+      physics: const ClampingScrollPhysics(),
+      itemExtent: _rowHeight,
+      itemCount: habits.length,
+      itemBuilder: (context, row) => _buildGridRow(theme, habits[row]),
+    );
+  }
+
+  Widget _buildStaticGridRows(ThemeData theme, List<Habit> habits) {
+    return Column(
+      children: [for (final habit in habits) _buildGridRow(theme, habit)],
+    );
+  }
+
+  Widget _buildGridRow(ThemeData theme, Habit habit) {
+    final historyIndex =
+        _historyIndexByHabit[habit.id] ?? const <String, dynamic>{};
+    return Row(
+      children:
+          _dates.map((d) => _cell(habit, historyIndex, d, theme)).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -624,7 +987,13 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                         : width < 1180
                         ? FocuslaneTokens.spacing24
                         : FocuslaneTokens.spacing32;
-                final nameColWidth = width < 620 ? 152.0 : _nameColWidth;
+                final isMobileLayout = width < FocuslaneTokens.mobileBreakpoint;
+                final nameColWidth =
+                    width < 420
+                        ? 136.0
+                        : width < 620
+                        ? 152.0
+                        : _nameColWidth;
 
                 if (habits.isEmpty) {
                   return Center(
@@ -670,331 +1039,370 @@ class _HabitsTableScreenState extends State<HabitsTableScreen> {
                     ),
                     child: Padding(
                       padding: EdgeInsets.all(padding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _HabitsHeader(
-                            summary: summary,
-                            showArchived: _showArchived,
-                            editMode: _editMode,
-                            onCreateHabit:
-                                () => Navigator.pushNamed(
-                                  context,
-                                  '/habits/create',
-                                ),
-                            onToggleArchived:
-                                () => setState(() {
-                                  _orderedHabits = null;
-                                  _showArchived = !_showArchived;
-                                }),
-                          ),
-                          const SizedBox(height: 16),
-                          _HabitsSummaryGrid(summary: summary),
-                          const SizedBox(height: 16),
-                          Expanded(
-                            child: FocusCard(
-                              padding: EdgeInsets.zero,
-                              backgroundColor:
-                                  theme.colorScheme.surfaceContainerLowest,
-                              child: Row(
+                      child:
+                          isMobileLayout
+                              ? _buildHabitsPage(
+                                context: context,
+                                theme: theme,
+                                habits: habits,
+                                summary: summary,
+                                nameColWidth: nameColWidth,
+                                gridWidth: gridWidth,
+                                isMobileLayout: true,
+                              )
+                              : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    width: nameColWidth,
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: _rowHeight,
-                                          margin: _cellMargin,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                          ),
-                                          alignment: Alignment.centerLeft,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                theme
-                                                    .colorScheme
-                                                    .surfaceContainerLow,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            border: Border.all(
-                                              color:
-                                                  theme
-                                                      .colorScheme
-                                                      .outlineVariant,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            'Hábito',
-                                            style: theme.textTheme.labelMedium
-                                                ?.copyWith(
-                                                  color:
-                                                      theme
-                                                          .colorScheme
-                                                          .onSurfaceVariant,
-                                                  fontWeight: FontWeight.w900,
-                                                ),
-                                          ),
+                                  _HabitsHeader(
+                                    summary: summary,
+                                    showArchived: _showArchived,
+                                    editMode: _editMode,
+                                    onCreateHabit:
+                                        () => Navigator.pushNamed(
+                                          context,
+                                          '/habits/create',
                                         ),
-                                        const SizedBox(height: 2),
-                                        Expanded(
-                                          child:
-                                              _editMode
-                                                  ? PrimaryScrollController(
-                                                    controller: _leftV,
-                                                    child: ReorderableListView.builder(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                            bottom:
-                                                                _bottomSafeGap,
-                                                          ),
-                                                      itemCount: habits.length,
-                                                      buildDefaultDragHandles:
-                                                          false,
-                                                      onReorder: _onReorder,
-                                                      physics:
-                                                          const ClampingScrollPhysics(),
-                                                      itemBuilder: (
-                                                        context,
-                                                        index,
-                                                      ) {
-                                                        final habit =
-                                                            habits[index];
-                                                        return _NameRow(
-                                                          key: ValueKey(
-                                                            habit.id,
-                                                          ),
-                                                          habit: habit,
-                                                          editMode: true,
-                                                          selected:
-                                                              _selectedHabit
-                                                                  ?.id ==
-                                                              habit.id,
-                                                          onTap:
-                                                              () => setState(
-                                                                () =>
-                                                                    _selectedHabit =
-                                                                        habit,
-                                                              ),
-                                                          trailing: ReorderableDragStartListener(
-                                                            index: index,
-                                                            child: const Padding(
-                                                              padding:
-                                                                  EdgeInsets.only(
-                                                                    right: 6,
-                                                                  ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .drag_handle_rounded,
-                                                                size: 18,
-                                                                color:
-                                                                    Colors.grey,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                                  : ListView.builder(
-                                                    controller: _leftV,
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                          bottom:
-                                                              _bottomSafeGap,
-                                                        ),
-                                                    physics:
-                                                        const ClampingScrollPhysics(),
-                                                    itemExtent: _rowHeight,
-                                                    itemCount: habits.length,
-                                                    itemBuilder: (
-                                                      context,
-                                                      index,
-                                                    ) {
-                                                      final habit =
-                                                          habits[index];
-                                                      final todayValue =
-                                                          habitHistoryIndexedValue(
-                                                            _historyIndexByHabit[habit
-                                                                    .id] ??
-                                                                const <
-                                                                  String,
-                                                                  dynamic
-                                                                >{},
-                                                            DateTime.now(),
-                                                          );
-                                                      return _NameRow(
-                                                        habit: habit,
-                                                        editMode: false,
-                                                        todayValue: todayValue,
-                                                        onTap:
-                                                            () => Navigator.pushNamed(
-                                                              context,
-                                                              '/habits/stats',
-                                                              arguments: habit,
-                                                            ),
-                                                      );
-                                                    },
-                                                  ),
-                                        ),
-                                      ],
-                                    ),
+                                    onToggleArchived:
+                                        () => setState(() {
+                                          _orderedHabits = null;
+                                          _showArchived = !_showArchived;
+                                        }),
                                   ),
-
+                                  const SizedBox(height: 16),
+                                  _HabitsSummaryGrid(summary: summary),
+                                  const SizedBox(height: 16),
                                   Expanded(
-                                    child: LayoutBuilder(
-                                      builder: (context, cons) {
-                                        final bodyHeight =
-                                            cons.maxHeight - _rowHeight - 2;
-                                        return Listener(
-                                          onPointerSignal:
-                                              _handleHorizontalPointerSignal,
-                                          child: ScrollConfiguration(
-                                            behavior:
-                                                const _HabitsTableScrollBehavior(),
-                                            child: Scrollbar(
-                                              controller: _horizontal,
-                                              thumbVisibility: true,
-                                              trackVisibility: true,
-                                              interactive: true,
-                                              notificationPredicate:
-                                                  (notification) =>
-                                                      notification
-                                                          .metrics
-                                                          .axis ==
-                                                      Axis.horizontal,
-                                              child: SingleChildScrollView(
-                                                controller: _horizontal,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: SizedBox(
-                                                  width: gridWidth,
-                                                  child: Column(
-                                                    children: [
-                                                      SizedBox(
-                                                        height: _rowHeight,
-                                                        child: Row(
-                                                          children:
-                                                              _dates.map((d) {
-                                                                final isToday =
-                                                                    _isToday(d);
-                                                                return Container(
-                                                                  width:
-                                                                      _cellWidth,
-                                                                  height:
-                                                                      _cellHeight,
-                                                                  margin:
-                                                                      _cellMargin,
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  decoration: BoxDecoration(
-                                                                    color:
-                                                                        isToday
-                                                                            ? theme.colorScheme.primaryContainer.withValues(
-                                                                              alpha:
-                                                                                  0.42,
-                                                                            )
-                                                                            : theme.colorScheme.surfaceContainerLow,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                          10,
-                                                                        ),
-                                                                    border: Border.all(
-                                                                      color:
-                                                                          isToday
-                                                                              ? theme.colorScheme.primary.withValues(
-                                                                                alpha:
-                                                                                    0.38,
-                                                                              )
-                                                                              : theme.colorScheme.outlineVariant,
-                                                                    ),
+                                    child: FocusCard(
+                                      padding: EdgeInsets.zero,
+                                      backgroundColor:
+                                          theme
+                                              .colorScheme
+                                              .surfaceContainerLowest,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: nameColWidth,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  height: _rowHeight,
+                                                  margin: _cellMargin,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                      ),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        theme
+                                                            .colorScheme
+                                                            .surfaceContainerLow,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                    border: Border.all(
+                                                      color:
+                                                          theme
+                                                              .colorScheme
+                                                              .outlineVariant,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Hábito',
+                                                    style: theme
+                                                        .textTheme
+                                                        .labelMedium
+                                                        ?.copyWith(
+                                                          color:
+                                                              theme
+                                                                  .colorScheme
+                                                                  .onSurfaceVariant,
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                        ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Expanded(
+                                                  child:
+                                                      _editMode
+                                                          ? PrimaryScrollController(
+                                                            controller: _leftV,
+                                                            child: ReorderableListView.builder(
+                                                              padding:
+                                                                  const EdgeInsets.only(
+                                                                    bottom:
+                                                                        _bottomSafeGap,
                                                                   ),
-                                                                  child: Text(
-                                                                    DateFormat(
-                                                                      'E\ndd',
-                                                                      'es_ES',
-                                                                    ).format(d),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          isToday
-                                                                              ? theme.colorScheme.primary
-                                                                              : theme.colorScheme.onSurfaceVariant,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
+                                                              itemCount:
+                                                                  habits.length,
+                                                              buildDefaultDragHandles:
+                                                                  false,
+                                                              onReorder:
+                                                                  _onReorder,
+                                                              physics:
+                                                                  const ClampingScrollPhysics(),
+                                                              itemBuilder: (
+                                                                context,
+                                                                index,
+                                                              ) {
+                                                                final habit =
+                                                                    habits[index];
+                                                                return _NameRow(
+                                                                  key: ValueKey(
+                                                                    habit.id,
+                                                                  ),
+                                                                  habit: habit,
+                                                                  editMode:
+                                                                      true,
+                                                                  selected:
+                                                                      _selectedHabit
+                                                                          ?.id ==
+                                                                      habit.id,
+                                                                  onTap:
+                                                                      () => setState(
+                                                                        () =>
+                                                                            _selectedHabit =
+                                                                                habit,
+                                                                      ),
+                                                                  trailing: ReorderableDragStartListener(
+                                                                    index:
+                                                                        index,
+                                                                    child: const Padding(
+                                                                      padding:
+                                                                          EdgeInsets.only(
+                                                                            right:
+                                                                                6,
+                                                                          ),
+                                                                      child: Icon(
+                                                                        Icons
+                                                                            .drag_handle_rounded,
+                                                                        size:
+                                                                            18,
+                                                                        color:
+                                                                            Colors.grey,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 );
-                                                              }).toList(),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 2),
-                                                      SizedBox(
-                                                        height: bodyHeight,
-                                                        child: ListView.builder(
-                                                          controller: _rightV,
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                bottom:
-                                                                    _bottomSafeGap,
-                                                              ),
-                                                          physics:
-                                                              const ClampingScrollPhysics(),
-                                                          itemExtent:
-                                                              _rowHeight,
-                                                          itemCount:
-                                                              habits.length,
-                                                          itemBuilder: (
-                                                            context,
-                                                            row,
-                                                          ) {
-                                                            final habit =
-                                                                habits[row];
-                                                            final historyIndex =
-                                                                _historyIndexByHabit[habit
-                                                                    .id] ??
-                                                                const <
-                                                                  String,
-                                                                  dynamic
-                                                                >{};
-                                                            return Row(
-                                                              children:
-                                                                  _dates
-                                                                      .map(
-                                                                        (
-                                                                          d,
-                                                                        ) => _cell(
+                                                              },
+                                                            ),
+                                                          )
+                                                          : ListView.builder(
+                                                            controller: _leftV,
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                  bottom:
+                                                                      _bottomSafeGap,
+                                                                ),
+                                                            physics:
+                                                                const ClampingScrollPhysics(),
+                                                            itemExtent:
+                                                                _rowHeight,
+                                                            itemCount:
+                                                                habits.length,
+                                                            itemBuilder: (
+                                                              context,
+                                                              index,
+                                                            ) {
+                                                              final habit =
+                                                                  habits[index];
+                                                              final todayValue =
+                                                                  habitHistoryIndexedValue(
+                                                                    _historyIndexByHabit[habit
+                                                                            .id] ??
+                                                                        const <
+                                                                          String,
+                                                                          dynamic
+                                                                        >{},
+                                                                    DateTime.now(),
+                                                                  );
+                                                              return _NameRow(
+                                                                habit: habit,
+                                                                editMode: false,
+                                                                todayValue:
+                                                                    todayValue,
+                                                                onTap:
+                                                                    () => Navigator.pushNamed(
+                                                                      context,
+                                                                      '/habits/stats',
+                                                                      arguments:
                                                                           habit,
-                                                                          historyIndex,
-                                                                          d,
-                                                                          theme,
-                                                                        ),
-                                                                      )
-                                                                      .toList(),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                                    ),
+                                                              );
+                                                            },
+                                                          ),
                                                 ),
-                                              ),
+                                              ],
                                             ),
                                           ),
-                                        );
-                                      },
+
+                                          Expanded(
+                                            child: LayoutBuilder(
+                                              builder: (context, cons) {
+                                                final bodyHeight =
+                                                    cons.maxHeight -
+                                                    _rowHeight -
+                                                    2;
+                                                return Listener(
+                                                  onPointerSignal:
+                                                      _handleHorizontalPointerSignal,
+                                                  child: ScrollConfiguration(
+                                                    behavior:
+                                                        const _HabitsTableScrollBehavior(),
+                                                    child: Scrollbar(
+                                                      controller: _horizontal,
+                                                      thumbVisibility: true,
+                                                      trackVisibility: true,
+                                                      interactive: true,
+                                                      notificationPredicate:
+                                                          (notification) =>
+                                                              notification
+                                                                  .metrics
+                                                                  .axis ==
+                                                              Axis.horizontal,
+                                                      child: SingleChildScrollView(
+                                                        controller: _horizontal,
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        child: SizedBox(
+                                                          width: gridWidth,
+                                                          child: Column(
+                                                            children: [
+                                                              SizedBox(
+                                                                height:
+                                                                    _rowHeight,
+                                                                child: Row(
+                                                                  children:
+                                                                      _dates.map((
+                                                                        d,
+                                                                      ) {
+                                                                        final isToday =
+                                                                            _isToday(
+                                                                              d,
+                                                                            );
+                                                                        return Container(
+                                                                          width:
+                                                                              _cellWidth,
+                                                                          height:
+                                                                              _cellHeight,
+                                                                          margin:
+                                                                              _cellMargin,
+                                                                          alignment:
+                                                                              Alignment.center,
+                                                                          decoration: BoxDecoration(
+                                                                            color:
+                                                                                isToday
+                                                                                    ? theme.colorScheme.primaryContainer.withValues(
+                                                                                      alpha:
+                                                                                          0.42,
+                                                                                    )
+                                                                                    : theme.colorScheme.surfaceContainerLow,
+                                                                            borderRadius: BorderRadius.circular(
+                                                                              10,
+                                                                            ),
+                                                                            border: Border.all(
+                                                                              color:
+                                                                                  isToday
+                                                                                      ? theme.colorScheme.primary.withValues(
+                                                                                        alpha:
+                                                                                            0.38,
+                                                                                      )
+                                                                                      : theme.colorScheme.outlineVariant,
+                                                                            ),
+                                                                          ),
+                                                                          child: Text(
+                                                                            DateFormat(
+                                                                              'E\ndd',
+                                                                              'es_ES',
+                                                                            ).format(
+                                                                              d,
+                                                                            ),
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style: TextStyle(
+                                                                              color:
+                                                                                  isToday
+                                                                                      ? theme.colorScheme.primary
+                                                                                      : theme.colorScheme.onSurfaceVariant,
+                                                                              fontWeight:
+                                                                                  FontWeight.w800,
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }).toList(),
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 2,
+                                                              ),
+                                                              SizedBox(
+                                                                height:
+                                                                    bodyHeight,
+                                                                child: ListView.builder(
+                                                                  controller:
+                                                                      _rightV,
+                                                                  padding:
+                                                                      const EdgeInsets.only(
+                                                                        bottom:
+                                                                            _bottomSafeGap,
+                                                                      ),
+                                                                  physics:
+                                                                      const ClampingScrollPhysics(),
+                                                                  itemExtent:
+                                                                      _rowHeight,
+                                                                  itemCount:
+                                                                      habits
+                                                                          .length,
+                                                                  itemBuilder: (
+                                                                    context,
+                                                                    row,
+                                                                  ) {
+                                                                    final habit =
+                                                                        habits[row];
+                                                                    final historyIndex =
+                                                                        _historyIndexByHabit[habit
+                                                                            .id] ??
+                                                                        const <
+                                                                          String,
+                                                                          dynamic
+                                                                        >{};
+                                                                    return Row(
+                                                                      children:
+                                                                          _dates
+                                                                              .map(
+                                                                                (
+                                                                                  d,
+                                                                                ) => _cell(
+                                                                                  habit,
+                                                                                  historyIndex,
+                                                                                  d,
+                                                                                  theme,
+                                                                                ),
+                                                                              )
+                                                                              .toList(),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 );
@@ -1184,9 +1592,10 @@ class _HabitsHeader extends StatelessWidget {
 }
 
 class _HabitsSummaryGrid extends StatelessWidget {
-  const _HabitsSummaryGrid({required this.summary});
+  const _HabitsSummaryGrid({required this.summary, this.compact = false});
 
   final _HabitDashboardSummary summary;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -1194,8 +1603,8 @@ class _HabitsSummaryGrid extends StatelessWidget {
     final progressLabel = '${(summary.weeklyProgress * 100).round()}%';
 
     return ResponsiveGrid(
-      minItemWidth: 200,
-      spacing: 16,
+      minItemWidth: compact ? 154 : 200,
+      spacing: compact ? 10 : 16,
       children: [
         FocusStatCard(
           title: 'Progreso semanal',

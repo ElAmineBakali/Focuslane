@@ -19,13 +19,13 @@ class PageContainer extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final resolvedPadding =
         padding ??
-        EdgeInsets.all(
-          width < 720
-              ? FocuslaneTokens.spacing16
-              : width < 1180
-              ? FocuslaneTokens.spacing24
-              : FocuslaneTokens.spacing32,
-        );
+        (width < FocuslaneTokens.mobileBreakpoint
+            ? FocuslaneTokens.pagePaddingFor(context)
+            : EdgeInsets.all(
+              width < 1180
+                  ? FocuslaneTokens.spacing24
+                  : FocuslaneTokens.spacing32,
+            ));
 
     return Align(
       alignment: Alignment.topCenter,

@@ -4,20 +4,21 @@ import '../tokens/focuslane_tokens.dart';
 class ModuleScaffold extends StatelessWidget {
   final Widget child;
 
-  const ModuleScaffold({
-    super.key,
-    required this.child,
-  });
+  const ModuleScaffold({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     final base = Theme.of(context);
     final cs = base.colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
     final input = base.inputDecorationTheme.copyWith(
       filled: true,
       isDense: true,
       fillColor: cs.surfaceContainerHighest,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: compact ? 8 : 10,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(FocuslaneTokens.radius16),
         borderSide: BorderSide(
@@ -39,9 +40,7 @@ class ModuleScaffold extends StatelessWidget {
           width: FocuslaneTokens.borderW,
         ),
       ),
-      hintStyle: base.textTheme.bodySmall?.copyWith(
-        color: cs.onSurfaceVariant,
-      ),
+      hintStyle: base.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
       labelStyle: base.textTheme.bodySmall?.copyWith(
         color: cs.onSurfaceVariant,
       ),
@@ -60,7 +59,7 @@ class ModuleScaffold extends StatelessWidget {
           foregroundColor: FocuslaneTokens.accent(context),
           elevation: 0,
           surfaceTintColor: Colors.transparent,
-          shadowColor: FocuslaneTokens.accent(context).withOpacity(0.25),
+          shadowColor: FocuslaneTokens.accent(context).withValues(alpha: 0.25),
           iconTheme: IconThemeData(color: FocuslaneTokens.accent(context)),
           titleTextStyle: base.textTheme.titleMedium?.copyWith(
             color: FocuslaneTokens.accent(context),
@@ -97,10 +96,7 @@ class ModuleScaffold extends StatelessWidget {
             context,
             opacity: 0.14,
           ),
-          selectedColor: FocuslaneTokens.accentSurface(
-            context,
-            opacity: 0.18,
-          ),
+          selectedColor: FocuslaneTokens.accentSurface(context, opacity: 0.18),
           side: BorderSide(
             color: FocuslaneTokens.borderColor(context),
             width: FocuslaneTokens.borderW,

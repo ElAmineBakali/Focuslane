@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
@@ -10,6 +10,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:focuslane/core/notifications/notifications_facade.dart';
 import 'package:focuslane/design/theme/theme.dart';
 import 'package:focuslane/design/theme/prefs.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:focuslane/screens/food/services/food_firestore_service.dart';
 import 'package:focuslane/screens/gym/services/gym_firestore_service.dart';
@@ -99,7 +100,9 @@ class _MyAppState extends State<MyApp> {
               }
             })
             .catchError((e) {
-              debugPrint('[CoreSync][debugAuth] signInWithCustomToken failed: $e');
+              debugPrint(
+                '[CoreSync][debugAuth] signInWithCustomToken failed: $e',
+              );
             }),
       );
     }
@@ -189,9 +192,14 @@ class _MyAppState extends State<MyApp> {
         scrollbars: false,
       ),
       builder: (context, child) {
-        return AppBackground(
+        final content = AppBackground(
           style: _bgStyle,
           child: child ?? const SizedBox.shrink(),
+        );
+
+        return Theme(
+          data: FocuslaneTokens.adaptiveTheme(context, Theme.of(context)),
+          child: content,
         );
       },
       initialRoute: AppRoutes.home,
@@ -222,5 +230,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-

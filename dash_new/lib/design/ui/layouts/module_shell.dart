@@ -43,15 +43,18 @@ class ModuleShell extends StatelessWidget {
         drawer:
             !isDesktop
                 ? Drawer(
-                  child: ModuleSidebar(
-                    items: items,
-                    selectedIndex: selectedIndex,
-                    onItemSelected: (index) {
-                      onItemSelected(index);
-                      Navigator.pop(context);
-                    },
-                    title: moduleTitle,
-                    headerIcon: moduleIcon,
+                  width: width < 600 ? width * 0.88 : null,
+                  child: SafeArea(
+                    child: ModuleSidebar(
+                      items: items,
+                      selectedIndex: selectedIndex,
+                      onItemSelected: (index) {
+                        onItemSelected(index);
+                        Navigator.pop(context);
+                      },
+                      title: moduleTitle,
+                      headerIcon: moduleIcon,
+                    ),
                   ),
                 )
                 : null,
@@ -67,37 +70,41 @@ class ModuleShell extends StatelessWidget {
                   useSoftGradient: true,
                 )
                 : null,
-        body: Row(
-          children: [
-            if (isDesktop)
-              ModuleSidebar(
-                items: items,
-                selectedIndex: selectedIndex,
-                onItemSelected: onItemSelected,
-                title: moduleTitle,
-                headerIcon: moduleIcon,
-              ),
-            Expanded(
-              child: Column(
-                children: [
-                  if (isDesktop)
-                    SizedBox(
-                      height: header.preferredSize.height,
-                      child: header,
+        body: SafeArea(
+          top: isDesktop,
+          bottom: true,
+          child: Row(
+            children: [
+              if (isDesktop)
+                ModuleSidebar(
+                  items: items,
+                  selectedIndex: selectedIndex,
+                  onItemSelected: onItemSelected,
+                  title: moduleTitle,
+                  headerIcon: moduleIcon,
+                ),
+              Expanded(
+                child: Column(
+                  children: [
+                    if (isDesktop)
+                      SizedBox(
+                        height: header.preferredSize.height,
+                        child: header,
+                      ),
+                    Expanded(
+                      child: Padding(
+                        padding:
+                            isDesktop
+                                ? const EdgeInsets.only(left: 0)
+                                : EdgeInsets.zero,
+                        child: body,
+                      ),
                     ),
-                  Expanded(
-                    child: Padding(
-                      padding:
-                          isDesktop
-                              ? const EdgeInsets.only(left: 0)
-                              : EdgeInsets.zero,
-                      child: body,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButton: floatingActionButton,
       ),

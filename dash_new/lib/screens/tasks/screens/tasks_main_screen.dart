@@ -131,10 +131,10 @@ class _TasksContent extends StatelessWidget {
               onNewTask: () => Navigator.pushNamed(context, '/tasks/create'),
               onToggleCompletedFilter: onToggleCompletedFilter,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: FocuslaneTokens.pageGapFor(context)),
             ResponsiveGrid(
               minItemWidth: 200,
-              spacing: 16,
+              spacing: FocuslaneTokens.gridGapFor(context),
               children: [
                 FocusStatCard(
                   title: 'Pendientes',
@@ -166,14 +166,14 @@ class _TasksContent extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: FocuslaneTokens.pageGapFor(context)),
             _TasksFilterBar(
               showCompleted: showCompleted,
               pendingCount: pendingCount,
               completedCount: completedCount,
               onToggleCompletedFilter: onToggleCompletedFilter,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: FocuslaneTokens.pageGapFor(context)),
             if (visibleTasks.isEmpty)
               FocusCard(
                 child: FocusEmptyState(
@@ -201,7 +201,7 @@ class _TasksContent extends StatelessWidget {
                         expanded: expandedGroups[group] ?? true,
                         onToggle: () => onToggleGroup(group),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: FocuslaneTokens.pageGapFor(context)),
                     ],
                 ],
               ),
@@ -260,7 +260,7 @@ class _TasksHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _TasksHeaderCopy(visibleCount: visibleCount),
-                      const SizedBox(height: 18),
+                      SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
                       actionRow,
                     ],
                   )
@@ -334,7 +334,7 @@ class _TasksFilterBar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return FocusCard(
-      padding: const EdgeInsets.all(16),
+      padding: FocuslaneTokens.cardPaddingFor(context),
       elevated: false,
       backgroundColor: scheme.surfaceContainerLow,
       child: LayoutBuilder(
@@ -375,7 +375,7 @@ class _TasksFilterBar extends StatelessWidget {
                   subtitle: 'Vista actual de la lista',
                   icon: Icons.filter_list_rounded,
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
                 filters,
               ],
             );
@@ -430,15 +430,15 @@ class _TaskGroupPanel extends StatelessWidget {
             child: InkWell(
               onTap: onToggle,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                padding: EdgeInsets.symmetric(
+                  horizontal: FocuslaneTokens.isCompact(context) ? 12 : 16,
+                  vertical: FocuslaneTokens.isCompact(context) ? 10 : 14,
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 34,
-                      height: 34,
+                      width: FocuslaneTokens.isCompact(context) ? 30 : 34,
+                      height: FocuslaneTokens.isCompact(context) ? 30 : 34,
                       decoration: BoxDecoration(
                         color: tone.withValues(alpha: 0.13),
                         borderRadius: BorderRadius.circular(8),
@@ -522,7 +522,7 @@ class _TaskCard extends StatelessWidget {
 
     return FocusCard(
       key: ValueKey(task.id),
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(FocuslaneTokens.isCompact(context) ? 10 : 14),
       elevated: false,
       backgroundColor: background,
       borderSide: BorderSide(

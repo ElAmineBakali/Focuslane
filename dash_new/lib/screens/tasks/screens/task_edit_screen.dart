@@ -135,8 +135,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
-    final horizontal = width < 720 ? 16.0 : 24.0;
+    final pagePadding = FocuslaneTokens.pagePaddingFor(context);
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -145,12 +144,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
         child: SingleChildScrollView(
           child: PageContainer(
             maxWidth: 960,
-            padding: EdgeInsets.fromLTRB(
-              horizontal,
-              18,
-              horizontal,
-              screenPad(context),
-            ),
+            padding: pagePadding.copyWith(bottom: screenPad(context)),
             child: Form(
               key: _formKey,
               child: Column(

@@ -96,13 +96,14 @@ class CalendarFilterChips extends StatelessWidget {
     final p = prefs;
     if (p == null) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
+    final isMobile = FocuslaneTokens.isCompact(context);
 
-    FilterChip chip(CalendarType t, String label, IconData icon) {
+    FilterChip chip(CalendarType t) {
       final selected = p.enabled.contains(t);
       return FilterChip(
-        label: Text(label),
+        label: Text(_typeLabel(t)),
         selected: selected,
-        avatar: Icon(icon, size: 18),
+        avatar: Icon(CalendarItemVisuals.iconFor(t), size: 18),
         onSelected: (v) => onTypeToggle(t, v),
         selectedColor: scheme.primaryContainer.withValues(alpha: 0.55),
         backgroundColor: scheme.surfaceContainerLowest,
@@ -111,6 +112,57 @@ class CalendarFilterChips extends StatelessWidget {
               selected
                   ? scheme.primary.withValues(alpha: 0.36)
                   : scheme.outlineVariant,
+        ),
+      );
+    }
+
+    if (isMobile) {
+      final allSelected = p.enabled.length == CalendarType.values.length;
+      final enabledLabel =
+          allSelected ? 'Todos los módulos' : '${p.enabled.length} módulos';
+      final priorityLabel = p.highOnly ? 'Solo alta prioridad' : 'Todas';
+
+      return FocusCard(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        elevated: false,
+        backgroundColor: scheme.surfaceContainerLow,
+        onTap: () => _showMobileFilters(context, p),
+        child: Row(
+          children: [
+            Icon(Icons.tune_rounded, color: scheme.primary, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Filtrar módulos',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$enabledLabel · $priorityLabel',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.expand_more_rounded,
+              color: scheme.onSurfaceVariant,
+              size: 22,
+            ),
+          ],
         ),
       );
     }
@@ -124,12 +176,7 @@ class CalendarFilterChips extends StatelessWidget {
         runSpacing: 8,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          chip(CalendarType.task, 'Tareas', Icons.checklist_rounded),
-          chip(CalendarType.study, 'Estudio', Icons.school_rounded),
-          chip(CalendarType.gym, 'Gimnasio', Icons.fitness_center_rounded),
-          chip(CalendarType.finance, 'Pagos', Icons.payments_rounded),
-          chip(CalendarType.food, 'Comidas', Icons.restaurant_rounded),
-          chip(CalendarType.other, 'Otros', Icons.event_note_rounded),
+          for (final type in CalendarType.values) chip(type),
           FilterChip(
             label: const Text('Prioridad alta'),
             selected: p.highOnly,
@@ -147,6 +194,94 @@ class CalendarFilterChips extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showMobileFilters(
+    BuildContext context,
+    PlannerPrefs prefs,
+  ) async {
+    final scheme = Theme.of(context).colorScheme;
+    final selected = {...prefs.enabled};
+    var highOnly = prefs.highOnly;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: scheme.surface,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Filtrar módulos',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    for (final type in CalendarType.values)
+                      CheckboxListTile(
+                        value: selected.contains(type),
+                        onChanged: (value) async {
+                          final next = value ?? false;
+                          setSheetState(() {
+                            if (next) {
+                              selected.add(type);
+                            } else {
+                              selected.remove(type);
+                            }
+                          });
+                          await onTypeToggle(type, next);
+                        },
+                        secondary: Icon(CalendarItemVisuals.iconFor(type)),
+                        title: Text(_typeLabel(type)),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    const Divider(height: 12),
+                    SwitchListTile(
+                      value: highOnly,
+                      onChanged: (value) async {
+                        setSheetState(() => highOnly = value);
+                        await onHighOnlyToggle(value);
+                      },
+                      secondary: const Icon(Icons.priority_high_rounded),
+                      title: const Text('Prioridad alta'),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _typeLabel(CalendarType type) {
+    switch (type) {
+      case CalendarType.task:
+        return 'Tareas';
+      case CalendarType.study:
+        return 'Estudio';
+      case CalendarType.gym:
+        return 'Gimnasio';
+      case CalendarType.finance:
+        return 'Pagos';
+      case CalendarType.food:
+        return 'Comidas';
+      case CalendarType.other:
+        return 'Otros';
+    }
   }
 }
 

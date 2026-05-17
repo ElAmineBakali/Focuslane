@@ -21,6 +21,7 @@ class FocusSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return TextField(
       controller: controller,
@@ -30,13 +31,13 @@ class FocusSearchField extends StatelessWidget {
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: const Icon(Icons.search_rounded, size: 20),
-        prefixIconConstraints: const BoxConstraints(minWidth: 40),
+        prefixIcon: Icon(Icons.search_rounded, size: compact ? 18 : 20),
+        prefixIconConstraints: BoxConstraints(minWidth: compact ? 34 : 40),
         filled: true,
         fillColor: scheme.surfaceContainerLowest,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 10,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: compact ? 10 : 12,
+          vertical: compact ? 8 : 10,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(FocuslaneTokens.radius8),

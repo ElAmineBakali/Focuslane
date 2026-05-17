@@ -19,14 +19,21 @@ class ResponsiveGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final columns = (width / minItemWidth).floor().clamp(1, 4);
+        final compact = FocuslaneTokens.isCompact(context);
+        final effectiveSpacing =
+            compact ? FocuslaneTokens.gridGapFor(context, spacing) : spacing;
+        final mobileColumns = width >= 340 && minItemWidth <= 220 ? 2 : 1;
+        final columns =
+            compact
+                ? mobileColumns
+                : (width / minItemWidth).floor().clamp(1, 4).toInt();
         return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
+          spacing: effectiveSpacing,
+          runSpacing: effectiveSpacing,
           children: [
             for (final child in children)
               SizedBox(
-                width: (width - spacing * (columns - 1)) / columns,
+                width: (width - effectiveSpacing * (columns - 1)) / columns,
                 child: child,
               ),
           ],

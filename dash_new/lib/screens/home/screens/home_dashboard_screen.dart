@@ -112,6 +112,7 @@ class _HomeDashboardContent extends StatelessWidget {
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 760;
         final isDesktop = constraints.maxWidth >= 1180;
+        final pageGap = FocuslaneTokens.pageGapFor(context);
 
         return SingleChildScrollView(
           child: PageContainer(
@@ -124,9 +125,9 @@ class _HomeDashboardContent extends StatelessWidget {
                   phrase: controller.motivationalPhraseFor(summary.today),
                   onRoute: onRoute,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: pageGap),
                 _StatsGrid(summary: summary, onRoute: onRoute),
-                const SizedBox(height: 24),
+                SizedBox(height: pageGap),
                 if (isDesktop)
                   _DesktopBento(summary: summary, onRoute: onRoute)
                 else
@@ -135,7 +136,7 @@ class _HomeDashboardContent extends StatelessWidget {
                     onRoute: onRoute,
                     isMobile: isMobile,
                   ),
-                const SizedBox(height: 24),
+                SizedBox(height: pageGap),
                 _QuickAccessSection(onRoute: onRoute),
               ],
             ),
@@ -207,7 +208,7 @@ class _WelcomeHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -341,13 +342,13 @@ class _StackedBento extends StatelessWidget {
       return Column(
         children: [
           _TodayTasksCard(summary: summary, onRoute: onRoute),
-          const SizedBox(height: 16),
+          SizedBox(height: FocuslaneTokens.pageGapFor(context)),
           _WeeklyProgressCard(summary: summary),
-          const SizedBox(height: 16),
+          SizedBox(height: FocuslaneTokens.pageGapFor(context)),
           _HabitsCard(summary: summary),
-          const SizedBox(height: 16),
+          SizedBox(height: FocuslaneTokens.pageGapFor(context)),
           _UpcomingEventsCard(summary: summary),
-          const SizedBox(height: 16),
+          SizedBox(height: FocuslaneTokens.pageGapFor(context)),
           _RecentNotesCard(summary: summary, onRoute: onRoute),
         ],
       );
@@ -408,7 +409,7 @@ class _TodayTasksCard extends StatelessWidget {
               child: const Text('Ver todas'),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           if (tasks.isEmpty)
             const _InlineEmptyState(
               icon: Icons.task_alt_rounded,
@@ -523,7 +524,7 @@ class _WeeklyProgressCard extends StatelessWidget {
             subtitle: 'Lunes a domingo',
             icon: Icons.trending_up_rounded,
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           Center(
             child: FocusProgressRing(
               value: progress,
@@ -531,7 +532,7 @@ class _WeeklyProgressCard extends StatelessWidget {
               color: scheme.primary,
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           _MetricLine(
             label: 'Habitos',
             value:
@@ -566,7 +567,7 @@ class _HabitsCard extends StatelessWidget {
             subtitle: 'Estado de hoy',
             icon: Icons.repeat_rounded,
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           if (habits.isEmpty)
             const _InlineEmptyState(
               icon: Icons.repeat_rounded,
@@ -654,7 +655,7 @@ class _UpcomingEventsCard extends StatelessWidget {
             subtitle: 'Agenda cercana',
             icon: Icons.calendar_month_rounded,
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           if (events.isEmpty)
             const _InlineEmptyState(
               icon: Icons.event_available_rounded,
@@ -769,7 +770,7 @@ class _RecentNotesCard extends StatelessWidget {
               child: const Text('Abrir'),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: FocuslaneTokens.sectionGapFor(context)),
           if (notes.isEmpty)
             const _InlineEmptyState(
               icon: Icons.note_add_rounded,
@@ -824,7 +825,7 @@ class _QuickAccessSection extends StatelessWidget {
           subtitle: 'Entradas directas a los modulos principales',
           icon: Icons.grid_view_rounded,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: FocuslaneTokens.pageGapFor(context)),
         ResponsiveGrid(
           minItemWidth: 180,
           spacing: 16,

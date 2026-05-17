@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focuslane/design/ui/tokens/focuslane_tokens.dart';
 
 class AuthHeader extends StatelessWidget {
   const AuthHeader({super.key, required this.title, required this.subtitle});
@@ -10,13 +11,14 @@ class AuthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 54,
-          height: 54,
+          width: compact ? 46 : 54,
+          height: compact ? 46 : 54,
           decoration: BoxDecoration(
             color: scheme.primary,
             borderRadius: BorderRadius.circular(14),
@@ -31,10 +33,10 @@ class AuthHeader extends StatelessWidget {
           child: Icon(
             Icons.psychology_rounded,
             color: scheme.onPrimary,
-            size: 28,
+            size: compact ? 24 : 28,
           ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: compact ? 10 : 14),
         Text(
           'FocusLane',
           textAlign: TextAlign.center,
@@ -43,17 +45,18 @@ class AuthHeader extends StatelessWidget {
             fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: compact ? 4 : 6),
         Text(
           title,
           textAlign: TextAlign.center,
-          style: textTheme.headlineSmall?.copyWith(
-            color: scheme.onSurface,
-            fontWeight: FontWeight.w900,
-            height: 1.12,
-          ),
+          style: (compact ? textTheme.titleLarge : textTheme.headlineSmall)
+              ?.copyWith(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w900,
+                height: 1.12,
+              ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: compact ? 6 : 8),
         Text(
           subtitle,
           textAlign: TextAlign.center,

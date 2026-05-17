@@ -22,6 +22,7 @@ class CalendarMonthView extends StatelessWidget {
     this.monthRowHeight = 42,
     this.dayListHeaderHeight = 48,
     this.dayListBodyHeight = 190,
+    this.usePageScroll = false,
   });
 
   final DateTime focusedDay;
@@ -39,6 +40,7 @@ class CalendarMonthView extends StatelessWidget {
   final double monthRowHeight;
   final double dayListHeaderHeight;
   final double dayListBodyHeight;
+  final bool usePageScroll;
 
   @override
   Widget build(BuildContext context) {
@@ -192,45 +194,55 @@ class CalendarMonthView extends StatelessWidget {
       child: calendar,
     );
 
-    final dayPanel = SizedBox(
-      height: dayListHeaderHeight + dayListBodyHeight + 1,
-      child: FocusCard(
-        padding: EdgeInsets.zero,
-        backgroundColor: colorScheme.surfaceContainerLowest,
-        child: Column(
+    Widget dayHeader() {
+      return SizedBox(
+        height: dayListHeaderHeight,
+        child: Row(
           children: [
-            SizedBox(
-              height: dayListHeaderHeight,
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.event_note_rounded,
-                    size: 20,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Eventos del ${humanDate(selectedDay)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  FocusBadge(
-                    label: '${selectedItems.length}',
-                    color: colorScheme.secondary,
-                  ),
-                  const SizedBox(width: 12),
-                ],
+            const SizedBox(width: 16),
+            Icon(
+              Icons.event_note_rounded,
+              size: 20,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Eventos del ${humanDate(selectedDay)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-            const Divider(height: 1),
+            const SizedBox(width: 12),
+            FocusBadge(
+              label: '${selectedItems.length}',
+              color: colorScheme.secondary,
+            ),
+            const SizedBox(width: 12),
+          ],
+        ),
+      );
+    }
+
+    final dayPanel = FocusCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: colorScheme.surfaceContainerLowest,
+      child: Column(
+        mainAxisSize: usePageScroll ? MainAxisSize.min : MainAxisSize.max,
+        children: [
+          dayHeader(),
+          const Divider(height: 1),
+          if (usePageScroll)
+            CalendarDayItemList(
+              items: selectedItems,
+              onTap: onTapItem,
+              onDelete: onDeletePlanner,
+            )
+          else
             SizedBox(
               height: dayListBodyHeight,
               child: CalendarDayItemList(
@@ -240,14 +252,30 @@ class CalendarMonthView extends StatelessWidget {
                 scrollable: true,
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final isCompactHeight = constraints.maxHeight < 760;
+
+        if (usePageScroll) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CalendarFilterChips(
+                prefs: prefs,
+                onTypeToggle: onTypeToggle,
+                onHighOnlyToggle: onHighOnlyToggle,
+              ),
+              const SizedBox(height: 12),
+              monthCard,
+              const SizedBox(height: 12),
+              dayPanel,
+            ],
+          );
+        }
 
         if (isCompactHeight) {
           return ListView(
@@ -261,7 +289,10 @@ class CalendarMonthView extends StatelessWidget {
               const SizedBox(height: 12),
               monthCard,
               const SizedBox(height: 12),
-              dayPanel,
+              SizedBox(
+                height: dayListHeaderHeight + dayListBodyHeight + 1,
+                child: dayPanel,
+              ),
               SizedBox(height: 16 + bottomPadding),
             ],
           );
@@ -277,7 +308,10 @@ class CalendarMonthView extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(child: monthCard),
             const SizedBox(height: 12),
-            dayPanel,
+            SizedBox(
+              height: dayListHeaderHeight + dayListBodyHeight + 1,
+              child: dayPanel,
+            ),
             SizedBox(height: 16 + bottomPadding),
           ],
         );

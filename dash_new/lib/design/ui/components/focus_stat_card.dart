@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/focuslane_tokens.dart';
 import 'focus_card.dart';
 
 class FocusStatCard extends StatelessWidget {
@@ -24,23 +25,24 @@ class FocusStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tone = color ?? scheme.primary;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return FocusCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(compact ? 12 : 18),
       child: Row(
         children: [
           if (icon != null) ...[
             Container(
-              width: 42,
-              height: 42,
+              width: compact ? 34 : 42,
+              height: compact ? 34 : 42,
               decoration: BoxDecoration(
                 color: tone.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: tone, size: 22),
+              child: Icon(icon, color: tone, size: compact ? 18 : 22),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: compact ? 10 : 14),
           ],
           Expanded(
             child: Column(
@@ -59,10 +61,13 @@ class FocusStatCard extends StatelessWidget {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: scheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: (compact
+                          ? Theme.of(context).textTheme.titleLarge
+                          : Theme.of(context).textTheme.headlineSmall)
+                      ?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 3),

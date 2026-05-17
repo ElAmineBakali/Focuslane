@@ -23,36 +23,39 @@ class FocusEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tone = color ?? FocuslaneTokens.accent(context);
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(FocuslaneTokens.spacing16),
+        padding: EdgeInsets.all(compact ? 12 : FocuslaneTokens.spacing16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: tone.withOpacity(0.35)),
-            const SizedBox(height: FocuslaneTokens.spacing12),
+            Icon(
+              icon,
+              size: compact ? 48 : 64,
+              color: tone.withValues(alpha: 0.35),
+            ),
+            SizedBox(height: compact ? 10 : FocuslaneTokens.spacing12),
             Text(
               message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: cs.onSurfaceVariant),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
-              const SizedBox(height: FocuslaneTokens.spacing8),
+              SizedBox(height: compact ? 6 : FocuslaneTokens.spacing8),
               Text(
                 subtitle!,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: cs.onSurfaceVariant.withOpacity(0.8)),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant.withValues(alpha: 0.8),
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: FocuslaneTokens.spacing12),
+              SizedBox(height: compact ? 10 : FocuslaneTokens.spacing12),
               FilledButton.icon(
                 onPressed: onAction,
                 icon: const Icon(Icons.add),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:focuslane/core/services/module_visibility_service.dart';
+import 'package:focuslane/design/ui/focuslane_ui.dart';
 
 class ModulesScreen extends StatefulWidget {
   const ModulesScreen({super.key});
@@ -37,14 +38,14 @@ class _ModulesScreenState extends State<ModulesScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Módulos')),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: FocuslaneTokens.pagePaddingFor(context),
         child:
             _loading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(18),
+                      padding: FocuslaneTokens.cardPaddingFor(context),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(24),
                         color: colorScheme.surface,
@@ -67,7 +68,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: FocuslaneTokens.pageGapFor(context)),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(24),
@@ -136,14 +137,18 @@ class _ModuleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final compact = FocuslaneTokens.isCompact(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 18,
+        vertical: compact ? 8 : 10,
+      ),
       child: Row(
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: compact ? 38 : 46,
+            height: compact ? 38 : 46,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               color:
@@ -159,7 +164,7 @@ class _ModuleTile extends StatelessWidget {
                       : colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: compact ? 10 : 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
